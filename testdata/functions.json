@@ -1,0 +1,259 @@
+{
+  "worlds": {
+    "arena_id": 0,
+    "items": []
+  },
+  "interfaces": {
+    "arena_id": 1,
+    "items": [
+      {
+        "name": "functions",
+        "docs": {
+          "contents": null
+        },
+        "types": {},
+        "functions": {
+          "f1": {
+            "docs": {
+              "contents": null
+            },
+            "name": "f1",
+            "kind": "Freestanding",
+            "params": [],
+            "results": {
+              "Named": []
+            }
+          },
+          "f2": {
+            "docs": {
+              "contents": null
+            },
+            "name": "f2",
+            "kind": "Freestanding",
+            "params": [
+              [
+                "a",
+                "U32"
+              ]
+            ],
+            "results": {
+              "Named": []
+            }
+          },
+          "f3": {
+            "docs": {
+              "contents": null
+            },
+            "name": "f3",
+            "kind": "Freestanding",
+            "params": [
+              [
+                "a",
+                "U32"
+              ]
+            ],
+            "results": {
+              "Named": []
+            }
+          },
+          "f4": {
+            "docs": {
+              "contents": null
+            },
+            "name": "f4",
+            "kind": "Freestanding",
+            "params": [],
+            "results": {
+              "Anon": "U32"
+            }
+          },
+          "f6": {
+            "docs": {
+              "contents": null
+            },
+            "name": "f6",
+            "kind": "Freestanding",
+            "params": [],
+            "results": {
+              "Anon": {
+                "Id": {
+                  "idx": 0,
+                  "arena_id": 2
+                }
+              }
+            }
+          },
+          "f7": {
+            "docs": {
+              "contents": null
+            },
+            "name": "f7",
+            "kind": "Freestanding",
+            "params": [
+              [
+                "a",
+                "Float32"
+              ],
+              [
+                "b",
+                "Float32"
+              ]
+            ],
+            "results": {
+              "Anon": {
+                "Id": {
+                  "idx": 0,
+                  "arena_id": 2
+                }
+              }
+            }
+          },
+          "f8": {
+            "docs": {
+              "contents": null
+            },
+            "name": "f8",
+            "kind": "Freestanding",
+            "params": [
+              [
+                "a",
+                {
+                  "Id": {
+                    "idx": 1,
+                    "arena_id": 2
+                  }
+                }
+              ]
+            ],
+            "results": {
+              "Anon": {
+                "Id": {
+                  "idx": 2,
+                  "arena_id": 2
+                }
+              }
+            }
+          },
+          "f9": {
+            "docs": {
+              "contents": null
+            },
+            "name": "f9",
+            "kind": "Freestanding",
+            "params": [],
+            "results": {
+              "Named": [
+                [
+                  "u",
+                  "U32"
+                ],
+                [
+                  "f",
+                  "Float32"
+                ]
+              ]
+            }
+          },
+          "f10": {
+            "docs": {
+              "contents": null
+            },
+            "name": "f10",
+            "kind": "Freestanding",
+            "params": [],
+            "results": {
+              "Named": [
+                [
+                  "u",
+                  "U32"
+                ]
+              ]
+            }
+          },
+          "f11": {
+            "docs": {
+              "contents": null
+            },
+            "name": "f11",
+            "kind": "Freestanding",
+            "params": [],
+            "results": {
+              "Named": []
+            }
+          }
+        },
+        "package": {
+          "idx": 0,
+          "arena_id": 3
+        }
+      }
+    ]
+  },
+  "types": {
+    "arena_id": 2,
+    "items": [
+      {
+        "docs": {
+          "contents": null
+        },
+        "kind": {
+          "Tuple": {
+            "types": [
+              "U32",
+              "U32"
+            ]
+          }
+        },
+        "name": null,
+        "owner": "None"
+      },
+      {
+        "docs": {
+          "contents": null
+        },
+        "kind": {
+          "Option": "U32"
+        },
+        "name": null,
+        "owner": "None"
+      },
+      {
+        "docs": {
+          "contents": null
+        },
+        "kind": {
+          "Result": {
+            "ok": "U32",
+            "err": "Float32"
+          }
+        },
+        "name": null,
+        "owner": "None"
+      }
+    ]
+  },
+  "packages": {
+    "arena_id": 3,
+    "items": [
+      {
+        "name": "foo:functions",
+        "docs": {
+          "contents": null
+        },
+        "interfaces": {
+          "functions": {
+            "idx": 0,
+            "arena_id": 1
+          }
+        },
+        "worlds": {}
+      }
+    ]
+  },
+  "package_names": {
+    "foo:functions": {
+      "idx": 0,
+      "arena_id": 3
+    }
+  }
+}
