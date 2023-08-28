@@ -23,7 +23,7 @@ func DecodeJSON(r io.Reader) (*Resolve, error) {
 
 func (res *Resolve) UnmarshalJSON(data []byte) error {
 	type arena[T any] struct {
-		Items items[T] `json:"items"`
+		Items UnmarshalJSONFunc `json:"items"`
 	}
 
 	var proxy struct {
@@ -32,14 +32,11 @@ func (res *Resolve) UnmarshalJSON(data []byte) error {
 		Types      arena[TypeDef]   `json:"types"`
 		Packages   arena[Package]   `json:"packages"`
 	}
-	proxy.Worlds.Items.res = res
-	proxy.Worlds.Items.items = &res.Worlds
-	proxy.Interfaces.Items.res = res
-	proxy.Interfaces.Items.items = &res.Interfaces
-	proxy.Types.Items.res = res
-	proxy.Types.Items.items = &res.Types
-	proxy.Packages.Items.res = res
-	proxy.Packages.Items.items = &res.Packages
+
+	proxy.Worlds.Items = UnmarshalJSONFunc(func(data []byte) error {
+		return nil
+	})
+
 	return json.Unmarshal(data, &proxy)
 }
 
@@ -50,4 +47,10 @@ type items[T any] struct {
 
 func (dec *items[T]) UnmarshalJSON() error {
 	return nil
+}
+
+type UnmarshalJSONFunc func(data []byte) error
+
+func (f UnmarshalJSONFunc) UnmarshalJSON(data []byte) error {
+	return f(data)
 }
