@@ -8,69 +8,75 @@ import (
 )
 
 func DecodeJSON(r io.Reader) (*Resolve, error) {
-	res := &Resolve{}
+	dec := &decodeState{
+		dec: json.NewDecoder(r),
+		res: &Resolve{},
+	}
+	dec.dec.UseNumber()
 
-	dec := json.NewDecoder(r)
-	dec.UseNumber()
-
-	err := decodeResolve(dec, res)
+	err := dec.decodeResolve()
 	if err != nil {
 		return nil, err
 	}
 
-	return res, nil
+	return dec.res, nil
 }
 
-func decodeResolve(dec *json.Decoder, res *Resolve) error {
-	return wjson.DecodeObject(dec, func(key string) error {
+type decodeState struct {
+	dec *json.Decoder
+	res *Resolve
+}
+
+func (dec *decodeState) decodeResolve() error {
+	return wjson.DecodeObject(dec.dec, func(key string) error {
 		switch key {
 		case "worlds":
-			return decodeResolveItem(dec, res, func(i int) error {
-				return decodeWorld(dec, res, element(&res.Worlds, i))
+			return dec.decodeResolveItem(func(i int) error {
+				return dec.decodeWorld(element(&dec.res.Worlds, i))
 			})
 		case "interfaces":
-			return decodeResolveItem(dec, res, func(i int) error {
-				return decodeInterface(dec, res, element(&res.Interfaces, i))
+			return dec.decodeResolveItem(func(i int) error {
+				return dec.decodeInterface(element(&dec.res.Interfaces, i))
 			})
 		case "types":
-			return decodeResolveItem(dec, res, func(i int) error {
-				return decodeTypeDef(dec, res, element(&res.Types, i))
+			return dec.decodeResolveItem(func(i int) error {
+				return dec.decodeTypeDef(element(&dec.res.Types, i))
 			})
 		case "packages":
-			return decodeResolveItem(dec, res, func(i int) error {
-				return decodePackage(dec, res, element(&res.Packages, i))
+			return dec.decodeResolveItem(func(i int) error {
+				return dec.decodePackage(element(&dec.res.Packages, i))
 			})
 		default:
-			return wjson.Ignore(dec)
+			return wjson.Ignore(dec.dec)
 		}
 	})
 }
 
-func decodeResolveItem(dec *json.Decoder, res *Resolve, f func(i int) error) error {
-	return wjson.DecodeObject(dec, func(key string) error {
+func (dec *decodeState) decodeResolveItem(f func(i int) error) error {
+	return wjson.DecodeObject(dec.dec, func(key string) error {
 		switch key {
 		case "items":
-			return wjson.DecodeArray(dec, f)
+			return wjson.DecodeArray(dec.dec, f)
 		default:
-			return wjson.Ignore(dec)
+			return wjson.Ignore(dec.dec)
 		}
 	})
 }
 
-func decodeWorld(dec *json.Decoder, res *Resolve, world *World) error {
-	return wjson.Ignore(dec)
+func (dec *decodeState) decodeWorld(world *World) error {
+	return wjson.Ignore(dec.dec)
 }
 
-func decodeInterface(dec *json.Decoder, res *Resolve, iface *Interface) error {
-	return wjson.Ignore(dec)
+func (dec *decodeState) decodeInterface(iface *Interface) error {
+	return wjson.Ignore(dec.dec)
 }
 
-func decodeTypeDef(dec *json.Decoder, res *Resolve, typ *TypeDef) error {
-	return wjson.Ignore(dec)
+func (dec *decodeState) decodeTypeDef(typ *TypeDef) error {
+	return wjson.Ignore(dec.dec)
 }
 
-func decodePackage(dec *json.Decoder, res *Resolve, pkg *Package) error {
-	return wjson.Ignore(dec)
+func (dec *decodeState) decodePackage(pkg *Package) error {
+	return wjson.Ignore(dec.dec)
 }
 
 // element returns the value of slice s at index i,
