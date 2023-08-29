@@ -1,23 +1,5 @@
 package wit
 
-// element returns the value of slice s at index i,
-// reallocating the slice if necessary. s must be a slice
-// of pointers, because the underlying backing to s might
-// change when reallocated.
-// If the value at s[i] is nil, a new *E will be allocated.
-func element[S ~[]*E, E any](s *S, i int) *E {
-	if i < 0 {
-		return nil
-	}
-	if i >= len(*s) {
-		*s = append(*s, make([]*E, i-len(*s))...)
-	}
-	if (*s)[i] == nil {
-		(*s)[i] = new(E)
-	}
-	return (*s)[i]
-}
-
 type Resolve struct {
 	Worlds     []*World
 	Interfaces []*Interface
