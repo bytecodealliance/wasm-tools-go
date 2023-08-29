@@ -1,12 +1,5 @@
 package wit
 
-type Resolve struct {
-	Worlds     []*World
-	Interfaces []*Interface
-	Types      []*TypeDef
-	Packages   []*Package
-}
-
 // element returns the value of slice s at index i,
 // reallocating the slice if necessary. s must be a slice
 // of pointers, because the underlying backing to s might
@@ -23,6 +16,13 @@ func element[S ~[]*E, E any](s *S, i int) *E {
 		(*s)[i] = new(E)
 	}
 	return (*s)[i]
+}
+
+type Resolve struct {
+	Worlds     []*World
+	Interfaces []*Interface
+	Types      []*TypeDef
+	Packages   []*Package
 }
 
 type World struct {

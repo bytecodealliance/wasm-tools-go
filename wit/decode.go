@@ -2,49 +2,54 @@ package wit
 
 import (
 	"encoding/json"
-	"errors"
 	"io"
+
+	"github.com/ydnar/wit-bindgen-go/internal/wjson"
 )
 
 func DecodeJSON(r io.Reader) (*Resolve, error) {
+	res := &Resolve{}
+
 	dec := json.NewDecoder(r)
 	dec.UseNumber()
 
-	res := &Resolve{}
-	tok, err := dec.Token()
+	err := decodeResolve(dec, res)
 	if err != nil {
 		return nil, err
 	}
-	if d, ok := tok.(json.Delim); !ok || d != '{' {
-		return nil, errors.New("missing {")
-	}
+
 	return res, nil
 }
 
-func (res *Resolve) UnmarshalJSON(data []byte) error {
-	type arena[T any] struct {
-		Items unmarshalJSONFunc `json:"items"`
-	}
-
-	var proxy struct {
-		Worlds     arena[World]     `json:"worlds"`
-		Interfaces arena[Interface] `json:"interfaces"`
-		Types      arena[TypeDef]   `json:"types"`
-		Packages   arena[Package]   `json:"packages"`
-	}
-
-	proxy.Worlds.Items = unmarshalJSONFunc(func(data []byte) error {
-		return nil
+func decodeResolve(dec *json.Decoder, res *Resolve) error {
+	return wjson.DecodeObject(dec, func(worldKey string) error {
+		switch worldKey {
+		case "worlds":
+			return decodeResolveItem(dec, res, &res.Worlds)
+		case "interfaces":
+			return decodeResolveItem(dec, res, &res.Interfaces)
+		case "types":
+			return decodeResolveItem(dec, res, &res.Types)
+		case "packages":
+			return decodeResolveItem(dec, res, &res.Packages)
+		default:
+			return wjson.Ignore(dec)
+		}
 	})
-
-	return json.Unmarshal(data, &proxy)
 }
 
-type items[T any] struct {
-	res   *Resolve
-	items *[]*T
-}
-
-func (dec *items[T]) UnmarshalJSON() error {
-	return nil
+func decodeResolveItem[S ~[]*E, E any](dec *json.Decoder, res *Resolve, s *S) error {
+	return wjson.DecodeObject(dec, func(key string) error {
+		switch key {
+		case "items":
+			return wjson.DecodeArray(dec, func(i int) error {
+				// TODO: decode an item
+				e := element(s, i)
+				_ = e
+				return nil
+			})
+		default:
+			return wjson.Ignore(dec)
+		}
+	})
 }
