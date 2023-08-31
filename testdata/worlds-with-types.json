@@ -1,376 +1,245 @@
 {
-  "worlds": {
-    "arena_id": 0,
-    "items": [
-      {
-        "name": "foo",
-        "docs": {
-          "contents": null
+  "worlds": [
+    {
+      "name": "foo",
+      "docs": {
+        "contents": null
+      },
+      "imports": {
+        "a": {
+          "Type": 1
         },
-        "imports": {
-          "a": {
-            "Type": {
-              "idx": 1,
-              "arena_id": 2
-            }
-          },
-          "b": {
-            "Type": {
-              "idx": 2,
-              "arena_id": 2
+        "b": {
+          "Type": 2
+        }
+      },
+      "exports": {
+        "c": {
+          "Function": {
+            "docs": {
+              "contents": null
+            },
+            "name": "c",
+            "kind": "Freestanding",
+            "params": [
+              [
+                "a",
+                1
+              ]
+            ],
+            "results": {
+              "Anon": 2
             }
           }
+        }
+      },
+      "package": 0
+    },
+    {
+      "name": "bar",
+      "docs": {
+        "contents": null
+      },
+      "imports": {
+        "interface-0": {
+          "Interface": 0
         },
-        "exports": {
-          "c": {
-            "Function": {
+        "t": {
+          "Type": 3
+        }
+      },
+      "exports": {
+        "foo": {
+          "Function": {
+            "docs": {
+              "contents": null
+            },
+            "name": "foo",
+            "kind": "Freestanding",
+            "params": [],
+            "results": {
+              "Anon": 3
+            }
+          }
+        }
+      },
+      "package": 0
+    },
+    {
+      "name": "the-test",
+      "docs": {
+        "contents": null
+      },
+      "imports": {
+        "a": {
+          "Type": 4
+        },
+        "b": {
+          "Type": 5
+        },
+        "foo": {
+          "Function": {
+            "docs": {
+              "contents": null
+            },
+            "name": "foo",
+            "kind": "Freestanding",
+            "params": [
+              [
+                "a",
+                4
+              ]
+            ],
+            "results": {
+              "Anon": 5
+            }
+          }
+        }
+      },
+      "exports": {
+        "bar": {
+          "Function": {
+            "docs": {
+              "contents": null
+            },
+            "name": "bar",
+            "kind": "Freestanding",
+            "params": [
+              [
+                "a",
+                4
+              ]
+            ],
+            "results": {
+              "Anon": 5
+            }
+          }
+        }
+      },
+      "package": 0
+    }
+  ],
+  "interfaces": [
+    {
+      "name": "disambiguate",
+      "docs": {
+        "contents": null
+      },
+      "types": {
+        "t": 0
+      },
+      "functions": {},
+      "package": 0
+    }
+  ],
+  "types": [
+    {
+      "docs": {
+        "contents": null
+      },
+      "kind": {
+        "Type": "U32"
+      },
+      "name": "t",
+      "owner": {
+        "Interface": 0
+      }
+    },
+    {
+      "docs": {
+        "contents": null
+      },
+      "kind": {
+        "Type": "U32"
+      },
+      "name": "a",
+      "owner": {
+        "World": 0
+      }
+    },
+    {
+      "docs": {
+        "contents": null
+      },
+      "kind": {
+        "Type": 1
+      },
+      "name": "b",
+      "owner": {
+        "World": 0
+      }
+    },
+    {
+      "docs": {
+        "contents": null
+      },
+      "kind": {
+        "Type": 0
+      },
+      "name": "t",
+      "owner": {
+        "World": 1
+      }
+    },
+    {
+      "docs": {
+        "contents": null
+      },
+      "kind": {
+        "Record": {
+          "fields": [
+            {
+              "docs": {
+                "contents": null
+              },
+              "name": "x",
+              "ty": "U32"
+            }
+          ]
+        }
+      },
+      "name": "a",
+      "owner": {
+        "World": 2
+      }
+    },
+    {
+      "docs": {
+        "contents": null
+      },
+      "kind": {
+        "Variant": {
+          "cases": [
+            {
               "docs": {
                 "contents": null
               },
               "name": "c",
-              "kind": "Freestanding",
-              "params": [
-                [
-                  "a",
-                  {
-                    "Id": {
-                      "idx": 1,
-                      "arena_id": 2
-                    }
-                  }
-                ]
-              ],
-              "results": {
-                "Anon": {
-                  "Id": {
-                    "idx": 2,
-                    "arena_id": 2
-                  }
-                }
-              }
+              "ty": 4
             }
-          }
-        },
-        "package": {
-          "idx": 0,
-          "arena_id": 3
+          ]
         }
       },
-      {
-        "name": "bar",
-        "docs": {
-          "contents": null
-        },
-        "imports": {
-          "interface-0": {
-            "Interface": {
-              "idx": 0,
-              "arena_id": 1
-            }
-          },
-          "t": {
-            "Type": {
-              "idx": 3,
-              "arena_id": 2
-            }
-          }
-        },
-        "exports": {
-          "foo": {
-            "Function": {
-              "docs": {
-                "contents": null
-              },
-              "name": "foo",
-              "kind": "Freestanding",
-              "params": [],
-              "results": {
-                "Anon": {
-                  "Id": {
-                    "idx": 3,
-                    "arena_id": 2
-                  }
-                }
-              }
-            }
-          }
-        },
-        "package": {
-          "idx": 0,
-          "arena_id": 3
-        }
-      },
-      {
-        "name": "the-test",
-        "docs": {
-          "contents": null
-        },
-        "imports": {
-          "a": {
-            "Type": {
-              "idx": 4,
-              "arena_id": 2
-            }
-          },
-          "b": {
-            "Type": {
-              "idx": 5,
-              "arena_id": 2
-            }
-          },
-          "foo": {
-            "Function": {
-              "docs": {
-                "contents": null
-              },
-              "name": "foo",
-              "kind": "Freestanding",
-              "params": [
-                [
-                  "a",
-                  {
-                    "Id": {
-                      "idx": 4,
-                      "arena_id": 2
-                    }
-                  }
-                ]
-              ],
-              "results": {
-                "Anon": {
-                  "Id": {
-                    "idx": 5,
-                    "arena_id": 2
-                  }
-                }
-              }
-            }
-          }
-        },
-        "exports": {
-          "bar": {
-            "Function": {
-              "docs": {
-                "contents": null
-              },
-              "name": "bar",
-              "kind": "Freestanding",
-              "params": [
-                [
-                  "a",
-                  {
-                    "Id": {
-                      "idx": 4,
-                      "arena_id": 2
-                    }
-                  }
-                ]
-              ],
-              "results": {
-                "Anon": {
-                  "Id": {
-                    "idx": 5,
-                    "arena_id": 2
-                  }
-                }
-              }
-            }
-          }
-        },
-        "package": {
-          "idx": 0,
-          "arena_id": 3
-        }
+      "name": "b",
+      "owner": {
+        "World": 2
       }
-    ]
-  },
-  "interfaces": {
-    "arena_id": 1,
-    "items": [
-      {
-        "name": "disambiguate",
-        "docs": {
-          "contents": null
-        },
-        "types": {
-          "t": {
-            "idx": 0,
-            "arena_id": 2
-          }
-        },
-        "functions": {},
-        "package": {
-          "idx": 0,
-          "arena_id": 3
-        }
-      }
-    ]
-  },
-  "types": {
-    "arena_id": 2,
-    "items": [
-      {
-        "docs": {
-          "contents": null
-        },
-        "kind": {
-          "Type": "U32"
-        },
-        "name": "t",
-        "owner": {
-          "Interface": {
-            "idx": 0,
-            "arena_id": 1
-          }
-        }
-      },
-      {
-        "docs": {
-          "contents": null
-        },
-        "kind": {
-          "Type": "U32"
-        },
-        "name": "a",
-        "owner": {
-          "World": {
-            "idx": 0,
-            "arena_id": 0
-          }
-        }
-      },
-      {
-        "docs": {
-          "contents": null
-        },
-        "kind": {
-          "Type": {
-            "Id": {
-              "idx": 1,
-              "arena_id": 2
-            }
-          }
-        },
-        "name": "b",
-        "owner": {
-          "World": {
-            "idx": 0,
-            "arena_id": 0
-          }
-        }
-      },
-      {
-        "docs": {
-          "contents": null
-        },
-        "kind": {
-          "Type": {
-            "Id": {
-              "idx": 0,
-              "arena_id": 2
-            }
-          }
-        },
-        "name": "t",
-        "owner": {
-          "World": {
-            "idx": 1,
-            "arena_id": 0
-          }
-        }
-      },
-      {
-        "docs": {
-          "contents": null
-        },
-        "kind": {
-          "Record": {
-            "fields": [
-              {
-                "docs": {
-                  "contents": null
-                },
-                "name": "x",
-                "ty": "U32"
-              }
-            ]
-          }
-        },
-        "name": "a",
-        "owner": {
-          "World": {
-            "idx": 2,
-            "arena_id": 0
-          }
-        }
-      },
-      {
-        "docs": {
-          "contents": null
-        },
-        "kind": {
-          "Variant": {
-            "cases": [
-              {
-                "docs": {
-                  "contents": null
-                },
-                "name": "c",
-                "ty": {
-                  "Id": {
-                    "idx": 4,
-                    "arena_id": 2
-                  }
-                }
-              }
-            ]
-          }
-        },
-        "name": "b",
-        "owner": {
-          "World": {
-            "idx": 2,
-            "arena_id": 0
-          }
-        }
-      }
-    ]
-  },
-  "packages": {
-    "arena_id": 3,
-    "items": [
-      {
-        "name": "foo:foo",
-        "docs": {
-          "contents": null
-        },
-        "interfaces": {
-          "disambiguate": {
-            "idx": 0,
-            "arena_id": 1
-          }
-        },
-        "worlds": {
-          "foo": {
-            "idx": 0,
-            "arena_id": 0
-          },
-          "bar": {
-            "idx": 1,
-            "arena_id": 0
-          },
-          "the-test": {
-            "idx": 2,
-            "arena_id": 0
-          }
-        }
-      }
-    ]
-  },
-  "package_names": {
-    "foo:foo": {
-      "idx": 0,
-      "arena_id": 3
     }
-  }
+  ],
+  "packages": [
+    {
+      "name": "foo:foo",
+      "docs": {
+        "contents": null
+      },
+      "interfaces": {
+        "disambiguate": 0
+      },
+      "worlds": {
+        "foo": 0,
+        "bar": 1,
+        "the-test": 2
+      }
+    }
+  ]
 }
