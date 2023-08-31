@@ -22,14 +22,16 @@
             "name": "c",
             "kind": "Freestanding",
             "params": [
-              [
-                "a",
-                1
-              ]
+              {
+                "name": "a",
+                "type": 1
+              }
             ],
-            "results": {
-              "Anon": 2
-            }
+            "results": [
+              {
+                "type": 2
+              }
+            ]
           }
         }
       },
@@ -57,9 +59,11 @@
             "name": "foo",
             "kind": "Freestanding",
             "params": [],
-            "results": {
-              "Anon": 3
-            }
+            "results": [
+              {
+                "type": 3
+              }
+            ]
           }
         }
       },
@@ -85,14 +89,16 @@
             "name": "foo",
             "kind": "Freestanding",
             "params": [
-              [
-                "a",
-                4
-              ]
+              {
+                "name": "a",
+                "type": 4
+              }
             ],
-            "results": {
-              "Anon": 5
-            }
+            "results": [
+              {
+                "type": 5
+              }
+            ]
           }
         }
       },
@@ -105,14 +111,16 @@
             "name": "bar",
             "kind": "Freestanding",
             "params": [
-              [
-                "a",
-                4
-              ]
+              {
+                "name": "a",
+                "type": 4
+              }
             ],
-            "results": {
-              "Anon": 5
-            }
+            "results": [
+              {
+                "type": 5
+              }
+            ]
           }
         }
       },
