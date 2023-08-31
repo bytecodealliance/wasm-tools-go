@@ -1,259 +1,211 @@
 {
-  "worlds": {
-    "arena_id": 0,
-    "items": []
-  },
-  "interfaces": {
-    "arena_id": 1,
-    "items": [
-      {
-        "name": "functions",
-        "docs": {
-          "contents": null
+  "worlds": [],
+  "interfaces": [
+    {
+      "name": "functions",
+      "docs": {
+        "contents": null
+      },
+      "types": {},
+      "functions": {
+        "f1": {
+          "docs": {
+            "contents": null
+          },
+          "name": "f1",
+          "kind": "Freestanding",
+          "params": [],
+          "results": []
         },
-        "types": {},
-        "functions": {
-          "f1": {
-            "docs": {
-              "contents": null
-            },
-            "name": "f1",
-            "kind": "Freestanding",
-            "params": [],
-            "results": {
-              "Named": []
-            }
+        "f2": {
+          "docs": {
+            "contents": null
           },
-          "f2": {
-            "docs": {
-              "contents": null
-            },
-            "name": "f2",
-            "kind": "Freestanding",
-            "params": [
-              [
-                "a",
-                "U32"
-              ]
-            ],
-            "results": {
-              "Named": []
+          "name": "f2",
+          "kind": "Freestanding",
+          "params": [
+            {
+              "name": "a",
+              "type": "U32"
             }
-          },
-          "f3": {
-            "docs": {
-              "contents": null
-            },
-            "name": "f3",
-            "kind": "Freestanding",
-            "params": [
-              [
-                "a",
-                "U32"
-              ]
-            ],
-            "results": {
-              "Named": []
-            }
-          },
-          "f4": {
-            "docs": {
-              "contents": null
-            },
-            "name": "f4",
-            "kind": "Freestanding",
-            "params": [],
-            "results": {
-              "Anon": "U32"
-            }
-          },
-          "f6": {
-            "docs": {
-              "contents": null
-            },
-            "name": "f6",
-            "kind": "Freestanding",
-            "params": [],
-            "results": {
-              "Anon": {
-                "Id": {
-                  "idx": 0,
-                  "arena_id": 2
-                }
-              }
-            }
-          },
-          "f7": {
-            "docs": {
-              "contents": null
-            },
-            "name": "f7",
-            "kind": "Freestanding",
-            "params": [
-              [
-                "a",
-                "Float32"
-              ],
-              [
-                "b",
-                "Float32"
-              ]
-            ],
-            "results": {
-              "Anon": {
-                "Id": {
-                  "idx": 0,
-                  "arena_id": 2
-                }
-              }
-            }
-          },
-          "f8": {
-            "docs": {
-              "contents": null
-            },
-            "name": "f8",
-            "kind": "Freestanding",
-            "params": [
-              [
-                "a",
-                {
-                  "Id": {
-                    "idx": 1,
-                    "arena_id": 2
-                  }
-                }
-              ]
-            ],
-            "results": {
-              "Anon": {
-                "Id": {
-                  "idx": 2,
-                  "arena_id": 2
-                }
-              }
-            }
-          },
-          "f9": {
-            "docs": {
-              "contents": null
-            },
-            "name": "f9",
-            "kind": "Freestanding",
-            "params": [],
-            "results": {
-              "Named": [
-                [
-                  "u",
-                  "U32"
-                ],
-                [
-                  "f",
-                  "Float32"
-                ]
-              ]
-            }
-          },
-          "f10": {
-            "docs": {
-              "contents": null
-            },
-            "name": "f10",
-            "kind": "Freestanding",
-            "params": [],
-            "results": {
-              "Named": [
-                [
-                  "u",
-                  "U32"
-                ]
-              ]
-            }
-          },
-          "f11": {
-            "docs": {
-              "contents": null
-            },
-            "name": "f11",
-            "kind": "Freestanding",
-            "params": [],
-            "results": {
-              "Named": []
-            }
-          }
+          ],
+          "results": []
         },
-        "package": {
-          "idx": 0,
-          "arena_id": 3
+        "f3": {
+          "docs": {
+            "contents": null
+          },
+          "name": "f3",
+          "kind": "Freestanding",
+          "params": [
+            {
+              "name": "a",
+              "type": "U32"
+            }
+          ],
+          "results": []
+        },
+        "f4": {
+          "docs": {
+            "contents": null
+          },
+          "name": "f4",
+          "kind": "Freestanding",
+          "params": [],
+          "results": [
+            {
+              "type": "U32"
+            }
+          ]
+        },
+        "f6": {
+          "docs": {
+            "contents": null
+          },
+          "name": "f6",
+          "kind": "Freestanding",
+          "params": [],
+          "results": [
+            {
+              "type": 0
+            }
+          ]
+        },
+        "f7": {
+          "docs": {
+            "contents": null
+          },
+          "name": "f7",
+          "kind": "Freestanding",
+          "params": [
+            {
+              "name": "a",
+              "type": "Float32"
+            },
+            {
+              "name": "b",
+              "type": "Float32"
+            }
+          ],
+          "results": [
+            {
+              "type": 0
+            }
+          ]
+        },
+        "f8": {
+          "docs": {
+            "contents": null
+          },
+          "name": "f8",
+          "kind": "Freestanding",
+          "params": [
+            {
+              "name": "a",
+              "type": 1
+            }
+          ],
+          "results": [
+            {
+              "type": 2
+            }
+          ]
+        },
+        "f9": {
+          "docs": {
+            "contents": null
+          },
+          "name": "f9",
+          "kind": "Freestanding",
+          "params": [],
+          "results": [
+            {
+              "name": "u",
+              "type": "U32"
+            },
+            {
+              "name": "f",
+              "type": "Float32"
+            }
+          ]
+        },
+        "f10": {
+          "docs": {
+            "contents": null
+          },
+          "name": "f10",
+          "kind": "Freestanding",
+          "params": [],
+          "results": [
+            {
+              "name": "u",
+              "type": "U32"
+            }
+          ]
+        },
+        "f11": {
+          "docs": {
+            "contents": null
+          },
+          "name": "f11",
+          "kind": "Freestanding",
+          "params": [],
+          "results": []
         }
-      }
-    ]
-  },
-  "types": {
-    "arena_id": 2,
-    "items": [
-      {
-        "docs": {
-          "contents": null
-        },
-        "kind": {
-          "Tuple": {
-            "types": [
-              "U32",
-              "U32"
-            ]
-          }
-        },
-        "name": null,
-        "owner": "None"
       },
-      {
-        "docs": {
-          "contents": null
-        },
-        "kind": {
-          "Option": "U32"
-        },
-        "name": null,
-        "owner": "None"
-      },
-      {
-        "docs": {
-          "contents": null
-        },
-        "kind": {
-          "Result": {
-            "ok": "U32",
-            "err": "Float32"
-          }
-        },
-        "name": null,
-        "owner": "None"
-      }
-    ]
-  },
-  "packages": {
-    "arena_id": 3,
-    "items": [
-      {
-        "name": "foo:functions",
-        "docs": {
-          "contents": null
-        },
-        "interfaces": {
-          "functions": {
-            "idx": 0,
-            "arena_id": 1
-          }
-        },
-        "worlds": {}
-      }
-    ]
-  },
-  "package_names": {
-    "foo:functions": {
-      "idx": 0,
-      "arena_id": 3
+      "package": 0
     }
-  }
+  ],
+  "types": [
+    {
+      "docs": {
+        "contents": null
+      },
+      "kind": {
+        "tuple": {
+          "types": [
+            "U32",
+            "U32"
+          ]
+        }
+      },
+      "name": null,
+      "owner": "none"
+    },
+    {
+      "docs": {
+        "contents": null
+      },
+      "kind": {
+        "option": "U32"
+      },
+      "name": null,
+      "owner": "none"
+    },
+    {
+      "docs": {
+        "contents": null
+      },
+      "kind": {
+        "result": {
+          "ok": "U32",
+          "err": "Float32"
+        }
+      },
+      "name": null,
+      "owner": "none"
+    }
+  ],
+  "packages": [
+    {
+      "name": "foo:functions",
+      "docs": {
+        "contents": null
+      },
+      "interfaces": {
+        "functions": 0
+      },
+      "worlds": {}
+    }
+  ]
 }
