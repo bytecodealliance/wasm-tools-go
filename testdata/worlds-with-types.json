@@ -7,15 +7,15 @@
       },
       "imports": {
         "a": {
-          "Type": 1
+          "type": 1
         },
         "b": {
-          "Type": 2
+          "type": 2
         }
       },
       "exports": {
         "c": {
-          "Function": {
+          "function": {
             "docs": {
               "contents": null
             },
@@ -44,15 +44,15 @@
       },
       "imports": {
         "interface-0": {
-          "Interface": 0
+          "interface": 0
         },
         "t": {
-          "Type": 3
+          "type": 3
         }
       },
       "exports": {
         "foo": {
-          "Function": {
+          "function": {
             "docs": {
               "contents": null
             },
@@ -76,13 +76,13 @@
       },
       "imports": {
         "a": {
-          "Type": 4
+          "type": 4
         },
         "b": {
-          "Type": 5
+          "type": 5
         },
         "foo": {
-          "Function": {
+          "function": {
             "docs": {
               "contents": null
             },
@@ -104,7 +104,7 @@
       },
       "exports": {
         "bar": {
-          "Function": {
+          "function": {
             "docs": {
               "contents": null
             },
@@ -146,11 +146,11 @@
         "contents": null
       },
       "kind": {
-        "Type": "U32"
+        "type": "U32"
       },
       "name": "t",
       "owner": {
-        "Interface": 0
+        "interface": 0
       }
     },
     {
@@ -158,11 +158,11 @@
         "contents": null
       },
       "kind": {
-        "Type": "U32"
+        "type": "U32"
       },
       "name": "a",
       "owner": {
-        "World": 0
+        "world": 0
       }
     },
     {
@@ -170,11 +170,11 @@
         "contents": null
       },
       "kind": {
-        "Type": 1
+        "type": 1
       },
       "name": "b",
       "owner": {
-        "World": 0
+        "world": 0
       }
     },
     {
@@ -182,11 +182,11 @@
         "contents": null
       },
       "kind": {
-        "Type": 0
+        "type": 0
       },
       "name": "t",
       "owner": {
-        "World": 1
+        "world": 1
       }
     },
     {
@@ -194,21 +194,21 @@
         "contents": null
       },
       "kind": {
-        "Record": {
+        "record": {
           "fields": [
             {
               "docs": {
                 "contents": null
               },
               "name": "x",
-              "ty": "U32"
+              "type": "U32"
             }
           ]
         }
       },
       "name": "a",
       "owner": {
-        "World": 2
+        "world": 2
       }
     },
     {
@@ -216,21 +216,21 @@
         "contents": null
       },
       "kind": {
-        "Variant": {
+        "variant": {
           "cases": [
             {
               "docs": {
                 "contents": null
               },
               "name": "c",
-              "ty": 4
+              "type": 4
             }
           ]
         }
       },
       "name": "b",
       "owner": {
-        "World": 2
+        "world": 2
       }
     }
   ],
