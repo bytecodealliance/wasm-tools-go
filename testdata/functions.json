@@ -13,7 +13,7 @@
             "contents": null
           },
           "name": "f1",
-          "kind": "Freestanding",
+          "kind": "freestanding",
           "params": [],
           "results": []
         },
@@ -22,11 +22,11 @@
             "contents": null
           },
           "name": "f2",
-          "kind": "Freestanding",
+          "kind": "freestanding",
           "params": [
             {
               "name": "a",
-              "type": "U32"
+              "type": "u32"
             }
           ],
           "results": []
@@ -36,11 +36,11 @@
             "contents": null
           },
           "name": "f3",
-          "kind": "Freestanding",
+          "kind": "freestanding",
           "params": [
             {
               "name": "a",
-              "type": "U32"
+              "type": "u32"
             }
           ],
           "results": []
@@ -50,11 +50,11 @@
             "contents": null
           },
           "name": "f4",
-          "kind": "Freestanding",
+          "kind": "freestanding",
           "params": [],
           "results": [
             {
-              "type": "U32"
+              "type": "u32"
             }
           ]
         },
@@ -63,7 +63,7 @@
             "contents": null
           },
           "name": "f6",
-          "kind": "Freestanding",
+          "kind": "freestanding",
           "params": [],
           "results": [
             {
@@ -76,15 +76,15 @@
             "contents": null
           },
           "name": "f7",
-          "kind": "Freestanding",
+          "kind": "freestanding",
           "params": [
             {
               "name": "a",
-              "type": "Float32"
+              "type": "float32"
             },
             {
               "name": "b",
-              "type": "Float32"
+              "type": "float32"
             }
           ],
           "results": [
@@ -98,7 +98,7 @@
             "contents": null
           },
           "name": "f8",
-          "kind": "Freestanding",
+          "kind": "freestanding",
           "params": [
             {
               "name": "a",
@@ -116,16 +116,16 @@
             "contents": null
           },
           "name": "f9",
-          "kind": "Freestanding",
+          "kind": "freestanding",
           "params": [],
           "results": [
             {
               "name": "u",
-              "type": "U32"
+              "type": "u32"
             },
             {
               "name": "f",
-              "type": "Float32"
+              "type": "float32"
             }
           ]
         },
@@ -134,12 +134,12 @@
             "contents": null
           },
           "name": "f10",
-          "kind": "Freestanding",
+          "kind": "freestanding",
           "params": [],
           "results": [
             {
               "name": "u",
-              "type": "U32"
+              "type": "u32"
             }
           ]
         },
@@ -148,7 +148,7 @@
             "contents": null
           },
           "name": "f11",
-          "kind": "Freestanding",
+          "kind": "freestanding",
           "params": [],
           "results": []
         }
@@ -164,8 +164,8 @@
       "kind": {
         "tuple": {
           "types": [
-            "U32",
-            "U32"
+            "u32",
+            "u32"
           ]
         }
       },
@@ -177,7 +177,7 @@
         "contents": null
       },
       "kind": {
-        "option": "U32"
+        "option": "u32"
       },
       "name": null,
       "owner": "none"
@@ -188,8 +188,8 @@
       },
       "kind": {
         "result": {
-          "ok": "U32",
-          "err": "Float32"
+          "ok": "u32",
+          "err": "float32"
         }
       },
       "name": null,

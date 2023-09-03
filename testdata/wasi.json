@@ -48,7 +48,7 @@
         "contents": null
       },
       "kind": {
-        "type": "U64"
+        "type": "u64"
       },
       "name": "timestamp",
       "owner": {

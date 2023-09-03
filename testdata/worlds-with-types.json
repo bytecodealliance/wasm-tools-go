@@ -20,7 +20,7 @@
               "contents": null
             },
             "name": "c",
-            "kind": "Freestanding",
+            "kind": "freestanding",
             "params": [
               {
                 "name": "a",
@@ -57,7 +57,7 @@
               "contents": null
             },
             "name": "foo",
-            "kind": "Freestanding",
+            "kind": "freestanding",
             "params": [],
             "results": [
               {
@@ -87,7 +87,7 @@
               "contents": null
             },
             "name": "foo",
-            "kind": "Freestanding",
+            "kind": "freestanding",
             "params": [
               {
                 "name": "a",
@@ -109,7 +109,7 @@
               "contents": null
             },
             "name": "bar",
-            "kind": "Freestanding",
+            "kind": "freestanding",
             "params": [
               {
                 "name": "a",
@@ -146,7 +146,7 @@
         "contents": null
       },
       "kind": {
-        "type": "U32"
+        "type": "u32"
       },
       "name": "t",
       "owner": {
@@ -158,7 +158,7 @@
         "contents": null
       },
       "kind": {
-        "type": "U32"
+        "type": "u32"
       },
       "name": "a",
       "owner": {
@@ -201,7 +201,7 @@
                 "contents": null
               },
               "name": "x",
-              "type": "U32"
+              "type": "u32"
             }
           ]
         }
