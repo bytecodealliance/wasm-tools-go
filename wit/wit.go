@@ -96,8 +96,8 @@ type Function struct {
 	Docs    Docs
 	Name    string
 	Kind    FunctionKind
-	Params  []Param // Vec<(String, Type)>;
-	Results Results // enum
+	Params  []Param
+	Results []Param
 }
 
 func (*Function) isWorldItem() {}
