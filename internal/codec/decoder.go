@@ -20,8 +20,20 @@ type FieldDecoder interface {
 	DecodeField(name string) (any, error)
 }
 
+type FieldDecoderFunc func(name string) (any, error)
+
+func (f FieldDecoderFunc) DecodeField(name string) (any, error) {
+	return f(name)
+}
+
 type ElementDecoder interface {
-	DecodeElement(index int) (any, error)
+	DecodeElement(i int) (any, error)
+}
+
+type ElementDecoderFunc func(i int) (any, error)
+
+func (f ElementDecoderFunc) DecodeElement(i int) (any, error) {
+	return f(i)
 }
 
 // type MapDecoder[T any] interface {

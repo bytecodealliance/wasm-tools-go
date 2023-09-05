@@ -4,8 +4,49 @@ import (
 	"encoding/json"
 	"io"
 
+	"github.com/ydnar/wit-bindgen-go/internal/codec"
 	"github.com/ydnar/wit-bindgen-go/internal/wjson"
 )
+
+func (res *Resolve) DecodeField(name string) (any, error) {
+	switch name {
+	case "worlds":
+		return codec.ElementDecoderFunc(func(i int) (any, error) {
+			return &worldDecoder{remake(&res.Worlds, i), res}, nil
+		}), nil
+	}
+	return nil, nil
+}
+
+type worldDecoder struct {
+	*World
+	res *Resolve
+}
+
+func (w *worldDecoder) DecodeField(name string) (any, error) {
+	switch name {
+	case "name":
+		return &w.Name, nil
+	case "docs":
+		return &w.Docs, nil
+	case "imports":
+		w.Imports = make(map[string]WorldItem)
+		return &worldItemsDecoder{w.Imports, w.res}, nil
+	case "exports":
+		w.Exports = make(map[string]WorldItem)
+		return &worldItemsDecoder{w.Exports, w.res}, nil
+	}
+	return nil, nil
+}
+
+type worldItemsDecoder struct {
+	m   map[string]WorldItem
+	res *Resolve
+}
+
+func (m *worldItemsDecoder) DecodeField(name string) (any, error) {
+	return nil, nil
+}
 
 func DecodeJSON(r io.Reader) (*Resolve, error) {
 	dec := &decodeState{
