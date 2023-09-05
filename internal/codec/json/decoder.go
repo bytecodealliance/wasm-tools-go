@@ -82,6 +82,8 @@ func (dec *Decoder) decodeNumber(v any, n json.Number) error {
 		return coerceNumber(v, n.Float64)
 	case *string:
 		*v = string(n)
+		// TODO: how to handle undecodable types?
+		// Return an error? Silently ignore? Configurable?
 	}
 	return nil
 }
