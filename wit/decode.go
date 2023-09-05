@@ -32,22 +32,22 @@ func (dec *decodeState) decodeResolve() error {
 		switch key {
 		case "worlds":
 			return wjson.DecodeArray(dec, func(i int) error {
-				return dec.decodeWorld(element(&dec.res.Worlds, i))
+				return dec.decodeWorld(remake(&dec.res.Worlds, i))
 			})
 		case "interfaces":
 			return wjson.DecodeArray(dec, func(i int) error {
-				return dec.decodeInterface(element(&dec.res.Interfaces, i))
+				return dec.decodeInterface(remake(&dec.res.Interfaces, i))
 			})
 		case "types":
 			return wjson.DecodeArray(dec, func(i int) error {
-				return dec.decodeTypeDef(element(&dec.res.Types, i))
+				return dec.decodeTypeDef(remake(&dec.res.TypeDefs, i))
 			})
 		case "packages":
 			return wjson.DecodeArray(dec, func(i int) error {
-				return dec.decodePackage(element(&dec.res.Packages, i))
+				return dec.decodePackage(remake(&dec.res.Packages, i))
 			})
 		default:
-			return wjson.Ignore(dec)
+			return nil
 		}
 	})
 }
@@ -62,21 +62,21 @@ func (dec *decodeState) decodeWorld(world *World) error {
 		case "package":
 			return decodeIndex(dec, &dec.res.Packages, &world.Package)
 		default:
-			return wjson.Ignore(dec)
+			return nil
 		}
 	})
 }
 
 func (dec *decodeState) decodeInterface(iface *Interface) error {
-	return wjson.Ignore(dec)
+	return nil
 }
 
 func (dec *decodeState) decodeTypeDef(typ *TypeDef) error {
-	return wjson.Ignore(dec)
+	return nil
 }
 
 func (dec *decodeState) decodePackage(pkg *Package) error {
-	return wjson.Ignore(dec)
+	return nil
 }
 
 func decodeIndex[S ~[]*E, E any](dec *decodeState, s *S, e **E) error {
@@ -85,16 +85,16 @@ func decodeIndex[S ~[]*E, E any](dec *decodeState, s *S, e **E) error {
 	if err != nil {
 		return err
 	}
-	*e = element(s, i)
+	*e = remake(s, i)
 	return nil
 }
 
-// element returns the value of slice s at index i,
+// remake returns the value of slice s at index i,
 // reallocating the slice if necessary. s must be a slice
 // of pointers, because the underlying backing to s might
 // change when reallocated.
 // If the value at s[i] is nil, a new *E will be allocated.
-func element[S ~[]*E, E any](s *S, i int) *E {
+func remake[S ~[]*E, E any](s *S, i int) *E {
 	if i < 0 {
 		return nil
 	}

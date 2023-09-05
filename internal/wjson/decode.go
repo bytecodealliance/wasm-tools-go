@@ -25,6 +25,7 @@ type Decoder interface {
 	Decode(any) error
 	More() bool
 	Token() (json.Token, error)
+	InputOffset() int64
 }
 
 // Ignore ignores the next logical JSON value, such as an object, array, or value.
@@ -33,8 +34,9 @@ func Ignore(dec Decoder) error {
 }
 
 // DecodeObject decodes a single JSON object, passing each decoded key to f.
-// Callback f is responsible for parsing the entire value of the object key
-// before returning.
+// Callback f must parse nothing, or parse the entire field.
+// Partially parsing a field, or parsing more than the field is undefined.
+// If f parses nothing, the field will be ignored.
 func DecodeObject(dec Decoder, f func(key string) error) error {
 	err := DecodeDelim(dec, '{')
 	if err != nil {
@@ -45,25 +47,35 @@ func DecodeObject(dec Decoder, f func(key string) error) error {
 		if err != nil {
 			return err
 		}
+		offset := dec.InputOffset()
 		err = f(key)
 		if err != nil {
 			return err
+		}
+		if dec.InputOffset() == offset {
+			Ignore(dec)
 		}
 	}
 	return DecodeDelim(dec, '}')
 }
 
 // DecodeArray decodes a single JSON array, passing the array index to f.
-// Callback f is responsible for parsing the entire array element before returning.
+// Callback f must parse nothing, or parse the entire array element.
+// Partially parsing an element, or parsing more than the element is undefined.
+// If f parses nothing, the element will be ignored.
 func DecodeArray(dec Decoder, f func(i int) error) error {
 	err := DecodeDelim(dec, '[')
 	if err != nil {
 		return err
 	}
 	for i := 0; dec.More(); i++ {
+		offset := dec.InputOffset()
 		err = f(i)
 		if err != nil {
 			return err
+		}
+		if dec.InputOffset() == offset {
+			Ignore(dec)
 		}
 	}
 	return DecodeDelim(dec, ']')
