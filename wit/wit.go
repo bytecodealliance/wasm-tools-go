@@ -1,18 +1,18 @@
 package wit
 
 type Resolve struct {
-	Worlds     []*World     `json:"worlds"`
-	Interfaces []*Interface `json:"interfaces"`
-	TypeDefs   []*TypeDef   `json:"types"`
-	Packages   []*Package   `json:"packages"`
+	Worlds     List[World, *Resolve]
+	Interfaces List[Interface, *Resolve]
+	TypeDefs   List[TypeDef, *Resolve]
+	Packages   List[Package, *Resolve]
 }
 
 type World struct {
-	Name    string               `json:"name"`
-	Docs    Docs                 `json:"docs"`
-	Imports map[string]WorldItem `json:"imports"`
-	Exports map[string]WorldItem `json:"exports"`
-	Package *Package             `json:"package"`
+	Name    string
+	Docs    Docs
+	Imports map[string]WorldItem
+	Exports map[string]WorldItem
+	Package *Package
 }
 
 func (*World) isTypeOwner() {}
@@ -22,11 +22,11 @@ type WorldItem interface {
 }
 
 type Interface struct {
-	Docs      Docs                `json:"docs"`
-	Name      *string             `json:"name"`
-	Types     map[string]*TypeDef `json:"types"`
-	Functions map[string]Function `json:"functions"`
-	Package   *Package            `json:"package"`
+	Docs      Docs
+	Name      *string
+	Types     map[string]*TypeDef
+	Functions map[string]Function
+	Package   *Package
 }
 
 func (*Interface) isWorldItem() {}
@@ -34,9 +34,9 @@ func (*Interface) isWorldItem() {}
 func (*Interface) isTypeOwner() {}
 
 type TypeDef struct {
-	Kind  TypeDefKind `json:"kind"`
-	Name  string      `json:"name,omitempty"`
-	Owner TypeOwner   `json:"owner"`
+	Kind  TypeDefKind
+	Name  string
+	Owner TypeOwner
 }
 
 func (TypeDef) isType() {}
@@ -83,11 +83,11 @@ func (U8Type) isType() {}
 // TODO: rest of the types
 
 type Function struct {
-	Docs    Docs         `json:"docs"`
-	Name    string       `json:"name"`
-	Kind    FunctionKind `json:"kind"`
-	Params  []Param      `json:"params"`
-	Results []Param      `json:"results"`
+	Docs    Docs
+	Name    string
+	Kind    FunctionKind
+	Params  []Param
+	Results []Param
 }
 
 type FunctionKind interface{ isFunctionKind() }
@@ -109,12 +109,12 @@ type FunctionKindConstructor struct{ Type }
 func (FunctionKindConstructor) isFunctionKind() {}
 
 type Docs struct {
-	Contents *string `json:"contents"`
+	Contents *string
 }
 
 type Param struct {
-	Name string `json:"contents"`
-	Type Type   `json:"type"`
+	Name string
+	Type Type
 }
 
 type Results interface {
@@ -130,10 +130,10 @@ type AnonResults struct{ Type }
 func (*AnonResults) isResults() {}
 
 type Package struct {
-	Name       PackageName           `json:"name"`
-	Docs       Docs                  `json:"docs"`
-	Interfaces map[string]*Interface `json:"interfaces"`
-	Worlds     map[string]*World     `json:"worlds"`
+	Name       PackageName
+	Docs       Docs
+	Interfaces map[string]*Interface
+	Worlds     map[string]*World
 }
 
 // TODO: implement package name parsing

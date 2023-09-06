@@ -4,16 +4,13 @@ import (
 	"encoding/json"
 	"io"
 
-	"github.com/ydnar/wit-bindgen-go/internal/codec"
 	"github.com/ydnar/wit-bindgen-go/internal/wjson"
 )
 
 func (res *Resolve) DecodeField(name string) (any, error) {
 	switch name {
 	case "worlds":
-		return codec.ElementDecoderFunc(func(i int) (any, error) {
-			return &worldDecoder{remake(&res.Worlds, i), res}, nil
-		}), nil
+		return &res.Worlds, nil
 	}
 	return nil, nil
 }
@@ -128,22 +125,4 @@ func decodeIndex[S ~[]*E, E any](dec *decodeState, s *S, e **E) error {
 	}
 	*e = remake(s, i)
 	return nil
-}
-
-// remake returns the value of slice s at index i,
-// reallocating the slice if necessary. s must be a slice
-// of pointers, because the underlying backing to s might
-// change when reallocated.
-// If the value at s[i] is nil, a new *E will be allocated.
-func remake[S ~[]*E, E any](s *S, i int) *E {
-	if i < 0 {
-		return nil
-	}
-	if i >= len(*s) {
-		*s = append(*s, make([]*E, i-len(*s))...)
-	}
-	if (*s)[i] == nil {
-		(*s)[i] = new(E)
-	}
-	return (*s)[i]
 }

@@ -10,21 +10,26 @@ import (
 	"golang.org/x/exp/constraints"
 )
 
-type Decoder struct {
+type Decoder[C any] struct {
 	dec *json.Decoder
+	ctx C
 }
 
-var _ codec.Decoder = &Decoder{}
-
-func NewDecoder(r io.Reader) *Decoder {
+func NewDecoder[C any](r io.Reader, ctx C) *Decoder[C] {
 	dec := json.NewDecoder(r)
 	dec.UseNumber()
-	return &Decoder{
+	return &Decoder[C]{
 		dec: dec,
+		ctx: ctx,
 	}
 }
 
-func (dec *Decoder) Decode(v any) error {
+func (dec *Decoder[C]) Decode(v any) error {
+	v, err := codec.Visit(dec.ctx, v)
+	if err != nil {
+		return err
+	}
+
 	tok, err := dec.dec.Token()
 	if err == io.EOF {
 		return nil
@@ -58,21 +63,21 @@ func (dec *Decoder) Decode(v any) error {
 	return nil
 }
 
-func (dec *Decoder) decodeNull(v any) error {
+func (dec *Decoder[C]) decodeNull(v any) error {
 	if v, ok := v.(codec.NilDecoder); ok {
 		return v.DecodeNil()
 	}
 	return nil
 }
 
-func (dec *Decoder) decodeBool(v any, b bool) error {
+func (dec *Decoder[C]) decodeBool(v any, b bool) error {
 	if v, ok := v.(codec.ValueDecoder[bool]); ok {
 		return v.DecodeValue(b)
 	}
 	return nil
 }
 
-func (dec *Decoder) decodeNumber(v any, n json.Number) error {
+func (dec *Decoder[C]) decodeNumber(v any, n json.Number) error {
 	switch v := v.(type) {
 	case *int64:
 		return coerceNumber(v, n.Int64)
@@ -97,7 +102,7 @@ func coerceNumber[To, From constraints.Integer | constraints.Float](v *To, f fun
 	return nil
 }
 
-func (dec *Decoder) decodeString(v any, s string) error {
+func (dec *Decoder[C]) decodeString(v any, s string) error {
 	switch v := v.(type) {
 	case *string:
 		*v = s
@@ -113,7 +118,7 @@ func (dec *Decoder) decodeString(v any, s string) error {
 
 // decodeObject decodes a JSON object into v.
 // It expects that the initial { token has already been decoded.
-func (dec *Decoder) decodeObject(o any) error {
+func (dec *Decoder[C]) decodeObject(o any) error {
 	d, ok := o.(codec.FieldDecoder)
 	if !ok {
 		// TODO: how to handle undecodable objects?
@@ -139,7 +144,7 @@ func (dec *Decoder) decodeObject(o any) error {
 
 // decodeArray decodes a JSON array into v.
 // It expects that the initial [ token has already been decoded.
-func (dec *Decoder) decodeArray(v any) error {
+func (dec *Decoder[C]) decodeArray(v any) error {
 	d, ok := v.(codec.ElementDecoder)
 	if !ok {
 		// TODO: how to handle undecodable arrays?
@@ -159,7 +164,7 @@ func (dec *Decoder) decodeArray(v any) error {
 	return nil
 }
 
-func (dec *Decoder) stringToken() (string, error) {
+func (dec *Decoder[C]) stringToken() (string, error) {
 	tok, err := dec.dec.Token()
 	if err != nil {
 		return "", err
