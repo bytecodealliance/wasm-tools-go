@@ -1,10 +1,10 @@
 package wit
 
 type Resolve struct {
-	Worlds     List[World, *Resolve]
-	Interfaces List[Interface, *Resolve]
-	TypeDefs   List[TypeDef, *Resolve]
-	Packages   List[Package, *Resolve]
+	Worlds     []*World
+	Interfaces []*Interface
+	TypeDefs   []*TypeDef
+	Packages   []*Package
 }
 
 type World struct {
@@ -25,7 +25,7 @@ type Interface struct {
 	Docs      Docs
 	Name      *string
 	Types     map[string]*TypeDef
-	Functions map[string]Function
+	Functions map[string]*Function
 	Package   *Package
 }
 

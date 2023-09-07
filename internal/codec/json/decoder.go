@@ -11,24 +11,25 @@ import (
 )
 
 type Decoder[C any] struct {
-	dec *json.Decoder
-	ctx C
+	dec    *json.Decoder
+	codecs []codec.Codec
 }
 
-func NewDecoder[C any](r io.Reader, ctx C) *Decoder[C] {
+func NewDecoder[C any](r io.Reader, codecs ...codec.Codec) *Decoder[C] {
 	dec := json.NewDecoder(r)
 	dec.UseNumber()
 	return &Decoder[C]{
-		dec: dec,
-		ctx: ctx,
+		dec:    dec,
+		codecs: codecs,
 	}
 }
 
 func (dec *Decoder[C]) Decode(v any) error {
-	v, err := codec.Visit(dec.ctx, v)
-	if err != nil {
-		return err
-	}
+	// TODO: dec.Codec(v)
+	// v, err := codec.Visit(dec.ctx, v)
+	// if err != nil {
+	// 	return err
+	// }
 
 	tok, err := dec.dec.Token()
 	if err == io.EOF {
