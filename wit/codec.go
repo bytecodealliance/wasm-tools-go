@@ -1,25 +1,9 @@
 package wit
 
-type Codec Resolve
-
-func (c *Codec) Codec(v any) (any, error) {
+// Codec implements the codec.Codec interface,
+// translating types to decoding/encoding-aware versions.
+func (res *Resolve) Codec(v any) (any, error) {
 	switch v := v.(type) {
-	// Outer Resolve struct
-	case *Resolve:
-		return (*resolveCodec)(v), nil
-
-	// Major WIT types
-	case *World:
-		return (*worldCodec)(v), nil
-	case *Interface:
-		return (*interfaceCodec)(v), nil
-	case *TypeDef:
-		return (*typeDefCodec)(v), nil
-	case *Package:
-		return (*packageCodec)(v), nil
-	case *Function:
-		return (*functionCodec)(v), nil
-
 	// WIT sections
 	case *[]*World:
 		return (*ptrSliceCodec[World])(v), nil
@@ -30,45 +14,38 @@ func (c *Codec) Codec(v any) (any, error) {
 	case *[]*Package:
 		return (*ptrSliceCodec[Package])(v), nil
 
-	// Maps
+	// Maps of concrete types
+	case map[string]*Function:
+		return mapCodec[Function](v), nil
+
+	// Maps of references
 	case map[string]WorldItem:
 		return mapFuncCodec[WorldItem](v), nil
-	case map[string]*TypeDef:
-		return mapCodec[TypeDef](v), nil
+	case map[string]*Interface:
+		return mapFuncCodec[*Interface](v), nil
+	case map[string]*World:
+		return mapFuncCodec[*World](v), nil
 
 	// Callback setters of enum/interface types
 	case func(WorldItem):
 		return worldItemCodec(v), nil
 	case func(Type):
-		return &typeCodec{v, (*Resolve)(c)}, nil
+		return &typeCodec{v, res}, nil
 
-	// Callback setters of concrete types
+	// Callback setters of references
 	case func(*World):
-		return &indexCodec[World]{&c.Worlds, v}, nil
+		return &indexCodec[World]{&res.Worlds, v}, nil
 	case func(*Interface):
-		return &indexCodec[Interface]{&c.Interfaces, v}, nil
+		return &indexCodec[Interface]{&res.Interfaces, v}, nil
 	case func(*TypeDef):
-		return &indexCodec[TypeDef]{&c.TypeDefs, v}, nil
+		return &indexCodec[TypeDef]{&res.TypeDefs, v}, nil
 	case func(*Package):
-		return &indexCodec[Package]{&c.Packages, v}, nil
+		return &indexCodec[Package]{&res.Packages, v}, nil
 	}
 	return nil, nil
 }
 
-type indexCodec[T any] struct {
-	s *[]*T
-	f func(*T)
-}
-
-func (c *indexCodec[T]) DecodeInt(i int64) error {
-	v := realloc(c.s, int(i))
-	c.f(v)
-	return nil
-}
-
-type resolveCodec Resolve
-
-func (c *resolveCodec) DecodeField(name string) (any, error) {
+func (c *Resolve) DecodeField(name string) (any, error) {
 	switch name {
 	case "worlds":
 		return &c.Worlds, nil
@@ -82,16 +59,7 @@ func (c *resolveCodec) DecodeField(name string) (any, error) {
 	return nil, nil
 }
 
-type Setter[T any] func(v T)
-
-func (s Setter[T]) Set(a any) {
-	v, _ := a.(T)
-	s(v)
-}
-
-type worldCodec World
-
-func (c *worldCodec) DecodeField(name string) (any, error) {
+func (c *World) DecodeField(name string) (any, error) {
 	switch name {
 	case "name":
 		return &c.Name, nil
@@ -117,64 +85,73 @@ func (c worldItemCodec) DecodeField(name string) (any, error) {
 	return nil, nil
 }
 
-type interfaceCodec Interface
-
-func (c *interfaceCodec) DecodeField(name string) (any, error) {
+func (i *Interface) DecodeField(name string) (any, error) {
 	switch name {
 	case "docs":
-		return &c.Docs, nil
+		return &i.Docs, nil
 	case "name":
-		return &c.Name, nil
+		return &i.Name, nil
 	case "types":
-		return &c.Types, nil
+		return &i.Types, nil
 	case "functions":
-		return &c.Functions, nil
+		return &i.Functions, nil
 	case "package":
-		return &c.Package, nil
+		return &i.Package, nil
 	}
 	return nil, nil
 }
 
-type typeDefCodec TypeDef
-
-type packageCodec Package
-
+// typeCodec translates WIT type strings or reference IDs into a Type.
+// The caller is responsible for setting f to receive the resolved Type.
 type typeCodec struct {
 	f func(Type)
 	*Resolve
 }
 
+// DecodeString translates a into to a primitive WIT type.
+// c.f is called with the resulting Type, if any.
 func (c typeCodec) DecodeString(s string) error {
-	var t Type
-	switch s {
-	// TODO
+	t, err := ParseType(s)
+	if err != nil {
+		return err
 	}
 	c.f(t)
 	return nil
 }
 
+// DecodeInt translates a TypeDef reference into a pointer to a TypeDef
+// in the parent Resolve struct.
 func (c typeCodec) DecodeInt(i int64) error {
 	var t Type = realloc(&c.TypeDefs, int(i))
 	c.f(t)
 	return nil
 }
 
-type functionCodec Function
-
-func (c *functionCodec) DecodeElement(name string) (any, error) {
+func (f *Function) DecodeElement(name string) (any, error) {
 	switch name {
 	case "docs":
-		return &c.Docs, nil
+		return &f.Docs, nil
 	case "name":
-		return &c.Name, nil
+		return &f.Name, nil
 	case "kind":
-		return &c.Kind, nil
+		return &f.Kind, nil
 	case "params":
-		return &c.Params, nil
+		return &f.Params, nil
 	case "results":
-		return &c.Results, nil
+		return &f.Results, nil
 	}
 	return nil, nil
+}
+
+type indexCodec[T any] struct {
+	s *[]*T
+	f func(*T)
+}
+
+func (c *indexCodec[T]) DecodeInt(i int64) error {
+	v := realloc(c.s, int(i))
+	c.f(v)
+	return nil
 }
 
 type ptrSliceCodec[T any] []*T

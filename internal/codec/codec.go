@@ -83,29 +83,3 @@ type ElementDecoderFunc func(i int) (any, error)
 func (f ElementDecoderFunc) DecodeElement(i int) (any, error) {
 	return f(i)
 }
-
-type MapValue[K comparable, V any] struct {
-	Map   map[K]V
-	Key   K
-	Value V
-}
-
-func M[K comparable, V any](m map[K]V, k K, v V) MapValue[K, V] {
-	return MapValue[K, V]{m, k, v}
-}
-
-type Assign[T any] struct {
-	V T
-	F func(T)
-}
-
-func (a Assign[T]) DecodeString(s string) error {
-	if d, ok := any(a.V).(StringDecoder); ok {
-		return d.DecodeString(s)
-	}
-	return nil
-}
-
-func (a Assign[T]) DecodeInt(i int64) error {
-	return nil
-}

@@ -1,5 +1,7 @@
 package wit
 
+import "fmt"
+
 type Resolve struct {
 	Worlds     []*World
 	Interfaces []*Interface
@@ -72,13 +74,71 @@ pub enum Type {
 
 type Type interface{ isType() }
 
-type BoolType struct{}
+type type_ struct{}
 
-func (BoolType) isType() {}
+func (type_) isType() {}
 
-type U8Type struct{}
+type IntType interface {
+	isIntType()
+	Type
+}
 
-func (U8Type) isType() {}
+type intType struct{ type_ }
+
+func (intType) isIntType() {}
+
+type FloatType interface {
+	isFloatType()
+	Type
+}
+
+type floatType struct{ type_ }
+
+func (floatType) isFloatType() {}
+
+type BoolType struct{ type_ }
+type S8Type struct{ intType }
+type U8Type struct{ intType }
+type S16Type struct{ intType }
+type U16Type struct{ intType }
+type S32Type struct{ intType }
+type U32Type struct{ intType }
+type S64Type struct{ intType }
+type U64Type struct{ intType }
+type Float32Type struct{ floatType }
+type Float64Type struct{ floatType }
+type CharType struct{ type_ }
+type StringType struct{ type_ }
+
+func ParseType(s string) (Type, error) {
+	switch s {
+	case "s8":
+		return S8Type{}, nil
+	case "u8":
+		return U8Type{}, nil
+	case "s16":
+		return S16Type{}, nil
+	case "u16":
+		return U16Type{}, nil
+	case "s32":
+		return S32Type{}, nil
+	case "u32":
+		return U32Type{}, nil
+	case "s64":
+		return S64Type{}, nil
+	case "u64":
+		return U64Type{}, nil
+	case "float32":
+		return Float32Type{}, nil
+	case "float64":
+		return Float64Type{}, nil
+	case "char":
+		return CharType{}, nil
+	case "string":
+		return StringType{}, nil
+	}
+	return nil, fmt.Errorf("unknown type %q", s)
+}
 
 // TODO: rest of the types
 
@@ -116,18 +176,6 @@ type Param struct {
 	Name string
 	Type Type
 }
-
-type Results interface {
-	isResults()
-}
-
-type NamedResults []Param
-
-func (NamedResults) isResults() {}
-
-type AnonResults struct{ Type }
-
-func (*AnonResults) isResults() {}
 
 type Package struct {
 	Name       PackageName
