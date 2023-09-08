@@ -1,23 +1,67 @@
 package codec
 
 // Codec is the interface implemented by types that return a codec for the value at v.
-// Values returned by Codec should implement one or more encoder or decoder methods.
+// Values returned by Codec should implement one or more encode or decode methods.
 type Codec interface {
 	Codec(v any) (any, error)
+}
+
+// Codecs is a slice of Codec values. It also implements the Codec interface.
+type Codecs []Codec
+
+// Codec walks the list of Codecs, returning the first non-nil value, or an error.
+func (codecs Codecs) Codec(v any) (any, error) {
+	for _, codec := range codecs {
+		c, err := codec.Codec(v)
+		if err != nil {
+			return nil, err
+		}
+		if c != nil {
+			return c, nil
+		}
+	}
+	return nil, nil
+}
+
+// Decoder is the interface implemented by types that can decode data into Go type(s).
+type Decoder interface {
+	Decode(v any) error
+	Codec
+}
+
+// EndDecoder is the interface implemented by types that wish to receive a signal
+// that decoding has finished. DecodeEnd is not called if an error occurs during
+// decoding. DecodeEnd can return an error to abort further decoding.
+type EndDecoder interface {
+	DecodeEnd() error
 }
 
 type NilDecoder interface {
 	DecodeNil() error
 }
 
-// TODO: delete this
-type Value interface {
-	bool | int64 | uint64 | float64 | string | []byte
+type BoolDecoder interface {
+	DecodeBool(bool) error
 }
 
-// TODO: StringDecoder, IntDecoder, FloatDecoder
-type ValueDecoder[T Value] interface {
-	DecodeValue(v T) error
+type BytesDecoder interface {
+	DecodeBytes([]byte) error
+}
+
+type StringDecoder interface {
+	DecodeString(string) error
+}
+
+type IntDecoder interface {
+	DecodeInt(int64) error
+}
+
+type UintDecoder interface {
+	DecodeUint(uint64) error
+}
+
+type FloatDecoder interface {
+	DecodeFloat(float64) error
 }
 
 type FieldDecoder interface {
@@ -38,4 +82,30 @@ type ElementDecoderFunc func(i int) (any, error)
 
 func (f ElementDecoderFunc) DecodeElement(i int) (any, error) {
 	return f(i)
+}
+
+type MapValue[K comparable, V any] struct {
+	Map   map[K]V
+	Key   K
+	Value V
+}
+
+func M[K comparable, V any](m map[K]V, k K, v V) MapValue[K, V] {
+	return MapValue[K, V]{m, k, v}
+}
+
+type Assign[T any] struct {
+	V T
+	F func(T)
+}
+
+func (a Assign[T]) DecodeString(s string) error {
+	if d, ok := any(a.V).(StringDecoder); ok {
+		return d.DecodeString(s)
+	}
+	return nil
+}
+
+func (a Assign[T]) DecodeInt(i int64) error {
+	return nil
 }

@@ -4,9 +4,11 @@ type Codec Resolve
 
 func (c *Codec) Codec(v any) (any, error) {
 	switch v := v.(type) {
+	// Outer Resolve struct
 	case *Resolve:
 		return (*resolveCodec)(v), nil
 
+	// Major WIT types
 	case *World:
 		return (*worldCodec)(v), nil
 	case *Interface:
@@ -15,22 +17,53 @@ func (c *Codec) Codec(v any) (any, error) {
 		return (*typeDefCodec)(v), nil
 	case *Package:
 		return (*packageCodec)(v), nil
+	case *Function:
+		return (*functionCodec)(v), nil
 
+	// WIT sections
 	case *[]*World:
-		return (*sliceCodec[World])(v), nil
+		return (*ptrSliceCodec[World])(v), nil
 	case *[]*Interface:
-		return (*sliceCodec[Interface])(v), nil
+		return (*ptrSliceCodec[Interface])(v), nil
 	case *[]*TypeDef:
-		return (*sliceCodec[TypeDef])(v), nil
+		return (*ptrSliceCodec[TypeDef])(v), nil
 	case *[]*Package:
-		return (*sliceCodec[Package])(v), nil
+		return (*ptrSliceCodec[Package])(v), nil
 
+	// Maps
 	case map[string]WorldItem:
 		return mapFuncCodec[WorldItem](v), nil
 	case map[string]*TypeDef:
 		return mapCodec[TypeDef](v), nil
+
+	// Callback setters of enum/interface types
+	case func(WorldItem):
+		return worldItemCodec(v), nil
+	case func(Type):
+		return &typeCodec{v, (*Resolve)(c)}, nil
+
+	// Callback setters of concrete types
+	case func(*World):
+		return &indexCodec[World]{&c.Worlds, v}, nil
+	case func(*Interface):
+		return &indexCodec[Interface]{&c.Interfaces, v}, nil
+	case func(*TypeDef):
+		return &indexCodec[TypeDef]{&c.TypeDefs, v}, nil
+	case func(*Package):
+		return &indexCodec[Package]{&c.Packages, v}, nil
 	}
 	return nil, nil
+}
+
+type indexCodec[T any] struct {
+	s *[]*T
+	f func(*T)
+}
+
+func (c *indexCodec[T]) DecodeInt(i int64) error {
+	v := realloc(c.s, int(i))
+	c.f(v)
+	return nil
 }
 
 type resolveCodec Resolve
@@ -49,6 +82,13 @@ func (c *resolveCodec) DecodeField(name string) (any, error) {
 	return nil, nil
 }
 
+type Setter[T any] func(v T)
+
+func (s Setter[T]) Set(a any) {
+	v, _ := a.(T)
+	s(v)
+}
+
 type worldCodec World
 
 func (c *worldCodec) DecodeField(name string) (any, error) {
@@ -61,6 +101,18 @@ func (c *worldCodec) DecodeField(name string) (any, error) {
 		return &c.Imports, nil
 	case "exports":
 		return &c.Exports, nil
+	}
+	return nil, nil
+}
+
+type worldItemCodec func(WorldItem)
+
+func (c worldItemCodec) DecodeField(name string) (any, error) {
+	switch name {
+	case "interface":
+		return func(i *Interface) { c(i) }, nil
+	case "type":
+		return func(i *TypeDef) { c(i) }, nil
 	}
 	return nil, nil
 }
@@ -92,30 +144,75 @@ type typeCodec struct {
 	*Resolve
 }
 
-func (c typeCodec) DecodeValue(v string) error {
+func (c typeCodec) DecodeString(s string) error {
 	var t Type
+	switch s {
+	// TODO
+	}
 	c.f(t)
 	return nil
 }
 
-type sliceCodec[T any] []*T
-
-func (c *sliceCodec[T]) DecodeElement(i int) (any, error) {
-	return remake(c, i), nil
+func (c typeCodec) DecodeInt(i int64) error {
+	var t Type = realloc(&c.TypeDefs, int(i))
+	c.f(t)
+	return nil
 }
 
-// remake returns the value of slice s at index i,
+type functionCodec Function
+
+func (c *functionCodec) DecodeElement(name string) (any, error) {
+	switch name {
+	case "docs":
+		return &c.Docs, nil
+	case "name":
+		return &c.Name, nil
+	case "kind":
+		return &c.Kind, nil
+	case "params":
+		return &c.Params, nil
+	case "results":
+		return &c.Results, nil
+	}
+	return nil, nil
+}
+
+type ptrSliceCodec[T any] []*T
+
+func (c *ptrSliceCodec[T]) DecodeElement(i int) (any, error) {
+	return realloc(c, i), nil
+}
+
+type sliceCodec[T any] []T
+
+func (c *sliceCodec[T]) DecodeElement(i int) (any, error) {
+	remake(c, i)
+	return &(*c)[i], nil
+}
+
+// remake reallocates a slice if necessary for len i,
+// returning the value of s[i].
+func remake[S ~[]E, E any](s *S, i int) E {
+	var e E
+	if i < 0 {
+		return e
+	}
+	if i >= len(*s) {
+		*s = append(*s, make([]E, i-len(*s))...)
+	}
+	return (*s)[i]
+}
+
+// realloc returns the value of slice s at index i,
 // reallocating the slice if necessary. s must be a slice
 // of pointers, because the underlying backing to s might
 // change when reallocated.
 // If the value at s[i] is nil, a new *E will be allocated.
-func remake[S ~[]*E, E any](s *S, i int) *E {
+func realloc[S ~[]*E, E any](s *S, i int) *E {
 	if i < 0 {
 		return nil
 	}
-	if i >= len(*s) {
-		*s = append(*s, make([]*E, i-len(*s))...)
-	}
+	remake(s, i)
 	if (*s)[i] == nil {
 		(*s)[i] = new(E)
 	}
