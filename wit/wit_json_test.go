@@ -21,7 +21,12 @@ func TestJSONUnmarshalSizing(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var res Resolve
+			var res struct {
+				Worlds     []struct{} `json:"worlds"`
+				Interfaces []struct{} `json:"interfaces"`
+				TypeDefs   []struct{} `json:"types"`
+				Packages   []struct{} `json:"packages"`
+			}
 			err := json.Unmarshal([]byte(tt.data), &res)
 			if err != nil {
 				t.Fatal(err)
