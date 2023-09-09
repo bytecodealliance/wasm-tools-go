@@ -1,5 +1,18 @@
 package wit
 
+import (
+	"io"
+
+	"github.com/ydnar/wit-bindgen-go/internal/codec/json"
+)
+
+func DecodeJSON(r io.Reader) (*Resolve, error) {
+	res := &Resolve{}
+	dec := json.NewDecoder(r, res)
+	err := dec.Decode(res)
+	return res, err
+}
+
 // Codec implements the codec.Codec interface,
 // translating types to decoding/encoding-aware versions.
 func (res *Resolve) Codec(v any) (any, error) {
@@ -175,7 +188,7 @@ func remake[S ~[]E, E any](s *S, i int) E {
 		return e
 	}
 	if i >= len(*s) {
-		*s = append(*s, make([]E, i-len(*s))...)
+		*s = append(*s, make([]E, i+1-len(*s))...)
 	}
 	return (*s)[i]
 }

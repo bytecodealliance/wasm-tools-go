@@ -79,6 +79,8 @@ func DecodeString(v any, s string) error {
 	switch v := v.(type) {
 	case *string:
 		*v = s
+	case **string:
+		*v = &s
 	case *[]byte:
 		*v = []byte(s)
 	case StringDecoder:

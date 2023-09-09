@@ -7,9 +7,9 @@ import (
 	"runtime"
 )
 
-// ReadFile reads a file, returning the contents or an error.
-func ReadFile(p string) ([]byte, error) {
-	f, err := os.Open(Path(p))
+// Read reads a file, returning the contents or an error.
+func Read(p string) ([]byte, error) {
+	f, err := os.Open(p)
 	if err != nil {
 		return nil, err
 	}

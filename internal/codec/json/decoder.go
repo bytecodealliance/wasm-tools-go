@@ -31,27 +31,26 @@ func (dec *Decoder) Decode(v any) error {
 		v = c
 	}
 
-	tok, err := dec.dec.Token()
-	if err == io.EOF {
-		return nil
-	}
-	if err != nil {
-		return err
-	}
-
-	err = dec.decodeToken(v, tok)
-	if err != nil {
+	err = dec.decodeToken(v)
+	if err != nil && err != io.EOF {
 		return err
 	}
 
 	if end, ok := v.(codec.EndDecoder); ok {
 		err = end.DecodeEnd()
+		if err != nil {
+			return err
+		}
 	}
 
-	return err
+	return nil
 }
 
-func (dec *Decoder) decodeToken(v any, tok json.Token) error {
+func (dec *Decoder) decodeToken(v any) error {
+	tok, err := dec.dec.Token()
+	if err != nil {
+		return err
+	}
 	if tok == nil {
 		return codec.DecodeNil(v)
 	}
@@ -78,7 +77,7 @@ func (dec *Decoder) decodeToken(v any, tok json.Token) error {
 }
 
 // decodeObject decodes a JSON object into v.
-// It expects that the initial { token has already been decodec.
+// It expects that the initial { token has already been decoded.
 func (dec *Decoder) decodeObject(o any) error {
 	d, ok := o.(codec.FieldDecoder)
 	if !ok {
@@ -100,6 +99,15 @@ func (dec *Decoder) decodeObject(o any) error {
 			return err
 		}
 	}
+
+	tok, err := dec.dec.Token()
+	if err != nil {
+		return err
+	}
+	if tok != json.Delim('}') {
+		return fmt.Errorf("unexpected JSON token %v at offset %d", tok, dec.dec.InputOffset())
+	}
+
 	return nil
 }
 
@@ -122,6 +130,15 @@ func (dec *Decoder) decodeArray(v any) error {
 			return err
 		}
 	}
+
+	tok, err := dec.dec.Token()
+	if err != nil {
+		return err
+	}
+	if tok != json.Delim(']') {
+		return fmt.Errorf("unexpected JSON token %v at offset %d", tok, dec.dec.InputOffset())
+	}
+
 	return nil
 }
 
