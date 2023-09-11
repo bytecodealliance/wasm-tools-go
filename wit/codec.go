@@ -13,9 +13,9 @@ func DecodeJSON(r io.Reader) (*Resolve, error) {
 	return res, err
 }
 
-// Codec implements the codec.Codec interface,
+// Resolve implements the codec.Resolve interface,
 // translating types to decoding/encoding-aware versions.
-func (res *Resolve) Codec(v any) (any, error) {
+func (res *Resolve) Resolve(v any) (any, error) {
 	switch v := v.(type) {
 	// WIT sections
 	case *[]*World:

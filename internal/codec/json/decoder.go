@@ -9,21 +9,21 @@ import (
 )
 
 type Decoder struct {
-	dec    *json.Decoder
-	codecs codec.Codecs
+	dec *json.Decoder
+	r   codec.Resolvers
 }
 
-func NewDecoder(r io.Reader, codecs ...codec.Codec) *Decoder {
+func NewDecoder(r io.Reader, resolvers ...codec.Resolver) *Decoder {
 	dec := json.NewDecoder(r)
 	dec.UseNumber()
 	return &Decoder{
-		dec:    dec,
-		codecs: codec.Codecs(codecs),
+		dec: dec,
+		r:   codec.Resolvers(resolvers),
 	}
 }
 
 func (dec *Decoder) Decode(v any) error {
-	c, err := dec.codecs.Codec(v)
+	c, err := dec.r.Resolve(v)
 	if err != nil {
 		return err
 	}

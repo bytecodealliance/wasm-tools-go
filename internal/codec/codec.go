@@ -1,18 +1,18 @@
 package codec
 
-// Codec is the interface implemented by types that return a codec for the value at v.
-// Values returned by Codec should implement one or more encode or decode methods.
-type Codec interface {
-	Codec(v any) (any, error)
+// Resolver is the interface implemented by types that return a codec for the value at v.
+// Values returned by Resolver should implement one or more encode or decode methods.
+type Resolver interface {
+	Resolve(v any) (any, error)
 }
 
-// Codecs is a slice of Codec values. It also implements the Codec interface.
-type Codecs []Codec
+// Resolvers is a slice of Resolver values. It also implements the Resolver interface.
+type Resolvers []Resolver
 
-// Codec walks the list of Codecs, returning the first non-nil value, or an error.
-func (codecs Codecs) Codec(v any) (any, error) {
-	for _, codec := range codecs {
-		c, err := codec.Codec(v)
+// Resolve walks the list of Resolvers, returning the first non-nil value or an error.
+func (rs Resolvers) Resolve(v any) (any, error) {
+	for _, r := range rs {
+		c, err := r.Resolve(v)
 		if err != nil {
 			return nil, err
 		}
@@ -26,7 +26,6 @@ func (codecs Codecs) Codec(v any) (any, error) {
 // Decoder is the interface implemented by types that can decode data into Go type(s).
 type Decoder interface {
 	Decode(v any) error
-	Codec
 }
 
 // EndDecoder is the interface implemented by types that wish to receive a signal
