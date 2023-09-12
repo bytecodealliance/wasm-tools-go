@@ -1,16 +1,16 @@
 package codec
 
-// Slice is an implementation of ElementDecoder for an arbitrary slice.
-type Slice[E comparable] []E
+// sliceCodec is an implementation of ElementDecoder for an arbitrary slice.
+type sliceCodec[E comparable] []E
 
-// AsSlice returns s coerced into a Slice.
-func AsSlice[E comparable](s *[]E) *Slice[E] {
-	return (*Slice[E])(s)
+// Slice returns an ElementDecoder for slice s.
+func Slice[E comparable](s *[]E) ElementDecoder {
+	return (*sliceCodec[E])(s)
 }
 
 // DecodeElement implements the ElementDecoder interface,
 // dynamically resizing the slice if necessary.
-func (s *Slice[E]) DecodeElement(dec Decoder, i int) error {
+func (s *sliceCodec[E]) DecodeElement(dec Decoder, i int) error {
 	var v E
 	if i >= 0 && i < len(*s) {
 		v = (*s)[i]
@@ -40,17 +40,17 @@ func Element[S ~[]E, E comparable](s *S, i int) E {
 	return (*s)[i]
 }
 
-// Map is an implementation of FieldDecoder for an arbitrary map with string keys.
-type Map[K ~string, V any] map[K]V
+// mapDecoder is an implementation of FieldDecoder for an arbitrary map with string keys.
+type mapDecoder[K ~string, V any] map[K]V
 
-// AsMap returns m coerced into a Map.
-func AsMap[K ~string, V any](m *map[K]V) *Map[K, V] {
-	return (*Map[K, V])(m)
+// Map returns an FieldDecoder for map m.
+func Map[K ~string, V any](m *map[K]V) FieldDecoder {
+	return (*mapDecoder[K, V])(m)
 }
 
 // DecodeField implements the FieldDecoder interface,
 // allocating the underlying map if necessary.
-func (m *Map[K, V]) DecodeField(dec Decoder, name string) error {
+func (m *mapDecoder[K, V]) DecodeField(dec Decoder, name string) error {
 	var v V
 	err := dec.Decode(&v)
 	if err != nil {
@@ -61,16 +61,4 @@ func (m *Map[K, V]) DecodeField(dec Decoder, name string) error {
 	}
 	(*m)[K(name)] = v
 	return nil
-}
-
-type IntDecoderFunc[T Integer] func(T) error
-
-func (f IntDecoderFunc[T]) DecodeInt(v T) error {
-	return f(v)
-}
-
-type FloatDecoderFunc[T Float] func(T) error
-
-func (f FloatDecoderFunc[T]) DecodeFloat(v T) error {
-	return f(v)
 }

@@ -18,16 +18,6 @@ func DecodeJSON(r io.Reader) (*Resolve, error) {
 // translating types to decoding/encoding-aware versions.
 func (res *Resolve) ResolveCodec(v any) (any, error) {
 	switch v := v.(type) {
-	// Maps
-	case *map[string]WorldItem:
-		return codec.AsMap(v), nil
-	case *map[string]*Function:
-		return codec.AsMap(v), nil
-	case *map[string]*Interface:
-		return codec.AsMap(v), nil
-	case *map[string]*World:
-		return codec.AsMap(v), nil
-
 	// References
 	case **World:
 		return asRefCodec(v, &res.Worlds), nil
@@ -78,9 +68,9 @@ func (w *World) DecodeField(dec codec.Decoder, name string) error {
 	case "docs":
 		return dec.Decode(&w.Docs)
 	case "imports":
-		return dec.Decode(&w.Imports)
+		return codec.DecodeMap(dec, &w.Imports)
 	case "exports":
-		return dec.Decode(&w.Exports)
+		return codec.DecodeMap(dec, &w.Exports)
 	}
 	return nil
 }
@@ -116,9 +106,9 @@ func (i *Interface) DecodeField(dec codec.Decoder, name string) error {
 	case "name":
 		return dec.Decode(&i.Name)
 	case "types":
-		return dec.Decode(&i.TypeDefs)
+		return codec.DecodeMap(dec, &i.TypeDefs)
 	case "functions":
-		return dec.Decode(&i.Functions)
+		return codec.DecodeMap(dec, &i.Functions)
 	case "package":
 		return dec.Decode(&i.Package)
 	}
@@ -201,9 +191,9 @@ func (f *Function) DecodeField(dec codec.Decoder, name string) error {
 	case "kind":
 		return dec.Decode(&f.Kind)
 	case "params":
-		return dec.Decode(&f.Params)
+		return codec.DecodeSlice(dec, &f.Params)
 	case "results":
-		return dec.Decode(&f.Results)
+		return codec.DecodeSlice(dec, &f.Results)
 	}
 	return nil
 }
@@ -215,9 +205,9 @@ func (p *Package) DecodeField(dec codec.Decoder, name string) error {
 	case "name":
 		return dec.Decode(&p.Name)
 	case "interfaces":
-		return dec.Decode(&p.Interfaces)
+		return codec.DecodeMap(dec, &p.Interfaces)
 	case "worlds":
-		return dec.Decode(&p.Worlds)
+		return codec.DecodeMap(dec, &p.Worlds)
 	}
 	return nil
 }

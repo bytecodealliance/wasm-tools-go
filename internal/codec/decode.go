@@ -172,7 +172,12 @@ func DecodeBytes(v any, data []byte) error {
 	return nil
 }
 
-// DecodeSlice wraps s in a Slice and passes it to Decode.
+// DecodeSlice adapts s into an ElementDecoder and decodes it.
 func DecodeSlice[T comparable](dec Decoder, s *[]T) error {
-	return dec.Decode(AsSlice(s))
+	return dec.Decode(Slice(s))
+}
+
+// DecodeMap adapts map m into a FieldDecoder and decodes it.
+func DecodeMap[K ~string, V any](dec Decoder, m *map[K]V) error {
+	return dec.Decode(Map(m))
 }
