@@ -1,8 +1,10 @@
 package wit
 
 import (
+	"fmt"
 	"io"
 
+	"github.com/ydnar/wit-bindgen-go/internal/codec"
 	"github.com/ydnar/wit-bindgen-go/internal/codec/json"
 )
 
@@ -13,172 +15,242 @@ func DecodeJSON(r io.Reader) (*Resolve, error) {
 	return res, err
 }
 
-// Resolve implements the codec.Resolve interface,
+// ResolveCodec implements the codec.Resolver interface,
 // translating types to decoding/encoding-aware versions.
-func (res *Resolve) Resolve(v any) (any, error) {
+func (res *Resolve) ResolveCodec(v any) (any, error) {
 	switch v := v.(type) {
 	// WIT sections
 	case *[]*World:
-		return (*ptrSliceCodec[World])(v), nil
+		return codec.AsSlice(v), nil
 	case *[]*Interface:
-		return (*ptrSliceCodec[Interface])(v), nil
+		return codec.AsSlice(v), nil
 	case *[]*TypeDef:
-		return (*ptrSliceCodec[TypeDef])(v), nil
+		return codec.AsSlice(v), nil
 	case *[]*Package:
-		return (*ptrSliceCodec[Package])(v), nil
+		return codec.AsSlice(v), nil
 
-	// Maps of concrete types
-	case map[string]*Function:
-		return mapCodec[Function](v), nil
+	// Maps
+	case *map[string]WorldItem:
+		return codec.AsMap(v), nil
+	case *map[string]*Function:
+		return codec.AsMap(v), nil
+	case *map[string]*Interface:
+		return codec.AsMap(v), nil
+	case *map[string]*World:
+		return codec.AsMap(v), nil
 
-	// Maps of references
-	case map[string]WorldItem:
-		return mapFuncCodec[WorldItem](v), nil
-	case map[string]*Interface:
-		return mapFuncCodec[*Interface](v), nil
-	case map[string]*World:
-		return mapFuncCodec[*World](v), nil
+	// References
+	case **World:
+		return asRefCodec(v, &res.Worlds), nil
+	case **Interface:
+		return asRefCodec(v, &res.Interfaces), nil
+	case **TypeDef:
+		return asRefCodec(v, &res.TypeDefs), nil
+	case **Package:
+		return asRefCodec(v, &res.Packages), nil
 
-	// Callback setters of enum/interface types
-	case func(WorldItem):
-		return worldItemCodec(v), nil
-	case func(Type):
+	// Handles
+	case **Function:
+		if *v == nil {
+			*v = new(Function)
+		}
+		return *v, nil
+
+	// Enums
+	case *Type:
 		return &typeCodec{v, res}, nil
-
-	// Callback setters of references
-	case func(*World):
-		return &indexCodec[World]{&res.Worlds, v}, nil
-	case func(*Interface):
-		return &indexCodec[Interface]{&res.Interfaces, v}, nil
-	case func(*TypeDef):
-		return &indexCodec[TypeDef]{&res.TypeDefs, v}, nil
-	case func(*Package):
-		return &indexCodec[Package]{&res.Packages, v}, nil
+	case *TypeOwner:
+		return &typeOwnerCodec{v, res}, nil
+	case *WorldItem:
+		return &worldItemCodec{v}, nil
 	}
+
 	return nil, nil
 }
 
-func (c *Resolve) DecodeField(name string) (any, error) {
+func (c *Resolve) DecodeField(dec codec.Decoder, name string) error {
 	switch name {
 	case "worlds":
-		return &c.Worlds, nil
+		return dec.Decode(&c.Worlds)
 	case "interfaces":
-		return &c.Interfaces, nil
+		return dec.Decode(&c.Interfaces)
 	case "types":
-		return &c.TypeDefs, nil
+		return dec.Decode(&c.TypeDefs)
 	case "packages":
-		return &c.Packages, nil
+		return dec.Decode(&c.Packages)
 	}
-	return nil, nil
+	return nil
 }
 
-func (c *World) DecodeField(name string) (any, error) {
+func (w *World) DecodeField(dec codec.Decoder, name string) error {
 	switch name {
 	case "name":
-		return &c.Name, nil
+		return dec.Decode(&w.Name)
 	case "docs":
-		return &c.Docs, nil
+		return dec.Decode(&w.Docs)
 	case "imports":
-		return &c.Imports, nil
+		return dec.Decode(&w.Imports)
 	case "exports":
-		return &c.Exports, nil
+		return dec.Decode(&w.Exports)
 	}
-	return nil, nil
+	return nil
 }
 
-type worldItemCodec func(WorldItem)
+type worldItemCodec struct {
+	i *WorldItem
+}
 
-func (c worldItemCodec) DecodeField(name string) (any, error) {
+func (c worldItemCodec) DecodeField(dec codec.Decoder, name string) error {
+	fmt.Println("(*worldItemCodec).DecodeField", name)
 	switch name {
 	case "interface":
-		return func(i *Interface) { c(i) }, nil
+		var i *Interface
+		err := dec.Decode(&i)
+		if err != nil {
+			return err
+		}
+		*c.i = i
 	case "type":
-		return func(i *TypeDef) { c(i) }, nil
+		var t *TypeDef
+		err := dec.Decode(&t)
+		if err != nil {
+			return err
+		}
+		*c.i = t
 	}
-	return nil, nil
+	return nil
 }
 
-func (i *Interface) DecodeField(name string) (any, error) {
+func (i *Interface) DecodeField(dec codec.Decoder, name string) error {
 	switch name {
 	case "docs":
-		return &i.Docs, nil
+		return dec.Decode(&i.Docs)
 	case "name":
-		return &i.Name, nil
+		return dec.Decode(&i.Name)
 	case "types":
-		return &i.Types, nil
+		return dec.Decode(&i.TypeDefs)
 	case "functions":
-		return &i.Functions, nil
+		return dec.Decode(&i.Functions)
 	case "package":
-		return &i.Package, nil
+		return dec.Decode(&i.Package)
 	}
-	return nil, nil
+	return nil
+}
+
+func (t *TypeDef) DecodeField(dec codec.Decoder, name string) error {
+	switch name {
+	case "kind":
+		return dec.Decode(&t.Kind)
+	case "name":
+		return dec.Decode(&t.Name)
+	case "owner":
+		return dec.Decode(&t.Owner)
+	}
+	return nil
 }
 
 // typeCodec translates WIT type strings or reference IDs into a Type.
-// The caller is responsible for setting f to receive the resolved Type.
 type typeCodec struct {
-	f func(Type)
+	t *Type
 	*Resolve
 }
 
 // DecodeString translates a into to a primitive WIT type.
 // c.f is called with the resulting Type, if any.
-func (c typeCodec) DecodeString(s string) error {
+func (c *typeCodec) DecodeString(s string) error {
 	t, err := ParseType(s)
 	if err != nil {
 		return err
 	}
-	c.f(t)
+	*c.t = t
 	return nil
 }
 
 // DecodeInt translates a TypeDef reference into a pointer to a TypeDef
 // in the parent Resolve struct.
-func (c typeCodec) DecodeInt(i int64) error {
-	var t Type = realloc(&c.TypeDefs, int(i))
-	c.f(t)
+func (c *typeCodec) DecodeInt(i int64) error {
+	t := codec.Index(&c.TypeDefs, int(i))
+	if t == nil {
+		c.TypeDefs[i] = new(TypeDef)
+	}
+	*c.t = t
 	return nil
 }
 
-func (f *Function) DecodeElement(name string) (any, error) {
+// typeOwnerCodec translates WIT type owner enums into a TypeOwner.
+type typeOwnerCodec struct {
+	o *TypeOwner
+	*Resolve
+}
+
+func (c *typeOwnerCodec) DecodeField(dec codec.Decoder, name string) error {
+	fmt.Println("(*typeOwnerCodec).DecodeField", name)
+	switch name {
+	case "interface":
+		var i *Interface
+		err := dec.Decode(&i)
+		if err != nil {
+			return err
+		}
+		*c.o = i
+	case "world":
+		var w *World
+		return dec.Decode(&w)
+		*c.o = w
+	}
+	return nil
+}
+
+func (f *Function) DecodeField(dec codec.Decoder, name string) error {
+	fmt.Println("(*Function).DecodeField", name)
 	switch name {
 	case "docs":
-		return &f.Docs, nil
+		return dec.Decode(&f.Docs)
 	case "name":
-		return &f.Name, nil
+		return dec.Decode(&f.Name)
 	case "kind":
-		return &f.Kind, nil
+		return dec.Decode(&f.Kind)
 	case "params":
-		return &f.Params, nil
+		return dec.Decode(&f.Params)
 	case "results":
-		return &f.Results, nil
+		return dec.Decode(&f.Results)
 	}
-	return nil, nil
-}
-
-type indexCodec[T any] struct {
-	s *[]*T
-	f func(*T)
-}
-
-func (c *indexCodec[T]) DecodeInt(i int64) error {
-	v := realloc(c.s, int(i))
-	c.f(v)
 	return nil
 }
 
-type ptrSliceCodec[T any] []*T
-
-func (c *ptrSliceCodec[T]) DecodeElement(i int) (any, error) {
-	return realloc(c, i), nil
+func (p *Package) DecodeField(dec codec.Decoder, name string) error {
+	fmt.Println("(*Function).DecodeField", name)
+	switch name {
+	case "docs":
+		return dec.Decode(&p.Docs)
+	case "name":
+		return dec.Decode(&p.Name)
+	case "interfaces":
+		return dec.Decode(&p.Interfaces)
+	case "worlds":
+		return dec.Decode(&p.Worlds)
+	}
+	return nil
 }
 
-type sliceCodec[T any] []T
+/*
+type sliceCodec[T comparable] []T
 
-func (c *sliceCodec[T]) DecodeElement(i int) (any, error) {
+func (c *sliceCodec[T]) DecodeElement(dec codec.Decoder, i int) error {
+	var v T
+	if i >= 0 && i < len(*c) {
+		v = (*c)[i]
+	}
+	err := dec.Decode(&v)
+	if err != nil {
+		return err
+	}
 	remake(c, i)
-	return &(*c)[i], nil
-}
+	if v != (*c)[i] {
+		(*c)[i] = v
+	}
+	return nil
+}*/
 
 // remake reallocates a slice if necessary for len i,
 // returning the value of s[i].
@@ -209,25 +281,60 @@ func realloc[S ~[]*E, E any](s *S, i int) *E {
 	return (*s)[i]
 }
 
-type mapCodec[T any] map[string]*T
+/*
+type mapCodec[T any] map[string]T
 
-func (c *mapCodec[T]) DecodeField(name string) (any, error) {
-	if _, ok := (*c)[name]; !ok {
-		if *c == nil {
-			*c = make(map[string]*T)
-		}
-		(*c)[name] = new(T)
+func (c *mapCodec[T]) DecodeField(dec codec.Decoder, name string) error {
+	var v T
+	err := dec.Decode(&v)
+	if err != nil {
+		return err
 	}
-	return (*c)[name], nil
+	if *c == nil {
+		*c = make(map[string]T)
+	}
+	(*c)[name] = v
+	return nil
+}
+*/
+
+// refCodec is a codec for decoding a 0-based reference to
+// some resource (T), or data structure representing that
+// type.
+type refCodec[T any] struct {
+	v **T
+	s *[]*T
 }
 
-type mapFuncCodec[T any] map[string]T
+func asRefCodec[T any](v **T, s *[]*T) *refCodec[T] {
+	return &refCodec[T]{v, s}
+}
 
-func (c *mapFuncCodec[T]) DecodeField(name string) (any, error) {
-	return func(v T) {
-		if *c == nil {
-			*c = make(map[string]T)
-		}
-		(*c)[name] = v
-	}, nil
+func (c *refCodec[T]) DecodeInt(i int64) error {
+	*c.v = codec.Index(c.s, int(i))
+	if *c.v == nil {
+		*c.v = new(T)
+		(*c.s)[i] = *c.v
+	}
+	return nil
+}
+
+func (c *refCodec[T]) DecodeElement(dec codec.Decoder, i int) error {
+	if *c.v == nil {
+		*c.v = new(T)
+	}
+	if ed, ok := any(*c.v).(codec.ElementDecoder); ok {
+		return ed.DecodeElement(dec, i)
+	}
+	return nil
+}
+
+func (c *refCodec[T]) DecodeField(dec codec.Decoder, name string) error {
+	if *c.v == nil {
+		*c.v = new(T)
+	}
+	if fd, ok := any(*c.v).(codec.FieldDecoder); ok {
+		return fd.DecodeField(dec, name)
+	}
+	return nil
 }

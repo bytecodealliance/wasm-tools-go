@@ -10,7 +10,7 @@ import (
 )
 
 func TestDecodeJSON(t *testing.T) {
-	f, err := os.Open(testutil.Path("../testdata/functions.json"))
+	f, err := os.Open(testutil.Path("../testdata/worlds-with-types.json"))
 	if err != nil {
 		t.Fatal(err)
 	}

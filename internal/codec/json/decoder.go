@@ -23,7 +23,7 @@ func NewDecoder(r io.Reader, resolvers ...codec.Resolver) *Decoder {
 }
 
 func (dec *Decoder) Decode(v any) error {
-	c, err := dec.r.Resolve(v)
+	c, err := dec.r.ResolveCodec(v)
 	if err != nil {
 		return err
 	}
@@ -90,13 +90,16 @@ func (dec *Decoder) decodeObject(o any) error {
 		if err != nil {
 			return err
 		}
-		v, err := d.DecodeField(name)
+		fdec := &onceDecoder{Decoder: dec}
+		err = d.DecodeField(fdec, name)
 		if err != nil {
 			return err
 		}
-		err = dec.Decode(v)
-		if err != nil {
-			return err
+		if fdec.calls == 0 {
+			err = dec.Decode(nil)
+			if err != nil {
+				return err
+			}
 		}
 	}
 
@@ -121,13 +124,16 @@ func (dec *Decoder) decodeArray(v any) error {
 	}
 
 	for i := 0; dec.dec.More(); i++ {
-		v, err := d.DecodeElement(i)
+		edec := &onceDecoder{Decoder: dec}
+		err := d.DecodeElement(edec, i)
 		if err != nil {
 			return err
 		}
-		err = dec.Decode(v)
-		if err != nil {
-			return err
+		if edec.calls == 0 {
+			err = dec.Decode(nil)
+			if err != nil {
+				return err
+			}
 		}
 	}
 
@@ -154,14 +160,27 @@ func (dec *Decoder) stringToken() (string, error) {
 	return s, nil
 }
 
-type ignore struct{}
-
-func (i *ignore) DecodeField(string) (any, error) {
-	return i, nil
+type onceDecoder struct {
+	*Decoder
+	calls int
 }
 
-func (i *ignore) DecodeElement(int) (any, error) {
-	return i, nil
+func (dec *onceDecoder) Decode(v any) error {
+	dec.calls++
+	if dec.calls > 1 {
+		return fmt.Errorf("unexpected call to Decode (%d > 1)", dec.calls)
+	}
+	return dec.Decoder.Decode(v)
+}
+
+type ignore struct{}
+
+func (ig *ignore) DecodeField(dec codec.Decoder, name string) error {
+	return nil
+}
+
+func (ig *ignore) DecodeElement(dec codec.Decoder, i int) error {
+	return nil
 }
 
 func (i *ignore) UnmarshalJSON([]byte) error {

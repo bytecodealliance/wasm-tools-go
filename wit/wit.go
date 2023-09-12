@@ -26,7 +26,7 @@ type WorldItem interface {
 type Interface struct {
 	Docs      Docs
 	Name      *string
-	Types     map[string]*TypeDef
+	TypeDefs  map[string]*TypeDef
 	Functions map[string]*Function
 	Package   *Package
 }
