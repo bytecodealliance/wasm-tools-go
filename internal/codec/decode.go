@@ -93,7 +93,7 @@ func decodeSignedValue[T Signed](v *T, n string) error {
 
 func decodeSigned[T Signed](v IntDecoder[T], n string) error {
 	var x T
-	i, err := strconv.ParseInt(n, 10, int(unsafe.Sizeof(x)))
+	i, err := strconv.ParseInt(n, 10, int(unsafe.Sizeof(x))*8)
 	if err != nil {
 		return err
 	}
@@ -111,7 +111,7 @@ func decodeUnsignedValue[T Unsigned](v *T, n string) error {
 
 func decodeUnsigned[T Unsigned](v IntDecoder[T], n string) error {
 	var x T
-	i, err := strconv.ParseUint(n, 10, int(unsafe.Sizeof(x)))
+	i, err := strconv.ParseUint(n, 10, int(unsafe.Sizeof(x))*8)
 	if err != nil {
 		return err
 	}
@@ -129,7 +129,7 @@ func decodeFloatValue[T Float](v *T, n string) error {
 
 func decodeFloat[T Float](v FloatDecoder[T], n string) error {
 	var x T
-	f, err := strconv.ParseFloat(n, int(unsafe.Sizeof(x)))
+	f, err := strconv.ParseFloat(n, int(unsafe.Sizeof(x))*8)
 	if err != nil {
 		return err
 	}
