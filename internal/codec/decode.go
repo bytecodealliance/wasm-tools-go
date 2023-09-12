@@ -171,3 +171,8 @@ func DecodeBytes(v any, data []byte) error {
 	// Return an error? Silently ignore? Configurable?
 	return nil
 }
+
+// DecodeSlice wraps s in a Slice and passes it to Decode.
+func DecodeSlice[T comparable](dec Decoder, s *[]T) error {
+	return dec.Decode(AsSlice(s))
+}

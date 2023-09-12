@@ -18,16 +18,6 @@ func DecodeJSON(r io.Reader) (*Resolve, error) {
 // translating types to decoding/encoding-aware versions.
 func (res *Resolve) ResolveCodec(v any) (any, error) {
 	switch v := v.(type) {
-	// WIT sections
-	case *[]*World:
-		return codec.AsSlice(v), nil
-	case *[]*Interface:
-		return codec.AsSlice(v), nil
-	case *[]*TypeDef:
-		return codec.AsSlice(v), nil
-	case *[]*Package:
-		return codec.AsSlice(v), nil
-
 	// Maps
 	case *map[string]WorldItem:
 		return codec.AsMap(v), nil
@@ -70,13 +60,13 @@ func (res *Resolve) ResolveCodec(v any) (any, error) {
 func (c *Resolve) DecodeField(dec codec.Decoder, name string) error {
 	switch name {
 	case "worlds":
-		return dec.Decode(&c.Worlds)
+		return codec.DecodeSlice(dec, &c.Worlds)
 	case "interfaces":
-		return dec.Decode(&c.Interfaces)
+		return codec.DecodeSlice(dec, &c.Interfaces)
 	case "types":
-		return dec.Decode(&c.TypeDefs)
+		return codec.DecodeSlice(dec, &c.TypeDefs)
 	case "packages":
-		return dec.Decode(&c.Packages)
+		return codec.DecodeSlice(dec, &c.Packages)
 	}
 	return nil
 }
