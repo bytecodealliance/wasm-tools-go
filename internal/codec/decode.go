@@ -3,6 +3,7 @@ package codec
 import (
 	"encoding"
 	"strconv"
+	"unsafe"
 )
 
 // DecodeNil calls DecodeNil on v if v implements NilDecoder.
@@ -27,70 +28,146 @@ func DecodeBool(v any, b bool) error {
 
 // DecodeNumber decodes a number encoded as a string into v.
 // The following types are supported: int64, uint64, float64, IntDecoder, and FloatDecoder.
-// It will also attempt to decode the string directly into v if it is one of:
-// string, []byte, StringDecoder, BytesDecoder, or encoding.TextUnmarshaler.
+// If unable to decode into a numeric type, it will fall back to DecodeString.
 func DecodeNumber(v any, n string) error {
 	switch v := v.(type) {
+	case *int8:
+		return decodeSignedValue(v, n)
+	case *int16:
+		return decodeSignedValue(v, n)
+	case *int32:
+		return decodeSignedValue(v, n)
 	case *int64:
-		i, err := strconv.ParseInt(n, 10, 64)
-		if err != nil {
-			return err
-		}
-		*v = i
+		return decodeSignedValue(v, n)
+
+	case *uint8:
+		return decodeUnsignedValue(v, n)
+	case *uint16:
+		return decodeUnsignedValue(v, n)
+	case *uint32:
+		return decodeUnsignedValue(v, n)
 	case *uint64:
-		i, err := strconv.ParseUint(n, 10, 64)
-		if err != nil {
-			return err
-		}
-		*v = i
+		return decodeUnsignedValue(v, n)
+
+	case *float32:
+		return decodeFloatValue(v, n)
 	case *float64:
-		f, err := strconv.ParseFloat(n, 64)
-		if err != nil {
-			return err
-		}
-		*v = f
-	case IntDecoder:
-		i, err := strconv.ParseInt(n, 10, 64)
-		if err != nil {
-			return err
-		}
-		return v.DecodeInt(i)
-	case UintDecoder:
-		i, err := strconv.ParseUint(n, 10, 64)
-		if err != nil {
-			return err
-		}
-		return v.DecodeUint(i)
-	case FloatDecoder:
-		f, err := strconv.ParseFloat(n, 64)
-		if err != nil {
-			return err
-		}
-		return v.DecodeFloat(f)
+		return decodeFloatValue(v, n)
+
+	case IntDecoder[int8]:
+		return decodeSigned(v, n)
+	case IntDecoder[int16]:
+		return decodeSigned(v, n)
+	case IntDecoder[int32]:
+		return decodeSigned(v, n)
+	case IntDecoder[int64]:
+		return decodeSigned(v, n)
+
+	case IntDecoder[uint8]:
+		return decodeUnsigned(v, n)
+	case IntDecoder[uint16]:
+		return decodeUnsigned(v, n)
+	case IntDecoder[uint32]:
+		return decodeUnsigned(v, n)
+	case IntDecoder[uint64]:
+		return decodeUnsigned(v, n)
+
+	case FloatDecoder[float32]:
+		return decodeFloat(v, n)
+	case FloatDecoder[float64]:
+		return decodeFloat(v, n)
 	}
 	// TODO: how to handle undecodable types?
 	// Return an error? Silently ignore? Configurable?
 	return DecodeString(v, n)
 }
 
-// Decode string decodes s into v. The following types are supported:
-// string, []byte, StringDecoder, BytesDecoder, and encoding.TextUnmarshaler.
+func decodeSignedValue[T Signed](v *T, n string) error {
+	i, err := strconv.ParseInt(n, 10, int(unsafe.Sizeof(*v)))
+	if err != nil {
+		return err
+	}
+	*v = T(i)
+	return nil
+}
+
+func decodeSigned[T Signed](v IntDecoder[T], n string) error {
+	var x T
+	i, err := strconv.ParseInt(n, 10, int(unsafe.Sizeof(x)))
+	if err != nil {
+		return err
+	}
+	return v.DecodeInt(T(i))
+}
+
+func decodeUnsignedValue[T Unsigned](v *T, n string) error {
+	i, err := strconv.ParseUint(n, 10, int(unsafe.Sizeof(*v)))
+	if err != nil {
+		return err
+	}
+	*v = T(i)
+	return nil
+}
+
+func decodeUnsigned[T Unsigned](v IntDecoder[T], n string) error {
+	var x T
+	i, err := strconv.ParseUint(n, 10, int(unsafe.Sizeof(x)))
+	if err != nil {
+		return err
+	}
+	return v.DecodeInt(T(i))
+}
+
+func decodeFloatValue[T Float](v *T, n string) error {
+	f, err := strconv.ParseFloat(n, int(unsafe.Sizeof(*v)))
+	if err != nil {
+		return err
+	}
+	*v = T(f)
+	return nil
+}
+
+func decodeFloat[T Float](v FloatDecoder[T], n string) error {
+	var x T
+	f, err := strconv.ParseFloat(n, int(unsafe.Sizeof(x)))
+	if err != nil {
+		return err
+	}
+	return v.DecodeFloat(T(f))
+}
+
+// DecodeString decodes s into v. The following types are supported:
+// string, *string, and StringDecoder. It will fall back to DecodeBytes
+// to attempt to decode into a byte slice or binary decoder.
 func DecodeString(v any, s string) error {
 	switch v := v.(type) {
 	case *string:
 		*v = s
+		return nil
 	case **string:
 		*v = &s
-	case *[]byte:
-		*v = []byte(s)
+		return nil
 	case StringDecoder:
 		return v.DecodeString(s)
-	case BytesDecoder:
-		return v.DecodeBytes([]byte(s))
-	case encoding.TextUnmarshaler:
-		return v.UnmarshalText([]byte(s))
-		// TODO: how to handle undecodable types?
-		// Return an error? Silently ignore? Configurable?
 	}
+	return DecodeBytes(v, []byte(s))
+}
+
+// DecodeBytes decodes data into v. The following types are supported:
+// []byte, BytesDecoder, encoding.BinaryUnmarshaler, and encoding.TextUnmarshaler.
+func DecodeBytes(v any, data []byte) error {
+	switch v := v.(type) {
+	case *[]byte:
+		Element(v, len(data))
+		copy(*v, data)
+	case BytesDecoder:
+		return v.DecodeBytes(data)
+	case encoding.BinaryUnmarshaler:
+		return v.UnmarshalBinary(data)
+	case encoding.TextUnmarshaler:
+		return v.UnmarshalText(data)
+	}
+	// TODO: how to handle undecodable types?
+	// Return an error? Silently ignore? Configurable?
 	return nil
 }

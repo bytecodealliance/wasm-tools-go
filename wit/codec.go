@@ -166,8 +166,8 @@ func (c *typeCodec) DecodeString(s string) error {
 
 // DecodeInt translates a TypeDef reference into a pointer to a TypeDef
 // in the parent Resolve struct.
-func (c *typeCodec) DecodeInt(i int64) error {
-	t := codec.Element(&c.TypeDefs, int(i))
+func (c *typeCodec) DecodeInt(i int) error {
+	t := codec.Element(&c.TypeDefs, i)
 	if t == nil {
 		t = new(TypeDef)
 		c.TypeDefs[i] = t
@@ -244,8 +244,8 @@ func asRefCodec[T any](v **T, s *[]*T) *refCodec[T] {
 	return &refCodec[T]{v, s}
 }
 
-func (c *refCodec[T]) DecodeInt(i int64) error {
-	*c.v = codec.Element(c.s, int(i))
+func (c *refCodec[T]) DecodeInt(i int) error {
+	*c.v = codec.Element(c.s, i)
 	if *c.v == nil {
 		*c.v = new(T)
 		(*c.s)[i] = *c.v
