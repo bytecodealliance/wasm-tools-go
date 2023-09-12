@@ -39,7 +39,7 @@ func (res *Resolve) ResolveCodec(v any) (any, error) {
 	case *Type:
 		return &typeCodec{v, res}, nil
 	case *TypeOwner:
-		return &typeOwnerCodec{v, res}, nil
+		return &typeOwnerCodec{v}, nil
 	case *WorldItem:
 		return &worldItemCodec{v}, nil
 	}
@@ -136,12 +136,9 @@ type typeCodec struct {
 // DecodeString translates a into to a primitive WIT type.
 // c.f is called with the resulting Type, if any.
 func (c *typeCodec) DecodeString(s string) error {
-	t, err := ParseType(s)
-	if err != nil {
-		return err
-	}
-	*c.t = t
-	return nil
+	var err error
+	*c.t, err = ParseType(s)
+	return err
 }
 
 // DecodeInt translates a TypeDef reference into a pointer to a TypeDef
@@ -159,7 +156,6 @@ func (c *typeCodec) DecodeInt(i int) error {
 // typeOwnerCodec translates WIT type owner enums into a TypeOwner.
 type typeOwnerCodec struct {
 	o *TypeOwner
-	*Resolve
 }
 
 func (c *typeOwnerCodec) DecodeField(dec codec.Decoder, name string) error {
