@@ -36,13 +36,6 @@ func (dec *Decoder) Decode(v any) error {
 		return err
 	}
 
-	if end, ok := v.(codec.EndDecoder); ok {
-		err = end.DecodeEnd()
-		if err != nil {
-			return err
-		}
-	}
-
 	return nil
 }
 

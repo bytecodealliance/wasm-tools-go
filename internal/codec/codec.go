@@ -28,13 +28,6 @@ type Decoder interface {
 	Decode(v any) error
 }
 
-// EndDecoder is the interface implemented by types that wish to receive a signal
-// that decoding has finished. DecodeEnd is not called if an error occurs during
-// decoding. DecodeEnd can return an error to abort further decoding.
-type EndDecoder interface {
-	DecodeEnd() error
-}
-
 type NilDecoder interface {
 	DecodeNil() error
 }
