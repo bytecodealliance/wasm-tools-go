@@ -1,7 +1,6 @@
 package wit
 
 import (
-	"fmt"
 	"io"
 
 	"github.com/ydnar/wit-bindgen-go/internal/codec"
@@ -101,7 +100,6 @@ type worldItemCodec struct {
 }
 
 func (c worldItemCodec) DecodeField(dec codec.Decoder, name string) error {
-	fmt.Println("(*worldItemCodec).DecodeField", name)
 	switch name {
 	case "interface":
 		var i *Interface
@@ -169,9 +167,10 @@ func (c *typeCodec) DecodeString(s string) error {
 // DecodeInt translates a TypeDef reference into a pointer to a TypeDef
 // in the parent Resolve struct.
 func (c *typeCodec) DecodeInt(i int64) error {
-	t := codec.Index(&c.TypeDefs, int(i))
+	t := codec.Element(&c.TypeDefs, int(i))
 	if t == nil {
-		c.TypeDefs[i] = new(TypeDef)
+		t = new(TypeDef)
+		c.TypeDefs[i] = t
 	}
 	*c.t = t
 	return nil
@@ -184,7 +183,6 @@ type typeOwnerCodec struct {
 }
 
 func (c *typeOwnerCodec) DecodeField(dec codec.Decoder, name string) error {
-	fmt.Println("(*typeOwnerCodec).DecodeField", name)
 	switch name {
 	case "interface":
 		var i *Interface
@@ -195,14 +193,16 @@ func (c *typeOwnerCodec) DecodeField(dec codec.Decoder, name string) error {
 		*c.o = i
 	case "world":
 		var w *World
-		return dec.Decode(&w)
+		err := dec.Decode(&w)
+		if err != nil {
+			return err
+		}
 		*c.o = w
 	}
 	return nil
 }
 
 func (f *Function) DecodeField(dec codec.Decoder, name string) error {
-	fmt.Println("(*Function).DecodeField", name)
 	switch name {
 	case "docs":
 		return dec.Decode(&f.Docs)
@@ -219,7 +219,6 @@ func (f *Function) DecodeField(dec codec.Decoder, name string) error {
 }
 
 func (p *Package) DecodeField(dec codec.Decoder, name string) error {
-	fmt.Println("(*Function).DecodeField", name)
 	switch name {
 	case "docs":
 		return dec.Decode(&p.Docs)
@@ -246,7 +245,7 @@ func asRefCodec[T any](v **T, s *[]*T) *refCodec[T] {
 }
 
 func (c *refCodec[T]) DecodeInt(i int64) error {
-	*c.v = codec.Index(c.s, int(i))
+	*c.v = codec.Element(c.s, int(i))
 	if *c.v == nil {
 		*c.v = new(T)
 		(*c.s)[i] = *c.v

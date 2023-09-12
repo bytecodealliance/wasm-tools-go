@@ -1,7 +1,5 @@
 package codec
 
-import "fmt"
-
 // Resolver is the interface implemented by types that return a codec for the value at v.
 // Values returned by Resolver should implement one or more encode or decode methods.
 type Resolver interface {
@@ -91,16 +89,16 @@ func (s *Slice[E]) DecodeElement(dec Decoder, i int) error {
 	if err != nil {
 		return err
 	}
-	Index(s, i)
+	Element(s, i)
 	if v != (*s)[i] {
 		(*s)[i] = v
 	}
 	return nil
 }
 
-// Index returns element i in slice s, reallocating the slice
+// Element returns element i in slice s, reallocating the slice
 // if necessary to at least len == i+1.
-func Index[S ~[]E, E any](s *S, i int) E {
+func Element[S ~[]E, E comparable](s *S, i int) E {
 	var e E
 	if i < 0 {
 		return e
@@ -123,7 +121,6 @@ func AsMap[K ~string, V any](m *map[K]V) *Map[K, V] {
 // allocating the underlying map if necessary.
 func (m *Map[K, V]) DecodeField(dec Decoder, name string) error {
 	var v V
-	fmt.Printf("(*Map).DecodeField(dec, %q) -> %#v\n", name, v)
 	err := dec.Decode(&v)
 	if err != nil {
 		return err

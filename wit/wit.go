@@ -28,7 +28,7 @@ type Interface struct {
 	Name      *string
 	TypeDefs  map[string]*TypeDef
 	Functions map[string]*Function
-	Package   *Package
+	Package   *Package `json:"-"`
 }
 
 func (*Interface) isWorldItem() {}
@@ -38,7 +38,7 @@ func (*Interface) isTypeOwner() {}
 type TypeDef struct {
 	Kind  TypeDefKind
 	Name  string
-	Owner TypeOwner
+	Owner TypeOwner `json:"-"`
 }
 
 func (TypeDef) isType() {}
