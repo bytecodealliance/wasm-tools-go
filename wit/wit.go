@@ -2,8 +2,6 @@ package wit
 
 import (
 	"fmt"
-
-	"github.com/ydnar/wit-bindgen-go/internal/codec"
 )
 
 type Resolve struct {
@@ -190,39 +188,17 @@ func (t coreType[T]) MarshalText() ([]byte, error) {
 	return []byte(t.TypeName()), nil
 }
 
-type IntType interface {
-	isIntType()
-	Type
-}
-
-type intType[T codec.Integer] struct{ coreType[T] }
-
-func (intType[T]) isIntType() {}
-
-type signedType[T codec.Signed] struct{ intType[T] }
-
-type unsignedType[T codec.Unsigned] struct{ intType[T] }
-
-type FloatType interface {
-	isFloatType()
-	Type
-}
-
-type floatType[T codec.Float] struct{ coreType[T] }
-
-func (floatType[T]) isFloatType() {}
-
 type BoolType struct{ coreType[bool] }
-type S8Type struct{ signedType[int8] }
-type U8Type struct{ unsignedType[uint8] }
-type S16Type struct{ signedType[int16] }
-type U16Type struct{ unsignedType[uint16] }
-type S32Type struct{ signedType[int32] }
-type U32Type struct{ unsignedType[uint32] }
-type S64Type struct{ signedType[int64] }
-type U64Type struct{ unsignedType[uint64] }
-type Float32Type struct{ floatType[float32] }
-type Float64Type struct{ floatType[float64] }
+type S8Type struct{ coreType[int8] }
+type U8Type struct{ coreType[uint8] }
+type S16Type struct{ coreType[int16] }
+type U16Type struct{ coreType[uint16] }
+type S32Type struct{ coreType[int32] }
+type U32Type struct{ coreType[uint32] }
+type S64Type struct{ coreType[int64] }
+type U64Type struct{ coreType[uint64] }
+type Float32Type struct{ coreType[float32] }
+type Float64Type struct{ coreType[float64] }
 type CharType struct{ coreType[char] }
 type StringType struct{ coreType[string] }
 
