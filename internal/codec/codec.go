@@ -6,14 +6,14 @@ type Codec any
 // Resolver is the interface implemented by types that return a codec for the value at v.
 // Values returned by Resolver should implement one or more encode or decode methods.
 type Resolver interface {
-	ResolveCodec(v any) Codec
+	ResolveCodec(v Codable) Codec
 }
 
 // Resolvers is a slice of Resolver values. It also implements the Resolver interface.
 type Resolvers []Resolver
 
 // ResolveCodec walks the slice of Resolvers, returning the first non-nil value or an error.
-func (rs Resolvers) ResolveCodec(v any) Codec {
+func (rs Resolvers) ResolveCodec(v Codable) Codec {
 	for _, r := range rs {
 		c := r.ResolveCodec(v)
 		if c != nil {
@@ -21,6 +21,11 @@ func (rs Resolvers) ResolveCodec(v any) Codec {
 		}
 	}
 	return nil
+}
+
+// Codable is any type that can encode or decode itself or via an associated Codec.
+type Codable interface {
+	Encodable | Decodable
 }
 
 // Encodable is any type that can be encoded directly or via an associated Codec.
