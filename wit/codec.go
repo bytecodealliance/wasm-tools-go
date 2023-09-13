@@ -20,19 +20,17 @@ func (res *Resolve) ResolveCodec(v any) (any, error) {
 	switch v := v.(type) {
 	// References
 	case **World:
-		return asRefCodec(v, &res.Worlds), nil
+		return &worldCodec{v, res}, nil
 	case **Interface:
-		return asRefCodec(v, &res.Interfaces), nil
+		return &interfaceCodec{v, res}, nil
 	case **TypeDef:
-		return asRefCodec(v, &res.TypeDefs), nil
+		return &typeDefCodec{v, res}, nil
 	case **Package:
-		return asRefCodec(v, &res.Packages), nil
+		return &packageCodec{v, res}, nil
 
 	// Handles
 	case **Function:
-		if *v == nil {
-			*v = new(Function)
-		}
+		newIfNil(v)
 		return *v, nil
 
 	// Enums
@@ -45,6 +43,22 @@ func (res *Resolve) ResolveCodec(v any) (any, error) {
 	}
 
 	return nil, nil
+}
+
+func (c *Resolve) getWorld(i int) *World {
+	return newIfElementNil(&c.Worlds, i)
+}
+
+func (c *Resolve) getInterface(i int) *Interface {
+	return newIfElementNil(&c.Interfaces, i)
+}
+
+func (c *Resolve) getTypeDef(i int) *TypeDef {
+	return newIfElementNil(&c.TypeDefs, i)
+}
+
+func (c *Resolve) getPackage(i int) *Package {
+	return newIfElementNil(&c.Packages, i)
 }
 
 func (c *Resolve) DecodeField(dec codec.Decoder, name string) error {
@@ -61,7 +75,18 @@ func (c *Resolve) DecodeField(dec codec.Decoder, name string) error {
 	return nil
 }
 
-func (w *World) DecodeField(dec codec.Decoder, name string) error {
+type worldCodec struct {
+	w **World
+	*Resolve
+}
+
+func (c *worldCodec) DecodeInt(i int) error {
+	*c.w = c.getWorld(i)
+	return nil
+}
+
+func (c *worldCodec) DecodeField(dec codec.Decoder, name string) error {
+	w := newIfNil(c.w)
 	switch name {
 	case "name":
 		return dec.Decode(&w.Name)
@@ -99,7 +124,18 @@ func (c worldItemCodec) DecodeField(dec codec.Decoder, name string) error {
 	return nil
 }
 
-func (i *Interface) DecodeField(dec codec.Decoder, name string) error {
+type interfaceCodec struct {
+	i **Interface
+	*Resolve
+}
+
+func (c *interfaceCodec) DecodeInt(i int) error {
+	*c.i = c.getInterface(i)
+	return nil
+}
+
+func (c *interfaceCodec) DecodeField(dec codec.Decoder, name string) error {
+	i := newIfNil(c.i)
 	switch name {
 	case "docs":
 		return dec.Decode(&i.Docs)
@@ -115,7 +151,18 @@ func (i *Interface) DecodeField(dec codec.Decoder, name string) error {
 	return nil
 }
 
-func (t *TypeDef) DecodeField(dec codec.Decoder, name string) error {
+type typeDefCodec struct {
+	t **TypeDef
+	*Resolve
+}
+
+func (c *typeDefCodec) DecodeInt(i int) error {
+	*c.t = c.getTypeDef(i)
+	return nil
+}
+
+func (c *typeDefCodec) DecodeField(dec codec.Decoder, name string) error {
+	t := newIfNil(c.t)
 	switch name {
 	case "kind":
 		return dec.Decode(&t.Kind)
@@ -144,12 +191,7 @@ func (c *typeCodec) DecodeString(s string) error {
 // DecodeInt translates a TypeDef reference into a pointer to a TypeDef
 // in the parent Resolve struct.
 func (c *typeCodec) DecodeInt(i int) error {
-	t := codec.Element(&c.TypeDefs, i)
-	if t == nil {
-		t = new(TypeDef)
-		c.TypeDefs[i] = t
-	}
-	*c.t = t
+	*c.t = c.getTypeDef(i)
 	return nil
 }
 
@@ -194,7 +236,18 @@ func (f *Function) DecodeField(dec codec.Decoder, name string) error {
 	return nil
 }
 
-func (p *Package) DecodeField(dec codec.Decoder, name string) error {
+type packageCodec struct {
+	p **Package
+	*Resolve
+}
+
+func (c *packageCodec) DecodeInt(i int) error {
+	*c.p = c.getPackage(i)
+	return nil
+}
+
+func (c *packageCodec) DecodeField(dec codec.Decoder, name string) error {
+	p := newIfNil(c.p)
 	switch name {
 	case "docs":
 		return dec.Decode(&p.Docs)
@@ -208,43 +261,21 @@ func (p *Package) DecodeField(dec codec.Decoder, name string) error {
 	return nil
 }
 
-// refCodec is a codec for decoding a 0-based reference to
-// some resource (T), or data structure representing that
-// type.
-type refCodec[T any] struct {
-	v **T
-	s *[]*T
+// newIfNil allocates a new instance of T if *v == nil.
+func newIfNil[T any](v **T) *T {
+	if *v == nil {
+		*v = new(T)
+	}
+	return *v
 }
 
-func asRefCodec[T any](v **T, s *[]*T) *refCodec[T] {
-	return &refCodec[T]{v, s}
-}
-
-func (c *refCodec[T]) DecodeInt(i int) error {
-	*c.v = codec.Element(c.s, i)
-	if *c.v == nil {
-		*c.v = new(T)
-		(*c.s)[i] = *c.v
+// newIfElementNil resizes s and allocates a new instance of T if necessary.
+func newIfElementNil[S ~[]*E, E any](s *S, i int) *E {
+	if i < 0 {
+		return nil
 	}
-	return nil
-}
-
-func (c *refCodec[T]) DecodeElement(dec codec.Decoder, i int) error {
-	if *c.v == nil {
-		*c.v = new(T)
+	if codec.Resize(s, i) == nil {
+		(*s)[i] = new(E)
 	}
-	if ed, ok := any(*c.v).(codec.ElementDecoder); ok {
-		return ed.DecodeElement(dec, i)
-	}
-	return nil
-}
-
-func (c *refCodec[T]) DecodeField(dec codec.Decoder, name string) error {
-	if *c.v == nil {
-		*c.v = new(T)
-	}
-	if fd, ok := any(*c.v).(codec.FieldDecoder); ok {
-		return fd.DecodeField(dec, name)
-	}
-	return nil
+	return (*s)[i]
 }

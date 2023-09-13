@@ -162,7 +162,7 @@ func DecodeString(v any, s string) error {
 func DecodeBytes(v any, data []byte) error {
 	switch v := v.(type) {
 	case *[]byte:
-		Element(v, len(data))
+		Resize(v, len(data))
 		copy(*v, data)
 	case BytesDecoder:
 		return v.DecodeBytes(data)
