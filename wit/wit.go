@@ -186,6 +186,9 @@ func (t coreType[T]) MarshalText() ([]byte, error) {
 	return []byte(t.TypeName()), nil
 }
 
+// WASI component model types
+// https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md#types
+
 type BoolType coreType[bool]
 type S8Type coreType[int8]
 type U8Type coreType[uint8]
