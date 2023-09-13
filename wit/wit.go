@@ -15,13 +15,14 @@ type World struct {
 	Imports map[string]WorldItem
 	Exports map[string]WorldItem
 	Package *Package
+	typeOwner
 }
 
-func (*World) isTypeOwner() {}
+type WorldItem interface{ isWorldItem() }
 
-type WorldItem interface {
-	isWorldItem()
-}
+type worldItem struct{}
+
+func (worldItem) isWorldItem() {}
 
 type Interface struct {
 	Docs      Docs
@@ -29,52 +30,103 @@ type Interface struct {
 	TypeDefs  map[string]*TypeDef
 	Functions map[string]*Function
 	Package   *Package `json:"-"`
+	worldItem
+	typeOwner
 }
-
-func (*Interface) isWorldItem() {}
-
-func (*Interface) isTypeOwner() {}
 
 type TypeDef struct {
 	Kind  TypeDefKind
 	Name  string
 	Owner TypeOwner `json:"-"`
+	worldItem
+	type_
 }
 
-func (TypeDef) isType() {}
+type TypeDefKind interface{ isTypeDefKind() }
 
-func (*TypeDef) isWorldItem() {}
+type typeDefKind struct{}
 
-type TypeDefKind interface {
-	isTypeDefKind()
-}
-
-type TypeOwner interface {
-	isTypeOwner()
-}
+func (typeDefKind) isTypeDefKind() {}
 
 /*
-pub enum Type {
-    Bool,
-    U8,
-    U16,
-    U32,
-    U64,
-    S8,
-    S16,
-    S32,
-    S64,
-    Float32,
-    Float64,
-    Char,
-    String,
-    Id(TypeId),
-}
+	Record(Record),
+	Resource,
+	Handle(Handle),
+	Flags(Flags),
+	Tuple(Tuple),
+	Variant(Variant),
+	Enum(Enum),
+	Option(Type),
+	Result(Result_),
+	List(Type),
+	Future(Option<Type>),
+	Stream(Stream),
+	Type(Type),
 */
 
-type Type interface{ isType() }
+type Record struct {
+	// TODO
+	typeDefKind
+}
 
-type type_ struct{}
+type Resource struct {
+	// TODO
+	typeDefKind
+}
+
+type Handle struct {
+	// TODO
+	typeDefKind
+}
+
+type Flags struct {
+	// TODO
+	typeDefKind
+}
+
+type Tuple struct {
+	// TODO
+	typeDefKind
+}
+
+type Variant struct {
+	// TODO
+	typeDefKind
+}
+
+type Enum struct {
+	// TODO
+	typeDefKind
+}
+
+type Option struct{ Type }
+
+type Result struct {
+	// TODO
+	typeDefKind
+}
+
+type List struct {
+	// TODO
+	typeDefKind
+}
+
+type Future struct{ Type } // Represented in Rust as Option<Type>, so Type field could be nil
+
+type Stream struct{ Type }
+
+type TypeOwner interface{ isTypeOwner() }
+
+type typeOwner struct{}
+
+func (typeOwner) isTypeOwner() {}
+
+type Type interface {
+	isType()
+	TypeDefKind
+}
+
+type type_ struct{ typeDefKind }
 
 func (type_) isType() {}
 
@@ -140,8 +192,6 @@ func ParseType(s string) (Type, error) {
 	return nil, fmt.Errorf("unknown type %q", s)
 }
 
-// TODO: rest of the types
-
 type Function struct {
 	Docs    Docs
 	Name    string
@@ -150,23 +200,32 @@ type Function struct {
 	Results []Param
 }
 
-type FunctionKind interface{ isFunctionKind() }
+type FunctionKind interface {
+	isFunctionKind()
+}
 
-type FunctionKindFreestanding struct{}
+type functionKind struct{}
 
-func (FunctionKindFreestanding) isFunctionKind() {}
+func (functionKind) isFunctionKind() {}
 
-type FunctionKindMethod struct{ Type }
+type FunctionKindFreestanding struct {
+	functionKind
+}
 
-func (FunctionKindMethod) isFunctionKind() {}
+type FunctionKindMethod struct {
+	Type
+	functionKind
+}
 
-type FunctionKindStatic struct{ Type }
+type FunctionKindStatic struct {
+	Type
+	functionKind
+}
 
-func (FunctionKindStatic) isFunctionKind() {}
-
-type FunctionKindConstructor struct{ Type }
-
-func (FunctionKindConstructor) isFunctionKind() {}
+type FunctionKindConstructor struct {
+	Type
+	functionKind
+}
 
 type Docs struct {
 	Contents *string
