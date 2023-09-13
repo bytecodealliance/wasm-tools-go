@@ -7,6 +7,8 @@ import (
 	"github.com/ydnar/wit-bindgen-go/internal/codec/json"
 )
 
+// DecodeJSON decodes JSON from r into a Resolve struct.
+// It returns any error that may occur during decoding.
 func DecodeJSON(r io.Reader) (*Resolve, error) {
 	res := &Resolve{}
 	dec := json.NewDecoder(r, res)
@@ -75,6 +77,7 @@ func (c *Resolve) DecodeField(dec codec.Decoder, name string) error {
 	return nil
 }
 
+// worldCodec translates WIT World references or structures into a *World.
 type worldCodec struct {
 	w **World
 	*Resolve
@@ -100,30 +103,7 @@ func (c *worldCodec) DecodeField(dec codec.Decoder, name string) error {
 	return nil
 }
 
-type worldItemCodec struct {
-	i *WorldItem
-}
-
-func (c worldItemCodec) DecodeField(dec codec.Decoder, name string) error {
-	switch name {
-	case "interface":
-		var i *Interface
-		err := dec.Decode(&i)
-		if err != nil {
-			return err
-		}
-		*c.i = i
-	case "type":
-		var t *TypeDef
-		err := dec.Decode(&t)
-		if err != nil {
-			return err
-		}
-		*c.i = t
-	}
-	return nil
-}
-
+// interfaceCodec translates WIT Interface references or structures into an *Interface.
 type interfaceCodec struct {
 	i **Interface
 	*Resolve
@@ -151,6 +131,7 @@ func (c *interfaceCodec) DecodeField(dec codec.Decoder, name string) error {
 	return nil
 }
 
+// typeDefCodec translates WIT TypeDef references or structures into a *TypeDef.
 type typeDefCodec struct {
 	t **TypeDef
 	*Resolve
@@ -170,6 +151,58 @@ func (c *typeDefCodec) DecodeField(dec codec.Decoder, name string) error {
 		return dec.Decode(&t.Name)
 	case "owner":
 		return dec.Decode(&t.Owner)
+	}
+	return nil
+}
+
+// packageCodec translates WIT Package references or structures into a *Package.
+type packageCodec struct {
+	p **Package
+	*Resolve
+}
+
+func (c *packageCodec) DecodeInt(i int) error {
+	*c.p = c.getPackage(i)
+	return nil
+}
+
+func (c *packageCodec) DecodeField(dec codec.Decoder, name string) error {
+	p := newIfNil(c.p)
+	switch name {
+	case "docs":
+		return dec.Decode(&p.Docs)
+	case "name":
+		return dec.Decode(&p.Name)
+	case "interfaces":
+		return codec.DecodeMap(dec, &p.Interfaces)
+	case "worlds":
+		return codec.DecodeMap(dec, &p.Worlds)
+	}
+	return nil
+}
+
+// worldItemCodec translates typed WorldItem references into a WorldItem,
+// currently either an Interface or a TypeDef.
+type worldItemCodec struct {
+	i *WorldItem
+}
+
+func (c worldItemCodec) DecodeField(dec codec.Decoder, name string) error {
+	switch name {
+	case "interface":
+		var i *Interface
+		err := dec.Decode(&i)
+		if err != nil {
+			return err
+		}
+		*c.i = i
+	case "type":
+		var t *TypeDef
+		err := dec.Decode(&t)
+		if err != nil {
+			return err
+		}
+		*c.i = t
 	}
 	return nil
 }
@@ -232,31 +265,6 @@ func (f *Function) DecodeField(dec codec.Decoder, name string) error {
 		return codec.DecodeSlice(dec, &f.Params)
 	case "results":
 		return codec.DecodeSlice(dec, &f.Results)
-	}
-	return nil
-}
-
-type packageCodec struct {
-	p **Package
-	*Resolve
-}
-
-func (c *packageCodec) DecodeInt(i int) error {
-	*c.p = c.getPackage(i)
-	return nil
-}
-
-func (c *packageCodec) DecodeField(dec codec.Decoder, name string) error {
-	p := newIfNil(c.p)
-	switch name {
-	case "docs":
-		return dec.Decode(&p.Docs)
-	case "name":
-		return dec.Decode(&p.Name)
-	case "interfaces":
-		return codec.DecodeMap(dec, &p.Interfaces)
-	case "worlds":
-		return codec.DecodeMap(dec, &p.Worlds)
 	}
 	return nil
 }
