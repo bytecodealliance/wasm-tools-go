@@ -152,8 +152,6 @@ func (coreType[T]) isType() {}
 func (coreType[T]) TypeName() string {
 	var v T
 	switch any(v).(type) {
-	case nil:
-		return "nil"
 	case bool:
 		return "bool"
 	case int8:
@@ -181,26 +179,26 @@ func (coreType[T]) TypeName() string {
 	case string:
 		return "string"
 	}
-	return ""
+	return "<undefined>"
 }
 
 func (t coreType[T]) MarshalText() ([]byte, error) {
 	return []byte(t.TypeName()), nil
 }
 
-type BoolType struct{ coreType[bool] }
-type S8Type struct{ coreType[int8] }
-type U8Type struct{ coreType[uint8] }
-type S16Type struct{ coreType[int16] }
-type U16Type struct{ coreType[uint16] }
-type S32Type struct{ coreType[int32] }
-type U32Type struct{ coreType[uint32] }
-type S64Type struct{ coreType[int64] }
-type U64Type struct{ coreType[uint64] }
-type Float32Type struct{ coreType[float32] }
-type Float64Type struct{ coreType[float64] }
-type CharType struct{ coreType[char] }
-type StringType struct{ coreType[string] }
+type BoolType coreType[bool]
+type S8Type coreType[int8]
+type U8Type coreType[uint8]
+type S16Type coreType[int16]
+type U16Type coreType[uint16]
+type S32Type coreType[int32]
+type U32Type coreType[uint32]
+type S64Type coreType[int64]
+type U64Type coreType[uint64]
+type Float32Type coreType[float32]
+type Float64Type coreType[float64]
+type CharType coreType[char]
+type StringType coreType[string]
 
 // char is defined because rune is an alias of int32
 type char int32
