@@ -32,8 +32,7 @@ func (res *Resolve) ResolveCodec(v any) codec.Codec {
 
 	// Handles
 	case **Function:
-		newIfNil(v)
-		return *v
+		return codec.Must(v)
 
 	// Enums
 	case *Type:
@@ -50,19 +49,19 @@ func (res *Resolve) ResolveCodec(v any) codec.Codec {
 }
 
 func (c *Resolve) getWorld(i int) *World {
-	return newIfElementNil(&c.Worlds, i)
+	return mustElement(&c.Worlds, i)
 }
 
 func (c *Resolve) getInterface(i int) *Interface {
-	return newIfElementNil(&c.Interfaces, i)
+	return mustElement(&c.Interfaces, i)
 }
 
 func (c *Resolve) getTypeDef(i int) *TypeDef {
-	return newIfElementNil(&c.TypeDefs, i)
+	return mustElement(&c.TypeDefs, i)
 }
 
 func (c *Resolve) getPackage(i int) *Package {
-	return newIfElementNil(&c.Packages, i)
+	return mustElement(&c.Packages, i)
 }
 
 func (c *Resolve) DecodeField(dec codec.Decoder, name string) error {
@@ -91,7 +90,7 @@ func (c *worldCodec) DecodeInt(i int) error {
 }
 
 func (c *worldCodec) DecodeField(dec codec.Decoder, name string) error {
-	w := newIfNil(c.w)
+	w := codec.Must(c.w)
 	switch name {
 	case "name":
 		return dec.Decode(&w.Name)
@@ -117,7 +116,7 @@ func (c *interfaceCodec) DecodeInt(i int) error {
 }
 
 func (c *interfaceCodec) DecodeField(dec codec.Decoder, name string) error {
-	i := newIfNil(c.i)
+	i := codec.Must(c.i)
 	switch name {
 	case "docs":
 		return dec.Decode(&i.Docs)
@@ -145,7 +144,7 @@ func (c *typeDefCodec) DecodeInt(i int) error {
 }
 
 func (c *typeDefCodec) DecodeField(dec codec.Decoder, name string) error {
-	t := newIfNil(c.t)
+	t := codec.Must(c.t)
 	switch name {
 	case "kind":
 		return dec.Decode(&t.Kind)
@@ -169,7 +168,7 @@ func (c *packageCodec) DecodeInt(i int) error {
 }
 
 func (c *packageCodec) DecodeField(dec codec.Decoder, name string) error {
-	p := newIfNil(c.p)
+	p := codec.Must(c.p)
 	switch name {
 	case "docs":
 		return dec.Decode(&p.Docs)
@@ -333,16 +332,8 @@ func (f *Function) DecodeField(dec codec.Decoder, name string) error {
 	return nil
 }
 
-// newIfNil allocates a new instance of T if *v == nil.
-func newIfNil[T any](v **T) *T {
-	if *v == nil {
-		*v = new(T)
-	}
-	return *v
-}
-
-// newIfElementNil resizes s and allocates a new instance of T if necessary.
-func newIfElementNil[S ~[]*E, E any](s *S, i int) *E {
+// mustElement resizes s and allocates a new instance of T if necessary.
+func mustElement[S ~[]*E, E any](s *S, i int) *E {
 	if i < 0 {
 		return nil
 	}
