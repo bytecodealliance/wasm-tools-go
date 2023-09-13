@@ -151,28 +151,16 @@ type intType struct{ type_ }
 
 func (intType) isIntType() {}
 
-/*
-func (intType[T]) MarshalText() ([]byte, error) {
-	var v T
-	v -= 1
-	pfx := "u"
-	if v < 0 {
-		pfx = "s"
-	}
-	return []byte(pfx + string(unsafe.Sizeof(v))), nil
-}
-*/
+type signedType[T codec.Signed] struct{ intType }
 
-type sintType[T codec.Signed] struct{ intType }
-
-func (sintType[T]) MarshalText() ([]byte, error) {
+func (signedType[T]) MarshalText() ([]byte, error) {
 	var v T
 	return []byte("s" + strconv.Itoa(int(unsafe.Sizeof(v)*8))), nil
 }
 
-type uintType[T codec.Unsigned] struct{ intType }
+type unsignedType[T codec.Unsigned] struct{ intType }
 
-func (uintType[T]) MarshalText() ([]byte, error) {
+func (unsignedType[T]) MarshalText() ([]byte, error) {
 	var v T
 	return []byte("u" + strconv.Itoa(int(unsafe.Sizeof(v)*8))), nil
 }
@@ -195,14 +183,14 @@ type BoolType struct{ type_ }
 
 func (BoolType) MarshalText() ([]byte, error) { return []byte("bool"), nil }
 
-type S8Type struct{ sintType[int8] }
-type U8Type struct{ uintType[uint8] }
-type S16Type struct{ sintType[int16] }
-type U16Type struct{ uintType[uint16] }
-type S32Type struct{ sintType[int32] }
-type U32Type struct{ uintType[uint32] }
-type S64Type struct{ sintType[int64] }
-type U64Type struct{ uintType[uint64] }
+type S8Type struct{ signedType[int8] }
+type U8Type struct{ unsignedType[uint8] }
+type S16Type struct{ signedType[int16] }
+type U16Type struct{ unsignedType[uint16] }
+type S32Type struct{ signedType[int32] }
+type U32Type struct{ unsignedType[uint32] }
+type S64Type struct{ signedType[int64] }
+type U64Type struct{ unsignedType[uint64] }
 type Float32Type struct{ floatType[float32] }
 type Float64Type struct{ floatType[float64] }
 type CharType struct{ type_ }
