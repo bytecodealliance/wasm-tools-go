@@ -2,10 +2,11 @@ package codec
 
 // Must ensures that the pointer at *p is non-nil.
 // If *p is nil, a new value of type T will be allocated.
-func Must[T any](p **T) {
+func Must[T any](p **T) *T {
 	if *p == nil {
 		*p = new(T)
 	}
+	return *p
 }
 
 // Slice returns an ElementDecoder for slice s.

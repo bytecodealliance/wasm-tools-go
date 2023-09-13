@@ -27,39 +27,65 @@ func DecodeBool(v any, b bool) error {
 }
 
 // DecodeNumber decodes a number encoded as a string into v.
-// The following types are supported: int64, uint64, float64, IntDecoder, and FloatDecoder.
+// The following core types are supported:
+// int8, uint8, int16, uint16, int32, uint32, int64, uint64, float32, and float64
+// The interface types IntDecoder, and FloatDecoder are also supported.
 // If unable to decode into a numeric type, it will fall back to DecodeString.
 func DecodeNumber(v any, n string) error {
 	switch v := v.(type) {
 	// Signed integers
 	case *int:
 		return decodeSignedValue(v, n)
+	case **int:
+		return decodeSignedValue(Must(v), n)
 	case *int8:
 		return decodeSignedValue(v, n)
+	case **int8:
+		return decodeSignedValue(Must(v), n)
 	case *int16:
 		return decodeSignedValue(v, n)
+	case **int16:
+		return decodeSignedValue(Must(v), n)
 	case *int32:
 		return decodeSignedValue(v, n)
+	case **int32:
+		return decodeSignedValue(Must(v), n)
 	case *int64:
 		return decodeSignedValue(v, n)
+	case **int64:
+		return decodeSignedValue(Must(v), n)
 
 	// Unsigned integers
 	case *uint:
 		return decodeUnsignedValue(v, n)
+	case **uint:
+		return decodeUnsignedValue(Must(v), n)
 	case *uint8:
 		return decodeUnsignedValue(v, n)
+	case **uint8:
+		return decodeUnsignedValue(Must(v), n)
 	case *uint16:
 		return decodeUnsignedValue(v, n)
+	case **uint16:
+		return decodeUnsignedValue(Must(v), n)
 	case *uint32:
 		return decodeUnsignedValue(v, n)
+	case **uint32:
+		return decodeUnsignedValue(Must(v), n)
 	case *uint64:
 		return decodeUnsignedValue(v, n)
+	case **uint64:
+		return decodeUnsignedValue(Must(v), n)
 
 	// Floating-point types
 	case *float32:
 		return decodeFloatValue(v, n)
+	case **float32:
+		return decodeFloatValue(Must(v), n)
 	case *float64:
 		return decodeFloatValue(v, n)
+	case **float64:
+		return decodeFloatValue(Must(v), n)
 
 	// Signed IntDecoder implementations
 	case IntDecoder[int]:
