@@ -22,10 +22,8 @@ type Float interface {
 	float32 | float64
 }
 
-// Numeric is a helper type for supported integer and floating-point types.
-type Numeric[T Integer | Float] struct{}
-
-func (Numeric[T]) String() string {
+// TypeName returns the Go type name for supported integer and floating-point types.
+func TypeName[T Integer | Float]() string {
 	var v T
 	v -= 1
 
