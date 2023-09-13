@@ -1,6 +1,12 @@
 package wit
 
-import "fmt"
+import (
+	"fmt"
+	"strconv"
+	"unsafe"
+
+	"github.com/ydnar/wit-bindgen-go/internal/codec"
+)
 
 type Resolve struct {
 	Worlds     []*World
@@ -65,8 +71,14 @@ func (typeDefKind) isTypeDefKind() {}
 */
 
 type Record struct {
-	// TODO
+	Fields []Field
 	typeDefKind
+}
+
+type Field struct {
+	Docs Docs
+	Name string
+	Type Type
 }
 
 type Resource struct {
@@ -139,28 +151,67 @@ type intType struct{ type_ }
 
 func (intType) isIntType() {}
 
+/*
+func (intType[T]) MarshalText() ([]byte, error) {
+	var v T
+	v -= 1
+	pfx := "u"
+	if v < 0 {
+		pfx = "s"
+	}
+	return []byte(pfx + string(unsafe.Sizeof(v))), nil
+}
+*/
+
+type sintType[T codec.Signed] struct{ intType }
+
+func (sintType[T]) MarshalText() ([]byte, error) {
+	var v T
+	return []byte("s" + strconv.Itoa(int(unsafe.Sizeof(v)*8))), nil
+}
+
+type uintType[T codec.Unsigned] struct{ intType }
+
+func (uintType[T]) MarshalText() ([]byte, error) {
+	var v T
+	return []byte("u" + strconv.Itoa(int(unsafe.Sizeof(v)*8))), nil
+}
+
 type FloatType interface {
 	isFloatType()
 	Type
 }
 
-type floatType struct{ type_ }
+type floatType[T codec.Float] struct{ type_ }
 
-func (floatType) isFloatType() {}
+func (floatType[T]) isFloatType() {}
+
+func (floatType[T]) MarshalText() ([]byte, error) {
+	var v T
+	return []byte("float" + strconv.Itoa(int(unsafe.Sizeof(v)*8))), nil
+}
 
 type BoolType struct{ type_ }
-type S8Type struct{ intType }
-type U8Type struct{ intType }
-type S16Type struct{ intType }
-type U16Type struct{ intType }
-type S32Type struct{ intType }
-type U32Type struct{ intType }
-type S64Type struct{ intType }
-type U64Type struct{ intType }
-type Float32Type struct{ floatType }
-type Float64Type struct{ floatType }
+
+func (BoolType) MarshalText() ([]byte, error) { return []byte("bool"), nil }
+
+type S8Type struct{ sintType[int8] }
+type U8Type struct{ uintType[uint8] }
+type S16Type struct{ sintType[int16] }
+type U16Type struct{ uintType[uint16] }
+type S32Type struct{ sintType[int32] }
+type U32Type struct{ uintType[uint32] }
+type S64Type struct{ sintType[int64] }
+type U64Type struct{ uintType[uint64] }
+type Float32Type struct{ floatType[float32] }
+type Float64Type struct{ floatType[float64] }
 type CharType struct{ type_ }
+
+func (CharType) MarshalText() ([]byte, error) { return []byte("char"), nil }
+
 type StringType struct{ type_ }
+
+func (StringType) MarshalText() ([]byte, error) { return []byte("string"), nil }
 
 func ParseType(s string) (Type, error) {
 	switch s {
