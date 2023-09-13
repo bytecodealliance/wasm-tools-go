@@ -22,7 +22,7 @@ func NewDecoder(r io.Reader, resolvers ...codec.Resolver) *Decoder {
 	}
 }
 
-func (dec *Decoder) Decode(v codec.Decodable) error {
+func (dec *Decoder) Decode(v any) error {
 	if c := dec.r.ResolveCodec(v); c != nil {
 		v = c
 	}
@@ -35,7 +35,7 @@ func (dec *Decoder) Decode(v codec.Decodable) error {
 	return nil
 }
 
-func (dec *Decoder) decodeToken(v codec.Decodable) error {
+func (dec *Decoder) decodeToken(v any) error {
 	tok, err := dec.dec.Token()
 	if err != nil {
 		return err
@@ -67,7 +67,7 @@ func (dec *Decoder) decodeToken(v codec.Decodable) error {
 
 // decodeObject decodes a JSON object into v.
 // It expects that the initial { token has already been decoded.
-func (dec *Decoder) decodeObject(o codec.Decodable) error {
+func (dec *Decoder) decodeObject(o any) error {
 	d, ok := o.(codec.FieldDecoder)
 	if !ok {
 		// TODO: how to handle undecodable objects?
@@ -105,7 +105,7 @@ func (dec *Decoder) decodeObject(o codec.Decodable) error {
 
 // decodeArray decodes a JSON array into v.
 // It expects that the initial [ token has already been decoded.
-func (dec *Decoder) decodeArray(v codec.Decodable) error {
+func (dec *Decoder) decodeArray(v any) error {
 	d, ok := v.(codec.ElementDecoder)
 	if !ok {
 		// TODO: how to handle undecodable arrays?
@@ -154,7 +154,7 @@ type onceDecoder struct {
 	calls int
 }
 
-func (dec *onceDecoder) Decode(v codec.Decodable) error {
+func (dec *onceDecoder) Decode(v any) error {
 	dec.calls++
 	if dec.calls > 1 {
 		return fmt.Errorf("unexpected call to Decode (%d > 1)", dec.calls)

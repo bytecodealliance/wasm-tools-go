@@ -7,7 +7,7 @@ import (
 )
 
 // DecodeNil calls DecodeNil on v if v implements NilDecoder.
-func DecodeNil(v Decodable) error {
+func DecodeNil(v any) error {
 	if v, ok := v.(NilDecoder); ok {
 		return v.DecodeNil()
 	}
@@ -16,7 +16,7 @@ func DecodeNil(v Decodable) error {
 
 // DecodeBool decodes a boolean value into v.
 // If v implements BoolDecoder, then DecodeBool(b) is called.
-func DecodeBool(v Decodable, b bool) error {
+func DecodeBool(v any, b bool) error {
 	switch v := v.(type) {
 	case *bool:
 		*v = b
@@ -29,7 +29,7 @@ func DecodeBool(v Decodable, b bool) error {
 // DecodeNumber decodes a number encoded as a string into v.
 // The following types are supported: int64, uint64, float64, IntDecoder, and FloatDecoder.
 // If unable to decode into a numeric type, it will fall back to DecodeString.
-func DecodeNumber(v Decodable, n string) error {
+func DecodeNumber(v any, n string) error {
 	switch v := v.(type) {
 	// Signed integers
 	case *int:
@@ -154,7 +154,7 @@ func decodeFloat[T Float](v FloatDecoder[T], n string) error {
 // DecodeString decodes s into v. The following types are supported:
 // string, *string, and StringDecoder. It will fall back to DecodeBytes
 // to attempt to decode into a byte slice or binary decoder.
-func DecodeString(v Decodable, s string) error {
+func DecodeString(v any, s string) error {
 	switch v := v.(type) {
 	case *string:
 		*v = s
@@ -170,7 +170,7 @@ func DecodeString(v Decodable, s string) error {
 
 // DecodeBytes decodes data into v. The following types are supported:
 // []byte, BytesDecoder, encoding.BinaryUnmarshaler, and encoding.TextUnmarshaler.
-func DecodeBytes(v Decodable, data []byte) error {
+func DecodeBytes(v any, data []byte) error {
 	switch v := v.(type) {
 	case *[]byte:
 		Resize(v, len(data))
