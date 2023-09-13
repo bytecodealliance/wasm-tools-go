@@ -54,6 +54,8 @@ func DecodeNumber(v any, n string) error {
 	case *float64:
 		return decodeFloatValue(v, n)
 
+	case IntDecoder[int]:
+		return decodeSigned(v, n)
 	case IntDecoder[int8]:
 		return decodeSigned(v, n)
 	case IntDecoder[int16]:
@@ -63,6 +65,8 @@ func DecodeNumber(v any, n string) error {
 	case IntDecoder[int64]:
 		return decodeSigned(v, n)
 
+	case IntDecoder[uint]:
+		return decodeUnsigned(v, n)
 	case IntDecoder[uint8]:
 		return decodeUnsigned(v, n)
 	case IntDecoder[uint16]:
