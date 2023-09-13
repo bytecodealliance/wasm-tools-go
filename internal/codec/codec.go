@@ -3,24 +3,21 @@ package codec
 // Resolver is the interface implemented by types that return a codec for the value at v.
 // Values returned by Resolver should implement one or more encode or decode methods.
 type Resolver interface {
-	ResolveCodec(v any) (any, error)
+	ResolveCodec(v any) any
 }
 
 // Resolvers is a slice of Resolver values. It also implements the Resolver interface.
 type Resolvers []Resolver
 
 // ResolveCodec walks the slice of Resolvers, returning the first non-nil value or an error.
-func (rs Resolvers) ResolveCodec(v any) (any, error) {
+func (rs Resolvers) ResolveCodec(v any) any {
 	for _, r := range rs {
-		c, err := r.ResolveCodec(v)
-		if err != nil {
-			return nil, err
-		}
+		c := r.ResolveCodec(v)
 		if c != nil {
-			return c, nil
+			return c
 		}
 	}
-	return nil, nil
+	return nil
 }
 
 // Decoder is the interface implemented by types that can decode data into Go type(s).

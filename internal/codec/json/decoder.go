@@ -23,15 +23,11 @@ func NewDecoder(r io.Reader, resolvers ...codec.Resolver) *Decoder {
 }
 
 func (dec *Decoder) Decode(v any) error {
-	c, err := dec.r.ResolveCodec(v)
-	if err != nil {
-		return err
-	}
-	if c != nil {
+	if c := dec.r.ResolveCodec(v); c != nil {
 		v = c
 	}
 
-	err = dec.decodeToken(v)
+	err := dec.decodeToken(v)
 	if err != nil && err != io.EOF {
 		return err
 	}

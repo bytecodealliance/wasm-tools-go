@@ -18,33 +18,33 @@ func DecodeJSON(r io.Reader) (*Resolve, error) {
 
 // ResolveCodec implements the codec.Resolver interface,
 // translating types to decoding/encoding-aware versions.
-func (res *Resolve) ResolveCodec(v any) (any, error) {
+func (res *Resolve) ResolveCodec(v any) any {
 	switch v := v.(type) {
 	// References
 	case **World:
-		return &worldCodec{v, res}, nil
+		return &worldCodec{v, res}
 	case **Interface:
-		return &interfaceCodec{v, res}, nil
+		return &interfaceCodec{v, res}
 	case **TypeDef:
-		return &typeDefCodec{v, res}, nil
+		return &typeDefCodec{v, res}
 	case **Package:
-		return &packageCodec{v, res}, nil
+		return &packageCodec{v, res}
 
 	// Handles
 	case **Function:
 		newIfNil(v)
-		return *v, nil
+		return *v
 
 	// Enums
 	case *Type:
-		return &typeCodec{v, res}, nil
+		return &typeCodec{v, res}
 	case *TypeOwner:
-		return &typeOwnerCodec{v}, nil
+		return &typeOwnerCodec{v}
 	case *WorldItem:
-		return &worldItemCodec{v}, nil
+		return &worldItemCodec{v}
 	}
 
-	return nil, nil
+	return nil
 }
 
 func (c *Resolve) getWorld(i int) *World {
