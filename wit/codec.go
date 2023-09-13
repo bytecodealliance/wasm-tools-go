@@ -38,6 +38,8 @@ func (res *Resolve) ResolveCodec(v any) codec.Codec {
 	// Enums
 	case *Type:
 		return &typeCodec{v, res}
+	case *TypeDefKind:
+		return &typeDefKindCodec{v}
 	case *TypeOwner:
 		return &typeOwnerCodec{v}
 	case *WorldItem:
@@ -249,6 +251,68 @@ func (c *typeOwnerCodec) DecodeField(dec codec.Decoder, name string) error {
 			return err
 		}
 		*c.o = w
+	}
+	return nil
+}
+
+// typeDefKindCodec translates WIT type owner enums into a TypeOwner.
+type typeDefKindCodec struct {
+	v *TypeDefKind
+}
+
+func (c *typeDefKindCodec) DecodeField(dec codec.Decoder, name string) error {
+	switch name {
+	case "record":
+		var v *Record
+		err := dec.Decode(&v)
+		if err != nil {
+			return err
+		}
+		*c.v = v
+	case "resource":
+		var v *Resource
+		err := dec.Decode(&v)
+		if err != nil {
+			return err
+		}
+		*c.v = v
+	case "handle":
+		var v *Handle
+		err := dec.Decode(&v)
+		if err != nil {
+			return err
+		}
+		*c.v = v
+
+	// TODO ...
+
+	case "type":
+		var v Type
+		err := dec.Decode(&v)
+		if err != nil {
+			return err
+		}
+		*c.v = v
+	}
+	return nil
+}
+
+func (r *Record) DecodeField(dec codec.Decoder, name string) error {
+	switch name {
+	case "fields":
+		return codec.DecodeSlice(dec, &r.Fields)
+	}
+	return nil
+}
+
+func (f *Field) DecodeField(dec codec.Decoder, name string) error {
+	switch name {
+	case "docs":
+		return dec.Decode(&f.Docs)
+	case "name":
+		return dec.Decode(&f.Name)
+	case "type":
+		return dec.Decode(&f.Type)
 	}
 	return nil
 }
