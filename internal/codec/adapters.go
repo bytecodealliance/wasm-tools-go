@@ -1,16 +1,11 @@
 package codec
 
-// Resize resizes the slice s to at least len(s) == i+1,
-// returning the value at s[i].
-func Resize[S ~[]E, E any](s *S, i int) E {
-	var e E
-	if i < 0 {
-		return e
+// Must ensures that the pointer at *p is non-nil.
+// If *p is nil, a new value of type T will be allocated.
+func Must[T any](p **T) {
+	if *p == nil {
+		*p = new(T)
 	}
-	if i >= len(*s) {
-		*s = append(*s, make([]E, i+1-len(*s))...)
-	}
-	return (*s)[i]
 }
 
 // Slice returns an ElementDecoder for slice s.
@@ -37,6 +32,19 @@ func (s *sliceCodec[E]) DecodeElement(dec Decoder, i int) error {
 		(*s)[i] = v
 	}
 	return nil
+}
+
+// Resize resizes the slice s to at least len(s) == i+1,
+// returning the value at s[i].
+func Resize[S ~[]E, E any](s *S, i int) E {
+	var e E
+	if i < 0 {
+		return e
+	}
+	if i >= len(*s) {
+		*s = append(*s, make([]E, i+1-len(*s))...)
+	}
+	return (*s)[i]
 }
 
 // Map returns an FieldDecoder for map m.
