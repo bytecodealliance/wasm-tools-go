@@ -7,7 +7,7 @@ type Encoder interface {
 }
 
 type StructEncoder interface {
-	EncodeField(name string, v any) error
+	EncodeField(name string, v Encodable) error
 	End() error
 }
 

@@ -23,9 +23,15 @@ func (rs Resolvers) ResolveCodec(v any) Codec {
 	return nil
 }
 
+// Encodable is any type that can be encoded directly or via an associated Codec.
+type Encodable any
+
+// Decodable is any type that can be decoded directly or via an associated Codec.
+type Decodable any
+
 // Decoder is the interface implemented by types that can decode data into Go type(s).
 type Decoder interface {
-	Decode(v any) error
+	Decode(v Decodable) error
 }
 
 type NilDecoder interface {
