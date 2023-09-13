@@ -15,11 +15,14 @@ func DecodeNil(v any) error {
 }
 
 // DecodeBool decodes a boolean value into v.
+// If *v is a pointer to a bool, then a bool will be allocated.
 // If v implements BoolDecoder, then DecodeBool(b) is called.
 func DecodeBool(v any, b bool) error {
 	switch v := v.(type) {
 	case *bool:
 		*v = b
+	case **bool:
+		*Must(v) = b
 	case BoolDecoder:
 		return v.DecodeBool(b)
 	}
