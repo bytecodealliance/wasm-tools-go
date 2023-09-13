@@ -278,10 +278,6 @@ type FunctionKindConstructor struct {
 	functionKind
 }
 
-type Docs struct {
-	Contents *string
-}
-
 type Param struct {
 	Name string
 	Type Type
@@ -296,3 +292,7 @@ type Package struct {
 
 // TODO: implement package name parsing
 type PackageName string
+
+type Docs struct {
+	Contents *string
+}
