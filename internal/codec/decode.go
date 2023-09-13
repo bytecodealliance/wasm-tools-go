@@ -28,7 +28,8 @@ func DecodeBool(v any, b bool) error {
 
 // DecodeNumber decodes a number encoded as a string into v.
 // The following core types are supported:
-// int8, uint8, int16, uint16, int32, uint32, int64, uint64, float32, and float64
+// int8, uint8, int16, uint16, int32, uint32, int64, uint64, float32, and float64.
+// Pointers to the above types are also supported, and will be allocated if necessary.
 // The interface types IntDecoder, and FloatDecoder are also supported.
 // If unable to decode into a numeric type, it will fall back to DecodeString.
 func DecodeNumber(v any, n string) error {
