@@ -33,6 +33,8 @@ func (res *Resolve) ResolveCodec(v any) codec.Codec {
 	// Handles
 	case **Function:
 		return codec.Must(v)
+	case **Record:
+		return codec.Must(v)
 
 	// Enums
 	case *Type:
