@@ -28,34 +28,47 @@ type Decoder interface {
 	Decode(v any) error
 }
 
+// NilDecoder is the interface implemented by types that can decode from nil.
 type NilDecoder interface {
 	DecodeNil() error
 }
 
+// BoolDecoder is the interface implemented by types that can decode from a bool.
 type BoolDecoder interface {
 	DecodeBool(bool) error
 }
 
+// BytesDecoder is the interface implemented by types that can decode from a byte slice.
+// It is similar to encoding.BinaryUnmarshaler and encoding.TextUnmarshaler.
 type BytesDecoder interface {
 	DecodeBytes([]byte) error
 }
 
+// StringDecoder is the interface implemented by types that can decode from a string.
 type StringDecoder interface {
 	DecodeString(string) error
 }
 
+// IntDecoder is the interface implemented by types that can decode
+// from an integer value. See Integer for the list of supported types.
 type IntDecoder[T Integer] interface {
 	DecodeInt(T) error
 }
 
+// FloatDecoder is the interface implemented by types that can decode
+// from a floating-point value. See Float for the list of supported types.
 type FloatDecoder[T Float] interface {
 	DecodeFloat(T) error
 }
 
+// FieldDecoder is the interface implemented by types that can decode
+// fields, such as structs or maps.
 type FieldDecoder interface {
 	DecodeField(dec Decoder, name string) error
 }
 
+// ElementDecoder is the interface implemented by types that can decode
+// 0-indexed elements, such as a slice or an array.
 type ElementDecoder interface {
 	DecodeElement(dec Decoder, i int) error
 }
