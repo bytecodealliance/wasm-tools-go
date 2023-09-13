@@ -2,8 +2,6 @@ package wit
 
 import (
 	"fmt"
-	"strconv"
-	"unsafe"
 
 	"github.com/ydnar/wit-bindgen-go/internal/codec"
 )
@@ -46,6 +44,10 @@ type TypeDef struct {
 	Owner TypeOwner `json:"-"`
 	worldItem
 	type_
+}
+
+func (t *TypeDef) TypeName() string {
+	return t.Name
 }
 
 type TypeDefKind interface{ isTypeDefKind() }
@@ -134,6 +136,7 @@ type typeOwner struct{}
 func (typeOwner) isTypeOwner() {}
 
 type Type interface {
+	TypeName() string
 	isType()
 	TypeDefKind
 }
@@ -142,47 +145,74 @@ type type_ struct{ typeDefKind }
 
 func (type_) isType() {}
 
+func (type_) TypeName() string { return "<undefined>" }
+
+type coreType[T any] struct{ type_ }
+
+func (coreType[T]) isType() {}
+
+func (coreType[T]) TypeName() string {
+	var v T
+	switch any(v).(type) {
+	case nil:
+		return "nil"
+	case bool:
+		return "bool"
+	case int8:
+		return "s8"
+	case uint8:
+		return "u8"
+	case int16:
+		return "s16"
+	case uint16:
+		return "u16"
+	case int32:
+		return "s32"
+	case uint32:
+		return "u32"
+	case int64:
+		return "s64"
+	case uint64:
+		return "u64"
+	case float32:
+		return "float32"
+	case float64:
+		return "float64"
+	case char:
+		return "char"
+	case string:
+		return "string"
+	}
+	return ""
+}
+
+func (t coreType[T]) MarshalText() ([]byte, error) {
+	return []byte(t.TypeName()), nil
+}
+
 type IntType interface {
 	isIntType()
 	Type
 }
 
-type intType struct{ type_ }
+type intType[T codec.Integer] struct{ coreType[T] }
 
-func (intType) isIntType() {}
+func (intType[T]) isIntType() {}
 
-type signedType[T codec.Signed] struct{ intType }
+type signedType[T codec.Signed] struct{ intType[T] }
 
-func (signedType[T]) MarshalText() ([]byte, error) {
-	var v T
-	return []byte("s" + strconv.Itoa(int(unsafe.Sizeof(v)*8))), nil
-}
-
-type unsignedType[T codec.Unsigned] struct{ intType }
-
-func (unsignedType[T]) MarshalText() ([]byte, error) {
-	var v T
-	return []byte("u" + strconv.Itoa(int(unsafe.Sizeof(v)*8))), nil
-}
+type unsignedType[T codec.Unsigned] struct{ intType[T] }
 
 type FloatType interface {
 	isFloatType()
 	Type
 }
 
-type floatType[T codec.Float] struct{ type_ }
+type floatType[T codec.Float] struct{ coreType[T] }
 
 func (floatType[T]) isFloatType() {}
 
-func (floatType[T]) MarshalText() ([]byte, error) {
-	var v T
-	return []byte("float" + strconv.Itoa(int(unsafe.Sizeof(v)*8))), nil
-}
-
-type BoolType struct{ type_ }
-
-func (BoolType) MarshalText() ([]byte, error) { return []byte("bool"), nil }
-
+type BoolType struct{ coreType[bool] }
 type S8Type struct{ signedType[int8] }
 type U8Type struct{ unsignedType[uint8] }
 type S16Type struct{ signedType[int16] }
@@ -193,13 +223,11 @@ type S64Type struct{ signedType[int64] }
 type U64Type struct{ unsignedType[uint64] }
 type Float32Type struct{ floatType[float32] }
 type Float64Type struct{ floatType[float64] }
-type CharType struct{ type_ }
+type CharType struct{ coreType[char] }
+type StringType struct{ coreType[string] }
 
-func (CharType) MarshalText() ([]byte, error) { return []byte("char"), nil }
-
-type StringType struct{ type_ }
-
-func (StringType) MarshalText() ([]byte, error) { return []byte("string"), nil }
+// char is defined because rune is an alias of int32
+type char int32
 
 func ParseType(s string) (Type, error) {
 	switch s {
