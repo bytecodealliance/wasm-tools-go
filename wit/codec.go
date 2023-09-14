@@ -187,27 +187,18 @@ func (c *packageCodec) DecodeField(dec codec.Decoder, name string) error {
 // worldItemCodec translates typed WorldItem references into a WorldItem,
 // currently either an Interface or a TypeDef.
 type worldItemCodec struct {
-	i *WorldItem
+	v *WorldItem
 }
 
 func (c worldItemCodec) DecodeField(dec codec.Decoder, name string) error {
+	var err error
 	switch name {
 	case "interface":
-		var i *Interface
-		err := dec.Decode(&i)
-		if err != nil {
-			return err
-		}
-		*c.i = i
+		*c.v, err = DecodeInto[*Interface](dec)
 	case "type":
-		var t *TypeDef
-		err := dec.Decode(&t)
-		if err != nil {
-			return err
-		}
-		*c.i = t
+		*c.v, err = DecodeInto[*TypeDef](dec)
 	}
-	return nil
+	return err
 }
 
 // typeCodec translates WIT type strings or reference IDs into a Type.
@@ -233,27 +224,18 @@ func (c *typeCodec) DecodeInt(i int) error {
 
 // typeOwnerCodec translates WIT type owner enums into a TypeOwner.
 type typeOwnerCodec struct {
-	o *TypeOwner
+	v *TypeOwner
 }
 
 func (c *typeOwnerCodec) DecodeField(dec codec.Decoder, name string) error {
+	var err error
 	switch name {
 	case "interface":
-		var i *Interface
-		err := dec.Decode(&i)
-		if err != nil {
-			return err
-		}
-		*c.o = i
+		*c.v, err = DecodeInto[*Interface](dec)
 	case "world":
-		var w *World
-		err := dec.Decode(&w)
-		if err != nil {
-			return err
-		}
-		*c.o = w
+		*c.v, err = DecodeInto[*World](dec)
 	}
-	return nil
+	return err
 }
 
 // typeDefKindCodec translates WIT type owner enums into a TypeOwner.
@@ -262,40 +244,26 @@ type typeDefKindCodec struct {
 }
 
 func (c *typeDefKindCodec) DecodeField(dec codec.Decoder, name string) error {
+	var err error
 	switch name {
 	case "record":
-		var v *Record
-		err := dec.Decode(&v)
-		if err != nil {
-			return err
-		}
-		*c.v = v
+		*c.v, err = DecodeInto[*Record](dec)
 	case "resource":
-		var v *Resource
-		err := dec.Decode(&v)
-		if err != nil {
-			return err
-		}
-		*c.v = v
+		*c.v, err = DecodeInto[*Resource](dec)
 	case "handle":
-		var v *Handle
-		err := dec.Decode(&v)
-		if err != nil {
-			return err
-		}
-		*c.v = v
+		*c.v, err = DecodeInto[*Handle](dec)
 
 	// TODO ...
 
 	case "type":
-		var v Type
-		err := dec.Decode(&v)
-		if err != nil {
-			return err
-		}
-		*c.v = v
+		*c.v, err = DecodeInto[Type](dec)
 	}
-	return nil
+	return err
+}
+
+func DecodeInto[T any](dec codec.Decoder) (T, error) {
+	var v T
+	return v, dec.Decode(&v)
 }
 
 func (r *Record) DecodeField(dec codec.Decoder, name string) error {
