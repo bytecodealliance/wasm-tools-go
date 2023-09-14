@@ -35,8 +35,14 @@ func (res *Resolve) ResolveCodec(v any) codec.Codec {
 		return codec.Must(v)
 	case **Record:
 		return codec.Must(v)
+	case **OwnHandle:
+		return &ownHandleCodec{v, res}
+	case **BorrowHandle:
+		return &borrowHandleCodec{v, res}
 
 	// Enums
+	case *Handle:
+		return &handleCodec{v}
 	case *Type:
 		return &typeCodec{v, res}
 	case *TypeDefKind:
@@ -251,7 +257,7 @@ func (c *typeDefKindCodec) DecodeField(dec codec.Decoder, name string) error {
 	case "resource":
 		*c.v, err = codec.DecodeInto[*Resource](dec)
 	case "handle":
-		*c.v, err = codec.DecodeInto[*Handle](dec)
+		*c.v, err = codec.DecodeInto[Handle](dec)
 
 	// TODO ...
 
@@ -278,6 +284,43 @@ func (f *Field) DecodeField(dec codec.Decoder, name string) error {
 	case "type":
 		return dec.Decode(&f.Type)
 	}
+	return nil
+}
+
+type handleCodec struct {
+	v *Handle
+}
+
+func (c *handleCodec) DecodeField(dec codec.Decoder, name string) error {
+	var err error
+	switch name {
+	case "own":
+		*c.v, err = codec.DecodeInto[*OwnHandle](dec)
+	case "borrow":
+		*c.v, err = codec.DecodeInto[*BorrowHandle](dec)
+	}
+	return err
+}
+
+type ownHandleCodec struct {
+	v **OwnHandle
+	*Resolve
+}
+
+func (c *ownHandleCodec) DecodeInt(i int) error {
+	v := codec.Must(c.v)
+	v.TypeDef = c.getTypeDef(i)
+	return nil
+}
+
+type borrowHandleCodec struct {
+	v **BorrowHandle
+	*Resolve
+}
+
+func (c *borrowHandleCodec) DecodeInt(i int) error {
+	v := codec.Must(c.v)
+	v.TypeDef = c.getTypeDef(i)
 	return nil
 }
 

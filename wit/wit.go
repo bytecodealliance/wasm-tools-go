@@ -81,14 +81,27 @@ type Field struct {
 	Type Type
 }
 
-type Resource struct {
-	// TODO
-	typeDefKind
+type Resource struct{ typeDefKind }
+
+func (Resource) UnmarshalText() ([]byte, error) { return []byte("resource"), nil }
+
+type Handle interface {
+	isHandle()
+	TypeDefKind
 }
 
-type Handle struct {
-	// TODO
-	typeDefKind
+type handle struct{ typeDefKind }
+
+func (handle) isHandle() {}
+
+type OwnHandle struct {
+	*TypeDef
+	handle
+}
+
+type BorrowHandle struct {
+	*TypeDef
+	handle
 }
 
 type Flags struct {
