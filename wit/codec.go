@@ -194,9 +194,9 @@ func (c worldItemCodec) DecodeField(dec codec.Decoder, name string) error {
 	var err error
 	switch name {
 	case "interface":
-		*c.v, err = DecodeInto[*Interface](dec)
+		*c.v, err = codec.DecodeInto[*Interface](dec)
 	case "type":
-		*c.v, err = DecodeInto[*TypeDef](dec)
+		*c.v, err = codec.DecodeInto[*TypeDef](dec)
 	}
 	return err
 }
@@ -231,9 +231,9 @@ func (c *typeOwnerCodec) DecodeField(dec codec.Decoder, name string) error {
 	var err error
 	switch name {
 	case "interface":
-		*c.v, err = DecodeInto[*Interface](dec)
+		*c.v, err = codec.DecodeInto[*Interface](dec)
 	case "world":
-		*c.v, err = DecodeInto[*World](dec)
+		*c.v, err = codec.DecodeInto[*World](dec)
 	}
 	return err
 }
@@ -247,23 +247,18 @@ func (c *typeDefKindCodec) DecodeField(dec codec.Decoder, name string) error {
 	var err error
 	switch name {
 	case "record":
-		*c.v, err = DecodeInto[*Record](dec)
+		*c.v, err = codec.DecodeInto[*Record](dec)
 	case "resource":
-		*c.v, err = DecodeInto[*Resource](dec)
+		*c.v, err = codec.DecodeInto[*Resource](dec)
 	case "handle":
-		*c.v, err = DecodeInto[*Handle](dec)
+		*c.v, err = codec.DecodeInto[*Handle](dec)
 
 	// TODO ...
 
 	case "type":
-		*c.v, err = DecodeInto[Type](dec)
+		*c.v, err = codec.DecodeInto[Type](dec)
 	}
 	return err
-}
-
-func DecodeInto[T any](dec codec.Decoder) (T, error) {
-	var v T
-	return v, dec.Decode(&v)
 }
 
 func (r *Record) DecodeField(dec codec.Decoder, name string) error {
