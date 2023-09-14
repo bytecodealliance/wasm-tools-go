@@ -3,8 +3,8 @@ package wit
 import (
 	"io"
 
-	"github.com/ydnar/wit-bindgen-go/internal/codec"
-	"github.com/ydnar/wit-bindgen-go/internal/codec/json"
+	"github.com/ydnar/wasm-tools-go/internal/codec"
+	"github.com/ydnar/wasm-tools-go/internal/codec/json"
 )
 
 // DecodeJSON decodes JSON from r into a Resolve struct.

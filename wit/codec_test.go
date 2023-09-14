@@ -6,7 +6,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/ydnar/wit-bindgen-go/internal/testutil"
+	"github.com/ydnar/wasm-tools-go/internal/testutil"
 )
 
 func TestDecodeJSON(t *testing.T) {
