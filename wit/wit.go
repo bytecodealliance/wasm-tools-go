@@ -13,10 +13,10 @@ type Resolve struct {
 
 type World struct {
 	Name    string
-	Docs    Docs
 	Imports map[string]WorldItem
 	Exports map[string]WorldItem
 	Package *Package
+	Docs    Docs
 	typeOwner
 }
 
@@ -27,19 +27,20 @@ type worldItem struct{}
 func (worldItem) isWorldItem() {}
 
 type Interface struct {
-	Docs      Docs
 	Name      string
 	TypeDefs  map[string]*TypeDef
 	Functions map[string]*Function
 	Package   *Package `json:"-"`
+	Docs      Docs
 	worldItem
 	typeOwner
 }
 
 type TypeDef struct {
-	Kind  TypeDefKind
 	Name  string
+	Kind  TypeDefKind
 	Owner TypeOwner `json:"-"`
+	Docs  Docs
 	worldItem
 	type_
 }
@@ -76,9 +77,9 @@ type Record struct {
 }
 
 type Field struct {
-	Docs Docs
 	Name string
 	Type Type
+	Docs Docs
 }
 
 type Resource struct{ typeDefKind }
@@ -250,11 +251,11 @@ func ParseType(s string) (Type, error) {
 }
 
 type Function struct {
-	Docs    Docs
 	Name    string
 	Kind    FunctionKind
 	Params  []Param
 	Results []Param
+	Docs    Docs
 }
 
 type FunctionKind interface {
@@ -291,9 +292,9 @@ type Param struct {
 
 type Package struct {
 	Name       PackageName
-	Docs       Docs
 	Interfaces map[string]*Interface
 	Worlds     map[string]*World
+	Docs       Docs
 }
 
 // TODO: implement package name parsing
