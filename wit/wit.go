@@ -28,7 +28,7 @@ func (worldItem) isWorldItem() {}
 
 type Interface struct {
 	Docs      Docs
-	Name      *string
+	Name      string
 	TypeDefs  map[string]*TypeDef
 	Functions map[string]*Function
 	Package   *Package `json:"-"`
@@ -300,5 +300,5 @@ type Package struct {
 type PackageName string
 
 type Docs struct {
-	Contents *string
+	Contents string
 }

@@ -66,7 +66,7 @@ func summarize(r io.Reader, name string) error {
 			fmt.Printf("Owner: ")
 			switch owner := t.Owner.(type) {
 			case *wit.Interface:
-				fmt.Printf("interface(%s)\n", Some(owner.Name, "<no name>"))
+				fmt.Printf("interface(%s)\n", Default(owner.Name, "<unnamed>"))
 			case *wit.World:
 				fmt.Printf("world(%s)\n", owner.Name)
 			}
@@ -118,16 +118,16 @@ func summarizeWorld(w *wit.World, indent string) {
 }
 
 func summarizeInterface(i *wit.Interface, indent string) {
-	fmt.Printf("%sInterface: %s\n", indent, Some(i.Name, "<unnamed>"))
+	fmt.Printf("%sInterface: %s\n", indent, Default(i.Name, "<unnamed>"))
 	fmt.Printf("%s%d type(s), %d function(s)\n", indent, len(i.TypeDefs), len(i.Functions))
 	fmt.Println()
 }
 
-func Some(s *string, fallback string) string {
-	if s != nil {
-		return *s
+func Default(s string, def string) string {
+	if s != "" {
+		return s
 	}
-	return fallback
+	return def
 }
 
 func Keys[K comparable, V any](m map[K]V) []K {
