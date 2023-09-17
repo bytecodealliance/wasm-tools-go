@@ -121,8 +121,14 @@ type Tuple struct {
 }
 
 type Variant struct {
-	// TODO
+	Cases []Case
 	typeDefKind
+}
+
+type Case struct {
+	Name string
+	Type Type // Can be nil
+	Docs Docs
 }
 
 type Enum struct {

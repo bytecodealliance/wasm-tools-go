@@ -268,6 +268,8 @@ func (c *typeDefKindCodec) DecodeField(dec codec.Decoder, name string) error {
 		*c.v, err = codec.DecodeInto[*Flags](dec)
 	case "tuple":
 		*c.v, err = codec.DecodeInto[*Tuple](dec)
+	case "variant":
+		*c.v, err = codec.DecodeInto[*Variant](dec)
 
 	// TODO ...
 
@@ -319,6 +321,26 @@ func (t *Tuple) DecodeField(dec codec.Decoder, name string) error {
 	switch name {
 	case "types":
 		return codec.DecodeSlice(dec, &t.Types)
+	}
+	return nil
+}
+
+func (v *Variant) DecodeField(dec codec.Decoder, name string) error {
+	switch name {
+	case "cases":
+		return codec.DecodeSlice(dec, &v.Cases)
+	}
+	return nil
+}
+
+func (c *Case) DecodeField(dec codec.Decoder, name string) error {
+	switch name {
+	case "name":
+		return dec.Decode(&c.Name)
+	case "type":
+		return dec.Decode(&c.Type)
+	case "docs":
+		return dec.Decode(&c.Docs)
 	}
 	return nil
 }
