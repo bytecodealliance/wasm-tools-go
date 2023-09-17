@@ -116,7 +116,7 @@ type Flag struct {
 }
 
 type Tuple struct {
-	// TODO
+	Types []Type
 	typeDefKind
 }
 
