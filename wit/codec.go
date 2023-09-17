@@ -264,6 +264,8 @@ func (c *typeDefKindCodec) DecodeField(dec codec.Decoder, name string) error {
 		*c.v, err = codec.DecodeInto[*Resource](dec)
 	case "handle":
 		*c.v, err = codec.DecodeInto[Handle](dec)
+	case "flags":
+		*c.v, err = codec.DecodeInto[*Flags](dec)
 
 	// TODO ...
 
@@ -283,12 +285,30 @@ func (r *Record) DecodeField(dec codec.Decoder, name string) error {
 
 func (f *Field) DecodeField(dec codec.Decoder, name string) error {
 	switch name {
-	case "docs":
-		return dec.Decode(&f.Docs)
 	case "name":
 		return dec.Decode(&f.Name)
 	case "type":
 		return dec.Decode(&f.Type)
+	case "docs":
+		return dec.Decode(&f.Docs)
+	}
+	return nil
+}
+
+func (f *Flags) DecodeField(dec codec.Decoder, name string) error {
+	switch name {
+	case "flags":
+		return codec.DecodeSlice(dec, &f.Flags)
+	}
+	return nil
+}
+
+func (f *Flag) DecodeField(dec codec.Decoder, name string) error {
+	switch name {
+	case "name":
+		return dec.Decode(&f.Name)
+	case "docs":
+		return dec.Decode(&f.Docs)
 	}
 	return nil
 }

@@ -106,8 +106,13 @@ type BorrowHandle struct {
 }
 
 type Flags struct {
-	// TODO
+	Flags []Flag
 	typeDefKind
+}
+
+type Flag struct {
+	Name string
+	Docs Docs
 }
 
 type Tuple struct {
