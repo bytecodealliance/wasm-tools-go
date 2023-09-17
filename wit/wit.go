@@ -222,6 +222,8 @@ type char int32
 
 func ParseType(s string) (Type, error) {
 	switch s {
+	case "bool":
+		return BoolType{}, nil
 	case "s8":
 		return S8Type{}, nil
 	case "u8":
