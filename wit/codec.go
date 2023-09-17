@@ -39,6 +39,24 @@ func (res *Resolve) ResolveCodec(v any) codec.Codec {
 		return &ownHandleCodec{v, res}
 	case **BorrowHandle:
 		return &borrowHandleCodec{v, res}
+	case **Flags:
+		return codec.Must(v)
+	case **Tuple:
+		return codec.Must(v)
+	case **Variant:
+		return codec.Must(v)
+	case **Enum:
+		return codec.Must(v)
+	case **Option:
+		return codec.Must(v)
+	case **Result:
+		return codec.Must(v)
+	case **List:
+		return codec.Must(v)
+	case **Future:
+		return codec.Must(v)
+	case **Stream:
+		return codec.Must(v)
 
 	// Enums
 	case *Handle:
