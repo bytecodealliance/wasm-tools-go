@@ -13,7 +13,7 @@ import (
 func main() {
 	err := Main()
 	if err != nil {
-		fmt.Printf("error: %v", err)
+		fmt.Printf("error: %v\n", err)
 		os.Exit(1)
 	}
 }
