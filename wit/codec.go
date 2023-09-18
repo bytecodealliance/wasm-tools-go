@@ -30,33 +30,15 @@ func (res *Resolve) ResolveCodec(v any) codec.Codec {
 	case **Package:
 		return &packageCodec{v, res}
 
-	// Handles
+	// Allocation required
 	case **Function:
 		return codec.Must(v)
-	case **Record:
-		return codec.Must(v)
-	case **OwnHandle:
+
+	// Special types
+	case *OwnHandle:
 		return &ownHandleCodec{v, res}
-	case **BorrowHandle:
+	case *BorrowHandle:
 		return &borrowHandleCodec{v, res}
-	case **Flags:
-		return codec.Must(v)
-	case **Tuple:
-		return codec.Must(v)
-	case **Variant:
-		return codec.Must(v)
-	case **Enum:
-		return codec.Must(v)
-	case **Option:
-		return codec.Must(v)
-	case **Result:
-		return codec.Must(v)
-	case **List:
-		return codec.Must(v)
-	case **Future:
-		return codec.Must(v)
-	case **Stream:
-		return codec.Must(v)
 
 	// Enums
 	case *Handle:
@@ -395,24 +377,22 @@ func (c *handleCodec) DecodeField(dec codec.Decoder, name string) error {
 }
 
 type ownHandleCodec struct {
-	v **OwnHandle
+	*OwnHandle
 	*Resolve
 }
 
 func (c *ownHandleCodec) DecodeInt(i int) error {
-	v := codec.Must(c.v)
-	v.TypeDef = c.getTypeDef(i)
+	c.TypeDef = c.getTypeDef(i)
 	return nil
 }
 
 type borrowHandleCodec struct {
-	v **BorrowHandle
+	*BorrowHandle
 	*Resolve
 }
 
 func (c *borrowHandleCodec) DecodeInt(i int) error {
-	v := codec.Must(c.v)
-	v.TypeDef = c.getTypeDef(i)
+	c.TypeDef = c.getTypeDef(i)
 	return nil
 }
 
