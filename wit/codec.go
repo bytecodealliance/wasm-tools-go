@@ -226,6 +226,9 @@ func (c worldItemCodec) DecodeField(dec codec.Decoder, name string) error {
 	case "interface":
 		var v *Interface
 		*c.v, err = v, dec.Decode(&v)
+	case "function":
+		var v *Function
+		*c.v, err = v, dec.Decode(&v)
 	case "type":
 		var v *TypeDef
 		*c.v, err = v, dec.Decode(&v)

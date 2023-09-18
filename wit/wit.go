@@ -269,6 +269,7 @@ type Function struct {
 	Params  []Param
 	Results []Param
 	Docs    Docs
+	worldItem
 }
 
 type FunctionKind interface {
