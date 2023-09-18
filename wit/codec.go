@@ -277,17 +277,17 @@ func (c *typeDefKindCodec) DecodeField(dec codec.Decoder, name string) error {
 	var err error
 	switch name {
 	case "record":
-		*c.v, err = codec.DecodeInto[*Record](dec)
+		*c.v, err = codec.DecodeNew[Record](dec)
 	case "resource":
-		*c.v, err = codec.DecodeInto[*Resource](dec)
+		*c.v, err = codec.DecodeNew[Resource](dec)
 	case "handle":
 		*c.v, err = codec.DecodeInto[Handle](dec)
 	case "flags":
-		*c.v, err = codec.DecodeInto[*Flags](dec)
+		*c.v, err = codec.DecodeNew[Flags](dec)
 	case "tuple":
-		*c.v, err = codec.DecodeInto[*Tuple](dec)
+		*c.v, err = codec.DecodeNew[Tuple](dec)
 	case "variant":
-		*c.v, err = codec.DecodeInto[*Variant](dec)
+		*c.v, err = codec.DecodeNew[Variant](dec)
 
 	// TODO ...
 
@@ -371,9 +371,9 @@ func (c *handleCodec) DecodeField(dec codec.Decoder, name string) error {
 	var err error
 	switch name {
 	case "own":
-		*c.v, err = codec.DecodeInto[*OwnHandle](dec)
+		*c.v, err = codec.DecodeNew[OwnHandle](dec)
 	case "borrow":
-		*c.v, err = codec.DecodeInto[*BorrowHandle](dec)
+		*c.v, err = codec.DecodeNew[BorrowHandle](dec)
 	}
 	return err
 }
