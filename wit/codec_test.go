@@ -1,11 +1,11 @@
 package wit
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
 	"testing"
 
+	"github.com/kr/pretty"
 	"github.com/ydnar/wasm-tools-go/internal/testutil"
 )
 
@@ -21,11 +21,5 @@ func TestDecodeJSON(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	fmt.Printf("%#v\n", res)
-
-	j, err := json.Marshal(res)
-	if err != nil {
-		t.Fatal(err)
-	}
-	fmt.Println(string(j))
+	fmt.Printf("%# v\n", pretty.Formatter(res))
 }
