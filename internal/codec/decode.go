@@ -6,30 +6,6 @@ import (
 	"unsafe"
 )
 
-// Decode decodes into an arbitrary type and returns the value.
-// This is useful for assigning to an interface that more than one type conforms to.
-// This can reduce boilerplate code when decoding a complex structure.
-func Decode[T any](dec Decoder, v T) (T, error) {
-	return v, dec.Decode(&v)
-}
-
-// DecodeNew decodes into a new value of type *T and returns that value.
-// This is useful for assigning to an interface that more than one type conforms to.
-// This can reduce boilerplate code when decoding a complex structure.
-func DecodeNew[T any](dec Decoder) (*T, error) {
-	v := new(T)
-	return v, dec.Decode(v)
-}
-
-// DecodeInto decodes into a value of type T and returns that value.
-// This is useful for decoding into a pointer to an arbitrary type,
-// which may need to be assigned to an interface that many types conform to.
-// This can reduce boilerplate code when decoding a complex structure.
-func DecodeInto[T any](dec Decoder) (T, error) {
-	var v T
-	return v, dec.Decode(&v)
-}
-
 // DecodeNil calls DecodeNil on v if v implements NilDecoder.
 func DecodeNil(v any) error {
 	if v, ok := v.(NilDecoder); ok {

@@ -224,9 +224,11 @@ func (c worldItemCodec) DecodeField(dec codec.Decoder, name string) error {
 	var err error
 	switch name {
 	case "interface":
-		*c.v, err = codec.DecodeInto[*Interface](dec)
+		var v *Interface
+		*c.v, err = v, dec.Decode(&v)
 	case "type":
-		*c.v, err = codec.DecodeInto[*TypeDef](dec)
+		var v *TypeDef
+		*c.v, err = v, dec.Decode(&v)
 	}
 	return err
 }
@@ -261,9 +263,11 @@ func (c *typeOwnerCodec) DecodeField(dec codec.Decoder, name string) error {
 	var err error
 	switch name {
 	case "interface":
-		*c.v, err = codec.DecodeInto[*Interface](dec)
+		var v *Interface
+		*c.v, err = v, dec.Decode(&v)
 	case "world":
-		*c.v, err = codec.DecodeInto[*World](dec)
+		var v *World
+		*c.v, err = v, dec.Decode(&v)
 	}
 	return err
 }
@@ -277,22 +281,29 @@ func (c *typeDefKindCodec) DecodeField(dec codec.Decoder, name string) error {
 	var err error
 	switch name {
 	case "record":
-		*c.v, err = codec.DecodeNew[Record](dec)
+		v := &Record{}
+		*c.v, err = v, dec.Decode(v)
 	case "resource":
-		*c.v, err = codec.DecodeNew[Resource](dec)
+		v := &Resource{}
+		*c.v, err = v, dec.Decode(v)
 	case "handle":
-		*c.v, err = codec.DecodeInto[Handle](dec)
+		var v Handle
+		*c.v, err = v, dec.Decode(&v)
 	case "flags":
-		*c.v, err = codec.DecodeNew[Flags](dec)
+		v := &Flags{}
+		*c.v, err = v, dec.Decode(v)
 	case "tuple":
-		*c.v, err = codec.DecodeNew[Tuple](dec)
+		v := &Tuple{}
+		*c.v, err = v, dec.Decode(v)
 	case "variant":
-		*c.v, err = codec.DecodeNew[Variant](dec)
+		v := &Variant{}
+		*c.v, err = v, dec.Decode(v)
 
 	// TODO ...
 
 	case "type":
-		*c.v, err = codec.DecodeInto[Type](dec)
+		var v Type
+		*c.v, err = v, dec.Decode(&v)
 	}
 	return err
 }
@@ -371,9 +382,11 @@ func (c *handleCodec) DecodeField(dec codec.Decoder, name string) error {
 	var err error
 	switch name {
 	case "own":
-		*c.v, err = codec.DecodeNew[OwnHandle](dec)
+		v := &OwnHandle{}
+		*c.v, err = v, dec.Decode(&v)
 	case "borrow":
-		*c.v, err = codec.DecodeNew[BorrowHandle](dec)
+		v := &BorrowHandle{}
+		*c.v, err = v, dec.Decode(&v)
 	}
 	return err
 }
