@@ -41,6 +41,8 @@ func (res *Resolve) ResolveCodec(v any) codec.Codec {
 		return &borrowHandleCodec{v, res}
 
 	// Enums
+	case *FunctionKind:
+		return &functionKindCodec{v}
 	case *Handle:
 		return &handleCodec{v}
 	case *Type:
@@ -410,6 +412,34 @@ func (f *Function) DecodeField(dec codec.Decoder, name string) error {
 		return codec.DecodeSlice(dec, &f.Results)
 	}
 	return nil
+}
+
+type functionKindCodec struct {
+	v *FunctionKind
+}
+
+func (c *functionKindCodec) DecodeString(s string) error {
+	switch s {
+	case "freestanding":
+		*c.v = &FunctionKindFreestanding{}
+	}
+	return nil
+}
+
+func (c *functionKindCodec) DecodeField(dec codec.Decoder, name string) error {
+	var err error
+	switch name {
+	case "method":
+		v := &FunctionKindMethod{}
+		*c.v, err = v, dec.Decode(&v.Type)
+	case "static":
+		v := &FunctionKindStatic{}
+		*c.v, err = v, dec.Decode(&v.Type)
+	case "constructor":
+		v := &FunctionKindConstructor{}
+		*c.v, err = v, dec.Decode(&v.Type)
+	}
+	return err
 }
 
 // mustElement resizes s and allocates a new instance of T if necessary.
