@@ -7,6 +7,7 @@ import (
 	"os"
 	"slices"
 
+	"github.com/kr/pretty"
 	"github.com/ydnar/wasm-tools-go/wit"
 )
 
@@ -50,29 +51,12 @@ func summarize(r io.Reader, name string) error {
 		return err
 	}
 
-	fmt.Printf("Summarizing %s\n", name)
-	fmt.Println()
-	fmt.Printf("%d worlds(s), %d packages(s), %d interfaces(s), %d types(s)\n",
+	fmt.Printf("// WIT: %s\n", name)
+	fmt.Printf("// %d worlds(s), %d packages(s), %d interfaces(s), %d types(s)\n",
 		len(res.Worlds), len(res.Packages), len(res.Interfaces), len(res.TypeDefs))
 	fmt.Println()
 
-	for _, p := range res.Packages {
-		summarizePackage(p, "")
-	}
-
-	for i, t := range res.TypeDefs {
-		fmt.Printf("Type %d: %s\n", i, Default(t.Name, "<unnamed>"))
-		if t.Owner != nil {
-			fmt.Printf("Owner: ")
-			switch owner := t.Owner.(type) {
-			case *wit.Interface:
-				fmt.Printf("interface#%s\n", Default(owner.Name, "<unnamed>"))
-			case *wit.World:
-				fmt.Printf("world#%s\n", owner.Name)
-			}
-		}
-		fmt.Println()
-	}
+	fmt.Printf("%# v\n", pretty.Formatter(res))
 
 	return nil
 }
