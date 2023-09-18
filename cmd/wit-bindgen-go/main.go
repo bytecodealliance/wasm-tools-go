@@ -61,14 +61,14 @@ func summarize(r io.Reader, name string) error {
 	}
 
 	for i, t := range res.TypeDefs {
-		fmt.Printf("Type %d: %s\n", i, t.Name)
+		fmt.Printf("Type %d: %s\n", i, Default(t.Name, "<unnamed>"))
 		if t.Owner != nil {
 			fmt.Printf("Owner: ")
 			switch owner := t.Owner.(type) {
 			case *wit.Interface:
-				fmt.Printf("interface(%s)\n", Default(owner.Name, "<unnamed>"))
+				fmt.Printf("interface#%s\n", Default(owner.Name, "<unnamed>"))
 			case *wit.World:
-				fmt.Printf("world(%s)\n", owner.Name)
+				fmt.Printf("world#%s\n", owner.Name)
 			}
 		}
 		fmt.Println()
@@ -123,9 +123,9 @@ func summarizeInterface(i *wit.Interface, indent string) {
 	fmt.Println()
 }
 
-func Default(s string, def string) string {
-	if s != "" {
-		return s
+func Default(s *string, def string) string {
+	if s != nil {
+		return *s
 	}
 	return def
 }

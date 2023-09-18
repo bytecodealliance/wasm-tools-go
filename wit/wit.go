@@ -27,7 +27,7 @@ type worldItem struct{}
 func (worldItem) isWorldItem() {}
 
 type Interface struct {
-	Name      string
+	Name      *string
 	TypeDefs  map[string]*TypeDef
 	Functions map[string]*Function
 	Package   *Package `json:"-"`
@@ -37,7 +37,7 @@ type Interface struct {
 }
 
 type TypeDef struct {
-	Name  string
+	Name  *string
 	Kind  TypeDefKind
 	Owner TypeOwner `json:"-"`
 	Docs  Docs
@@ -46,7 +46,10 @@ type TypeDef struct {
 }
 
 func (t *TypeDef) TypeName() string {
-	return t.Name
+	if t.Name != nil {
+		return *t.Name
+	}
+	return "<unnamed>"
 }
 
 type TypeDefKind interface{ isTypeDefKind() }
@@ -179,7 +182,7 @@ type type_ struct{ typeDefKind }
 
 func (type_) isType() {}
 
-func (type_) TypeName() string { return "<undefined>" }
+func (type_) TypeName() string { return "<unnamed>" }
 
 type coreType[T any] struct{ type_ }
 
