@@ -127,7 +127,7 @@ type Variant struct {
 
 type Case struct {
 	Name string
-	Type Type // Can be nil
+	Type Type // Represented in Rust as Option<Type>, so Type field could be nil
 	Docs Docs
 }
 
@@ -136,21 +136,32 @@ type Enum struct {
 	typeDefKind
 }
 
-type Option struct{ Type }
+type Option struct {
+	Type Type
+	typeDefKind
+}
 
 type Result struct {
-	// TODO
+	OK    Type // Represented in Rust as Option<Type>, so Type field could be nil
+	Error Type // Represented in Rust as Option<Type>, so Type field could be nil
 	typeDefKind
 }
 
 type List struct {
-	// TODO
+	Type Type
 	typeDefKind
 }
 
-type Future struct{ Type } // Represented in Rust as Option<Type>, so Type field could be nil
+type Future struct {
+	Type Type // Represented in Rust as Option<Type>, so Type field could be nil
+	typeDefKind
+}
 
-type Stream struct{ Type }
+type Stream struct {
+	Element Type // Represented in Rust as Option<Type>, so Type field could be nil
+	End     Type // Represented in Rust as Option<Type>, so Type field could be nil
+	typeDefKind
+}
 
 type TypeOwner interface{ isTypeOwner() }
 
