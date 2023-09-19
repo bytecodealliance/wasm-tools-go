@@ -282,8 +282,11 @@ func (c *typeDefKindCodec) DecodeField(dec codec.Decoder, name string) error {
 	case "enum":
 		v := &Enum{}
 		*c.v, err = v, dec.Decode(v)
+	case "option":
+		v := &Option{}
+		*c.v, err = v, dec.Decode(&v.Type)
 
-	// TODO: Option, Result, List, Future, Stream
+	// TODO: Result, List, Future, Stream
 
 	case "type":
 		var v Type
