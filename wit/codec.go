@@ -286,7 +286,7 @@ func (c *typeDefKindCodec) DecodeField(dec codec.Decoder, name string) error {
 		v := &Variant{}
 		*c.v, err = v, dec.Decode(v)
 
-	// TODO ...
+	// TODO: Enum, Option, Result, List, Future, Stream
 
 	case "type":
 		var v Type
