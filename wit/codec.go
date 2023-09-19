@@ -186,10 +186,10 @@ func (c *packageCodec) DecodeField(dec codec.Decoder, name string) error {
 	return nil
 }
 
-// TODO: parse package name e.g. "wasi:clocks@1.0.2"
-func (c *PackageName) DecodeString(s string) error {
-	*c = PackageName(s)
-	return nil
+func (pn *PackageName) DecodeString(s string) error {
+	var err error
+	*pn, err = ParsePackageName(s)
+	return err
 }
 
 // worldItemCodec translates typed WorldItem references into a WorldItem,

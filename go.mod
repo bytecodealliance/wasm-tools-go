@@ -2,7 +2,10 @@ module github.com/ydnar/wasm-tools-go
 
 go 1.21.1
 
-require github.com/kr/pretty v0.3.1
+require (
+	github.com/coreos/go-semver v0.3.1
+	github.com/kr/pretty v0.3.1
+)
 
 require (
 	github.com/kr/text v0.2.0 // indirect
