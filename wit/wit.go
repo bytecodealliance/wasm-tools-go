@@ -99,12 +99,12 @@ type handle struct{ typeDefKind }
 func (handle) isHandle() {}
 
 type OwnHandle struct {
-	*TypeDef
+	Type *TypeDef
 	handle
 }
 
 type BorrowHandle struct {
-	*TypeDef
+	Type *TypeDef
 	handle
 }
 

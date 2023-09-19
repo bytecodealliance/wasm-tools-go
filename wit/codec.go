@@ -34,12 +34,6 @@ func (res *Resolve) ResolveCodec(v any) codec.Codec {
 	case **Function:
 		return codec.Must(v)
 
-	// Special types
-	case *OwnHandle:
-		return &ownHandleCodec{v, res}
-	case *BorrowHandle:
-		return &borrowHandleCodec{v, res}
-
 	// Enums
 	case *FunctionKind:
 		return &functionKindCodec{v}
@@ -370,32 +364,12 @@ func (c *handleCodec) DecodeField(dec codec.Decoder, name string) error {
 	switch name {
 	case "own":
 		v := &OwnHandle{}
-		*c.v, err = v, dec.Decode(&v)
+		*c.v, err = v, dec.Decode(&v.Type)
 	case "borrow":
 		v := &BorrowHandle{}
-		*c.v, err = v, dec.Decode(&v)
+		*c.v, err = v, dec.Decode(&v.Type)
 	}
 	return err
-}
-
-type ownHandleCodec struct {
-	*OwnHandle
-	*Resolve
-}
-
-func (c *ownHandleCodec) DecodeInt(i int) error {
-	c.TypeDef = c.getTypeDef(i)
-	return nil
-}
-
-type borrowHandleCodec struct {
-	*BorrowHandle
-	*Resolve
-}
-
-func (c *borrowHandleCodec) DecodeInt(i int) error {
-	c.TypeDef = c.getTypeDef(i)
-	return nil
 }
 
 func (f *Function) DecodeField(dec codec.Decoder, name string) error {
