@@ -98,12 +98,12 @@ func (c *worldCodec) DecodeField(dec codec.Decoder, name string) error {
 	switch name {
 	case "name":
 		return dec.Decode(&w.Name)
-	case "docs":
-		return dec.Decode(&w.Docs)
 	case "imports":
 		return codec.DecodeMap(dec, &w.Imports)
 	case "exports":
 		return codec.DecodeMap(dec, &w.Exports)
+	case "docs":
+		return dec.Decode(&w.Docs)
 	}
 	return nil
 }
@@ -122,8 +122,6 @@ func (c *interfaceCodec) DecodeInt(i int) error {
 func (c *interfaceCodec) DecodeField(dec codec.Decoder, name string) error {
 	i := codec.Must(c.i)
 	switch name {
-	case "docs":
-		return dec.Decode(&i.Docs)
 	case "name":
 		return dec.Decode(&i.Name)
 	case "types":
@@ -132,6 +130,8 @@ func (c *interfaceCodec) DecodeField(dec codec.Decoder, name string) error {
 		return codec.DecodeMap(dec, &i.Functions)
 	case "package":
 		return dec.Decode(&i.Package)
+	case "docs":
+		return dec.Decode(&i.Docs)
 	}
 	return nil
 }
@@ -174,14 +174,14 @@ func (c *packageCodec) DecodeInt(i int) error {
 func (c *packageCodec) DecodeField(dec codec.Decoder, name string) error {
 	p := codec.Must(c.p)
 	switch name {
-	case "docs":
-		return dec.Decode(&p.Docs)
 	case "name":
 		return dec.Decode(&p.Name)
 	case "interfaces":
 		return codec.DecodeMap(dec, &p.Interfaces)
 	case "worlds":
 		return codec.DecodeMap(dec, &p.Worlds)
+	case "docs":
+		return dec.Decode(&p.Docs)
 	}
 	return nil
 }
@@ -372,10 +372,16 @@ func (c *handleCodec) DecodeField(dec codec.Decoder, name string) error {
 	return err
 }
 
+func (e *Enum) DecodeField(dec codec.Decoder, name string) error {
+	switch name {
+	case "cases":
+		return codec.DecodeSlice(dec, &e.Cases)
+	}
+	return nil
+}
+
 func (f *Function) DecodeField(dec codec.Decoder, name string) error {
 	switch name {
-	case "docs":
-		return dec.Decode(&f.Docs)
 	case "name":
 		return dec.Decode(&f.Name)
 	case "kind":
@@ -384,6 +390,8 @@ func (f *Function) DecodeField(dec codec.Decoder, name string) error {
 		return codec.DecodeSlice(dec, &f.Params)
 	case "results":
 		return codec.DecodeSlice(dec, &f.Results)
+	case "docs":
+		return dec.Decode(&f.Docs)
 	}
 	return nil
 }
