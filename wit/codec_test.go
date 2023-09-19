@@ -1,7 +1,6 @@
 package wit
 
 import (
-	"fmt"
 	"os"
 	"testing"
 
@@ -21,5 +20,5 @@ func TestDecodeJSON(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	fmt.Printf("%# v\n", pretty.Formatter(res))
+	pretty.Println(res)
 }
