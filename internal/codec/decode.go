@@ -204,8 +204,6 @@ func DecodeBytes(v any, data []byte) error {
 	case encoding.TextUnmarshaler:
 		return v.UnmarshalText(data)
 	}
-	// TODO: how to handle undecodable types?
-	// Return an error? Silently ignore? Configurable?
 	return nil
 }
 

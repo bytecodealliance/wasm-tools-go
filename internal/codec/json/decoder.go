@@ -70,7 +70,6 @@ func (dec *Decoder) decodeToken(v any) error {
 func (dec *Decoder) decodeObject(o any) error {
 	d, ok := o.(codec.FieldDecoder)
 	if !ok {
-		// TODO: how to handle undecodable objects?
 		d = &ignore{}
 	}
 
@@ -108,7 +107,6 @@ func (dec *Decoder) decodeObject(o any) error {
 func (dec *Decoder) decodeArray(v any) error {
 	d, ok := v.(codec.ElementDecoder)
 	if !ok {
-		// TODO: how to handle undecodable arrays?
 		d = &ignore{}
 	}
 
