@@ -150,8 +150,8 @@ type Option struct {
 }
 
 type Result struct {
-	OK    Type // Represented in Rust as Option<Type>, so Type field could be nil
-	Error Type // Represented in Rust as Option<Type>, so Type field could be nil
+	OK  Type // Represented in Rust as Option<Type>, so Type field could be nil
+	Err Type // Represented in Rust as Option<Type>, so Type field could be nil
 	typeDefKind
 }
 
