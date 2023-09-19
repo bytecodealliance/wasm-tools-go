@@ -250,6 +250,9 @@ type StringType struct{ primitiveType[string] }
 // char is defined because rune is an alias of int32
 type char int32
 
+// ParseType parses a WIT primitive type string into
+// the associated Type implementation from this package.
+// It returns an error if the type string is not recoginized.
 func ParseType(s string) (Type, error) {
 	switch s {
 	case "bool":
