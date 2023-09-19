@@ -135,8 +135,13 @@ type Case struct {
 }
 
 type Enum struct {
-	// TODO
+	Cases []EnumCase
 	typeDefKind
+}
+
+type EnumCase struct {
+	Name string
+	Docs Docs
 }
 
 type Option struct {
