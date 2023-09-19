@@ -442,6 +442,16 @@ func (c *functionKindCodec) DecodeField(dec codec.Decoder, name string) error {
 	return err
 }
 
+func (p *Param) DecodeField(dec codec.Decoder, name string) error {
+	switch name {
+	case "name":
+		return dec.Decode(&p.Name)
+	case "type":
+		return dec.Decode(&p.Type)
+	}
+	return nil
+}
+
 // mustElement resizes s and allocates a new instance of T if necessary.
 func mustElement[S ~[]*E, E any](s *S, i int) *E {
 	if i < 0 {
