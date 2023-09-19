@@ -30,7 +30,7 @@ type Interface struct {
 	Name      *string
 	TypeDefs  map[string]*TypeDef
 	Functions map[string]*Function
-	Package   *Package `json:"-"`
+	Package   *Package
 	Docs      Docs
 	worldItem
 	typeOwner
@@ -39,7 +39,7 @@ type Interface struct {
 type TypeDef struct {
 	Name  *string
 	Kind  TypeDefKind
-	Owner TypeOwner `json:"-"`
+	Owner TypeOwner
 	Docs  Docs
 	worldItem
 	type_
