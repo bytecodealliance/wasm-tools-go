@@ -37,7 +37,6 @@ func DecodeBool(v any, b bool) error {
 // If unable to decode into a numeric type, it will fall back to DecodeString.
 func DecodeNumber(v any, n string) error {
 	switch v := v.(type) {
-	// Signed integers
 	case *int:
 		return decodeSignedValue(v, n)
 	case **int:
@@ -59,7 +58,6 @@ func DecodeNumber(v any, n string) error {
 	case **int64:
 		return decodeSignedValue(Must(v), n)
 
-	// Unsigned integers
 	case *uint:
 		return decodeUnsignedValue(v, n)
 	case **uint:
@@ -81,7 +79,6 @@ func DecodeNumber(v any, n string) error {
 	case **uint64:
 		return decodeUnsignedValue(Must(v), n)
 
-	// Floating-point types
 	case *float32:
 		return decodeFloatValue(v, n)
 	case **float32:
@@ -91,7 +88,6 @@ func DecodeNumber(v any, n string) error {
 	case **float64:
 		return decodeFloatValue(Must(v), n)
 
-	// Signed IntDecoder implementations
 	case IntDecoder[int]:
 		return decodeSigned(v, n)
 	case IntDecoder[int8]:
@@ -103,7 +99,6 @@ func DecodeNumber(v any, n string) error {
 	case IntDecoder[int64]:
 		return decodeSigned(v, n)
 
-	// Unsigned IntDecoder implementations
 	case IntDecoder[uint]:
 		return decodeUnsigned(v, n)
 	case IntDecoder[uint8]:
@@ -115,15 +110,12 @@ func DecodeNumber(v any, n string) error {
 	case IntDecoder[uint64]:
 		return decodeUnsigned(v, n)
 
-	// FloatDecoder implementations
 	case FloatDecoder[float32]:
 		return decodeFloat(v, n)
 	case FloatDecoder[float64]:
 		return decodeFloat(v, n)
 	}
 
-	// TODO: how to handle undecodable types?
-	// Return an error? Silently ignore? Configurable?
 	return DecodeString(v, n)
 }
 
