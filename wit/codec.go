@@ -288,9 +288,15 @@ func (c *typeDefKindCodec) DecodeField(dec codec.Decoder, name string) error {
 	case "result":
 		v := &Result{}
 		*c.v, err = v, dec.Decode(v)
-
-	// TODO: List, Future, Stream
-
+	case "list":
+		v := &List{}
+		*c.v, err = v, dec.Decode(&v.Type)
+	case "future":
+		v := &Future{}
+		*c.v, err = v, dec.Decode(&v.Type)
+	case "stream":
+		v := &Stream{}
+		*c.v, err = v, dec.Decode(v)
 	case "type":
 		var v Type
 		*c.v, err = v, dec.Decode(&v)
@@ -395,6 +401,16 @@ func (r *Result) DecodeField(dec codec.Decoder, name string) error {
 		return dec.Decode(&r.OK)
 	case "err":
 		return dec.Decode(&r.Err)
+	}
+	return nil
+}
+
+func (s *Stream) DecodeField(dec codec.Decoder, name string) error {
+	switch name {
+	case "element":
+		return dec.Decode(&s.Element)
+	case "end":
+		return dec.Decode(&s.End)
 	}
 	return nil
 }
