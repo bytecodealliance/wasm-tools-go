@@ -189,11 +189,14 @@ func (type_) isType() {}
 
 func (type_) TypeName() string { return "<unnamed>" }
 
-type coreType[T any] struct{ type_ }
+// primitiveType represents a WebAssembly Component Model primitive type
+// mapped to its equivalent Go type.
+// https://component-model.bytecodealliance.org/wit-overview.html#primitive-types
+type primitiveType[T any] struct{ type_ }
 
-func (coreType[T]) isType() {}
+func (primitiveType[T]) isType() {}
 
-func (coreType[T]) TypeName() string {
+func (primitiveType[T]) TypeName() string {
 	var v T
 	switch any(v).(type) {
 	case bool:
@@ -226,26 +229,23 @@ func (coreType[T]) TypeName() string {
 	return "<undefined>"
 }
 
-func (t coreType[T]) MarshalText() ([]byte, error) {
+func (t primitiveType[T]) MarshalText() ([]byte, error) {
 	return []byte(t.TypeName()), nil
 }
 
-// WASI component model types
-// https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md#types
-
-type BoolType struct{ coreType[bool] }
-type S8Type struct{ coreType[int8] }
-type U8Type struct{ coreType[uint8] }
-type S16Type struct{ coreType[int16] }
-type U16Type struct{ coreType[uint16] }
-type S32Type struct{ coreType[int32] }
-type U32Type struct{ coreType[uint32] }
-type S64Type struct{ coreType[int64] }
-type U64Type struct{ coreType[uint64] }
-type Float32Type struct{ coreType[float32] }
-type Float64Type struct{ coreType[float64] }
-type CharType struct{ coreType[char] }
-type StringType struct{ coreType[string] }
+type BoolType struct{ primitiveType[bool] }
+type S8Type struct{ primitiveType[int8] }
+type U8Type struct{ primitiveType[uint8] }
+type S16Type struct{ primitiveType[int16] }
+type U16Type struct{ primitiveType[uint16] }
+type S32Type struct{ primitiveType[int32] }
+type U32Type struct{ primitiveType[uint32] }
+type S64Type struct{ primitiveType[int64] }
+type U64Type struct{ primitiveType[uint64] }
+type Float32Type struct{ primitiveType[float32] }
+type Float64Type struct{ primitiveType[float64] }
+type CharType struct{ primitiveType[char] }
+type StringType struct{ primitiveType[string] }
 
 // char is defined because rune is an alias of int32
 type char int32
