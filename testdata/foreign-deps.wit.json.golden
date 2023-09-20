@@ -8,7 +8,7 @@
                     TypeDefs: {
                         "timestamp": &wit.TypeDef{
                             Name:       &"timestamp",
-                            Kind:       wit.U64Type{},
+                            Kind:       wit.U64{},
                             Owner:      &wit.Interface{(CYCLIC REFERENCE)},
                             Docs:       wit.Docs{},
                             _worldItem: wit._worldItem{},
@@ -33,7 +33,7 @@
                                             Fields: {
                                                 {
                                                     Name: "ino",
-                                                    Type: wit.U64Type{},
+                                                    Type: wit.U64{},
                                                     Docs: wit.Docs{},
                                                 },
                                             },
@@ -68,7 +68,7 @@
                                 Fields: {
                                     {
                                         Name: "ino",
-                                        Type: wit.U64Type{},
+                                        Type: wit.U64{},
                                         Docs: wit.Docs{},
                                     },
                                 },
@@ -133,7 +133,7 @@
                     TypeDefs: {
                         "timestamp": &wit.TypeDef{
                             Name:       &"timestamp",
-                            Kind:       wit.U64Type{},
+                            Kind:       wit.U64{},
                             Owner:      &wit.Interface{(CYCLIC REFERENCE)},
                             Docs:       wit.Docs{},
                             _worldItem: wit._worldItem{},
@@ -167,7 +167,7 @@
                                 Fields: {
                                     {
                                         Name: "ino",
-                                        Type: wit.U64Type{},
+                                        Type: wit.U64{},
                                         Docs: wit.Docs{},
                                     },
                                 },
@@ -254,7 +254,7 @@
                                         Name: &"another-type",
                                         Kind: &wit.TypeDef{
                                             Name:  &"another-type",
-                                            Kind:  wit.U32Type{},
+                                            Kind:  wit.U32{},
                                             Owner: &wit.Interface{
                                                 Name:     &"some-interface",
                                                 TypeDefs: {
@@ -292,7 +292,7 @@
                                         Name: &"from-default",
                                         Kind: &wit.TypeDef{
                                             Name:  &"from-default",
-                                            Kind:  wit.StringType{},
+                                            Kind:  wit.String{},
                                             Owner: &wit.Interface{
                                                 Name:     &"the-default",
                                                 TypeDefs: {
@@ -330,7 +330,7 @@
                                         Name: &"yet-another-type",
                                         Kind: &wit.TypeDef{
                                             Name:  &"yet-another-type",
-                                            Kind:  wit.U8Type{},
+                                            Kind:  wit.U8{},
                                             Owner: &wit.Interface{
                                                 Name:     &"another-interface",
                                                 TypeDefs: {
@@ -379,7 +379,7 @@
                                         Name: &"some-type",
                                         Kind: &wit.TypeDef{
                                             Name:  &"some-type",
-                                            Kind:  wit.U32Type{},
+                                            Kind:  wit.U32{},
                                             Owner: &wit.Interface{
                                                 Name:     &"the-default",
                                                 TypeDefs: {
@@ -425,7 +425,7 @@
                                         Name: &"some-type",
                                         Kind: &wit.TypeDef{
                                             Name:  &"some-type",
-                                            Kind:  wit.U32Type{},
+                                            Kind:  wit.U32{},
                                             Owner: &wit.Interface{
                                                 Name:     &"the-default",
                                                 TypeDefs: {
@@ -561,7 +561,7 @@
                     TypeDefs: {
                         "from-default": &wit.TypeDef{
                             Name:       &"from-default",
-                            Kind:       wit.StringType{},
+                            Kind:       wit.String{},
                             Owner:      &wit.Interface{(CYCLIC REFERENCE)},
                             Docs:       wit.Docs{},
                             _worldItem: wit._worldItem{},
@@ -581,7 +581,7 @@
                                 TypeDefs: {
                                     "yet-another-type": &wit.TypeDef{
                                         Name:       &"yet-another-type",
-                                        Kind:       wit.U8Type{},
+                                        Kind:       wit.U8{},
                                         Owner:      &wit.Interface{(CYCLIC REFERENCE)},
                                         Docs:       wit.Docs{},
                                         _worldItem: wit._worldItem{},
@@ -599,7 +599,7 @@
                                 TypeDefs: {
                                     "another-type": &wit.TypeDef{
                                         Name:       &"another-type",
-                                        Kind:       wit.U32Type{},
+                                        Kind:       wit.U32{},
                                         Owner:      &wit.Interface{(CYCLIC REFERENCE)},
                                         Docs:       wit.Docs{},
                                         _worldItem: wit._worldItem{},
@@ -694,7 +694,7 @@
             TypeDefs: {
                 "some-type": &wit.TypeDef{
                     Name:       &"some-type",
-                    Kind:       wit.U32Type{},
+                    Kind:       wit.U32{},
                     Owner:      &wit.Interface{(CYCLIC REFERENCE)},
                     Docs:       wit.Docs{},
                     _worldItem: wit._worldItem{},
@@ -723,7 +723,7 @@
             TypeDefs: {
                 "from-default": &wit.TypeDef{
                     Name:       &"from-default",
-                    Kind:       wit.StringType{},
+                    Kind:       wit.String{},
                     Owner:      &wit.Interface{(CYCLIC REFERENCE)},
                     Docs:       wit.Docs{},
                     _worldItem: wit._worldItem{},
@@ -743,7 +743,7 @@
                         TypeDefs: {
                             "yet-another-type": &wit.TypeDef{
                                 Name:       &"yet-another-type",
-                                Kind:       wit.U8Type{},
+                                Kind:       wit.U8{},
                                 Owner:      &wit.Interface{(CYCLIC REFERENCE)},
                                 Docs:       wit.Docs{},
                                 _worldItem: wit._worldItem{},
@@ -761,7 +761,7 @@
                         TypeDefs: {
                             "another-type": &wit.TypeDef{
                                 Name:       &"another-type",
-                                Kind:       wit.U32Type{},
+                                Kind:       wit.U32{},
                                 Owner:      &wit.Interface{(CYCLIC REFERENCE)},
                                 Docs:       wit.Docs{},
                                 _worldItem: wit._worldItem{},
@@ -788,7 +788,7 @@
             TypeDefs: {
                 "another-type": &wit.TypeDef{
                     Name:       &"another-type",
-                    Kind:       wit.U32Type{},
+                    Kind:       wit.U32{},
                     Owner:      &wit.Interface{(CYCLIC REFERENCE)},
                     Docs:       wit.Docs{},
                     _worldItem: wit._worldItem{},
@@ -808,7 +808,7 @@
                         TypeDefs: {
                             "yet-another-type": &wit.TypeDef{
                                 Name:       &"yet-another-type",
-                                Kind:       wit.U8Type{},
+                                Kind:       wit.U8{},
                                 Owner:      &wit.Interface{(CYCLIC REFERENCE)},
                                 Docs:       wit.Docs{},
                                 _worldItem: wit._worldItem{},
@@ -836,7 +836,7 @@
             TypeDefs: {
                 "yet-another-type": &wit.TypeDef{
                     Name:       &"yet-another-type",
-                    Kind:       wit.U8Type{},
+                    Kind:       wit.U8{},
                     Owner:      &wit.Interface{(CYCLIC REFERENCE)},
                     Docs:       wit.Docs{},
                     _worldItem: wit._worldItem{},
@@ -867,7 +867,7 @@
             TypeDefs: {
                 "timestamp": &wit.TypeDef{
                     Name:       &"timestamp",
-                    Kind:       wit.U64Type{},
+                    Kind:       wit.U64{},
                     Owner:      &wit.Interface{(CYCLIC REFERENCE)},
                     Docs:       wit.Docs{},
                     _worldItem: wit._worldItem{},
@@ -892,7 +892,7 @@
                                     Fields: {
                                         {
                                             Name: "ino",
-                                            Type: wit.U64Type{},
+                                            Type: wit.U64{},
                                             Docs: wit.Docs{},
                                         },
                                     },
@@ -927,7 +927,7 @@
                         Fields: {
                             {
                                 Name: "ino",
-                                Type: wit.U64Type{},
+                                Type: wit.U64{},
                                 Docs: wit.Docs{},
                             },
                         },
@@ -1247,7 +1247,7 @@
     TypeDefs: {
         &wit.TypeDef{
             Name:       &"some-type",
-            Kind:       wit.U32Type{},
+            Kind:       wit.U32{},
             Owner:      &wit.Interface{(CYCLIC REFERENCE)},
             Docs:       wit.Docs{},
             _worldItem: wit._worldItem{},
@@ -1255,7 +1255,7 @@
         },
         &wit.TypeDef{
             Name:       &"from-default",
-            Kind:       wit.StringType{},
+            Kind:       wit.String{},
             Owner:      &wit.Interface{(CYCLIC REFERENCE)},
             Docs:       wit.Docs{},
             _worldItem: wit._worldItem{},
@@ -1263,7 +1263,7 @@
         },
         &wit.TypeDef{
             Name:       &"another-type",
-            Kind:       wit.U32Type{},
+            Kind:       wit.U32{},
             Owner:      &wit.Interface{(CYCLIC REFERENCE)},
             Docs:       wit.Docs{},
             _worldItem: wit._worldItem{},
@@ -1271,7 +1271,7 @@
         },
         &wit.TypeDef{
             Name:       &"yet-another-type",
-            Kind:       wit.U8Type{},
+            Kind:       wit.U8{},
             Owner:      &wit.Interface{(CYCLIC REFERENCE)},
             Docs:       wit.Docs{},
             _worldItem: wit._worldItem{},
@@ -1279,7 +1279,7 @@
         },
         &wit.TypeDef{
             Name:       &"timestamp",
-            Kind:       wit.U64Type{},
+            Kind:       wit.U64{},
             Owner:      &wit.Interface{(CYCLIC REFERENCE)},
             Docs:       wit.Docs{},
             _worldItem: wit._worldItem{},
@@ -1291,7 +1291,7 @@
                 Fields: {
                     {
                         Name: "ino",
-                        Type: wit.U64Type{},
+                        Type: wit.U64{},
                         Docs: wit.Docs{},
                     },
                 },

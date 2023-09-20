@@ -148,7 +148,7 @@
                     Params: {
                         {
                             Name: "x",
-                            Type: wit.U32Type{},
+                            Type: wit.U32{},
                         },
                     },
                     Results: {
@@ -179,7 +179,7 @@
                     Params: {
                         {
                             Name: "x",
-                            Type: wit.U32Type{},
+                            Type: wit.U32{},
                         },
                     },
                     Results: {

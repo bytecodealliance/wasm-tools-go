@@ -50,7 +50,7 @@
                                     Type: &wit.TypeDef{
                                         Name: (*string)(nil),
                                         Kind: &wit.List{
-                                            Type:         wit.U32Type{},
+                                            Type:         wit.U32{},
                                             _typeDefKind: wit._typeDefKind{},
                                         },
                                         Owner:      nil,
@@ -116,7 +116,7 @@
                                     Type: &wit.TypeDef{
                                         Name: (*string)(nil),
                                         Kind: &wit.List{
-                                            Type:         wit.U32Type{},
+                                            Type:         wit.U32{},
                                             _typeDefKind: wit._typeDefKind{},
                                         },
                                         Owner:      nil,
@@ -568,7 +568,7 @@
                             Type: &wit.TypeDef{
                                 Name: (*string)(nil),
                                 Kind: &wit.List{
-                                    Type:         wit.U32Type{},
+                                    Type:         wit.U32{},
                                     _typeDefKind: wit._typeDefKind{},
                                 },
                                 Owner:      nil,
@@ -634,7 +634,7 @@
                             Type: &wit.TypeDef{
                                 Name: (*string)(nil),
                                 Kind: &wit.List{
-                                    Type:         wit.U32Type{},
+                                    Type:         wit.U32{},
                                     _typeDefKind: wit._typeDefKind{},
                                 },
                                 Owner:      nil,
@@ -945,7 +945,7 @@
         &wit.TypeDef{
             Name: (*string)(nil),
             Kind: &wit.List{
-                Type:         wit.U32Type{},
+                Type:         wit.U32{},
                 _typeDefKind: wit._typeDefKind{},
             },
             Owner:      nil,

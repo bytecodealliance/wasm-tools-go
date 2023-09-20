@@ -65,7 +65,7 @@
                     Results: {
                         {
                             Name: "u",
-                            Type: wit.U32Type{},
+                            Type: wit.U32{},
                         },
                     },
                     Docs:       wit.Docs{},
@@ -120,7 +120,7 @@
                         },
                         {
                             Name: "a",
-                            Type: wit.U32Type{},
+                            Type: wit.U32{},
                         },
                     },
                     Results:    nil,
@@ -150,7 +150,7 @@
                         },
                         {
                             Name: "a",
-                            Type: wit.U32Type{},
+                            Type: wit.U32{},
                         },
                     },
                     Results:    nil,
@@ -182,7 +182,7 @@
                     Results: {
                         {
                             Name: "",
-                            Type: wit.U32Type{},
+                            Type: wit.U32{},
                         },
                     },
                     Docs:       wit.Docs{},
@@ -217,8 +217,8 @@
                                 Name: (*string)(nil),
                                 Kind: &wit.Tuple{
                                     Types: {
-                                        wit.U32Type{},
-                                        wit.U32Type{},
+                                        wit.U32{},
+                                        wit.U32{},
                                     },
                                     _typeDefKind: wit._typeDefKind{},
                                 },
@@ -255,11 +255,11 @@
                         },
                         {
                             Name: "a",
-                            Type: wit.Float32Type{},
+                            Type: wit.Float32{},
                         },
                         {
                             Name: "b",
-                            Type: wit.Float32Type{},
+                            Type: wit.Float32{},
                         },
                     },
                     Results: {
@@ -269,8 +269,8 @@
                                 Name: (*string)(nil),
                                 Kind: &wit.Tuple{
                                     Types: {
-                                        wit.U32Type{},
-                                        wit.U32Type{},
+                                        wit.U32{},
+                                        wit.U32{},
                                     },
                                     _typeDefKind: wit._typeDefKind{},
                                 },
@@ -310,7 +310,7 @@
                             Type: &wit.TypeDef{
                                 Name: (*string)(nil),
                                 Kind: &wit.Option{
-                                    Type:         wit.U32Type{},
+                                    Type:         wit.U32{},
                                     _typeDefKind: wit._typeDefKind{},
                                 },
                                 Owner:      nil,
@@ -326,8 +326,8 @@
                             Type: &wit.TypeDef{
                                 Name: (*string)(nil),
                                 Kind: &wit.Result{
-                                    OK:           wit.U32Type{},
-                                    Err:          wit.Float32Type{},
+                                    OK:           wit.U32{},
+                                    Err:          wit.Float32{},
                                     _typeDefKind: wit._typeDefKind{},
                                 },
                                 Owner:      nil,
@@ -365,11 +365,11 @@
                     Results: {
                         {
                             Name: "u",
-                            Type: wit.U32Type{},
+                            Type: wit.U32{},
                         },
                         {
                             Name: "f",
-                            Type: wit.Float32Type{},
+                            Type: wit.Float32{},
                         },
                     },
                     Docs:       wit.Docs{},
@@ -463,8 +463,8 @@
             Name: (*string)(nil),
             Kind: &wit.Tuple{
                 Types: {
-                    wit.U32Type{},
-                    wit.U32Type{},
+                    wit.U32{},
+                    wit.U32{},
                 },
                 _typeDefKind: wit._typeDefKind{},
             },
@@ -476,7 +476,7 @@
         &wit.TypeDef{
             Name: (*string)(nil),
             Kind: &wit.Option{
-                Type:         wit.U32Type{},
+                Type:         wit.U32{},
                 _typeDefKind: wit._typeDefKind{},
             },
             Owner:      nil,
@@ -487,8 +487,8 @@
         &wit.TypeDef{
             Name: (*string)(nil),
             Kind: &wit.Result{
-                OK:           wit.U32Type{},
-                Err:          wit.Float32Type{},
+                OK:           wit.U32{},
+                Err:          wit.Float32{},
                 _typeDefKind: wit._typeDefKind{},
             },
             Owner:      nil,

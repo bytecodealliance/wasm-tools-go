@@ -39,7 +39,7 @@
                     Results: {
                         {
                             Name: "a",
-                            Type: wit.S32Type{},
+                            Type: wit.S32{},
                         },
                         {
                             Name: "handle",

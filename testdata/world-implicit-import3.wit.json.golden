@@ -7,7 +7,7 @@
                     Name: &"g",
                     Kind: &wit.TypeDef{
                         Name:  &"g",
-                        Kind:  wit.CharType{},
+                        Kind:  wit.Char{},
                         Owner: &wit.Interface{
                             Name:     &"foo",
                             TypeDefs: {
@@ -46,7 +46,7 @@
                     TypeDefs: {
                         "g": &wit.TypeDef{
                             Name:       &"g",
-                            Kind:       wit.CharType{},
+                            Kind:       wit.Char{},
                             Owner:      &wit.Interface{(CYCLIC REFERENCE)},
                             Docs:       wit.Docs{},
                             _worldItem: wit._worldItem{},
@@ -99,7 +99,7 @@
             TypeDefs: {
                 "g": &wit.TypeDef{
                     Name:       &"g",
-                    Kind:       wit.CharType{},
+                    Kind:       wit.Char{},
                     Owner:      &wit.Interface{(CYCLIC REFERENCE)},
                     Docs:       wit.Docs{},
                     _worldItem: wit._worldItem{},
@@ -129,7 +129,7 @@
     TypeDefs: {
         &wit.TypeDef{
             Name:       &"g",
-            Kind:       wit.CharType{},
+            Kind:       wit.Char{},
             Owner:      &wit.Interface{(CYCLIC REFERENCE)},
             Docs:       wit.Docs{},
             _worldItem: wit._worldItem{},

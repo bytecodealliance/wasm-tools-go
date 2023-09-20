@@ -9,7 +9,7 @@
                     Kind: &wit.Stream{
                         Element: &wit.TypeDef{
                             Name:       &"x",
-                            Kind:       wit.U32Type{},
+                            Kind:       wit.U32{},
                             Owner:      &wit.Interface{(CYCLIC REFERENCE)},
                             Docs:       wit.Docs{},
                             _worldItem: wit._worldItem{},
@@ -25,7 +25,7 @@
                 },
                 "x": &wit.TypeDef{
                     Name:       &"x",
-                    Kind:       wit.U32Type{},
+                    Kind:       wit.U32{},
                     Owner:      &wit.Interface{(CYCLIC REFERENCE)},
                     Docs:       wit.Docs{},
                     _worldItem: wit._worldItem{},
@@ -53,7 +53,7 @@
     TypeDefs: {
         &wit.TypeDef{
             Name:       &"x",
-            Kind:       wit.U32Type{},
+            Kind:       wit.U32{},
             Owner:      &wit.Interface{(CYCLIC REFERENCE)},
             Docs:       wit.Docs{},
             _worldItem: wit._worldItem{},

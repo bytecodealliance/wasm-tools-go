@@ -18,8 +18,8 @@
                                         Name: (*string)(nil),
                                         Kind: &wit.Tuple{
                                             Types: {
-                                                wit.U64Type{},
-                                                wit.U64Type{},
+                                                wit.U64{},
+                                                wit.U64{},
                                             },
                                             _typeDefKind: wit._typeDefKind{},
                                         },
@@ -51,7 +51,7 @@
                                         Params: {
                                             {
                                                 Name: "len",
-                                                Type: wit.U64Type{},
+                                                Type: wit.U64{},
                                             },
                                         },
                                         Results: {
@@ -60,7 +60,7 @@
                                                 Type: &wit.TypeDef{
                                                     Name: (*string)(nil),
                                                     Kind: &wit.List{
-                                                        Type:         wit.U8Type{},
+                                                        Type:         wit.U8{},
                                                         _typeDefKind: wit._typeDefKind{},
                                                     },
                                                     Owner:      nil,
@@ -80,7 +80,7 @@
                                         Results: {
                                             {
                                                 Name: "",
-                                                Type: wit.U64Type{},
+                                                Type: wit.U64{},
                                             },
                                         },
                                         Docs:       wit.Docs{},
@@ -103,7 +103,7 @@
                                         Params: {
                                             {
                                                 Name: "len",
-                                                Type: wit.U64Type{},
+                                                Type: wit.U64{},
                                             },
                                         },
                                         Results: {
@@ -112,7 +112,7 @@
                                                 Type: &wit.TypeDef{
                                                     Name: (*string)(nil),
                                                     Kind: &wit.List{
-                                                        Type:         wit.U8Type{},
+                                                        Type:         wit.U8{},
                                                         _typeDefKind: wit._typeDefKind{},
                                                     },
                                                     Owner:      nil,
@@ -132,7 +132,7 @@
                                         Results: {
                                             {
                                                 Name: "",
-                                                Type: wit.U64Type{},
+                                                Type: wit.U64{},
                                             },
                                         },
                                         Docs:       wit.Docs{},
@@ -164,7 +164,7 @@
                             Params: {
                                 {
                                     Name: "len",
-                                    Type: wit.U64Type{},
+                                    Type: wit.U64{},
                                 },
                             },
                             Results: {
@@ -173,7 +173,7 @@
                                     Type: &wit.TypeDef{
                                         Name: (*string)(nil),
                                         Kind: &wit.List{
-                                            Type:         wit.U8Type{},
+                                            Type:         wit.U8{},
                                             _typeDefKind: wit._typeDefKind{},
                                         },
                                         Owner:      nil,
@@ -193,7 +193,7 @@
                             Results: {
                                 {
                                     Name: "",
-                                    Type: wit.U64Type{},
+                                    Type: wit.U64{},
                                 },
                             },
                             Docs:       wit.Docs{},
@@ -219,7 +219,7 @@
                                         Params: {
                                             {
                                                 Name: "len",
-                                                Type: wit.U64Type{},
+                                                Type: wit.U64{},
                                             },
                                         },
                                         Results: {
@@ -238,7 +238,7 @@
                                         Results: {
                                             {
                                                 Name: "",
-                                                Type: wit.U64Type{},
+                                                Type: wit.U64{},
                                             },
                                         },
                                         Docs:       wit.Docs{},
@@ -270,7 +270,7 @@
                             Params: {
                                 {
                                     Name: "len",
-                                    Type: wit.U64Type{},
+                                    Type: wit.U64{},
                                 },
                             },
                             Results: {
@@ -279,7 +279,7 @@
                                     Type: &wit.TypeDef{
                                         Name: (*string)(nil),
                                         Kind: &wit.List{
-                                            Type:         wit.U8Type{},
+                                            Type:         wit.U8{},
                                             _typeDefKind: wit._typeDefKind{},
                                         },
                                         Owner:      nil,
@@ -299,7 +299,7 @@
                             Results: {
                                 {
                                     Name: "",
-                                    Type: wit.U64Type{},
+                                    Type: wit.U64{},
                                 },
                             },
                             Docs:       wit.Docs{},
@@ -349,8 +349,8 @@
                                 Name: (*string)(nil),
                                 Kind: &wit.Tuple{
                                     Types: {
-                                        wit.U64Type{},
-                                        wit.U64Type{},
+                                        wit.U64{},
+                                        wit.U64{},
                                     },
                                     _typeDefKind: wit._typeDefKind{},
                                 },
@@ -382,7 +382,7 @@
                                 Params: {
                                     {
                                         Name: "len",
-                                        Type: wit.U64Type{},
+                                        Type: wit.U64{},
                                     },
                                 },
                                 Results: {
@@ -391,7 +391,7 @@
                                         Type: &wit.TypeDef{
                                             Name: (*string)(nil),
                                             Kind: &wit.List{
-                                                Type:         wit.U8Type{},
+                                                Type:         wit.U8{},
                                                 _typeDefKind: wit._typeDefKind{},
                                             },
                                             Owner:      nil,
@@ -411,7 +411,7 @@
                                 Results: {
                                     {
                                         Name: "",
-                                        Type: wit.U64Type{},
+                                        Type: wit.U64{},
                                     },
                                 },
                                 Docs:       wit.Docs{},
@@ -434,7 +434,7 @@
                                 Params: {
                                     {
                                         Name: "len",
-                                        Type: wit.U64Type{},
+                                        Type: wit.U64{},
                                     },
                                 },
                                 Results: {
@@ -443,7 +443,7 @@
                                         Type: &wit.TypeDef{
                                             Name: (*string)(nil),
                                             Kind: &wit.List{
-                                                Type:         wit.U8Type{},
+                                                Type:         wit.U8{},
                                                 _typeDefKind: wit._typeDefKind{},
                                             },
                                             Owner:      nil,
@@ -463,7 +463,7 @@
                                 Results: {
                                     {
                                         Name: "",
-                                        Type: wit.U64Type{},
+                                        Type: wit.U64{},
                                     },
                                 },
                                 Docs:       wit.Docs{},
@@ -495,7 +495,7 @@
                     Params: {
                         {
                             Name: "len",
-                            Type: wit.U64Type{},
+                            Type: wit.U64{},
                         },
                     },
                     Results: {
@@ -504,7 +504,7 @@
                             Type: &wit.TypeDef{
                                 Name: (*string)(nil),
                                 Kind: &wit.List{
-                                    Type:         wit.U8Type{},
+                                    Type:         wit.U8{},
                                     _typeDefKind: wit._typeDefKind{},
                                 },
                                 Owner:      nil,
@@ -524,7 +524,7 @@
                     Results: {
                         {
                             Name: "",
-                            Type: wit.U64Type{},
+                            Type: wit.U64{},
                         },
                     },
                     Docs:       wit.Docs{},
@@ -550,7 +550,7 @@
                                 Params: {
                                     {
                                         Name: "len",
-                                        Type: wit.U64Type{},
+                                        Type: wit.U64{},
                                     },
                                 },
                                 Results: {
@@ -569,7 +569,7 @@
                                 Results: {
                                     {
                                         Name: "",
-                                        Type: wit.U64Type{},
+                                        Type: wit.U64{},
                                     },
                                 },
                                 Docs:       wit.Docs{},
@@ -601,7 +601,7 @@
                     Params: {
                         {
                             Name: "len",
-                            Type: wit.U64Type{},
+                            Type: wit.U64{},
                         },
                     },
                     Results: {
@@ -610,7 +610,7 @@
                             Type: &wit.TypeDef{
                                 Name: (*string)(nil),
                                 Kind: &wit.List{
-                                    Type:         wit.U8Type{},
+                                    Type:         wit.U8{},
                                     _typeDefKind: wit._typeDefKind{},
                                 },
                                 Owner:      nil,
@@ -630,7 +630,7 @@
                     Results: {
                         {
                             Name: "",
-                            Type: wit.U64Type{},
+                            Type: wit.U64{},
                         },
                     },
                     Docs:       wit.Docs{},
@@ -663,8 +663,8 @@
             Name: (*string)(nil),
             Kind: &wit.Tuple{
                 Types: {
-                    wit.U64Type{},
-                    wit.U64Type{},
+                    wit.U64{},
+                    wit.U64{},
                 },
                 _typeDefKind: wit._typeDefKind{},
             },
@@ -676,7 +676,7 @@
         &wit.TypeDef{
             Name: (*string)(nil),
             Kind: &wit.List{
-                Type:         wit.U8Type{},
+                Type:         wit.U8{},
                 _typeDefKind: wit._typeDefKind{},
             },
             Owner:      nil,

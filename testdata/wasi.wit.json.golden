@@ -346,7 +346,7 @@
                 },
                 "timestamp": &wit.TypeDef{
                     Name:       &"timestamp",
-                    Kind:       wit.U64Type{},
+                    Kind:       wit.U64{},
                     Owner:      &wit.Interface{(CYCLIC REFERENCE)},
                     Docs:       wit.Docs{},
                     _worldItem: wit._worldItem{},
@@ -394,7 +394,7 @@
         },
         &wit.TypeDef{
             Name:       &"timestamp",
-            Kind:       wit.U64Type{},
+            Kind:       wit.U64{},
             Owner:      &wit.Interface{(CYCLIC REFERENCE)},
             Docs:       wit.Docs{},
             _worldItem: wit._worldItem{},

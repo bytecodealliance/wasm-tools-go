@@ -5,7 +5,7 @@
             Imports: {
                 "a": &wit.TypeDef{
                     Name:       &"a",
-                    Kind:       wit.U32Type{},
+                    Kind:       wit.U32{},
                     Owner:      &wit.World{(CYCLIC REFERENCE)},
                     Docs:       wit.Docs{},
                     _worldItem: wit._worldItem{},
@@ -52,7 +52,7 @@
                     TypeDefs: {
                         "t": &wit.TypeDef{
                             Name:       &"t",
-                            Kind:       wit.U32Type{},
+                            Kind:       wit.U32{},
                             Owner:      &wit.Interface{(CYCLIC REFERENCE)},
                             Docs:       wit.Docs{},
                             _worldItem: wit._worldItem{},
@@ -81,7 +81,7 @@
                                             Fields: {
                                                 {
                                                     Name: "x",
-                                                    Type: wit.U32Type{},
+                                                    Type: wit.U32{},
                                                     Docs: wit.Docs{},
                                                 },
                                             },
@@ -163,7 +163,7 @@
                     Name: &"t",
                     Kind: &wit.TypeDef{
                         Name:       &"t",
-                        Kind:       wit.U32Type{},
+                        Kind:       wit.U32{},
                         Owner:      &wit.Interface{(CYCLIC REFERENCE)},
                         Docs:       wit.Docs{},
                         _worldItem: wit._worldItem{},
@@ -203,7 +203,7 @@
                         Fields: {
                             {
                                 Name: "x",
-                                Type: wit.U32Type{},
+                                Type: wit.U32{},
                                 Docs: wit.Docs{},
                             },
                         },
@@ -281,7 +281,7 @@
             TypeDefs: {
                 "t": &wit.TypeDef{
                     Name:       &"t",
-                    Kind:       wit.U32Type{},
+                    Kind:       wit.U32{},
                     Owner:      &wit.Interface{(CYCLIC REFERENCE)},
                     Docs:       wit.Docs{},
                     _worldItem: wit._worldItem{},
@@ -313,7 +313,7 @@
     TypeDefs: {
         &wit.TypeDef{
             Name:       &"t",
-            Kind:       wit.U32Type{},
+            Kind:       wit.U32{},
             Owner:      &wit.Interface{(CYCLIC REFERENCE)},
             Docs:       wit.Docs{},
             _worldItem: wit._worldItem{},
@@ -321,7 +321,7 @@
         },
         &wit.TypeDef{
             Name:       &"a",
-            Kind:       wit.U32Type{},
+            Kind:       wit.U32{},
             Owner:      &wit.World{(CYCLIC REFERENCE)},
             Docs:       wit.Docs{},
             _worldItem: wit._worldItem{},
@@ -349,7 +349,7 @@
                 Fields: {
                     {
                         Name: "x",
-                        Type: wit.U32Type{},
+                        Type: wit.U32{},
                         Docs: wit.Docs{},
                     },
                 },

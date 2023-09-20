@@ -11,7 +11,7 @@
                     Params: {
                         {
                             Name: "len",
-                            Type: wit.U64Type{},
+                            Type: wit.U64{},
                         },
                     },
                     Results: {
@@ -20,7 +20,7 @@
                             Type: &wit.TypeDef{
                                 Name: (*string)(nil),
                                 Kind: &wit.List{
-                                    Type:         wit.U8Type{},
+                                    Type:         wit.U8{},
                                     _typeDefKind: wit._typeDefKind{},
                                 },
                                 Owner:      nil,
@@ -40,7 +40,7 @@
                     Results: {
                         {
                             Name: "",
-                            Type: wit.U64Type{},
+                            Type: wit.U64{},
                         },
                     },
                     Docs:       wit.Docs{},
@@ -68,7 +68,7 @@
         &wit.TypeDef{
             Name: (*string)(nil),
             Kind: &wit.List{
-                Type:         wit.U8Type{},
+                Type:         wit.U8{},
                 _typeDefKind: wit._typeDefKind{},
             },
             Owner:      nil,

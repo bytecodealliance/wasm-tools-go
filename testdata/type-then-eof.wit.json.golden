@@ -12,7 +12,7 @@
                     Results: {
                         {
                             Name: "",
-                            Type: wit.StringType{},
+                            Type: wit.String{},
                         },
                     },
                     Docs:       wit.Docs{},

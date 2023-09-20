@@ -46,7 +46,7 @@
                                         Name: &"x",
                                         Kind: &wit.TypeDef{
                                             Name:  &"x",
-                                            Kind:  wit.U32Type{},
+                                            Kind:  wit.U32{},
                                             Owner: &wit.Interface{
                                                 Name:     &"foo",
                                                 TypeDefs: {
@@ -71,7 +71,7 @@
                                         Name: &"x2",
                                         Kind: &wit.TypeDef{
                                             Name:  &"x",
-                                            Kind:  wit.U32Type{},
+                                            Kind:  wit.U32{},
                                             Owner: &wit.Interface{
                                                 Name:     &"foo",
                                                 TypeDefs: {
@@ -96,7 +96,7 @@
                                         Name: &"x3",
                                         Kind: &wit.TypeDef{
                                             Name:  &"x",
-                                            Kind:  wit.U32Type{},
+                                            Kind:  wit.U32{},
                                             Owner: &wit.Interface{
                                                 Name:     &"foo",
                                                 TypeDefs: {
@@ -121,7 +121,7 @@
                                         Name: &"x4",
                                         Kind: &wit.TypeDef{
                                             Name:  &"x",
-                                            Kind:  wit.U32Type{},
+                                            Kind:  wit.U32{},
                                             Owner: &wit.Interface{
                                                 Name:     &"depend-on-me",
                                                 TypeDefs: {
@@ -146,7 +146,7 @@
                                         Name: &"y",
                                         Kind: &wit.TypeDef{
                                             Name:  &"y",
-                                            Kind:  wit.U64Type{},
+                                            Kind:  wit.U64{},
                                             Owner: &wit.Interface{
                                                 Name:     &"something-else",
                                                 TypeDefs: {
@@ -171,7 +171,7 @@
                                         Name: &"y2",
                                         Kind: &wit.TypeDef{
                                             Name:  &"y",
-                                            Kind:  wit.U64Type{},
+                                            Kind:  wit.U64{},
                                             Owner: &wit.Interface{
                                                 Name:     &"something-else",
                                                 TypeDefs: {
@@ -204,7 +204,7 @@
                                 TypeDefs: {
                                     "t": &wit.TypeDef{
                                         Name:       &"t",
-                                        Kind:       wit.U32Type{},
+                                        Kind:       wit.U32{},
                                         Owner:      &wit.Interface{(CYCLIC REFERENCE)},
                                         Docs:       wit.Docs{},
                                         _worldItem: wit._worldItem{},
@@ -258,7 +258,7 @@
                                 TypeDefs: {
                                     "x": &wit.TypeDef{
                                         Name:       &"x",
-                                        Kind:       wit.U32Type{},
+                                        Kind:       wit.U32{},
                                         Owner:      &wit.Interface{(CYCLIC REFERENCE)},
                                         Docs:       wit.Docs{},
                                         _worldItem: wit._worldItem{},
@@ -294,7 +294,7 @@
                                 TypeDefs: {
                                     "x": &wit.TypeDef{
                                         Name:       &"x",
-                                        Kind:       wit.U32Type{},
+                                        Kind:       wit.U32{},
                                         Owner:      &wit.Interface{(CYCLIC REFERENCE)},
                                         Docs:       wit.Docs{},
                                         _worldItem: wit._worldItem{},
@@ -331,7 +331,7 @@
                                 TypeDefs: {
                                     "y": &wit.TypeDef{
                                         Name:       &"y",
-                                        Kind:       wit.U64Type{},
+                                        Kind:       wit.U64{},
                                         Owner:      &wit.Interface{(CYCLIC REFERENCE)},
                                         Docs:       wit.Docs{},
                                         _worldItem: wit._worldItem{},
@@ -476,7 +476,7 @@
                                 TypeDefs: {
                                     "t": &wit.TypeDef{
                                         Name:       &"t",
-                                        Kind:       wit.U32Type{},
+                                        Kind:       wit.U32{},
                                         Owner:      &wit.Interface{(CYCLIC REFERENCE)},
                                         Docs:       wit.Docs{},
                                         _worldItem: wit._worldItem{},
@@ -530,7 +530,7 @@
                                 TypeDefs: {
                                     "x": &wit.TypeDef{
                                         Name:       &"x",
-                                        Kind:       wit.U32Type{},
+                                        Kind:       wit.U32{},
                                         Owner:      &wit.Interface{(CYCLIC REFERENCE)},
                                         Docs:       wit.Docs{},
                                         _worldItem: wit._worldItem{},
@@ -566,7 +566,7 @@
                                 TypeDefs: {
                                     "x": &wit.TypeDef{
                                         Name:       &"x",
-                                        Kind:       wit.U32Type{},
+                                        Kind:       wit.U32{},
                                         Owner:      &wit.Interface{(CYCLIC REFERENCE)},
                                         Docs:       wit.Docs{},
                                         _worldItem: wit._worldItem{},
@@ -603,7 +603,7 @@
                                 TypeDefs: {
                                     "y": &wit.TypeDef{
                                         Name:       &"y",
-                                        Kind:       wit.U64Type{},
+                                        Kind:       wit.U64{},
                                         Owner:      &wit.Interface{(CYCLIC REFERENCE)},
                                         Docs:       wit.Docs{},
                                         _worldItem: wit._worldItem{},
@@ -676,7 +676,7 @@
                                 Name: &"x",
                                 Kind: &wit.TypeDef{
                                     Name:       &"x",
-                                    Kind:       wit.U32Type{},
+                                    Kind:       wit.U32{},
                                     Owner:      &wit.Interface{(CYCLIC REFERENCE)},
                                     Docs:       wit.Docs{},
                                     _worldItem: wit._worldItem{},
@@ -697,7 +697,7 @@
                     TypeDefs: {
                         "x": &wit.TypeDef{
                             Name:       &"x",
-                            Kind:       wit.U32Type{},
+                            Kind:       wit.U32{},
                             Owner:      &wit.Interface{(CYCLIC REFERENCE)},
                             Docs:       wit.Docs{},
                             _worldItem: wit._worldItem{},
@@ -783,7 +783,7 @@
                                 TypeDefs: {
                                     "t": &wit.TypeDef{
                                         Name:       &"t",
-                                        Kind:       wit.U32Type{},
+                                        Kind:       wit.U32{},
                                         Owner:      &wit.Interface{(CYCLIC REFERENCE)},
                                         Docs:       wit.Docs{},
                                         _worldItem: wit._worldItem{},
@@ -856,7 +856,7 @@
                                 TypeDefs: {
                                     "x": &wit.TypeDef{
                                         Name:       &"x",
-                                        Kind:       wit.U32Type{},
+                                        Kind:       wit.U32{},
                                         Owner:      &wit.Interface{(CYCLIC REFERENCE)},
                                         Docs:       wit.Docs{},
                                         _worldItem: wit._worldItem{},
@@ -893,7 +893,7 @@
                                 TypeDefs: {
                                     "y": &wit.TypeDef{
                                         Name:       &"y",
-                                        Kind:       wit.U64Type{},
+                                        Kind:       wit.U64{},
                                         Owner:      &wit.Interface{(CYCLIC REFERENCE)},
                                         Docs:       wit.Docs{},
                                         _worldItem: wit._worldItem{},
@@ -921,7 +921,7 @@
                     Name: &"x",
                     Kind: &wit.TypeDef{
                         Name:       &"x",
-                        Kind:       wit.U32Type{},
+                        Kind:       wit.U32{},
                         Owner:      &wit.Interface{(CYCLIC REFERENCE)},
                         Docs:       wit.Docs{},
                         _worldItem: wit._worldItem{},
@@ -975,7 +975,7 @@
                                 Name: &"x",
                                 Kind: &wit.TypeDef{
                                     Name:       &"x",
-                                    Kind:       wit.U32Type{},
+                                    Kind:       wit.U32{},
                                     Owner:      &wit.Interface{(CYCLIC REFERENCE)},
                                     Docs:       wit.Docs{},
                                     _worldItem: wit._worldItem{},
@@ -990,7 +990,7 @@
                                 Name: &"x2",
                                 Kind: &wit.TypeDef{
                                     Name:       &"x",
-                                    Kind:       wit.U32Type{},
+                                    Kind:       wit.U32{},
                                     Owner:      &wit.Interface{(CYCLIC REFERENCE)},
                                     Docs:       wit.Docs{},
                                     _worldItem: wit._worldItem{},
@@ -1005,7 +1005,7 @@
                                 Name: &"x3",
                                 Kind: &wit.TypeDef{
                                     Name:       &"x",
-                                    Kind:       wit.U32Type{},
+                                    Kind:       wit.U32{},
                                     Owner:      &wit.Interface{(CYCLIC REFERENCE)},
                                     Docs:       wit.Docs{},
                                     _worldItem: wit._worldItem{},
@@ -1028,7 +1028,7 @@
                                 Name: &"y",
                                 Kind: &wit.TypeDef{
                                     Name:       &"y",
-                                    Kind:       wit.U64Type{},
+                                    Kind:       wit.U64{},
                                     Owner:      &wit.Interface{(CYCLIC REFERENCE)},
                                     Docs:       wit.Docs{},
                                     _worldItem: wit._worldItem{},
@@ -1043,7 +1043,7 @@
                                 Name: &"y2",
                                 Kind: &wit.TypeDef{
                                     Name:       &"y",
-                                    Kind:       wit.U64Type{},
+                                    Kind:       wit.U64{},
                                     Owner:      &wit.Interface{(CYCLIC REFERENCE)},
                                     Docs:       wit.Docs{},
                                     _worldItem: wit._worldItem{},
@@ -1066,7 +1066,7 @@
                         TypeDefs: {
                             "t": &wit.TypeDef{
                                 Name:       &"t",
-                                Kind:       wit.U32Type{},
+                                Kind:       wit.U32{},
                                 Owner:      &wit.Interface{(CYCLIC REFERENCE)},
                                 Docs:       wit.Docs{},
                                 _worldItem: wit._worldItem{},
@@ -1120,7 +1120,7 @@
                         TypeDefs: {
                             "x": &wit.TypeDef{
                                 Name:       &"x",
-                                Kind:       wit.U32Type{},
+                                Kind:       wit.U32{},
                                 Owner:      &wit.Interface{(CYCLIC REFERENCE)},
                                 Docs:       wit.Docs{},
                                 _worldItem: wit._worldItem{},
@@ -1156,7 +1156,7 @@
                         TypeDefs: {
                             "x": &wit.TypeDef{
                                 Name:       &"x",
-                                Kind:       wit.U32Type{},
+                                Kind:       wit.U32{},
                                 Owner:      &wit.Interface{(CYCLIC REFERENCE)},
                                 Docs:       wit.Docs{},
                                 _worldItem: wit._worldItem{},
@@ -1184,7 +1184,7 @@
                         TypeDefs: {
                             "y": &wit.TypeDef{
                                 Name:       &"y",
-                                Kind:       wit.U64Type{},
+                                Kind:       wit.U64{},
                                 Owner:      &wit.Interface{(CYCLIC REFERENCE)},
                                 Docs:       wit.Docs{},
                                 _worldItem: wit._worldItem{},
@@ -1213,7 +1213,7 @@
             TypeDefs: {
                 "x": &wit.TypeDef{
                     Name:       &"x",
-                    Kind:       wit.U32Type{},
+                    Kind:       wit.U32{},
                     Owner:      &wit.Interface{(CYCLIC REFERENCE)},
                     Docs:       wit.Docs{},
                     _worldItem: wit._worldItem{},
@@ -1299,7 +1299,7 @@
                         TypeDefs: {
                             "t": &wit.TypeDef{
                                 Name:       &"t",
-                                Kind:       wit.U32Type{},
+                                Kind:       wit.U32{},
                                 Owner:      &wit.Interface{(CYCLIC REFERENCE)},
                                 Docs:       wit.Docs{},
                                 _worldItem: wit._worldItem{},
@@ -1372,7 +1372,7 @@
                         TypeDefs: {
                             "x": &wit.TypeDef{
                                 Name:       &"x",
-                                Kind:       wit.U32Type{},
+                                Kind:       wit.U32{},
                                 Owner:      &wit.Interface{(CYCLIC REFERENCE)},
                                 Docs:       wit.Docs{},
                                 _worldItem: wit._worldItem{},
@@ -1400,7 +1400,7 @@
                         TypeDefs: {
                             "y": &wit.TypeDef{
                                 Name:       &"y",
-                                Kind:       wit.U64Type{},
+                                Kind:       wit.U64{},
                                 Owner:      &wit.Interface{(CYCLIC REFERENCE)},
                                 Docs:       wit.Docs{},
                                 _worldItem: wit._worldItem{},
@@ -1515,7 +1515,7 @@
                         TypeDefs: {
                             "t": &wit.TypeDef{
                                 Name:       &"t",
-                                Kind:       wit.U32Type{},
+                                Kind:       wit.U32{},
                                 Owner:      &wit.Interface{(CYCLIC REFERENCE)},
                                 Docs:       wit.Docs{},
                                 _worldItem: wit._worldItem{},
@@ -1571,7 +1571,7 @@
                         TypeDefs: {
                             "x": &wit.TypeDef{
                                 Name:       &"x",
-                                Kind:       wit.U32Type{},
+                                Kind:       wit.U32{},
                                 Owner:      &wit.Interface{(CYCLIC REFERENCE)},
                                 Docs:       wit.Docs{},
                                 _worldItem: wit._worldItem{},
@@ -1599,7 +1599,7 @@
                         TypeDefs: {
                             "y": &wit.TypeDef{
                                 Name:       &"y",
-                                Kind:       wit.U64Type{},
+                                Kind:       wit.U64{},
                                 Owner:      &wit.Interface{(CYCLIC REFERENCE)},
                                 Docs:       wit.Docs{},
                                 _worldItem: wit._worldItem{},
@@ -1705,7 +1705,7 @@
                         TypeDefs: {
                             "t": &wit.TypeDef{
                                 Name:       &"t",
-                                Kind:       wit.U32Type{},
+                                Kind:       wit.U32{},
                                 Owner:      &wit.Interface{(CYCLIC REFERENCE)},
                                 Docs:       wit.Docs{},
                                 _worldItem: wit._worldItem{},
@@ -1761,7 +1761,7 @@
                         TypeDefs: {
                             "x": &wit.TypeDef{
                                 Name:       &"x",
-                                Kind:       wit.U32Type{},
+                                Kind:       wit.U32{},
                                 Owner:      &wit.Interface{(CYCLIC REFERENCE)},
                                 Docs:       wit.Docs{},
                                 _worldItem: wit._worldItem{},
@@ -1781,7 +1781,7 @@
                         TypeDefs: {
                             "y": &wit.TypeDef{
                                 Name:       &"y",
-                                Kind:       wit.U64Type{},
+                                Kind:       wit.U64{},
                                 Owner:      &wit.Interface{(CYCLIC REFERENCE)},
                                 Docs:       wit.Docs{},
                                 _worldItem: wit._worldItem{},
@@ -1810,7 +1810,7 @@
             TypeDefs: {
                 "t": &wit.TypeDef{
                     Name:       &"t",
-                    Kind:       wit.U32Type{},
+                    Kind:       wit.U32{},
                     Owner:      &wit.Interface{(CYCLIC REFERENCE)},
                     Docs:       wit.Docs{},
                     _worldItem: wit._worldItem{},
@@ -1935,7 +1935,7 @@
                         TypeDefs: {
                             "x": &wit.TypeDef{
                                 Name:       &"x",
-                                Kind:       wit.U32Type{},
+                                Kind:       wit.U32{},
                                 Owner:      &wit.Interface{(CYCLIC REFERENCE)},
                                 Docs:       wit.Docs{},
                                 _worldItem: wit._worldItem{},
@@ -1955,7 +1955,7 @@
                         TypeDefs: {
                             "y": &wit.TypeDef{
                                 Name:       &"y",
-                                Kind:       wit.U64Type{},
+                                Kind:       wit.U64{},
                                 Owner:      &wit.Interface{(CYCLIC REFERENCE)},
                                 Docs:       wit.Docs{},
                                 _worldItem: wit._worldItem{},
@@ -2092,7 +2092,7 @@
                         TypeDefs: {
                             "x": &wit.TypeDef{
                                 Name:       &"x",
-                                Kind:       wit.U32Type{},
+                                Kind:       wit.U32{},
                                 Owner:      &wit.Interface{(CYCLIC REFERENCE)},
                                 Docs:       wit.Docs{},
                                 _worldItem: wit._worldItem{},
@@ -2112,7 +2112,7 @@
                         TypeDefs: {
                             "y": &wit.TypeDef{
                                 Name:       &"y",
-                                Kind:       wit.U64Type{},
+                                Kind:       wit.U64{},
                                 Owner:      &wit.Interface{(CYCLIC REFERENCE)},
                                 Docs:       wit.Docs{},
                                 _worldItem: wit._worldItem{},
@@ -2232,7 +2232,7 @@
                         TypeDefs: {
                             "x": &wit.TypeDef{
                                 Name:       &"x",
-                                Kind:       wit.U32Type{},
+                                Kind:       wit.U32{},
                                 Owner:      &wit.Interface{(CYCLIC REFERENCE)},
                                 Docs:       wit.Docs{},
                                 _worldItem: wit._worldItem{},
@@ -2252,7 +2252,7 @@
                         TypeDefs: {
                             "y": &wit.TypeDef{
                                 Name:       &"y",
-                                Kind:       wit.U64Type{},
+                                Kind:       wit.U64{},
                                 Owner:      &wit.Interface{(CYCLIC REFERENCE)},
                                 Docs:       wit.Docs{},
                                 _worldItem: wit._worldItem{},
@@ -2281,7 +2281,7 @@
             TypeDefs: {
                 "x": &wit.TypeDef{
                     Name:       &"x",
-                    Kind:       wit.U32Type{},
+                    Kind:       wit.U32{},
                     Owner:      &wit.Interface{(CYCLIC REFERENCE)},
                     Docs:       wit.Docs{},
                     _worldItem: wit._worldItem{},
@@ -2375,7 +2375,7 @@
                         TypeDefs: {
                             "y": &wit.TypeDef{
                                 Name:       &"y",
-                                Kind:       wit.U64Type{},
+                                Kind:       wit.U64{},
                                 Owner:      &wit.Interface{(CYCLIC REFERENCE)},
                                 Docs:       wit.Docs{},
                                 _worldItem: wit._worldItem{},
@@ -2404,7 +2404,7 @@
             TypeDefs: {
                 "y": &wit.TypeDef{
                     Name:       &"y",
-                    Kind:       wit.U64Type{},
+                    Kind:       wit.U64{},
                     Owner:      &wit.Interface{(CYCLIC REFERENCE)},
                     Docs:       wit.Docs{},
                     _worldItem: wit._worldItem{},
@@ -2606,7 +2606,7 @@
         },
         &wit.TypeDef{
             Name:       &"x",
-            Kind:       wit.U32Type{},
+            Kind:       wit.U32{},
             Owner:      &wit.Interface{(CYCLIC REFERENCE)},
             Docs:       wit.Docs{},
             _worldItem: wit._worldItem{},
@@ -2622,7 +2622,7 @@
         },
         &wit.TypeDef{
             Name:       &"t",
-            Kind:       wit.U32Type{},
+            Kind:       wit.U32{},
             Owner:      &wit.Interface{(CYCLIC REFERENCE)},
             Docs:       wit.Docs{},
             _worldItem: wit._worldItem{},
@@ -2646,7 +2646,7 @@
         },
         &wit.TypeDef{
             Name:       &"x",
-            Kind:       wit.U32Type{},
+            Kind:       wit.U32{},
             Owner:      &wit.Interface{(CYCLIC REFERENCE)},
             Docs:       wit.Docs{},
             _worldItem: wit._worldItem{},
@@ -2654,7 +2654,7 @@
         },
         &wit.TypeDef{
             Name:       &"y",
-            Kind:       wit.U64Type{},
+            Kind:       wit.U64{},
             Owner:      &wit.Interface{(CYCLIC REFERENCE)},
             Docs:       wit.Docs{},
             _worldItem: wit._worldItem{},
