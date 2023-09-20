@@ -79,7 +79,7 @@ func (t *TypeDef) TypeName() string {
 	if t.Name != nil {
 		return *t.Name
 	}
-	return "<unnamed>"
+	return ""
 }
 
 // TypeDefKind represents the underlying type in a [TypeDef], which can be one of
@@ -261,7 +261,7 @@ type _type struct{ _typeDefKind }
 
 func (_type) isType() {}
 
-func (_type) TypeName() string { return "<unnamed>" }
+func (_type) TypeName() string { return "" }
 
 // Primitive is a type constriant of the Go equivalents of WIT [primitive types].
 //
@@ -314,10 +314,6 @@ func (_primitive[T]) TypeName() string {
 		return "string"
 	}
 	return "<undefined>"
-}
-
-func (t _primitive[T]) MarshalText() ([]byte, error) {
-	return []byte(t.TypeName()), nil
 }
 
 type BoolType struct{ _primitive[bool] }
