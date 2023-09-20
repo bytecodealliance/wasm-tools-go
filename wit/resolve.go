@@ -316,23 +316,103 @@ func (_primitive[T]) TypeName() string {
 	return "<undefined>"
 }
 
+// BoolType represents the WIT [primitive type] bool, a boolean value either true or false.
+// It is equivalent to the Go type [bool].
+//
+// [primitive type]: https://component-model.bytecodealliance.org/wit-overview.html#primitive-types
+// [bool]: https://pkg.go.dev/builtin#bool
 type BoolType struct{ _primitive[bool] }
+
+// S8Type represents the WIT [primitive type] s8, a signed 8-bit integer.
+// It is equivalent to the Go type [int8].
+//
+// [primitive type]: https://component-model.bytecodealliance.org/wit-overview.html#primitive-types
+// [int8]: https://pkg.go.dev/builtin#int8
 type S8Type struct{ _primitive[int8] }
+
+// U8Type represents the WIT [primitive type] u8, an unsigned 8-bit integer.
+// It is equivalent to the Go type [uint8].
+//
+// [primitive type]: https://component-model.bytecodealliance.org/wit-overview.html#primitive-types
+// [uint8]: https://pkg.go.dev/builtin#uint8
 type U8Type struct{ _primitive[uint8] }
+
+// S16Type represents the WIT [primitive type] s16, a signed 16-bit integer.
+// It is equivalent to the Go type [int16].
+//
+// [primitive type]: https://component-model.bytecodealliance.org/wit-overview.html#primitive-types
+// [int16]: https://pkg.go.dev/builtin#int16
 type S16Type struct{ _primitive[int16] }
+
+// U16Type represents the WIT [primitive type] u16, an unsigned 16-bit integer.
+// It is equivalent to the Go type [uint16].
+//
+// [primitive type]: https://component-model.bytecodealliance.org/wit-overview.html#primitive-types
+// [uint16]: https://pkg.go.dev/builtin#uint16
 type U16Type struct{ _primitive[uint16] }
+
+// S32Type represents the WIT [primitive type] s32, a signed 32-bit integer.
+// It is equivalent to the Go type [int32].
+//
+// [primitive type]: https://component-model.bytecodealliance.org/wit-overview.html#primitive-types
+// [int32]: https://pkg.go.dev/builtin#int32
 type S32Type struct{ _primitive[int32] }
+
+// U32Type represents the WIT [primitive type] u32, an unsigned 32-bit integer.
+// It is equivalent to the Go type [uint32].
+//
+// [primitive type]: https://component-model.bytecodealliance.org/wit-overview.html#primitive-types
+// [uint32]: https://pkg.go.dev/builtin#uint32
 type U32Type struct{ _primitive[uint32] }
+
+// S64Type represents the WIT [primitive type] s64, a signed 64-bit integer.
+// It is equivalent to the Go type [int64].
+//
+// [primitive type]: https://component-model.bytecodealliance.org/wit-overview.html#primitive-types
+// [int64]: https://pkg.go.dev/builtin#int64
 type S64Type struct{ _primitive[int64] }
+
+// U64Type represents the WIT [primitive type] u64, an unsigned 64-bit integer.
+// It is equivalent to the Go type [uint64].
+//
+// [primitive type]: https://component-model.bytecodealliance.org/wit-overview.html#primitive-types
+// [uint64]: https://pkg.go.dev/builtin#uint64
 type U64Type struct{ _primitive[uint64] }
+
+// Float32Type represents the WIT [primitive type] float32, a 32-bit floating point value.
+// It is equivalent to the Go type [float32].
+//
+// [primitive type]: https://component-model.bytecodealliance.org/wit-overview.html#primitive-types
+// [float32]: https://pkg.go.dev/builtin#float32
 type Float32Type struct{ _primitive[float32] }
+
+// Float64Type represents the WIT [primitive type] float64, a 64-bit floating point value.
+// It is equivalent to the Go type [float64].
+//
+// [primitive type]: https://component-model.bytecodealliance.org/wit-overview.html#primitive-types
+// [float64]: https://pkg.go.dev/builtin#float64
 type Float64Type struct{ _primitive[float64] }
+
+// CharType represents the WIT [primitive type] char, a single Unicode character,
+// specifically a [Unicode scalar value]. It is equivalent to the Go type [rune].
+//
+// [primitive type]: https://component-model.bytecodealliance.org/wit-overview.html#primitive-types
+// [Unicode scalar value]: https://unicode.org/glossary/#unicode_scalar_value
+// [rune]: https://pkg.go.dev/builtin#rune
 type CharType struct{ _primitive[char] }
+
+// StringType represents the WIT [primitive type] string, a finite string of Unicode characters.
+// It is equivalent to the Go type [string].
+//
+// [primitive type]: https://component-model.bytecodealliance.org/wit-overview.html#primitive-types
+// [string]: https://pkg.go.dev/builtin#string
 type StringType struct{ _primitive[string] }
 
 // ParseType parses a WIT [primitive type] string into
 // the associated Type implementation from this package.
 // It returns an error if the type string is not recoginized.
+//
+// [primitive type]: https://component-model.bytecodealliance.org/wit-overview.html#primitive-types
 func ParseType(s string) (Type, error) {
 	switch s {
 	case "bool":
