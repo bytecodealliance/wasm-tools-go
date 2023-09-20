@@ -5,6 +5,7 @@ go 1.21.1
 require (
 	github.com/coreos/go-semver v0.3.1
 	github.com/kr/pretty v0.3.1
+	github.com/sergi/go-diff v1.3.1
 )
 
 require (
