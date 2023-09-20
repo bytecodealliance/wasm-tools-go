@@ -53,7 +53,7 @@
         },
         "t2": &wit.TypeDef{
           Name: &"t2",
-          Kind: &wit.BorrowHandle{
+          Kind: &wit.BorrowedHandle{
             Type: &wit.TypeDef{...},
           },
           Owner: &wit.Interface{...},
@@ -63,7 +63,7 @@
         },
         "t3": &wit.TypeDef{
           Name: &"t3",
-          Kind: &wit.BorrowHandle{
+          Kind: &wit.BorrowedHandle{
             Type: &wit.TypeDef{...},
           },
           Owner: &wit.Interface{...},

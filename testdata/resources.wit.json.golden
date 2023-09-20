@@ -21,7 +21,7 @@
               Name: "",
               Type: &wit.TypeDef{
                 Name: (*string)(nil),
-                Kind: &wit.OwnHandle{
+                Kind: &wit.OwnedHandle{
                   Type: &wit.TypeDef{...},
                 },
                 Owner: nil,
@@ -117,7 +117,7 @@
               Name: "",
               Type: &wit.TypeDef{
                 Name: (*string)(nil),
-                Kind: &wit.OwnHandle{
+                Kind: &wit.OwnedHandle{
                   Type: &wit.TypeDef{...},
                 },
                 Owner: nil,
@@ -147,7 +147,7 @@
               Name: "",
               Type: &wit.TypeDef{
                 Name: (*string)(nil),
-                Kind: &wit.OwnHandle{
+                Kind: &wit.OwnedHandle{
                   Type: &wit.TypeDef{...},
                 },
                 Owner: nil,
@@ -177,7 +177,7 @@
               Name: "",
               Type: &wit.TypeDef{
                 Name: (*string)(nil),
-                Kind: &wit.OwnHandle{
+                Kind: &wit.OwnedHandle{
                   Type: &wit.TypeDef{...},
                 },
                 Owner: nil,
@@ -201,7 +201,7 @@
               Name: "other",
               Type: &wit.TypeDef{
                 Name: (*string)(nil),
-                Kind: &wit.OwnHandle{
+                Kind: &wit.OwnedHandle{
                   Type: &wit.TypeDef{...},
                 },
                 Owner: nil,
@@ -214,7 +214,7 @@
               Name: "other2",
               Type: &wit.TypeDef{
                 Name: (*string)(nil),
-                Kind: &wit.BorrowHandle{
+                Kind: &wit.BorrowedHandle{
                   Type: &wit.TypeDef{...},
                 },
                 Owner: nil,
@@ -244,7 +244,7 @@
               Name: "self",
               Type: &wit.TypeDef{
                 Name: (*string)(nil),
-                Kind: &wit.BorrowHandle{
+                Kind: &wit.BorrowedHandle{
                   Type: &wit.TypeDef{...},
                 },
                 Owner: nil,
@@ -324,7 +324,7 @@
               },
               "t2": &wit.TypeDef{
                 Name: &"t2",
-                Kind: &wit.BorrowHandle{
+                Kind: &wit.BorrowedHandle{
                   Type: &wit.TypeDef{...},
                 },
                 Owner: &wit.Interface{...},
@@ -334,7 +334,7 @@
               },
               "t3": &wit.TypeDef{
                 Name: &"t3",
-                Kind: &wit.BorrowHandle{
+                Kind: &wit.BorrowedHandle{
                   Type: &wit.TypeDef{...},
                 },
                 Owner: &wit.Interface{...},

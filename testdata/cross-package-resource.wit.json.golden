@@ -45,7 +45,7 @@
         },
         "t": &wit.TypeDef{
           Name: &"t",
-          Kind: &wit.OwnHandle{
+          Kind: &wit.OwnedHandle{
             Type: &wit.TypeDef{...},
           },
           Owner: &wit.Interface{...},

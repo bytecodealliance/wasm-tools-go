@@ -34,7 +34,7 @@
                   Name: "self",
                   Type: &wit.TypeDef{
                     Name: (*string)(nil),
-                    Kind: &wit.BorrowHandle{
+                    Kind: &wit.BorrowedHandle{
                       Type: &wit.TypeDef{...},
                     },
                     Owner: nil,
@@ -88,7 +88,7 @@
                   Name: "self",
                   Type: &wit.TypeDef{
                     Name: (*string)(nil),
-                    Kind: &wit.BorrowHandle{
+                    Kind: &wit.BorrowedHandle{
                       Type: &wit.TypeDef{...},
                     },
                     Owner: nil,
@@ -160,7 +160,7 @@
                         Name: "some",
                         Type: &wit.TypeDef{
                           Name: (*string)(nil),
-                          Kind: &wit.BorrowHandle{
+                          Kind: &wit.BorrowedHandle{
                             Type: &wit.TypeDef{...},
                           },
                           Owner: nil,
@@ -175,7 +175,7 @@
                         Name: "",
                         Type: &wit.TypeDef{
                           Name: (*string)(nil),
-                          Kind: &wit.BorrowHandle{
+                          Kind: &wit.BorrowedHandle{
                             Type: &wit.TypeDef{...},
                           },
                           Owner: nil,
@@ -197,7 +197,7 @@
                         Name: "some",
                         Type: &wit.TypeDef{
                           Name: (*string)(nil),
-                          Kind: &wit.OwnHandle{
+                          Kind: &wit.OwnedHandle{
                             Type: &wit.TypeDef{...},
                           },
                           Owner: nil,
@@ -212,7 +212,7 @@
                         Name: "",
                         Type: &wit.TypeDef{
                           Name: (*string)(nil),
-                          Kind: &wit.OwnHandle{
+                          Kind: &wit.OwnedHandle{
                             Type: &wit.TypeDef{...},
                           },
                           Owner: nil,

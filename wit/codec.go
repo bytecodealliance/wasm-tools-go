@@ -378,10 +378,10 @@ func (c *handleCodec) DecodeField(dec codec.Decoder, name string) error {
 	var err error
 	switch name {
 	case "own":
-		v := &OwnHandle{}
+		v := &OwnedHandle{}
 		*c.v, err = v, dec.Decode(&v.Type)
 	case "borrow":
-		v := &BorrowHandle{}
+		v := &BorrowedHandle{}
 		*c.v, err = v, dec.Decode(&v.Type)
 	}
 	return err

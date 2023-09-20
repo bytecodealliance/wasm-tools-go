@@ -24,7 +24,7 @@
               Name: "self",
               Type: &wit.TypeDef{
                 Name: (*string)(nil),
-                Kind: &wit.BorrowHandle{
+                Kind: &wit.BorrowedHandle{
                   Type: &wit.TypeDef{...},
                 },
                 Owner: nil,

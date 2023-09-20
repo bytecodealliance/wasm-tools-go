@@ -42,7 +42,7 @@ type World struct {
 // currently either an [Interface], [TypeDef], or [Function].
 type WorldItem interface{ isWorldItem() }
 
-// _worldItem is an embeddable type that conforms to the WorldItem interface.
+// _worldItem is an embeddable type that conforms to the [WorldItem] interface.
 type _worldItem struct{}
 
 func (_worldItem) isWorldItem() {}
@@ -87,14 +87,14 @@ func (t *TypeDef) TypeName() string {
 // [Option], [Result], [List], [Future], [Stream], or [Type].
 type TypeDefKind interface{ isTypeDefKind() }
 
-// _typeDefKind is an embeddable type that conforms to the TypeDefKind interface.
+// _typeDefKind is an embeddable type that conforms to the [TypeDefKind] interface.
 type _typeDefKind struct{}
 
 func (_typeDefKind) isTypeDefKind() {}
 
 // Record represents a WIT [record type], akin to a struct.
 //
-// [record type]: https://component-model.bytecodealliance.org/wit-overview.html#records
+// [record type]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md#item-record-bag-of-named-fields
 type Record struct {
 	Fields []Field
 	_typeDefKind
@@ -107,29 +107,38 @@ type Field struct {
 	Docs Docs
 }
 
-// Resource represents a WIT resource type.
+// Resource represents a WIT [resource type].
+//
+// [resource type]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md#item-resource
 type Resource struct{ _typeDefKind }
 
 func (Resource) UnmarshalText() ([]byte, error) { return []byte("resource"), nil }
 
-// Handle represents a WIT handle type.
+// Handle represents a WIT [handle type].
+//
+// [handle type]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md#handles
 type Handle interface {
 	isHandle()
 	TypeDefKind
 }
 
+// _handle is an embeddable type that conforms to the [Handle] interface.
 type _handle struct{ _typeDefKind }
 
 func (_handle) isHandle() {}
 
-// OwnHandle represents an owned WIT handle type.
-type OwnHandle struct {
+// OwnedHandle represents an WIT [owned handle].
+//
+// [owned handle]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md#handles
+type OwnedHandle struct {
 	Type *TypeDef
 	_handle
 }
 
-// BorrowHandle represents an borrowed WIT handle type.
-type BorrowHandle struct {
+// BorrowedHandle represents a WIT [borrowed handle].
+//
+// [borrowed handle]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md#handles
+type BorrowedHandle struct {
 	Type *TypeDef
 	_handle
 }
@@ -256,7 +265,7 @@ type Type interface {
 	TypeDefKind
 }
 
-// _type is an embeddable type that conforms to the Type interface.
+// _type is an embeddable type that conforms to the [Type] interface.
 type _type struct{ _typeDefKind }
 
 func (_type) isType() {}
@@ -466,7 +475,7 @@ type FunctionKind interface {
 	isFunctionKind()
 }
 
-// _functionKind is an embeddable type that conforms to the FunctionKind interface.
+// _functionKind is an embeddable type that conforms to the [FunctionKind] interface.
 type _functionKind struct{}
 
 func (_functionKind) isFunctionKind() {}
