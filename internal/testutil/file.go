@@ -1,21 +1,9 @@
 package testutil
 
 import (
-	"io"
-	"os"
 	"path/filepath"
 	"runtime"
 )
-
-// Read reads a file, returning the contents or an error.
-func Read(p string) ([]byte, error) {
-	f, err := os.Open(p)
-	if err != nil {
-		return nil, err
-	}
-	defer f.Close()
-	return io.ReadAll(f)
-}
 
 // Path returns an absolute path to the source-file relative path p.
 // Used for testing when PWD is not set, such as running tests under wasm/wasip1.
