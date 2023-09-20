@@ -8,7 +8,7 @@ This repository contains code to adapt [WIT](https://github.com/WebAssembly/comp
 
 ## WIT → JSON
 
-This package can decode a JSON representation of a fully-resolved WIT file. Serializing WIT into JSON requires a version of wasm-tools as of commit [4975360](https://github.com/bytecodealliance/wasm-tools/commit/49753602683a539b66d0a65ffa11acb402f148bb) ([#1203](https://github.com/bytecodealliance/wasm-tools/pull/1203)), which adds serialization support to the [wit-parser](https://docs.rs/wit-parser/latest/wit_parser/) crate. To convert a WIT file into JSON, run `wasm-tools` with the `-j` argument:
+This package can decode a JSON representation of a fully-resolved WIT file. Serializing WIT into JSON requires [wasm-tools](https://crates.io/crates/wasm-tools) v1.0.42 or higher, which includes commit [4975360](https://github.com/bytecodealliance/wasm-tools/commit/49753602683a539b66d0a65ffa11acb402f148bb) ([#1203](https://github.com/bytecodealliance/wasm-tools/pull/1203)), with JSON serialization support. To convert a WIT file into JSON, run `wasm-tools` with the `-j` argument:
 
 ```sh
 wasm-tools component wit -j example.wit
