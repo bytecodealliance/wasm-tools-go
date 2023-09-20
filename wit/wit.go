@@ -21,14 +21,14 @@ type World struct {
 	Exports map[string]WorldItem
 	Package *Package
 	Docs    Docs
-	typeOwner
+	_typeOwner
 }
 
 type WorldItem interface{ isWorldItem() }
 
-type worldItem struct{}
+type _worldItem struct{}
 
-func (worldItem) isWorldItem() {}
+func (_worldItem) isWorldItem() {}
 
 type Interface struct {
 	Name      *string
@@ -36,8 +36,8 @@ type Interface struct {
 	Functions map[string]*Function
 	Package   *Package
 	Docs      Docs
-	worldItem
-	typeOwner
+	_worldItem
+	_typeOwner
 }
 
 type TypeDef struct {
@@ -45,8 +45,8 @@ type TypeDef struct {
 	Kind  TypeDefKind
 	Owner TypeOwner
 	Docs  Docs
-	worldItem
-	type_
+	_worldItem
+	_type
 }
 
 func (t *TypeDef) TypeName() string {
@@ -58,9 +58,9 @@ func (t *TypeDef) TypeName() string {
 
 type TypeDefKind interface{ isTypeDefKind() }
 
-type typeDefKind struct{}
+type _typeDefKind struct{}
 
-func (typeDefKind) isTypeDefKind() {}
+func (_typeDefKind) isTypeDefKind() {}
 
 /*
 	Record(Record),
@@ -80,7 +80,7 @@ func (typeDefKind) isTypeDefKind() {}
 
 type Record struct {
 	Fields []Field
-	typeDefKind
+	_typeDefKind
 }
 
 type Field struct {
@@ -89,7 +89,7 @@ type Field struct {
 	Docs Docs
 }
 
-type Resource struct{ typeDefKind }
+type Resource struct{ _typeDefKind }
 
 func (Resource) UnmarshalText() ([]byte, error) { return []byte("resource"), nil }
 
@@ -98,23 +98,23 @@ type Handle interface {
 	TypeDefKind
 }
 
-type handle struct{ typeDefKind }
+type _handle struct{ _typeDefKind }
 
-func (handle) isHandle() {}
+func (_handle) isHandle() {}
 
 type OwnHandle struct {
 	Type *TypeDef
-	handle
+	_handle
 }
 
 type BorrowHandle struct {
 	Type *TypeDef
-	handle
+	_handle
 }
 
 type Flags struct {
 	Flags []Flag
-	typeDefKind
+	_typeDefKind
 }
 
 type Flag struct {
@@ -124,12 +124,12 @@ type Flag struct {
 
 type Tuple struct {
 	Types []Type
-	typeDefKind
+	_typeDefKind
 }
 
 type Variant struct {
 	Cases []Case
-	typeDefKind
+	_typeDefKind
 }
 
 type Case struct {
@@ -140,7 +140,7 @@ type Case struct {
 
 type Enum struct {
 	Cases []EnumCase
-	typeDefKind
+	_typeDefKind
 }
 
 type EnumCase struct {
@@ -150,36 +150,36 @@ type EnumCase struct {
 
 type Option struct {
 	Type Type
-	typeDefKind
+	_typeDefKind
 }
 
 type Result struct {
 	OK  Type // Represented in Rust as Option<Type>, so Type field could be nil
 	Err Type // Represented in Rust as Option<Type>, so Type field could be nil
-	typeDefKind
+	_typeDefKind
 }
 
 type List struct {
 	Type Type
-	typeDefKind
+	_typeDefKind
 }
 
 type Future struct {
 	Type Type // Represented in Rust as Option<Type>, so Type field could be nil
-	typeDefKind
+	_typeDefKind
 }
 
 type Stream struct {
 	Element Type // Represented in Rust as Option<Type>, so Type field could be nil
 	End     Type // Represented in Rust as Option<Type>, so Type field could be nil
-	typeDefKind
+	_typeDefKind
 }
 
 type TypeOwner interface{ isTypeOwner() }
 
-type typeOwner struct{}
+type _typeOwner struct{}
 
-func (typeOwner) isTypeOwner() {}
+func (_typeOwner) isTypeOwner() {}
 
 type Type interface {
 	TypeName() string
@@ -187,20 +187,20 @@ type Type interface {
 	TypeDefKind
 }
 
-type type_ struct{ typeDefKind }
+type _type struct{ _typeDefKind }
 
-func (type_) isType() {}
+func (_type) isType() {}
 
-func (type_) TypeName() string { return "<unnamed>" }
+func (_type) TypeName() string { return "<unnamed>" }
 
-// primitiveType represents a WebAssembly Component Model primitive type
+// _primitive represents a WebAssembly Component Model primitive type
 // mapped to its equivalent Go type.
 // https://component-model.bytecodealliance.org/wit-overview.html#primitive-types
-type primitiveType[T any] struct{ type_ }
+type _primitive[T any] struct{ _type }
 
-func (primitiveType[T]) isType() {}
+func (_primitive[T]) isType() {}
 
-func (primitiveType[T]) TypeName() string {
+func (_primitive[T]) TypeName() string {
 	var v T
 	switch any(v).(type) {
 	case bool:
@@ -233,26 +233,26 @@ func (primitiveType[T]) TypeName() string {
 	return "<undefined>"
 }
 
-func (t primitiveType[T]) MarshalText() ([]byte, error) {
+func (t _primitive[T]) MarshalText() ([]byte, error) {
 	return []byte(t.TypeName()), nil
 }
 
-type BoolType struct{ primitiveType[bool] }
-type S8Type struct{ primitiveType[int8] }
-type U8Type struct{ primitiveType[uint8] }
-type S16Type struct{ primitiveType[int16] }
-type U16Type struct{ primitiveType[uint16] }
-type S32Type struct{ primitiveType[int32] }
-type U32Type struct{ primitiveType[uint32] }
-type S64Type struct{ primitiveType[int64] }
-type U64Type struct{ primitiveType[uint64] }
-type Float32Type struct{ primitiveType[float32] }
-type Float64Type struct{ primitiveType[float64] }
-type CharType struct{ primitiveType[char] }
-type StringType struct{ primitiveType[string] }
+type BoolType struct{ _primitive[bool] }
+type S8Type struct{ _primitive[int8] }
+type U8Type struct{ _primitive[uint8] }
+type S16Type struct{ _primitive[int16] }
+type U16Type struct{ _primitive[uint16] }
+type S32Type struct{ _primitive[int32] }
+type U32Type struct{ _primitive[uint32] }
+type S64Type struct{ _primitive[int64] }
+type U64Type struct{ _primitive[uint64] }
+type Float32Type struct{ _primitive[float32] }
+type Float64Type struct{ _primitive[float64] }
+type CharType struct{ _primitive[char] }
+type StringType struct{ _primitive[string] }
 
 // char is defined because rune is an alias of int32
-type char int32
+type char rune
 
 // ParseType parses a WIT primitive type string into
 // the associated Type implementation from this package.
@@ -295,34 +295,34 @@ type Function struct {
 	Params  []Param
 	Results []Param
 	Docs    Docs
-	worldItem
+	_worldItem
 }
 
 type FunctionKind interface {
 	isFunctionKind()
 }
 
-type functionKind struct{}
+type _functionKind struct{}
 
-func (functionKind) isFunctionKind() {}
+func (_functionKind) isFunctionKind() {}
 
 type FunctionKindFreestanding struct {
-	functionKind
+	_functionKind
 }
 
 type FunctionKindMethod struct {
 	Type
-	functionKind
+	_functionKind
 }
 
 type FunctionKindStatic struct {
 	Type
-	functionKind
+	_functionKind
 }
 
 type FunctionKindConstructor struct {
 	Type
-	functionKind
+	_functionKind
 }
 
 type Param struct {
