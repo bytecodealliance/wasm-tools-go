@@ -9,7 +9,7 @@ type Resolver interface {
 	ResolveCodec(v any) Codec
 }
 
-// Resolvers is a slice of Resolver values. It also implements the Resolver interface.
+// Resolvers is a slice of [Resolver] values. It also implements the [Resolver] interface.
 type Resolvers []Resolver
 
 // ResolveCodec walks the slice of Resolvers, returning the first non-nil value or an error.
@@ -39,7 +39,7 @@ type BoolDecoder interface {
 }
 
 // BytesDecoder is the interface implemented by types that can decode from a byte slice.
-// It is similar to encoding.BinaryUnmarshaler and encoding.TextUnmarshaler.
+// It is similar to [encoding.BinaryUnmarshaler] and [encoding.TextUnmarshaler].
 type BytesDecoder interface {
 	DecodeBytes([]byte) error
 }
@@ -50,13 +50,13 @@ type StringDecoder interface {
 }
 
 // IntDecoder is the interface implemented by types that can decode
-// from an integer value. See Integer for the list of supported types.
+// from an integer value. See [Integer] for the list of supported types.
 type IntDecoder[T Integer] interface {
 	DecodeInt(T) error
 }
 
 // FloatDecoder is the interface implemented by types that can decode
-// from a floating-point value. See Float for the list of supported types.
+// from a floating-point value. See [Float] for the list of supported types.
 type FloatDecoder[T Float] interface {
 	DecodeFloat(T) error
 }

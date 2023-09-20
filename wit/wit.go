@@ -8,6 +8,17 @@ import (
 	"github.com/coreos/go-semver/semver"
 )
 
+// Resolve represents a fully resolved set of WIT ([WebAssembly Interface Type])
+// packages.
+//
+// This structure contains a graph of WIT packages and their contents
+// merged together into slices organized by type. Items are sorted
+// topologically and everything is fully resolved.
+//
+// Each item in a [Resolve] has a parent link to trace it back to the original
+// package as necessary.
+//
+// [WebAssembly Interface Type]: https://component-model.bytecodealliance.org/wit-overview.html
 type Resolve struct {
 	Worlds     []*World
 	Interfaces []*Interface
@@ -15,6 +26,9 @@ type Resolve struct {
 	Packages   []*Package
 }
 
+// A World represents all of the imports and exports of a [WebAssembly component].
+//
+// [WebAssembly component]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md#wit-worlds
 type World struct {
 	Name    string
 	Imports map[string]WorldItem
@@ -24,12 +38,20 @@ type World struct {
 	_typeOwner
 }
 
+// A WorldItem is any item that can be exported from or imported into a [World],
+// currently either an [Interface], [TypeDef], or [Function].
 type WorldItem interface{ isWorldItem() }
 
+// _worldItem is an embeddable type that conforms to the WorldItem interface.
 type _worldItem struct{}
 
 func (_worldItem) isWorldItem() {}
 
+// An Interface represents a [collection of types and functions], which are imported into
+// or exported from a [WebAssembly component].
+//
+// [collection of types and functions]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md#wit-interfaces.
+// [WebAssembly component]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md#wit-worlds
 type Interface struct {
 	Name      *string
 	TypeDefs  map[string]*TypeDef
@@ -40,6 +62,8 @@ type Interface struct {
 	_typeOwner
 }
 
+// TypeDef represents a WIT type definition. A TypeDef may be named or anonymous,
+// and optionally belong to a [World] or [Interface].
 type TypeDef struct {
 	Name  *string
 	Kind  TypeDefKind
@@ -49,6 +73,8 @@ type TypeDef struct {
 	_type
 }
 
+// TypeName returns the type name of t, if present.
+// This partially implements the Type interface.
 func (t *TypeDef) TypeName() string {
 	if t.Name != nil {
 		return *t.Name
@@ -56,27 +82,15 @@ func (t *TypeDef) TypeName() string {
 	return "<unnamed>"
 }
 
+// TypeDefKind represents the underlying type in a [TypeDef], which can be one of
+// [Record], [Resource], [Handle], [Flags], [Tuple], [Variant], [Enum],
+// [Option], [Result], [List], [Future], [Stream], or [Type].
 type TypeDefKind interface{ isTypeDefKind() }
 
+// _typeDefKind is an embeddable type that conforms to the TypeDefKind interface.
 type _typeDefKind struct{}
 
 func (_typeDefKind) isTypeDefKind() {}
-
-/*
-	Record(Record),
-	Resource,
-	Handle(Handle),
-	Flags(Flags),
-	Tuple(Tuple),
-	Variant(Variant),
-	Enum(Enum),
-	Option(Type),
-	Result(Result_),
-	List(Type),
-	Future(Option<Type>),
-	Stream(Stream),
-	Type(Type),
-*/
 
 type Record struct {
 	Fields []Field
@@ -193,9 +207,10 @@ func (_type) isType() {}
 
 func (_type) TypeName() string { return "<unnamed>" }
 
-// _primitive represents a WebAssembly Component Model primitive type
+// _primitive represents a WebAssembly Component Model [primitive type]
 // mapped to its equivalent Go type.
-// https://component-model.bytecodealliance.org/wit-overview.html#primitive-types
+//
+// [primitive type]: https://component-model.bytecodealliance.org/wit-overview.html#primitive-types
 type _primitive[T any] struct{ _type }
 
 func (_primitive[T]) isType() {}
@@ -254,7 +269,7 @@ type StringType struct{ _primitive[string] }
 // char is defined because rune is an alias of int32
 type char rune
 
-// ParseType parses a WIT primitive type string into
+// ParseType parses a WIT [primitive type] string into
 // the associated Type implementation from this package.
 // It returns an error if the type string is not recoginized.
 func ParseType(s string) (Type, error) {
@@ -330,6 +345,13 @@ type Param struct {
 	Type Type
 }
 
+// Package represents a [WIT package] within a [Resolve].
+//
+// A Package is a collection of [Interface] and [World] values. Additionally,
+// a Package contains a unique identifier that affects generated components and uniquely
+// identifies this particular package.
+//
+// [WIT package]: https://component-model.bytecodealliance.org/wit-overview.html#packages
 type Package struct {
 	Name       PackageName
 	Interfaces map[string]*Interface
@@ -337,11 +359,15 @@ type Package struct {
 	Docs       Docs
 }
 
-// PackageName represents a WebAssembly Component Model package name,
-// such as `wasi:clocks@1.0.0`. It contains a namespace, name, and
-// optional SemVer version information.
+// PackageName represents a [WebAssembly Component Model] package name,
+// such as [wasi:clocks@1.0.0]. It contains a namespace, name, and
+// optional [SemVer] version information.
+//
+// [WebAssembly Component Model]: https://component-model.bytecodealliance.org/introduction.html
+// [wasi:clocks@1.0.0]: https://github.com/WebAssembly/wasi-clocks
+// [SemVer]: https://semver.org/
 type PackageName struct {
-	// Namespace specifies the package namespace, such as `wasi` in `wasi:foo/bar`.
+	// Namespace specifies the package namespace, such as "wasi" in "wasi:foo/bar".
 	Namespace string
 	// Name specifies the kebab-name of the package.
 	Name string
@@ -349,7 +375,7 @@ type PackageName struct {
 	Version *semver.Version
 }
 
-// ParsePackageName parses a package string into a PackageName,
+// ParsePackageName parses a package string into a [PackageName],
 // returning any errors encountered. The resulting PackageName
 // may not be valid.
 func ParsePackageName(s string) (PackageName, error) {
@@ -366,6 +392,8 @@ func ParsePackageName(s string) (PackageName, error) {
 	return pn, pn.Validate()
 }
 
+// Validate validates p, returning any errors.
+// TODO: finish this.
 func (pn *PackageName) Validate() error {
 	switch {
 	case pn.Namespace == "":
@@ -377,7 +405,7 @@ func (pn *PackageName) Validate() error {
 	return nil
 }
 
-// String implements fmt.Stringer, returning the canonical string representation of a PackageName.
+// String implements [fmt.Stringer], returning the canonical string representation of a [PackageName].
 func (pn *PackageName) String() string {
 	if pn.Version == nil {
 		return pn.Namespace + ":" + pn.Name
@@ -385,6 +413,7 @@ func (pn *PackageName) String() string {
 	return pn.Namespace + ":" + pn.Name + "@" + pn.Version.String()
 }
 
+// Docs represent WIT documentation text extracted from comments.
 type Docs struct {
-	Contents string
+	Contents string // may be empty
 }
