@@ -1,0 +1,54 @@
+&wit.Resolve{
+    Worlds:     nil,
+    Interfaces: {
+        &wit.Interface{
+            Name:      &"foo",
+            TypeDefs:  {},
+            Functions: {
+                "foo": &wit.Function{
+                    Name:    "foo",
+                    Kind:    &wit.FunctionKindFreestanding{},
+                    Params:  nil,
+                    Results: {
+                        {
+                            Name: "",
+                            Type: wit.StringType{},
+                        },
+                    },
+                    Docs:      wit.Docs{},
+                    worldItem: wit.worldItem{},
+                },
+            },
+            Package: &wit.Package{
+                Name: wit.PackageName{
+                    Namespace: "foo",
+                    Name:      "foo",
+                    Version:   (*semver.Version)(nil),
+                },
+                Interfaces: {
+                    "foo": &wit.Interface{(CYCLIC REFERENCE)},
+                },
+                Worlds: {},
+                Docs:   wit.Docs{},
+            },
+            Docs:      wit.Docs{},
+            worldItem: wit.worldItem{},
+            typeOwner: wit.typeOwner{},
+        },
+    },
+    TypeDefs: nil,
+    Packages: {
+        &wit.Package{
+            Name: wit.PackageName{
+                Namespace: "foo",
+                Name:      "foo",
+                Version:   (*semver.Version)(nil),
+            },
+            Interfaces: {
+                "foo": &wit.Interface{(CYCLIC REFERENCE)},
+            },
+            Worlds: {},
+            Docs:   wit.Docs{},
+        },
+    },
+}

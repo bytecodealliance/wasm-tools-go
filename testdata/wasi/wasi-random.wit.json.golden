@@ -1,0 +1,706 @@
+&wit.Resolve{
+    Worlds: {
+        &wit.World{
+            Name:    "imports",
+            Imports: {
+                "interface-0": &wit.Interface{
+                    Name:      &"insecure-seed",
+                    TypeDefs:  {},
+                    Functions: {
+                        "insecure-seed": &wit.Function{
+                            Name:    "insecure-seed",
+                            Kind:    &wit.FunctionKindFreestanding{},
+                            Params:  nil,
+                            Results: {
+                                {
+                                    Name: "",
+                                    Type: &wit.TypeDef{
+                                        Name: (*string)(nil),
+                                        Kind: &wit.Tuple{
+                                            Types: {
+                                                wit.U64Type{},
+                                                wit.U64Type{},
+                                            },
+                                            typeDefKind: wit.typeDefKind{},
+                                        },
+                                        Owner:     nil,
+                                        Docs:      wit.Docs{},
+                                        worldItem: wit.worldItem{},
+                                        type_:     wit.type_{},
+                                    },
+                                },
+                            },
+                            Docs:      wit.Docs{},
+                            worldItem: wit.worldItem{},
+                        },
+                    },
+                    Package: &wit.Package{
+                        Name: wit.PackageName{
+                            Namespace: "wasi",
+                            Name:      "random",
+                            Version:   (*semver.Version)(nil),
+                        },
+                        Interfaces: {
+                            "insecure": &wit.Interface{
+                                Name:      &"insecure",
+                                TypeDefs:  {},
+                                Functions: {
+                                    "get-insecure-random-bytes": &wit.Function{
+                                        Name:   "get-insecure-random-bytes",
+                                        Kind:   &wit.FunctionKindFreestanding{(CYCLIC REFERENCE)},
+                                        Params: {
+                                            {
+                                                Name: "len",
+                                                Type: wit.U64Type{},
+                                            },
+                                        },
+                                        Results: {
+                                            {
+                                                Name: "",
+                                                Type: &wit.TypeDef{
+                                                    Name: (*string)(nil),
+                                                    Kind: &wit.List{
+                                                        Type:        wit.U8Type{},
+                                                        typeDefKind: wit.typeDefKind{},
+                                                    },
+                                                    Owner:     nil,
+                                                    Docs:      wit.Docs{},
+                                                    worldItem: wit.worldItem{},
+                                                    type_:     wit.type_{},
+                                                },
+                                            },
+                                        },
+                                        Docs:      wit.Docs{},
+                                        worldItem: wit.worldItem{},
+                                    },
+                                    "get-insecure-random-u64": &wit.Function{
+                                        Name:    "get-insecure-random-u64",
+                                        Kind:    &wit.FunctionKindFreestanding{(CYCLIC REFERENCE)},
+                                        Params:  nil,
+                                        Results: {
+                                            {
+                                                Name: "",
+                                                Type: wit.U64Type{},
+                                            },
+                                        },
+                                        Docs:      wit.Docs{},
+                                        worldItem: wit.worldItem{},
+                                    },
+                                },
+                                Package:   &wit.Package{(CYCLIC REFERENCE)},
+                                Docs:      wit.Docs{},
+                                worldItem: wit.worldItem{},
+                                typeOwner: wit.typeOwner{},
+                            },
+                            "insecure-seed": &wit.Interface{(CYCLIC REFERENCE)},
+                            "random":        &wit.Interface{
+                                Name:      &"random",
+                                TypeDefs:  {},
+                                Functions: {
+                                    "get-random-bytes": &wit.Function{
+                                        Name:   "get-random-bytes",
+                                        Kind:   &wit.FunctionKindFreestanding{(CYCLIC REFERENCE)},
+                                        Params: {
+                                            {
+                                                Name: "len",
+                                                Type: wit.U64Type{},
+                                            },
+                                        },
+                                        Results: {
+                                            {
+                                                Name: "",
+                                                Type: &wit.TypeDef{
+                                                    Name: (*string)(nil),
+                                                    Kind: &wit.List{
+                                                        Type:        wit.U8Type{},
+                                                        typeDefKind: wit.typeDefKind{},
+                                                    },
+                                                    Owner:     nil,
+                                                    Docs:      wit.Docs{},
+                                                    worldItem: wit.worldItem{},
+                                                    type_:     wit.type_{},
+                                                },
+                                            },
+                                        },
+                                        Docs:      wit.Docs{},
+                                        worldItem: wit.worldItem{},
+                                    },
+                                    "get-random-u64": &wit.Function{
+                                        Name:    "get-random-u64",
+                                        Kind:    &wit.FunctionKindFreestanding{(CYCLIC REFERENCE)},
+                                        Params:  nil,
+                                        Results: {
+                                            {
+                                                Name: "",
+                                                Type: wit.U64Type{},
+                                            },
+                                        },
+                                        Docs:      wit.Docs{},
+                                        worldItem: wit.worldItem{},
+                                    },
+                                },
+                                Package:   &wit.Package{(CYCLIC REFERENCE)},
+                                Docs:      wit.Docs{},
+                                worldItem: wit.worldItem{},
+                                typeOwner: wit.typeOwner{},
+                            },
+                        },
+                        Worlds: {
+                            "imports": &wit.World{(CYCLIC REFERENCE)},
+                        },
+                        Docs: wit.Docs{},
+                    },
+                    Docs:      wit.Docs{},
+                    worldItem: wit.worldItem{},
+                    typeOwner: wit.typeOwner{},
+                },
+                "interface-1": &wit.Interface{
+                    Name:      &"insecure",
+                    TypeDefs:  {},
+                    Functions: {
+                        "get-insecure-random-bytes": &wit.Function{
+                            Name:   "get-insecure-random-bytes",
+                            Kind:   &wit.FunctionKindFreestanding{},
+                            Params: {
+                                {
+                                    Name: "len",
+                                    Type: wit.U64Type{},
+                                },
+                            },
+                            Results: {
+                                {
+                                    Name: "",
+                                    Type: &wit.TypeDef{
+                                        Name: (*string)(nil),
+                                        Kind: &wit.List{
+                                            Type:        wit.U8Type{},
+                                            typeDefKind: wit.typeDefKind{},
+                                        },
+                                        Owner:     nil,
+                                        Docs:      wit.Docs{},
+                                        worldItem: wit.worldItem{},
+                                        type_:     wit.type_{},
+                                    },
+                                },
+                            },
+                            Docs:      wit.Docs{},
+                            worldItem: wit.worldItem{},
+                        },
+                        "get-insecure-random-u64": &wit.Function{
+                            Name:    "get-insecure-random-u64",
+                            Kind:    &wit.FunctionKindFreestanding{},
+                            Params:  nil,
+                            Results: {
+                                {
+                                    Name: "",
+                                    Type: wit.U64Type{},
+                                },
+                            },
+                            Docs:      wit.Docs{},
+                            worldItem: wit.worldItem{},
+                        },
+                    },
+                    Package: &wit.Package{
+                        Name: wit.PackageName{
+                            Namespace: "wasi",
+                            Name:      "random",
+                            Version:   (*semver.Version)(nil),
+                        },
+                        Interfaces: {
+                            "insecure":      &wit.Interface{(CYCLIC REFERENCE)},
+                            "insecure-seed": &wit.Interface{(CYCLIC REFERENCE)},
+                            "random":        &wit.Interface{
+                                Name:      &"random",
+                                TypeDefs:  {},
+                                Functions: {
+                                    "get-random-bytes": &wit.Function{
+                                        Name:   "get-random-bytes",
+                                        Kind:   &wit.FunctionKindFreestanding{(CYCLIC REFERENCE)},
+                                        Params: {
+                                            {
+                                                Name: "len",
+                                                Type: wit.U64Type{},
+                                            },
+                                        },
+                                        Results: {
+                                            {
+                                                Name: "",
+                                                Type: &wit.TypeDef{(CYCLIC REFERENCE)},
+                                            },
+                                        },
+                                        Docs:      wit.Docs{},
+                                        worldItem: wit.worldItem{},
+                                    },
+                                    "get-random-u64": &wit.Function{
+                                        Name:    "get-random-u64",
+                                        Kind:    &wit.FunctionKindFreestanding{(CYCLIC REFERENCE)},
+                                        Params:  nil,
+                                        Results: {
+                                            {
+                                                Name: "",
+                                                Type: wit.U64Type{},
+                                            },
+                                        },
+                                        Docs:      wit.Docs{},
+                                        worldItem: wit.worldItem{},
+                                    },
+                                },
+                                Package:   &wit.Package{(CYCLIC REFERENCE)},
+                                Docs:      wit.Docs{},
+                                worldItem: wit.worldItem{},
+                                typeOwner: wit.typeOwner{},
+                            },
+                        },
+                        Worlds: {
+                            "imports": &wit.World{(CYCLIC REFERENCE)},
+                        },
+                        Docs: wit.Docs{},
+                    },
+                    Docs:      wit.Docs{},
+                    worldItem: wit.worldItem{},
+                    typeOwner: wit.typeOwner{},
+                },
+                "interface-2": &wit.Interface{
+                    Name:      &"random",
+                    TypeDefs:  {},
+                    Functions: {
+                        "get-random-bytes": &wit.Function{
+                            Name:   "get-random-bytes",
+                            Kind:   &wit.FunctionKindFreestanding{},
+                            Params: {
+                                {
+                                    Name: "len",
+                                    Type: wit.U64Type{},
+                                },
+                            },
+                            Results: {
+                                {
+                                    Name: "",
+                                    Type: &wit.TypeDef{
+                                        Name: (*string)(nil),
+                                        Kind: &wit.List{
+                                            Type:        wit.U8Type{},
+                                            typeDefKind: wit.typeDefKind{},
+                                        },
+                                        Owner:     nil,
+                                        Docs:      wit.Docs{},
+                                        worldItem: wit.worldItem{},
+                                        type_:     wit.type_{},
+                                    },
+                                },
+                            },
+                            Docs:      wit.Docs{},
+                            worldItem: wit.worldItem{},
+                        },
+                        "get-random-u64": &wit.Function{
+                            Name:    "get-random-u64",
+                            Kind:    &wit.FunctionKindFreestanding{},
+                            Params:  nil,
+                            Results: {
+                                {
+                                    Name: "",
+                                    Type: wit.U64Type{},
+                                },
+                            },
+                            Docs:      wit.Docs{},
+                            worldItem: wit.worldItem{},
+                        },
+                    },
+                    Package: &wit.Package{
+                        Name: wit.PackageName{
+                            Namespace: "wasi",
+                            Name:      "random",
+                            Version:   (*semver.Version)(nil),
+                        },
+                        Interfaces: {
+                            "insecure":      &wit.Interface{(CYCLIC REFERENCE)},
+                            "insecure-seed": &wit.Interface{(CYCLIC REFERENCE)},
+                            "random":        &wit.Interface{(CYCLIC REFERENCE)},
+                        },
+                        Worlds: {
+                            "imports": &wit.World{(CYCLIC REFERENCE)},
+                        },
+                        Docs: wit.Docs{},
+                    },
+                    Docs:      wit.Docs{},
+                    worldItem: wit.worldItem{},
+                    typeOwner: wit.typeOwner{},
+                },
+            },
+            Exports:   {},
+            Package:   (*wit.Package)(nil),
+            Docs:      wit.Docs{},
+            typeOwner: wit.typeOwner{},
+        },
+    },
+    Interfaces: {
+        &wit.Interface{
+            Name:      &"insecure-seed",
+            TypeDefs:  {},
+            Functions: {
+                "insecure-seed": &wit.Function{
+                    Name:    "insecure-seed",
+                    Kind:    &wit.FunctionKindFreestanding{},
+                    Params:  nil,
+                    Results: {
+                        {
+                            Name: "",
+                            Type: &wit.TypeDef{
+                                Name: (*string)(nil),
+                                Kind: &wit.Tuple{
+                                    Types: {
+                                        wit.U64Type{},
+                                        wit.U64Type{},
+                                    },
+                                    typeDefKind: wit.typeDefKind{},
+                                },
+                                Owner:     nil,
+                                Docs:      wit.Docs{},
+                                worldItem: wit.worldItem{},
+                                type_:     wit.type_{},
+                            },
+                        },
+                    },
+                    Docs:      wit.Docs{},
+                    worldItem: wit.worldItem{},
+                },
+            },
+            Package: &wit.Package{
+                Name: wit.PackageName{
+                    Namespace: "wasi",
+                    Name:      "random",
+                    Version:   (*semver.Version)(nil),
+                },
+                Interfaces: {
+                    "insecure": &wit.Interface{
+                        Name:      &"insecure",
+                        TypeDefs:  {},
+                        Functions: {
+                            "get-insecure-random-bytes": &wit.Function{
+                                Name:   "get-insecure-random-bytes",
+                                Kind:   &wit.FunctionKindFreestanding{(CYCLIC REFERENCE)},
+                                Params: {
+                                    {
+                                        Name: "len",
+                                        Type: wit.U64Type{},
+                                    },
+                                },
+                                Results: {
+                                    {
+                                        Name: "",
+                                        Type: &wit.TypeDef{
+                                            Name: (*string)(nil),
+                                            Kind: &wit.List{
+                                                Type:        wit.U8Type{},
+                                                typeDefKind: wit.typeDefKind{},
+                                            },
+                                            Owner:     nil,
+                                            Docs:      wit.Docs{},
+                                            worldItem: wit.worldItem{},
+                                            type_:     wit.type_{},
+                                        },
+                                    },
+                                },
+                                Docs:      wit.Docs{},
+                                worldItem: wit.worldItem{},
+                            },
+                            "get-insecure-random-u64": &wit.Function{
+                                Name:    "get-insecure-random-u64",
+                                Kind:    &wit.FunctionKindFreestanding{(CYCLIC REFERENCE)},
+                                Params:  nil,
+                                Results: {
+                                    {
+                                        Name: "",
+                                        Type: wit.U64Type{},
+                                    },
+                                },
+                                Docs:      wit.Docs{},
+                                worldItem: wit.worldItem{},
+                            },
+                        },
+                        Package:   &wit.Package{(CYCLIC REFERENCE)},
+                        Docs:      wit.Docs{},
+                        worldItem: wit.worldItem{},
+                        typeOwner: wit.typeOwner{},
+                    },
+                    "insecure-seed": &wit.Interface{(CYCLIC REFERENCE)},
+                    "random":        &wit.Interface{
+                        Name:      &"random",
+                        TypeDefs:  {},
+                        Functions: {
+                            "get-random-bytes": &wit.Function{
+                                Name:   "get-random-bytes",
+                                Kind:   &wit.FunctionKindFreestanding{(CYCLIC REFERENCE)},
+                                Params: {
+                                    {
+                                        Name: "len",
+                                        Type: wit.U64Type{},
+                                    },
+                                },
+                                Results: {
+                                    {
+                                        Name: "",
+                                        Type: &wit.TypeDef{
+                                            Name: (*string)(nil),
+                                            Kind: &wit.List{
+                                                Type:        wit.U8Type{},
+                                                typeDefKind: wit.typeDefKind{},
+                                            },
+                                            Owner:     nil,
+                                            Docs:      wit.Docs{},
+                                            worldItem: wit.worldItem{},
+                                            type_:     wit.type_{},
+                                        },
+                                    },
+                                },
+                                Docs:      wit.Docs{},
+                                worldItem: wit.worldItem{},
+                            },
+                            "get-random-u64": &wit.Function{
+                                Name:    "get-random-u64",
+                                Kind:    &wit.FunctionKindFreestanding{(CYCLIC REFERENCE)},
+                                Params:  nil,
+                                Results: {
+                                    {
+                                        Name: "",
+                                        Type: wit.U64Type{},
+                                    },
+                                },
+                                Docs:      wit.Docs{},
+                                worldItem: wit.worldItem{},
+                            },
+                        },
+                        Package:   &wit.Package{(CYCLIC REFERENCE)},
+                        Docs:      wit.Docs{},
+                        worldItem: wit.worldItem{},
+                        typeOwner: wit.typeOwner{},
+                    },
+                },
+                Worlds: {
+                    "imports": &wit.World{(CYCLIC REFERENCE)},
+                },
+                Docs: wit.Docs{},
+            },
+            Docs:      wit.Docs{},
+            worldItem: wit.worldItem{},
+            typeOwner: wit.typeOwner{},
+        },
+        &wit.Interface{
+            Name:      &"insecure",
+            TypeDefs:  {},
+            Functions: {
+                "get-insecure-random-bytes": &wit.Function{
+                    Name:   "get-insecure-random-bytes",
+                    Kind:   &wit.FunctionKindFreestanding{},
+                    Params: {
+                        {
+                            Name: "len",
+                            Type: wit.U64Type{},
+                        },
+                    },
+                    Results: {
+                        {
+                            Name: "",
+                            Type: &wit.TypeDef{
+                                Name: (*string)(nil),
+                                Kind: &wit.List{
+                                    Type:        wit.U8Type{},
+                                    typeDefKind: wit.typeDefKind{},
+                                },
+                                Owner:     nil,
+                                Docs:      wit.Docs{},
+                                worldItem: wit.worldItem{},
+                                type_:     wit.type_{},
+                            },
+                        },
+                    },
+                    Docs:      wit.Docs{},
+                    worldItem: wit.worldItem{},
+                },
+                "get-insecure-random-u64": &wit.Function{
+                    Name:    "get-insecure-random-u64",
+                    Kind:    &wit.FunctionKindFreestanding{},
+                    Params:  nil,
+                    Results: {
+                        {
+                            Name: "",
+                            Type: wit.U64Type{},
+                        },
+                    },
+                    Docs:      wit.Docs{},
+                    worldItem: wit.worldItem{},
+                },
+            },
+            Package: &wit.Package{
+                Name: wit.PackageName{
+                    Namespace: "wasi",
+                    Name:      "random",
+                    Version:   (*semver.Version)(nil),
+                },
+                Interfaces: {
+                    "insecure":      &wit.Interface{(CYCLIC REFERENCE)},
+                    "insecure-seed": &wit.Interface{(CYCLIC REFERENCE)},
+                    "random":        &wit.Interface{
+                        Name:      &"random",
+                        TypeDefs:  {},
+                        Functions: {
+                            "get-random-bytes": &wit.Function{
+                                Name:   "get-random-bytes",
+                                Kind:   &wit.FunctionKindFreestanding{(CYCLIC REFERENCE)},
+                                Params: {
+                                    {
+                                        Name: "len",
+                                        Type: wit.U64Type{},
+                                    },
+                                },
+                                Results: {
+                                    {
+                                        Name: "",
+                                        Type: &wit.TypeDef{(CYCLIC REFERENCE)},
+                                    },
+                                },
+                                Docs:      wit.Docs{},
+                                worldItem: wit.worldItem{},
+                            },
+                            "get-random-u64": &wit.Function{
+                                Name:    "get-random-u64",
+                                Kind:    &wit.FunctionKindFreestanding{(CYCLIC REFERENCE)},
+                                Params:  nil,
+                                Results: {
+                                    {
+                                        Name: "",
+                                        Type: wit.U64Type{},
+                                    },
+                                },
+                                Docs:      wit.Docs{},
+                                worldItem: wit.worldItem{},
+                            },
+                        },
+                        Package:   &wit.Package{(CYCLIC REFERENCE)},
+                        Docs:      wit.Docs{},
+                        worldItem: wit.worldItem{},
+                        typeOwner: wit.typeOwner{},
+                    },
+                },
+                Worlds: {
+                    "imports": &wit.World{(CYCLIC REFERENCE)},
+                },
+                Docs: wit.Docs{},
+            },
+            Docs:      wit.Docs{},
+            worldItem: wit.worldItem{},
+            typeOwner: wit.typeOwner{},
+        },
+        &wit.Interface{
+            Name:      &"random",
+            TypeDefs:  {},
+            Functions: {
+                "get-random-bytes": &wit.Function{
+                    Name:   "get-random-bytes",
+                    Kind:   &wit.FunctionKindFreestanding{},
+                    Params: {
+                        {
+                            Name: "len",
+                            Type: wit.U64Type{},
+                        },
+                    },
+                    Results: {
+                        {
+                            Name: "",
+                            Type: &wit.TypeDef{
+                                Name: (*string)(nil),
+                                Kind: &wit.List{
+                                    Type:        wit.U8Type{},
+                                    typeDefKind: wit.typeDefKind{},
+                                },
+                                Owner:     nil,
+                                Docs:      wit.Docs{},
+                                worldItem: wit.worldItem{},
+                                type_:     wit.type_{},
+                            },
+                        },
+                    },
+                    Docs:      wit.Docs{},
+                    worldItem: wit.worldItem{},
+                },
+                "get-random-u64": &wit.Function{
+                    Name:    "get-random-u64",
+                    Kind:    &wit.FunctionKindFreestanding{},
+                    Params:  nil,
+                    Results: {
+                        {
+                            Name: "",
+                            Type: wit.U64Type{},
+                        },
+                    },
+                    Docs:      wit.Docs{},
+                    worldItem: wit.worldItem{},
+                },
+            },
+            Package: &wit.Package{
+                Name: wit.PackageName{
+                    Namespace: "wasi",
+                    Name:      "random",
+                    Version:   (*semver.Version)(nil),
+                },
+                Interfaces: {
+                    "insecure":      &wit.Interface{(CYCLIC REFERENCE)},
+                    "insecure-seed": &wit.Interface{(CYCLIC REFERENCE)},
+                    "random":        &wit.Interface{(CYCLIC REFERENCE)},
+                },
+                Worlds: {
+                    "imports": &wit.World{(CYCLIC REFERENCE)},
+                },
+                Docs: wit.Docs{},
+            },
+            Docs:      wit.Docs{},
+            worldItem: wit.worldItem{},
+            typeOwner: wit.typeOwner{},
+        },
+    },
+    TypeDefs: {
+        &wit.TypeDef{
+            Name: (*string)(nil),
+            Kind: &wit.Tuple{
+                Types: {
+                    wit.U64Type{},
+                    wit.U64Type{},
+                },
+                typeDefKind: wit.typeDefKind{},
+            },
+            Owner:     nil,
+            Docs:      wit.Docs{},
+            worldItem: wit.worldItem{},
+            type_:     wit.type_{},
+        },
+        &wit.TypeDef{
+            Name: (*string)(nil),
+            Kind: &wit.List{
+                Type:        wit.U8Type{},
+                typeDefKind: wit.typeDefKind{},
+            },
+            Owner:     nil,
+            Docs:      wit.Docs{},
+            worldItem: wit.worldItem{},
+            type_:     wit.type_{},
+        },
+    },
+    Packages: {
+        &wit.Package{
+            Name: wit.PackageName{
+                Namespace: "wasi",
+                Name:      "random",
+                Version:   (*semver.Version)(nil),
+            },
+            Interfaces: {
+                "insecure":      &wit.Interface{(CYCLIC REFERENCE)},
+                "insecure-seed": &wit.Interface{(CYCLIC REFERENCE)},
+                "random":        &wit.Interface{(CYCLIC REFERENCE)},
+            },
+            Worlds: {
+                "imports": &wit.World{(CYCLIC REFERENCE)},
+            },
+            Docs: wit.Docs{},
+        },
+    },
+}

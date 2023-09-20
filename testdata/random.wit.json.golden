@@ -1,0 +1,94 @@
+&wit.Resolve{
+    Worlds:     nil,
+    Interfaces: {
+        &wit.Interface{
+            Name:      &"random",
+            TypeDefs:  {},
+            Functions: {
+                "get-random-bytes": &wit.Function{
+                    Name:   "get-random-bytes",
+                    Kind:   &wit.FunctionKindFreestanding{},
+                    Params: {
+                        {
+                            Name: "len",
+                            Type: wit.U64Type{},
+                        },
+                    },
+                    Results: {
+                        {
+                            Name: "",
+                            Type: &wit.TypeDef{
+                                Name: (*string)(nil),
+                                Kind: &wit.List{
+                                    Type:        wit.U8Type{},
+                                    typeDefKind: wit.typeDefKind{},
+                                },
+                                Owner:     nil,
+                                Docs:      wit.Docs{},
+                                worldItem: wit.worldItem{},
+                                type_:     wit.type_{},
+                            },
+                        },
+                    },
+                    Docs:      wit.Docs{},
+                    worldItem: wit.worldItem{},
+                },
+                "get-random-u64": &wit.Function{
+                    Name:    "get-random-u64",
+                    Kind:    &wit.FunctionKindFreestanding{},
+                    Params:  nil,
+                    Results: {
+                        {
+                            Name: "",
+                            Type: wit.U64Type{},
+                        },
+                    },
+                    Docs:      wit.Docs{},
+                    worldItem: wit.worldItem{},
+                },
+            },
+            Package: &wit.Package{
+                Name: wit.PackageName{
+                    Namespace: "wasi",
+                    Name:      "random",
+                    Version:   (*semver.Version)(nil),
+                },
+                Interfaces: {
+                    "random": &wit.Interface{(CYCLIC REFERENCE)},
+                },
+                Worlds: {},
+                Docs:   wit.Docs{},
+            },
+            Docs:      wit.Docs{},
+            worldItem: wit.worldItem{},
+            typeOwner: wit.typeOwner{},
+        },
+    },
+    TypeDefs: {
+        &wit.TypeDef{
+            Name: (*string)(nil),
+            Kind: &wit.List{
+                Type:        wit.U8Type{},
+                typeDefKind: wit.typeDefKind{},
+            },
+            Owner:     nil,
+            Docs:      wit.Docs{},
+            worldItem: wit.worldItem{},
+            type_:     wit.type_{},
+        },
+    },
+    Packages: {
+        &wit.Package{
+            Name: wit.PackageName{
+                Namespace: "wasi",
+                Name:      "random",
+                Version:   (*semver.Version)(nil),
+            },
+            Interfaces: {
+                "random": &wit.Interface{(CYCLIC REFERENCE)},
+            },
+            Worlds: {},
+            Docs:   wit.Docs{},
+        },
+    },
+}

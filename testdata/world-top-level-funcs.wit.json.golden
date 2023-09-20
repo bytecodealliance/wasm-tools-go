@@ -1,0 +1,136 @@
+&wit.Resolve{
+    Worlds: {
+        &wit.World{
+            Name:    "foo",
+            Imports: {
+                "bar": &wit.Function{
+                    Name:   "bar",
+                    Kind:   &wit.FunctionKindFreestanding{},
+                    Params: {
+                        {
+                            Name: "arg",
+                            Type: &wit.TypeDef{
+                                Name: (*string)(nil),
+                                Kind: &wit.List{
+                                    Type:        wit.U32Type{},
+                                    typeDefKind: wit.typeDefKind{},
+                                },
+                                Owner:     nil,
+                                Docs:      wit.Docs{},
+                                worldItem: wit.worldItem{},
+                                type_:     wit.type_{},
+                            },
+                        },
+                    },
+                    Results:   nil,
+                    Docs:      wit.Docs{},
+                    worldItem: wit.worldItem{},
+                },
+                "foo": &wit.Function{
+                    Name:      "foo",
+                    Kind:      &wit.FunctionKindFreestanding{},
+                    Params:    nil,
+                    Results:   nil,
+                    Docs:      wit.Docs{},
+                    worldItem: wit.worldItem{},
+                },
+            },
+            Exports: {
+                "foo2": &wit.Function{
+                    Name:      "foo2",
+                    Kind:      &wit.FunctionKindFreestanding{},
+                    Params:    nil,
+                    Results:   nil,
+                    Docs:      wit.Docs{},
+                    worldItem: wit.worldItem{},
+                },
+                "some-name": &wit.Function{
+                    Name:    "some-name",
+                    Kind:    &wit.FunctionKindFreestanding{},
+                    Params:  nil,
+                    Results: {
+                        {
+                            Name: "",
+                            Type: &wit.TypeDef{
+                                Name: (*string)(nil),
+                                Kind: &wit.List{
+                                    Type: &wit.TypeDef{
+                                        Name: (*string)(nil),
+                                        Kind: &wit.Option{
+                                            Type:        wit.U32Type{},
+                                            typeDefKind: wit.typeDefKind{},
+                                        },
+                                        Owner:     nil,
+                                        Docs:      wit.Docs{},
+                                        worldItem: wit.worldItem{},
+                                        type_:     wit.type_{},
+                                    },
+                                    typeDefKind: wit.typeDefKind{},
+                                },
+                                Owner:     nil,
+                                Docs:      wit.Docs{},
+                                worldItem: wit.worldItem{},
+                                type_:     wit.type_{},
+                            },
+                        },
+                    },
+                    Docs:      wit.Docs{},
+                    worldItem: wit.worldItem{},
+                },
+            },
+            Package:   (*wit.Package)(nil),
+            Docs:      wit.Docs{},
+            typeOwner: wit.typeOwner{},
+        },
+    },
+    Interfaces: nil,
+    TypeDefs:   {
+        &wit.TypeDef{
+            Name: (*string)(nil),
+            Kind: &wit.List{
+                Type:        wit.U32Type{},
+                typeDefKind: wit.typeDefKind{},
+            },
+            Owner:     nil,
+            Docs:      wit.Docs{},
+            worldItem: wit.worldItem{},
+            type_:     wit.type_{},
+        },
+        &wit.TypeDef{
+            Name: (*string)(nil),
+            Kind: &wit.Option{
+                Type:        wit.U32Type{},
+                typeDefKind: wit.typeDefKind{},
+            },
+            Owner:     nil,
+            Docs:      wit.Docs{},
+            worldItem: wit.worldItem{},
+            type_:     wit.type_{},
+        },
+        &wit.TypeDef{
+            Name: (*string)(nil),
+            Kind: &wit.List{
+                Type:        &wit.TypeDef{(CYCLIC REFERENCE)},
+                typeDefKind: wit.typeDefKind{},
+            },
+            Owner:     nil,
+            Docs:      wit.Docs{},
+            worldItem: wit.worldItem{},
+            type_:     wit.type_{},
+        },
+    },
+    Packages: {
+        &wit.Package{
+            Name: wit.PackageName{
+                Namespace: "foo",
+                Name:      "foo",
+                Version:   (*semver.Version)(nil),
+            },
+            Interfaces: {},
+            Worlds:     {
+                "foo": &wit.World{(CYCLIC REFERENCE)},
+            },
+            Docs: wit.Docs{},
+        },
+    },
+}

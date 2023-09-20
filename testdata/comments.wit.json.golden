@@ -1,0 +1,89 @@
+&wit.Resolve{
+    Worlds:     nil,
+    Interfaces: {
+        &wit.Interface{
+            Name:     &"foo",
+            TypeDefs: {
+                "bar": &wit.TypeDef{
+                    Name: &"bar",
+                    Kind: &wit.Stream{
+                        Element: &wit.TypeDef{
+                            Name:      &"x",
+                            Kind:      wit.U32Type{},
+                            Owner:     &wit.Interface{(CYCLIC REFERENCE)},
+                            Docs:      wit.Docs{},
+                            worldItem: wit.worldItem{},
+                            type_:     wit.type_{},
+                        },
+                        End:         nil,
+                        typeDefKind: wit.typeDefKind{},
+                    },
+                    Owner:     &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:      wit.Docs{},
+                    worldItem: wit.worldItem{},
+                    type_:     wit.type_{},
+                },
+                "x": &wit.TypeDef{
+                    Name:      &"x",
+                    Kind:      wit.U32Type{},
+                    Owner:     &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:      wit.Docs{},
+                    worldItem: wit.worldItem{},
+                    type_:     wit.type_{},
+                },
+            },
+            Functions: {},
+            Package:   &wit.Package{
+                Name: wit.PackageName{
+                    Namespace: "foo",
+                    Name:      "comments",
+                    Version:   (*semver.Version)(nil),
+                },
+                Interfaces: {
+                    "foo": &wit.Interface{(CYCLIC REFERENCE)},
+                },
+                Worlds: {},
+                Docs:   wit.Docs{},
+            },
+            Docs:      wit.Docs{},
+            worldItem: wit.worldItem{},
+            typeOwner: wit.typeOwner{},
+        },
+    },
+    TypeDefs: {
+        &wit.TypeDef{
+            Name:      &"x",
+            Kind:      wit.U32Type{},
+            Owner:     &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:      wit.Docs{},
+            worldItem: wit.worldItem{},
+            type_:     wit.type_{},
+        },
+        &wit.TypeDef{
+            Name: &"bar",
+            Kind: &wit.Stream{
+                Element:     &wit.TypeDef{(CYCLIC REFERENCE)},
+                End:         nil,
+                typeDefKind: wit.typeDefKind{},
+            },
+            Owner:     &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:      wit.Docs{},
+            worldItem: wit.worldItem{},
+            type_:     wit.type_{},
+        },
+    },
+    Packages: {
+        &wit.Package{
+            Name: wit.PackageName{
+                Namespace: "foo",
+                Name:      "comments",
+                Version:   (*semver.Version)(nil),
+            },
+            Interfaces: {
+                "foo": &wit.Interface{(CYCLIC REFERENCE)},
+            },
+            Worlds: {},
+            Docs:   wit.Docs{},
+        },
+    },
+}

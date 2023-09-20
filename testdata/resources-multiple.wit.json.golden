@@ -1,0 +1,525 @@
+&wit.Resolve{
+    Worlds:     nil,
+    Interfaces: {
+        &wit.Interface{
+            Name:     &"resources-multiple",
+            TypeDefs: {
+                "r1": &wit.TypeDef{
+                    Name:      &"r1",
+                    Kind:      nil,
+                    Owner:     &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:      wit.Docs{},
+                    worldItem: wit.worldItem{},
+                    type_:     wit.type_{},
+                },
+            },
+            Functions: {
+                "[method]r1.f1": &wit.Function{
+                    Name: "[method]r1.f1",
+                    Kind: &wit.FunctionKindMethod{
+                        Type:         &wit.TypeDef{(CYCLIC REFERENCE)},
+                        functionKind: wit.functionKind{},
+                    },
+                    Params: {
+                        {
+                            Name: "self",
+                            Type: &wit.TypeDef{
+                                Name: (*string)(nil),
+                                Kind: &wit.BorrowHandle{
+                                    Type:   &wit.TypeDef{(CYCLIC REFERENCE)},
+                                    handle: wit.handle{},
+                                },
+                                Owner:     nil,
+                                Docs:      wit.Docs{},
+                                worldItem: wit.worldItem{},
+                                type_:     wit.type_{},
+                            },
+                        },
+                    },
+                    Results:   nil,
+                    Docs:      wit.Docs{},
+                    worldItem: wit.worldItem{},
+                },
+                "[method]r1.f10": &wit.Function{
+                    Name: "[method]r1.f10",
+                    Kind: &wit.FunctionKindMethod{
+                        Type:         &wit.TypeDef{(CYCLIC REFERENCE)},
+                        functionKind: wit.functionKind{},
+                    },
+                    Params: {
+                        {
+                            Name: "self",
+                            Type: &wit.TypeDef{
+                                Name: (*string)(nil),
+                                Kind: &wit.BorrowHandle{
+                                    Type:   &wit.TypeDef{(CYCLIC REFERENCE)},
+                                    handle: wit.handle{},
+                                },
+                                Owner:     nil,
+                                Docs:      wit.Docs{},
+                                worldItem: wit.worldItem{},
+                                type_:     wit.type_{},
+                            },
+                        },
+                    },
+                    Results: {
+                        {
+                            Name: "u",
+                            Type: wit.U32Type{},
+                        },
+                    },
+                    Docs:      wit.Docs{},
+                    worldItem: wit.worldItem{},
+                },
+                "[method]r1.f11": &wit.Function{
+                    Name: "[method]r1.f11",
+                    Kind: &wit.FunctionKindMethod{
+                        Type:         &wit.TypeDef{(CYCLIC REFERENCE)},
+                        functionKind: wit.functionKind{},
+                    },
+                    Params: {
+                        {
+                            Name: "self",
+                            Type: &wit.TypeDef{
+                                Name: (*string)(nil),
+                                Kind: &wit.BorrowHandle{
+                                    Type:   &wit.TypeDef{(CYCLIC REFERENCE)},
+                                    handle: wit.handle{},
+                                },
+                                Owner:     nil,
+                                Docs:      wit.Docs{},
+                                worldItem: wit.worldItem{},
+                                type_:     wit.type_{},
+                            },
+                        },
+                    },
+                    Results:   nil,
+                    Docs:      wit.Docs{},
+                    worldItem: wit.worldItem{},
+                },
+                "[method]r1.f2": &wit.Function{
+                    Name: "[method]r1.f2",
+                    Kind: &wit.FunctionKindMethod{
+                        Type:         &wit.TypeDef{(CYCLIC REFERENCE)},
+                        functionKind: wit.functionKind{},
+                    },
+                    Params: {
+                        {
+                            Name: "self",
+                            Type: &wit.TypeDef{
+                                Name: (*string)(nil),
+                                Kind: &wit.BorrowHandle{
+                                    Type:   &wit.TypeDef{(CYCLIC REFERENCE)},
+                                    handle: wit.handle{},
+                                },
+                                Owner:     nil,
+                                Docs:      wit.Docs{},
+                                worldItem: wit.worldItem{},
+                                type_:     wit.type_{},
+                            },
+                        },
+                        {
+                            Name: "a",
+                            Type: wit.U32Type{},
+                        },
+                    },
+                    Results:   nil,
+                    Docs:      wit.Docs{},
+                    worldItem: wit.worldItem{},
+                },
+                "[method]r1.f3": &wit.Function{
+                    Name: "[method]r1.f3",
+                    Kind: &wit.FunctionKindMethod{
+                        Type:         &wit.TypeDef{(CYCLIC REFERENCE)},
+                        functionKind: wit.functionKind{},
+                    },
+                    Params: {
+                        {
+                            Name: "self",
+                            Type: &wit.TypeDef{
+                                Name: (*string)(nil),
+                                Kind: &wit.BorrowHandle{
+                                    Type:   &wit.TypeDef{(CYCLIC REFERENCE)},
+                                    handle: wit.handle{},
+                                },
+                                Owner:     nil,
+                                Docs:      wit.Docs{},
+                                worldItem: wit.worldItem{},
+                                type_:     wit.type_{},
+                            },
+                        },
+                        {
+                            Name: "a",
+                            Type: wit.U32Type{},
+                        },
+                    },
+                    Results:   nil,
+                    Docs:      wit.Docs{},
+                    worldItem: wit.worldItem{},
+                },
+                "[method]r1.f4": &wit.Function{
+                    Name: "[method]r1.f4",
+                    Kind: &wit.FunctionKindMethod{
+                        Type:         &wit.TypeDef{(CYCLIC REFERENCE)},
+                        functionKind: wit.functionKind{},
+                    },
+                    Params: {
+                        {
+                            Name: "self",
+                            Type: &wit.TypeDef{
+                                Name: (*string)(nil),
+                                Kind: &wit.BorrowHandle{
+                                    Type:   &wit.TypeDef{(CYCLIC REFERENCE)},
+                                    handle: wit.handle{},
+                                },
+                                Owner:     nil,
+                                Docs:      wit.Docs{},
+                                worldItem: wit.worldItem{},
+                                type_:     wit.type_{},
+                            },
+                        },
+                    },
+                    Results: {
+                        {
+                            Name: "",
+                            Type: wit.U32Type{},
+                        },
+                    },
+                    Docs:      wit.Docs{},
+                    worldItem: wit.worldItem{},
+                },
+                "[method]r1.f6": &wit.Function{
+                    Name: "[method]r1.f6",
+                    Kind: &wit.FunctionKindMethod{
+                        Type:         &wit.TypeDef{(CYCLIC REFERENCE)},
+                        functionKind: wit.functionKind{},
+                    },
+                    Params: {
+                        {
+                            Name: "self",
+                            Type: &wit.TypeDef{
+                                Name: (*string)(nil),
+                                Kind: &wit.BorrowHandle{
+                                    Type:   &wit.TypeDef{(CYCLIC REFERENCE)},
+                                    handle: wit.handle{},
+                                },
+                                Owner:     nil,
+                                Docs:      wit.Docs{},
+                                worldItem: wit.worldItem{},
+                                type_:     wit.type_{},
+                            },
+                        },
+                    },
+                    Results: {
+                        {
+                            Name: "",
+                            Type: &wit.TypeDef{
+                                Name: (*string)(nil),
+                                Kind: &wit.Tuple{
+                                    Types: {
+                                        wit.U32Type{},
+                                        wit.U32Type{},
+                                    },
+                                    typeDefKind: wit.typeDefKind{},
+                                },
+                                Owner:     nil,
+                                Docs:      wit.Docs{},
+                                worldItem: wit.worldItem{},
+                                type_:     wit.type_{},
+                            },
+                        },
+                    },
+                    Docs:      wit.Docs{},
+                    worldItem: wit.worldItem{},
+                },
+                "[method]r1.f7": &wit.Function{
+                    Name: "[method]r1.f7",
+                    Kind: &wit.FunctionKindMethod{
+                        Type:         &wit.TypeDef{(CYCLIC REFERENCE)},
+                        functionKind: wit.functionKind{},
+                    },
+                    Params: {
+                        {
+                            Name: "self",
+                            Type: &wit.TypeDef{
+                                Name: (*string)(nil),
+                                Kind: &wit.BorrowHandle{
+                                    Type:   &wit.TypeDef{(CYCLIC REFERENCE)},
+                                    handle: wit.handle{},
+                                },
+                                Owner:     nil,
+                                Docs:      wit.Docs{},
+                                worldItem: wit.worldItem{},
+                                type_:     wit.type_{},
+                            },
+                        },
+                        {
+                            Name: "a",
+                            Type: wit.Float32Type{},
+                        },
+                        {
+                            Name: "b",
+                            Type: wit.Float32Type{},
+                        },
+                    },
+                    Results: {
+                        {
+                            Name: "",
+                            Type: &wit.TypeDef{
+                                Name: (*string)(nil),
+                                Kind: &wit.Tuple{
+                                    Types: {
+                                        wit.U32Type{},
+                                        wit.U32Type{},
+                                    },
+                                    typeDefKind: wit.typeDefKind{},
+                                },
+                                Owner:     nil,
+                                Docs:      wit.Docs{},
+                                worldItem: wit.worldItem{},
+                                type_:     wit.type_{},
+                            },
+                        },
+                    },
+                    Docs:      wit.Docs{},
+                    worldItem: wit.worldItem{},
+                },
+                "[method]r1.f8": &wit.Function{
+                    Name: "[method]r1.f8",
+                    Kind: &wit.FunctionKindMethod{
+                        Type:         &wit.TypeDef{(CYCLIC REFERENCE)},
+                        functionKind: wit.functionKind{},
+                    },
+                    Params: {
+                        {
+                            Name: "self",
+                            Type: &wit.TypeDef{
+                                Name: (*string)(nil),
+                                Kind: &wit.BorrowHandle{
+                                    Type:   &wit.TypeDef{(CYCLIC REFERENCE)},
+                                    handle: wit.handle{},
+                                },
+                                Owner:     nil,
+                                Docs:      wit.Docs{},
+                                worldItem: wit.worldItem{},
+                                type_:     wit.type_{},
+                            },
+                        },
+                        {
+                            Name: "a",
+                            Type: &wit.TypeDef{
+                                Name: (*string)(nil),
+                                Kind: &wit.Option{
+                                    Type:        wit.U32Type{},
+                                    typeDefKind: wit.typeDefKind{},
+                                },
+                                Owner:     nil,
+                                Docs:      wit.Docs{},
+                                worldItem: wit.worldItem{},
+                                type_:     wit.type_{},
+                            },
+                        },
+                    },
+                    Results: {
+                        {
+                            Name: "",
+                            Type: &wit.TypeDef{
+                                Name: (*string)(nil),
+                                Kind: &wit.Result{
+                                    OK:          wit.U32Type{},
+                                    Err:         wit.Float32Type{},
+                                    typeDefKind: wit.typeDefKind{},
+                                },
+                                Owner:     nil,
+                                Docs:      wit.Docs{},
+                                worldItem: wit.worldItem{},
+                                type_:     wit.type_{},
+                            },
+                        },
+                    },
+                    Docs:      wit.Docs{},
+                    worldItem: wit.worldItem{},
+                },
+                "[method]r1.f9": &wit.Function{
+                    Name: "[method]r1.f9",
+                    Kind: &wit.FunctionKindMethod{
+                        Type:         &wit.TypeDef{(CYCLIC REFERENCE)},
+                        functionKind: wit.functionKind{},
+                    },
+                    Params: {
+                        {
+                            Name: "self",
+                            Type: &wit.TypeDef{
+                                Name: (*string)(nil),
+                                Kind: &wit.BorrowHandle{
+                                    Type:   &wit.TypeDef{(CYCLIC REFERENCE)},
+                                    handle: wit.handle{},
+                                },
+                                Owner:     nil,
+                                Docs:      wit.Docs{},
+                                worldItem: wit.worldItem{},
+                                type_:     wit.type_{},
+                            },
+                        },
+                    },
+                    Results: {
+                        {
+                            Name: "u",
+                            Type: wit.U32Type{},
+                        },
+                        {
+                            Name: "f",
+                            Type: wit.Float32Type{},
+                        },
+                    },
+                    Docs:      wit.Docs{},
+                    worldItem: wit.worldItem{},
+                },
+                "t1": &wit.Function{
+                    Name:   "t1",
+                    Kind:   &wit.FunctionKindFreestanding{},
+                    Params: {
+                        {
+                            Name: "a",
+                            Type: &wit.TypeDef{
+                                Name: (*string)(nil),
+                                Kind: &wit.BorrowHandle{
+                                    Type:   &wit.TypeDef{(CYCLIC REFERENCE)},
+                                    handle: wit.handle{},
+                                },
+                                Owner:     nil,
+                                Docs:      wit.Docs{},
+                                worldItem: wit.worldItem{},
+                                type_:     wit.type_{},
+                            },
+                        },
+                    },
+                    Results:   nil,
+                    Docs:      wit.Docs{},
+                    worldItem: wit.worldItem{},
+                },
+                "t2": &wit.Function{
+                    Name:   "t2",
+                    Kind:   &wit.FunctionKindFreestanding{},
+                    Params: {
+                        {
+                            Name: "a",
+                            Type: &wit.TypeDef{
+                                Name: (*string)(nil),
+                                Kind: &wit.OwnHandle{
+                                    Type:   &wit.TypeDef{(CYCLIC REFERENCE)},
+                                    handle: wit.handle{},
+                                },
+                                Owner:     nil,
+                                Docs:      wit.Docs{},
+                                worldItem: wit.worldItem{},
+                                type_:     wit.type_{},
+                            },
+                        },
+                    },
+                    Results:   nil,
+                    Docs:      wit.Docs{},
+                    worldItem: wit.worldItem{},
+                },
+            },
+            Package: &wit.Package{
+                Name: wit.PackageName{
+                    Namespace: "foo",
+                    Name:      "resources-multiple",
+                    Version:   (*semver.Version)(nil),
+                },
+                Interfaces: {
+                    "resources-multiple": &wit.Interface{(CYCLIC REFERENCE)},
+                },
+                Worlds: {},
+                Docs:   wit.Docs{},
+            },
+            Docs:      wit.Docs{},
+            worldItem: wit.worldItem{},
+            typeOwner: wit.typeOwner{},
+        },
+    },
+    TypeDefs: {
+        &wit.TypeDef{
+            Name:      &"r1",
+            Kind:      nil,
+            Owner:     &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:      wit.Docs{},
+            worldItem: wit.worldItem{},
+            type_:     wit.type_{},
+        },
+        &wit.TypeDef{
+            Name: (*string)(nil),
+            Kind: &wit.BorrowHandle{
+                Type:   &wit.TypeDef{(CYCLIC REFERENCE)},
+                handle: wit.handle{},
+            },
+            Owner:     nil,
+            Docs:      wit.Docs{},
+            worldItem: wit.worldItem{},
+            type_:     wit.type_{},
+        },
+        &wit.TypeDef{
+            Name: (*string)(nil),
+            Kind: &wit.Tuple{
+                Types: {
+                    wit.U32Type{},
+                    wit.U32Type{},
+                },
+                typeDefKind: wit.typeDefKind{},
+            },
+            Owner:     nil,
+            Docs:      wit.Docs{},
+            worldItem: wit.worldItem{},
+            type_:     wit.type_{},
+        },
+        &wit.TypeDef{
+            Name: (*string)(nil),
+            Kind: &wit.Option{
+                Type:        wit.U32Type{},
+                typeDefKind: wit.typeDefKind{},
+            },
+            Owner:     nil,
+            Docs:      wit.Docs{},
+            worldItem: wit.worldItem{},
+            type_:     wit.type_{},
+        },
+        &wit.TypeDef{
+            Name: (*string)(nil),
+            Kind: &wit.Result{
+                OK:          wit.U32Type{},
+                Err:         wit.Float32Type{},
+                typeDefKind: wit.typeDefKind{},
+            },
+            Owner:     nil,
+            Docs:      wit.Docs{},
+            worldItem: wit.worldItem{},
+            type_:     wit.type_{},
+        },
+        &wit.TypeDef{
+            Name: (*string)(nil),
+            Kind: &wit.OwnHandle{
+                Type:   &wit.TypeDef{(CYCLIC REFERENCE)},
+                handle: wit.handle{},
+            },
+            Owner:     nil,
+            Docs:      wit.Docs{},
+            worldItem: wit.worldItem{},
+            type_:     wit.type_{},
+        },
+    },
+    Packages: {
+        &wit.Package{
+            Name: wit.PackageName{
+                Namespace: "foo",
+                Name:      "resources-multiple",
+                Version:   (*semver.Version)(nil),
+            },
+            Interfaces: {
+                "resources-multiple": &wit.Interface{(CYCLIC REFERENCE)},
+            },
+            Worlds: {},
+            Docs:   wit.Docs{},
+        },
+    },
+}

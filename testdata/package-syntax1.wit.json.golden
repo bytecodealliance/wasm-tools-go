@@ -1,0 +1,17 @@
+&wit.Resolve{
+    Worlds:     nil,
+    Interfaces: nil,
+    TypeDefs:   nil,
+    Packages:   {
+        &wit.Package{
+            Name: wit.PackageName{
+                Namespace: "foo",
+                Name:      "foo",
+                Version:   (*semver.Version)(nil),
+            },
+            Interfaces: {},
+            Worlds:     {},
+            Docs:       wit.Docs{},
+        },
+    },
+}

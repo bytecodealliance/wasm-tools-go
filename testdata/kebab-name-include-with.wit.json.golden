@@ -1,0 +1,81 @@
+&wit.Resolve{
+    Worlds: {
+        &wit.World{
+            Name:    "foo",
+            Imports: {
+                "a": &wit.Function{
+                    Name:      "a",
+                    Kind:      &wit.FunctionKindFreestanding{},
+                    Params:    nil,
+                    Results:   nil,
+                    Docs:      wit.Docs{},
+                    worldItem: wit.worldItem{},
+                },
+            },
+            Exports:   {},
+            Package:   (*wit.Package)(nil),
+            Docs:      wit.Docs{},
+            typeOwner: wit.typeOwner{},
+        },
+        &wit.World{
+            Name:    "bar",
+            Imports: {
+                "a": &wit.Function{
+                    Name:      "a",
+                    Kind:      &wit.FunctionKindFreestanding{},
+                    Params:    nil,
+                    Results:   nil,
+                    Docs:      wit.Docs{},
+                    worldItem: wit.worldItem{},
+                },
+            },
+            Exports:   {},
+            Package:   (*wit.Package)(nil),
+            Docs:      wit.Docs{},
+            typeOwner: wit.typeOwner{},
+        },
+        &wit.World{
+            Name:    "baz",
+            Imports: {
+                "a": &wit.Function{
+                    Name:      "a",
+                    Kind:      &wit.FunctionKindFreestanding{},
+                    Params:    nil,
+                    Results:   nil,
+                    Docs:      wit.Docs{},
+                    worldItem: wit.worldItem{},
+                },
+                "b": &wit.Function{
+                    Name:      "a",
+                    Kind:      &wit.FunctionKindFreestanding{},
+                    Params:    nil,
+                    Results:   nil,
+                    Docs:      wit.Docs{},
+                    worldItem: wit.worldItem{},
+                },
+            },
+            Exports:   {},
+            Package:   (*wit.Package)(nil),
+            Docs:      wit.Docs{},
+            typeOwner: wit.typeOwner{},
+        },
+    },
+    Interfaces: nil,
+    TypeDefs:   nil,
+    Packages:   {
+        &wit.Package{
+            Name: wit.PackageName{
+                Namespace: "foo",
+                Name:      "foo",
+                Version:   (*semver.Version)(nil),
+            },
+            Interfaces: {},
+            Worlds:     {
+                "bar": &wit.World{(CYCLIC REFERENCE)},
+                "baz": &wit.World{(CYCLIC REFERENCE)},
+                "foo": &wit.World{(CYCLIC REFERENCE)},
+            },
+            Docs: wit.Docs{},
+        },
+    },
+}
