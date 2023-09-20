@@ -98,7 +98,7 @@ type TypeDef struct {
 }
 
 // TypeName returns the type name of t, if present.
-// This partially implements the Type interface.
+// This partially implements the [Type] interface.
 func (t *TypeDef) TypeName() string {
 	if t.Name != nil {
 		return *t.Name
@@ -116,21 +116,27 @@ type _typeDefKind struct{}
 
 func (_typeDefKind) isTypeDefKind() {}
 
+// Record represents a WIT [record type], akin to a struct.
+//
+// [record type]: https://component-model.bytecodealliance.org/wit-overview.html#records
 type Record struct {
 	Fields []Field
 	_typeDefKind
 }
 
+// Field represents a field in a [Record].
 type Field struct {
 	Name string
 	Type Type
 	Docs Docs
 }
 
+// Resource represents a WIT resource type.
 type Resource struct{ _typeDefKind }
 
 func (Resource) UnmarshalText() ([]byte, error) { return []byte("resource"), nil }
 
+// Handle represents a WIT handle type.
 type Handle interface {
 	isHandle()
 	TypeDefKind
@@ -140,105 +146,167 @@ type _handle struct{ _typeDefKind }
 
 func (_handle) isHandle() {}
 
+// OwnHandle represents an owned WIT handle type.
 type OwnHandle struct {
 	Type *TypeDef
 	_handle
 }
 
+// BorrowHandle represents an borrowed WIT handle type.
 type BorrowHandle struct {
 	Type *TypeDef
 	_handle
 }
 
+// Flags represents a WIT [flags type], stored as a bitfield.
+//
+// [flags type]: https://component-model.bytecodealliance.org/wit-overview.html#flags
 type Flags struct {
 	Flags []Flag
 	_typeDefKind
 }
 
+// Flag represents a single flag value in a [Flags] type.
 type Flag struct {
 	Name string
 	Docs Docs
 }
 
+// Tuple represents a WIT [tuple type].
+// A tuple type is an ordered fixed length sequence of values of specified types.
+// It is similar to a [Record], except that the fields are identified by their order instead of by names.
+//
+// [tuple type]: https://component-model.bytecodealliance.org/wit-overview.html#tuples
 type Tuple struct {
 	Types []Type
 	_typeDefKind
 }
 
+// Variant represents a WIT [variant type], a tagged/discriminated union.
+// A variant type declares one or more cases. Each case has a name and, optionally,
+// a type of data associated with that case.
+//
+// [variant type]: https://component-model.bytecodealliance.org/wit-overview.html#variants
 type Variant struct {
 	Cases []Case
 	_typeDefKind
 }
 
+// Case represents a single case in a [Variant].
 type Case struct {
 	Name string
 	Type Type // Represented in Rust as Option<Type>, so Type field could be nil
 	Docs Docs
 }
 
+// Enum represents a WIT [enum type], which is a [Variant] without associated data.
+// The equivalent in Go is a set of const identifiers declared with iota.
+//
+// [enum type]: https://component-model.bytecodealliance.org/wit-overview.html#enums
 type Enum struct {
 	Cases []EnumCase
 	_typeDefKind
 }
 
+// EnumCase represents a single case in an [Enum].
 type EnumCase struct {
 	Name string
 	Docs Docs
 }
 
+// Option represents a WIT [option type], a special case of [Variant]. An Option can
+// contain a value of a single type, either build-in or user defined, or no value.
+// The equivalent in Go for an option<string> could be represented as *string.
+//
+// [option type]: https://component-model.bytecodealliance.org/wit-overview.html#options
 type Option struct {
 	Type Type
 	_typeDefKind
 }
 
+// Result represents a WIT [result type], which is the result of a function call,
+// returning an optional value and/or an optional error. It is roughly equivalent to
+// the Go pattern of returning (T, error).
+//
+// [result type]: https://component-model.bytecodealliance.org/wit-overview.html#results
 type Result struct {
 	OK  Type // Represented in Rust as Option<Type>, so Type field could be nil
 	Err Type // Represented in Rust as Option<Type>, so Type field could be nil
 	_typeDefKind
 }
 
+// List represents a WIT [list type], which is an ordered vector of an arbitrary type.
+//
+// [list type]: https://component-model.bytecodealliance.org/wit-overview.html#lists
 type List struct {
 	Type Type
 	_typeDefKind
 }
 
+// Future represents a WIT [future type], expected to be part of [WASI Preview 3].
+//
+// [future type]: https://github.com/bytecodealliance/wit-bindgen/issues/270
+// [WASI Preview 3]: https://bytecodealliance.org/articles/webassembly-the-updated-roadmap-for-developers
 type Future struct {
 	Type Type // Represented in Rust as Option<Type>, so Type field could be nil
 	_typeDefKind
 }
 
+// Stream represents a WIT [stream type], expected to be part of [WASI Preview 3].
+//
+// [stream type]: https://github.com/WebAssembly/WASI/blob/main/docs/WitInWasi.md#streams
+// [WASI Preview 3]: https://bytecodealliance.org/articles/webassembly-the-updated-roadmap-for-developers
 type Stream struct {
 	Element Type // Represented in Rust as Option<Type>, so Type field could be nil
 	End     Type // Represented in Rust as Option<Type>, so Type field could be nil
 	_typeDefKind
 }
 
+// TypeOwner is the interface implemented by any type that can own a TypeDef,
+// currently [World] and [Interface].
 type TypeOwner interface{ isTypeOwner() }
 
 type _typeOwner struct{}
 
 func (_typeOwner) isTypeOwner() {}
 
+// Type is the interface implemented by any type definition. This can be a
+// [primitive type] or a user-defined type in a [TypeDef].
+//
+// [primitive type]: https://component-model.bytecodealliance.org/wit-overview.html#primitive-types
 type Type interface {
 	TypeName() string
 	isType()
 	TypeDefKind
 }
 
+// _type is an embeddable type that conforms to the Type interface.
 type _type struct{ _typeDefKind }
 
 func (_type) isType() {}
 
 func (_type) TypeName() string { return "<unnamed>" }
 
+// Primitive is a type constriant of the Go equivalents of WIT [primitive types].
+//
+// [primitive types]: https://component-model.bytecodealliance.org/wit-overview.html#primitive-types
+type Primitive interface {
+	bool | int8 | uint8 | int16 | uint16 | int32 | uint32 | int64 | uint64 | float32 | float64 | char | string
+}
+
+// char is defined because [rune] is an alias of [int32]
+type char rune
+
 // _primitive represents a WebAssembly Component Model [primitive type]
 // mapped to its equivalent Go type.
 //
 // [primitive type]: https://component-model.bytecodealliance.org/wit-overview.html#primitive-types
-type _primitive[T any] struct{ _type }
+type _primitive[T Primitive] struct{ _type }
 
+// _primitive is a generic embeddable type that conforms to the [Type] interface.
 func (_primitive[T]) isType() {}
 
+// TypeName partially implements the [Type] interface.
 func (_primitive[T]) TypeName() string {
 	var v T
 	switch any(v).(type) {
@@ -290,9 +358,6 @@ type Float64Type struct{ _primitive[float64] }
 type CharType struct{ _primitive[char] }
 type StringType struct{ _primitive[string] }
 
-// char is defined because rune is an alias of int32
-type char rune
-
 // ParseType parses a WIT [primitive type] string into
 // the associated Type implementation from this package.
 // It returns an error if the type string is not recoginized.
@@ -328,6 +393,10 @@ func ParseType(s string) (Type, error) {
 	return nil, fmt.Errorf("unknown type %q", s)
 }
 
+// Function represents a WIT [function].
+// Functions can be freestanding, methods, constructors or static.
+//
+// [function]: https://component-model.bytecodealliance.org/wit-overview.html#functions
 type Function struct {
 	Name    string
 	Kind    FunctionKind
