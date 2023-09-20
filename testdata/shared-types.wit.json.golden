@@ -9,7 +9,7 @@
                     Functions: {
                         "a": &wit.Function{
                             Name:    "a",
-                            Kind:    &wit.FunctionKindFreestanding{},
+                            Kind:    &wit.Freestanding{},
                             Params:  nil,
                             Results: {
                                 {
@@ -55,7 +55,7 @@
                     Functions: {
                         "a": &wit.Function{
                             Name:    "a",
-                            Kind:    &wit.FunctionKindFreestanding{},
+                            Kind:    &wit.Freestanding{},
                             Params:  nil,
                             Results: {
                                 {
@@ -108,7 +108,7 @@
             Functions: {
                 "a": &wit.Function{
                     Name:    "a",
-                    Kind:    &wit.FunctionKindFreestanding{},
+                    Kind:    &wit.Freestanding{},
                     Params:  nil,
                     Results: {
                         {
@@ -152,7 +152,7 @@
             Functions: {
                 "a": &wit.Function{
                     Name:    "a",
-                    Kind:    &wit.FunctionKindFreestanding{},
+                    Kind:    &wit.Freestanding{},
                     Params:  nil,
                     Results: {
                         {

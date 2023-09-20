@@ -5,7 +5,7 @@
             Imports: {
                 "a": &wit.Function{
                     Name:       "a",
-                    Kind:       &wit.FunctionKindFreestanding{},
+                    Kind:       &wit.Freestanding{},
                     Params:     nil,
                     Results:    nil,
                     Docs:       wit.Docs{},
@@ -22,7 +22,7 @@
             Imports: {
                 "a": &wit.Function{
                     Name:       "a",
-                    Kind:       &wit.FunctionKindFreestanding{},
+                    Kind:       &wit.Freestanding{},
                     Params:     nil,
                     Results:    nil,
                     Docs:       wit.Docs{},
@@ -39,7 +39,7 @@
             Imports: {
                 "a": &wit.Function{
                     Name:       "a",
-                    Kind:       &wit.FunctionKindFreestanding{},
+                    Kind:       &wit.Freestanding{},
                     Params:     nil,
                     Results:    nil,
                     Docs:       wit.Docs{},
@@ -47,7 +47,7 @@
                 },
                 "b": &wit.Function{
                     Name:       "a",
-                    Kind:       &wit.FunctionKindFreestanding{},
+                    Kind:       &wit.Freestanding{},
                     Params:     nil,
                     Results:    nil,
                     Docs:       wit.Docs{},

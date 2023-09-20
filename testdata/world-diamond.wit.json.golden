@@ -5,7 +5,7 @@
             Imports: {
                 "a": &wit.Function{
                     Name:       "a",
-                    Kind:       &wit.FunctionKindFreestanding{},
+                    Kind:       &wit.Freestanding{},
                     Params:     nil,
                     Results:    nil,
                     Docs:       wit.Docs{},
@@ -46,7 +46,7 @@
                                 Functions: {
                                     "a": &wit.Function{
                                         Name:    "a",
-                                        Kind:    &wit.FunctionKindFreestanding{(CYCLIC REFERENCE)},
+                                        Kind:    &wit.Freestanding{(CYCLIC REFERENCE)},
                                         Params:  nil,
                                         Results: {
                                             {
@@ -78,7 +78,7 @@
                                 Functions: {
                                     "a": &wit.Function{
                                         Name:    "a",
-                                        Kind:    &wit.FunctionKindFreestanding{(CYCLIC REFERENCE)},
+                                        Kind:    &wit.Freestanding{(CYCLIC REFERENCE)},
                                         Params:  nil,
                                         Results: {
                                             {
@@ -121,7 +121,7 @@
                     Functions: {
                         "a": &wit.Function{
                             Name:    "a",
-                            Kind:    &wit.FunctionKindFreestanding{(CYCLIC REFERENCE)},
+                            Kind:    &wit.Freestanding{(CYCLIC REFERENCE)},
                             Params:  nil,
                             Results: {
                                 {
@@ -156,7 +156,7 @@
                                 Functions: {
                                     "a": &wit.Function{
                                         Name:    "a",
-                                        Kind:    &wit.FunctionKindFreestanding{(CYCLIC REFERENCE)},
+                                        Kind:    &wit.Freestanding{(CYCLIC REFERENCE)},
                                         Params:  nil,
                                         Results: {
                                             {
@@ -199,7 +199,7 @@
                     Functions: {
                         "a": &wit.Function{
                             Name:    "a",
-                            Kind:    &wit.FunctionKindFreestanding{(CYCLIC REFERENCE)},
+                            Kind:    &wit.Freestanding{(CYCLIC REFERENCE)},
                             Params:  nil,
                             Results: {
                                 {
@@ -274,7 +274,7 @@
                         Functions: {
                             "a": &wit.Function{
                                 Name:    "a",
-                                Kind:    &wit.FunctionKindFreestanding{(CYCLIC REFERENCE)},
+                                Kind:    &wit.Freestanding{(CYCLIC REFERENCE)},
                                 Params:  nil,
                                 Results: {
                                     {
@@ -306,7 +306,7 @@
                         Functions: {
                             "a": &wit.Function{
                                 Name:    "a",
-                                Kind:    &wit.FunctionKindFreestanding{(CYCLIC REFERENCE)},
+                                Kind:    &wit.Freestanding{(CYCLIC REFERENCE)},
                                 Params:  nil,
                                 Results: {
                                     {
@@ -349,7 +349,7 @@
             Functions: {
                 "a": &wit.Function{
                     Name:    "a",
-                    Kind:    &wit.FunctionKindFreestanding{},
+                    Kind:    &wit.Freestanding{},
                     Params:  nil,
                     Results: {
                         {
@@ -384,7 +384,7 @@
                         Functions: {
                             "a": &wit.Function{
                                 Name:    "a",
-                                Kind:    &wit.FunctionKindFreestanding{(CYCLIC REFERENCE)},
+                                Kind:    &wit.Freestanding{(CYCLIC REFERENCE)},
                                 Params:  nil,
                                 Results: {
                                     {
@@ -427,7 +427,7 @@
             Functions: {
                 "a": &wit.Function{
                     Name:    "a",
-                    Kind:    &wit.FunctionKindFreestanding{},
+                    Kind:    &wit.Freestanding{},
                     Params:  nil,
                     Results: {
                         {

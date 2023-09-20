@@ -5,7 +5,7 @@
             Imports: {
                 "bar": &wit.Function{
                     Name:   "bar",
-                    Kind:   &wit.FunctionKindFreestanding{},
+                    Kind:   &wit.Freestanding{},
                     Params: {
                         {
                             Name: "arg",
@@ -28,7 +28,7 @@
                 },
                 "foo": &wit.Function{
                     Name:       "foo",
-                    Kind:       &wit.FunctionKindFreestanding{},
+                    Kind:       &wit.Freestanding{},
                     Params:     nil,
                     Results:    nil,
                     Docs:       wit.Docs{},
@@ -38,7 +38,7 @@
             Exports: {
                 "foo2": &wit.Function{
                     Name:       "foo2",
-                    Kind:       &wit.FunctionKindFreestanding{},
+                    Kind:       &wit.Freestanding{},
                     Params:     nil,
                     Results:    nil,
                     Docs:       wit.Docs{},
@@ -46,7 +46,7 @@
                 },
                 "some-name": &wit.Function{
                     Name:    "some-name",
-                    Kind:    &wit.FunctionKindFreestanding{},
+                    Kind:    &wit.Freestanding{},
                     Params:  nil,
                     Results: {
                         {

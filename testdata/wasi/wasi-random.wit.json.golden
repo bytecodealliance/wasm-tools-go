@@ -9,7 +9,7 @@
                     Functions: {
                         "insecure-seed": &wit.Function{
                             Name:    "insecure-seed",
-                            Kind:    &wit.FunctionKindFreestanding{},
+                            Kind:    &wit.Freestanding{},
                             Params:  nil,
                             Results: {
                                 {
@@ -47,7 +47,7 @@
                                 Functions: {
                                     "get-insecure-random-bytes": &wit.Function{
                                         Name:   "get-insecure-random-bytes",
-                                        Kind:   &wit.FunctionKindFreestanding{(CYCLIC REFERENCE)},
+                                        Kind:   &wit.Freestanding{(CYCLIC REFERENCE)},
                                         Params: {
                                             {
                                                 Name: "len",
@@ -75,7 +75,7 @@
                                     },
                                     "get-insecure-random-u64": &wit.Function{
                                         Name:    "get-insecure-random-u64",
-                                        Kind:    &wit.FunctionKindFreestanding{(CYCLIC REFERENCE)},
+                                        Kind:    &wit.Freestanding{(CYCLIC REFERENCE)},
                                         Params:  nil,
                                         Results: {
                                             {
@@ -99,7 +99,7 @@
                                 Functions: {
                                     "get-random-bytes": &wit.Function{
                                         Name:   "get-random-bytes",
-                                        Kind:   &wit.FunctionKindFreestanding{(CYCLIC REFERENCE)},
+                                        Kind:   &wit.Freestanding{(CYCLIC REFERENCE)},
                                         Params: {
                                             {
                                                 Name: "len",
@@ -127,7 +127,7 @@
                                     },
                                     "get-random-u64": &wit.Function{
                                         Name:    "get-random-u64",
-                                        Kind:    &wit.FunctionKindFreestanding{(CYCLIC REFERENCE)},
+                                        Kind:    &wit.Freestanding{(CYCLIC REFERENCE)},
                                         Params:  nil,
                                         Results: {
                                             {
@@ -160,7 +160,7 @@
                     Functions: {
                         "get-insecure-random-bytes": &wit.Function{
                             Name:   "get-insecure-random-bytes",
-                            Kind:   &wit.FunctionKindFreestanding{},
+                            Kind:   &wit.Freestanding{},
                             Params: {
                                 {
                                     Name: "len",
@@ -188,7 +188,7 @@
                         },
                         "get-insecure-random-u64": &wit.Function{
                             Name:    "get-insecure-random-u64",
-                            Kind:    &wit.FunctionKindFreestanding{},
+                            Kind:    &wit.Freestanding{},
                             Params:  nil,
                             Results: {
                                 {
@@ -215,7 +215,7 @@
                                 Functions: {
                                     "get-random-bytes": &wit.Function{
                                         Name:   "get-random-bytes",
-                                        Kind:   &wit.FunctionKindFreestanding{(CYCLIC REFERENCE)},
+                                        Kind:   &wit.Freestanding{(CYCLIC REFERENCE)},
                                         Params: {
                                             {
                                                 Name: "len",
@@ -233,7 +233,7 @@
                                     },
                                     "get-random-u64": &wit.Function{
                                         Name:    "get-random-u64",
-                                        Kind:    &wit.FunctionKindFreestanding{(CYCLIC REFERENCE)},
+                                        Kind:    &wit.Freestanding{(CYCLIC REFERENCE)},
                                         Params:  nil,
                                         Results: {
                                             {
@@ -266,7 +266,7 @@
                     Functions: {
                         "get-random-bytes": &wit.Function{
                             Name:   "get-random-bytes",
-                            Kind:   &wit.FunctionKindFreestanding{},
+                            Kind:   &wit.Freestanding{},
                             Params: {
                                 {
                                     Name: "len",
@@ -294,7 +294,7 @@
                         },
                         "get-random-u64": &wit.Function{
                             Name:    "get-random-u64",
-                            Kind:    &wit.FunctionKindFreestanding{},
+                            Kind:    &wit.Freestanding{},
                             Params:  nil,
                             Results: {
                                 {
@@ -340,7 +340,7 @@
             Functions: {
                 "insecure-seed": &wit.Function{
                     Name:    "insecure-seed",
-                    Kind:    &wit.FunctionKindFreestanding{},
+                    Kind:    &wit.Freestanding{},
                     Params:  nil,
                     Results: {
                         {
@@ -378,7 +378,7 @@
                         Functions: {
                             "get-insecure-random-bytes": &wit.Function{
                                 Name:   "get-insecure-random-bytes",
-                                Kind:   &wit.FunctionKindFreestanding{(CYCLIC REFERENCE)},
+                                Kind:   &wit.Freestanding{(CYCLIC REFERENCE)},
                                 Params: {
                                     {
                                         Name: "len",
@@ -406,7 +406,7 @@
                             },
                             "get-insecure-random-u64": &wit.Function{
                                 Name:    "get-insecure-random-u64",
-                                Kind:    &wit.FunctionKindFreestanding{(CYCLIC REFERENCE)},
+                                Kind:    &wit.Freestanding{(CYCLIC REFERENCE)},
                                 Params:  nil,
                                 Results: {
                                     {
@@ -430,7 +430,7 @@
                         Functions: {
                             "get-random-bytes": &wit.Function{
                                 Name:   "get-random-bytes",
-                                Kind:   &wit.FunctionKindFreestanding{(CYCLIC REFERENCE)},
+                                Kind:   &wit.Freestanding{(CYCLIC REFERENCE)},
                                 Params: {
                                     {
                                         Name: "len",
@@ -458,7 +458,7 @@
                             },
                             "get-random-u64": &wit.Function{
                                 Name:    "get-random-u64",
-                                Kind:    &wit.FunctionKindFreestanding{(CYCLIC REFERENCE)},
+                                Kind:    &wit.Freestanding{(CYCLIC REFERENCE)},
                                 Params:  nil,
                                 Results: {
                                     {
@@ -491,7 +491,7 @@
             Functions: {
                 "get-insecure-random-bytes": &wit.Function{
                     Name:   "get-insecure-random-bytes",
-                    Kind:   &wit.FunctionKindFreestanding{},
+                    Kind:   &wit.Freestanding{},
                     Params: {
                         {
                             Name: "len",
@@ -519,7 +519,7 @@
                 },
                 "get-insecure-random-u64": &wit.Function{
                     Name:    "get-insecure-random-u64",
-                    Kind:    &wit.FunctionKindFreestanding{},
+                    Kind:    &wit.Freestanding{},
                     Params:  nil,
                     Results: {
                         {
@@ -546,7 +546,7 @@
                         Functions: {
                             "get-random-bytes": &wit.Function{
                                 Name:   "get-random-bytes",
-                                Kind:   &wit.FunctionKindFreestanding{(CYCLIC REFERENCE)},
+                                Kind:   &wit.Freestanding{(CYCLIC REFERENCE)},
                                 Params: {
                                     {
                                         Name: "len",
@@ -564,7 +564,7 @@
                             },
                             "get-random-u64": &wit.Function{
                                 Name:    "get-random-u64",
-                                Kind:    &wit.FunctionKindFreestanding{(CYCLIC REFERENCE)},
+                                Kind:    &wit.Freestanding{(CYCLIC REFERENCE)},
                                 Params:  nil,
                                 Results: {
                                     {
@@ -597,7 +597,7 @@
             Functions: {
                 "get-random-bytes": &wit.Function{
                     Name:   "get-random-bytes",
-                    Kind:   &wit.FunctionKindFreestanding{},
+                    Kind:   &wit.Freestanding{},
                     Params: {
                         {
                             Name: "len",
@@ -625,7 +625,7 @@
                 },
                 "get-random-u64": &wit.Function{
                     Name:    "get-random-u64",
-                    Kind:    &wit.FunctionKindFreestanding{},
+                    Kind:    &wit.Freestanding{},
                     Params:  nil,
                     Results: {
                         {

@@ -166,7 +166,7 @@
                         Functions: {
                             "some-function": &wit.Function{
                                 Name:   "some-function",
-                                Kind:   &wit.FunctionKindFreestanding{},
+                                Kind:   &wit.Freestanding{},
                                 Params: {
                                     {
                                         Name: "x",
@@ -320,7 +320,7 @@
                         Functions: {
                             "some-function": &wit.Function{
                                 Name:   "some-function",
-                                Kind:   &wit.FunctionKindFreestanding{},
+                                Kind:   &wit.Freestanding{},
                                 Params: {
                                     {
                                         Name: "x",
@@ -457,7 +457,7 @@
                         Functions: {
                             "some-function": &wit.Function{
                                 Name:   "some-function",
-                                Kind:   &wit.FunctionKindFreestanding{},
+                                Kind:   &wit.Freestanding{},
                                 Params: {
                                     {
                                         Name: "x",
@@ -569,7 +569,7 @@
                         Functions: {
                             "some-function": &wit.Function{
                                 Name:   "some-function",
-                                Kind:   &wit.FunctionKindFreestanding{},
+                                Kind:   &wit.Freestanding{},
                                 Params: {
                                     {
                                         Name: "x",
@@ -673,7 +673,7 @@
                         Functions: {
                             "some-function": &wit.Function{
                                 Name:   "some-function",
-                                Kind:   &wit.FunctionKindFreestanding{},
+                                Kind:   &wit.Freestanding{},
                                 Params: {
                                     {
                                         Name: "x",
@@ -726,7 +726,7 @@
             Functions: {
                 "some-function": &wit.Function{
                     Name:   "some-function",
-                    Kind:   &wit.FunctionKindFreestanding{},
+                    Kind:   &wit.Freestanding{},
                     Params: {
                         {
                             Name: "x",

@@ -372,39 +372,51 @@ func ParseType(s string) (Type, error) {
 type Function struct {
 	Name    string
 	Kind    FunctionKind
-	Params  []Param
-	Results []Param
+	Params  []Param // arguments to the function
+	Results []Param // a function can have a single anonymous result, or > 1 named results
 	Docs    Docs
 	_worldItem
 }
 
+// FunctionKind represents the kind of a WIT [function], which can be one of
+// [Freestanding], [Method], [Static], or [Constructor].
+//
+// [function]: https://component-model.bytecodealliance.org/wit-overview.html#functions
 type FunctionKind interface {
 	isFunctionKind()
 }
 
+// _functionKind is an embeddable type that conforms to the FunctionKind interface.
 type _functionKind struct{}
 
 func (_functionKind) isFunctionKind() {}
 
-type FunctionKindFreestanding struct {
+// Freestanding represents a free-standing function that is not a method, static, or a constructor.
+type Freestanding struct {
 	_functionKind
 }
 
-type FunctionKindMethod struct {
-	Type
+// Method represents a function that is a method on its associated [Type].
+// The first argument to the function is self, an instance of [Type].
+type Method struct {
+	Type Type
 	_functionKind
 }
 
-type FunctionKindStatic struct {
-	Type
+// Static represents a function that is a static method of its associated [Type].
+type Static struct {
+	Type Type
 	_functionKind
 }
 
-type FunctionKindConstructor struct {
-	Type
+// Constructor represents a function that is a constructor for its associated [Type].
+type Constructor struct {
+	Type Type
 	_functionKind
 }
 
+// Param represents a parameter to or the result of a [Function].
+// A Param can be unnamed.
 type Param struct {
 	Name string
 	Type Type

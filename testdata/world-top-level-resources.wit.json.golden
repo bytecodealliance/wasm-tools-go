@@ -26,7 +26,7 @@
                     Functions: {
                         "[method]request.bar": &wit.Function{
                             Name: "[method]request.bar",
-                            Kind: &wit.FunctionKindMethod{
+                            Kind: &wit.Method{
                                 Type:          &wit.TypeDef{(CYCLIC REFERENCE)},
                                 _functionKind: wit._functionKind{},
                             },
@@ -66,7 +66,7 @@
                         },
                         "[method]request.foo": &wit.Function{
                             Name: "[method]request.foo",
-                            Kind: &wit.FunctionKindMethod{
+                            Kind: &wit.Method{
                                 Type:          &wit.TypeDef{(CYCLIC REFERENCE)},
                                 _functionKind: wit._functionKind{},
                             },
@@ -92,7 +92,7 @@
                         },
                         "[method]response.bar": &wit.Function{
                             Name: "[method]response.bar",
-                            Kind: &wit.FunctionKindMethod{
+                            Kind: &wit.Method{
                                 Type:          &wit.TypeDef{(CYCLIC REFERENCE)},
                                 _functionKind: wit._functionKind{},
                             },
@@ -132,7 +132,7 @@
                         },
                         "[method]response.foo": &wit.Function{
                             Name: "[method]response.foo",
-                            Kind: &wit.FunctionKindMethod{
+                            Kind: &wit.Method{
                                 Type:          &wit.TypeDef{(CYCLIC REFERENCE)},
                                 _functionKind: wit._functionKind{},
                             },
@@ -187,7 +187,7 @@
                                 Functions: {
                                     "handle": &wit.Function{
                                         Name:   "handle",
-                                        Kind:   &wit.FunctionKindFreestanding{},
+                                        Kind:   &wit.Freestanding{},
                                         Params: {
                                             {
                                                 Name: "some",
@@ -225,7 +225,7 @@
                                     },
                                     "handle-owned": &wit.Function{
                                         Name:   "handle-owned",
-                                        Kind:   &wit.FunctionKindFreestanding{},
+                                        Kind:   &wit.Freestanding{},
                                         Params: {
                                             {
                                                 Name: "some",
@@ -301,7 +301,7 @@
                     Functions: {
                         "handle": &wit.Function{
                             Name:   "handle",
-                            Kind:   &wit.FunctionKindFreestanding{},
+                            Kind:   &wit.Freestanding{},
                             Params: {
                                 {
                                     Name: "some",
@@ -339,7 +339,7 @@
                         },
                         "handle-owned": &wit.Function{
                             Name:   "handle-owned",
-                            Kind:   &wit.FunctionKindFreestanding{},
+                            Kind:   &wit.Freestanding{},
                             Params: {
                                 {
                                     Name: "some",
@@ -420,7 +420,7 @@
                     Functions: {
                         "handle": &wit.Function{
                             Name:   "handle",
-                            Kind:   &wit.FunctionKindFreestanding{},
+                            Kind:   &wit.Freestanding{},
                             Params: {
                                 {
                                     Name: "some",
@@ -458,7 +458,7 @@
                         },
                         "handle-owned": &wit.Function{
                             Name:   "handle-owned",
-                            Kind:   &wit.FunctionKindFreestanding{},
+                            Kind:   &wit.Freestanding{},
                             Params: {
                                 {
                                     Name: "some",
@@ -544,7 +544,7 @@
             Functions: {
                 "[method]request.bar": &wit.Function{
                     Name: "[method]request.bar",
-                    Kind: &wit.FunctionKindMethod{
+                    Kind: &wit.Method{
                         Type:          &wit.TypeDef{(CYCLIC REFERENCE)},
                         _functionKind: wit._functionKind{},
                     },
@@ -584,7 +584,7 @@
                 },
                 "[method]request.foo": &wit.Function{
                     Name: "[method]request.foo",
-                    Kind: &wit.FunctionKindMethod{
+                    Kind: &wit.Method{
                         Type:          &wit.TypeDef{(CYCLIC REFERENCE)},
                         _functionKind: wit._functionKind{},
                     },
@@ -610,7 +610,7 @@
                 },
                 "[method]response.bar": &wit.Function{
                     Name: "[method]response.bar",
-                    Kind: &wit.FunctionKindMethod{
+                    Kind: &wit.Method{
                         Type:          &wit.TypeDef{(CYCLIC REFERENCE)},
                         _functionKind: wit._functionKind{},
                     },
@@ -650,7 +650,7 @@
                 },
                 "[method]response.foo": &wit.Function{
                     Name: "[method]response.foo",
-                    Kind: &wit.FunctionKindMethod{
+                    Kind: &wit.Method{
                         Type:          &wit.TypeDef{(CYCLIC REFERENCE)},
                         _functionKind: wit._functionKind{},
                     },
@@ -705,7 +705,7 @@
                         Functions: {
                             "handle": &wit.Function{
                                 Name:   "handle",
-                                Kind:   &wit.FunctionKindFreestanding{},
+                                Kind:   &wit.Freestanding{},
                                 Params: {
                                     {
                                         Name: "some",
@@ -743,7 +743,7 @@
                             },
                             "handle-owned": &wit.Function{
                                 Name:   "handle-owned",
-                                Kind:   &wit.FunctionKindFreestanding{},
+                                Kind:   &wit.Freestanding{},
                                 Params: {
                                     {
                                         Name: "some",
@@ -819,7 +819,7 @@
             Functions: {
                 "handle": &wit.Function{
                     Name:   "handle",
-                    Kind:   &wit.FunctionKindFreestanding{},
+                    Kind:   &wit.Freestanding{},
                     Params: {
                         {
                             Name: "some",
@@ -857,7 +857,7 @@
                 },
                 "handle-owned": &wit.Function{
                     Name:   "handle-owned",
-                    Kind:   &wit.FunctionKindFreestanding{},
+                    Kind:   &wit.Freestanding{},
                     Params: {
                         {
                             Name: "some",

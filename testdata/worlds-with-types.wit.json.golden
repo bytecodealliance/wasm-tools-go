@@ -23,7 +23,7 @@
             Exports: {
                 "c": &wit.Function{
                     Name:   "c",
-                    Kind:   &wit.FunctionKindFreestanding{},
+                    Kind:   &wit.Freestanding{},
                     Params: {
                         {
                             Name: "a",
@@ -111,7 +111,7 @@
                                     },
                                     "foo": &wit.Function{
                                         Name:   "foo",
-                                        Kind:   &wit.FunctionKindFreestanding{(CYCLIC REFERENCE)},
+                                        Kind:   &wit.Freestanding{(CYCLIC REFERENCE)},
                                         Params: {
                                             {
                                                 Name: "a",
@@ -131,7 +131,7 @@
                                 Exports: {
                                     "bar": &wit.Function{
                                         Name:   "bar",
-                                        Kind:   &wit.FunctionKindFreestanding{(CYCLIC REFERENCE)},
+                                        Kind:   &wit.Freestanding{(CYCLIC REFERENCE)},
                                         Params: {
                                             {
                                                 Name: "a",
@@ -178,7 +178,7 @@
             Exports: {
                 "foo": &wit.Function{
                     Name:    "foo",
-                    Kind:    &wit.FunctionKindFreestanding{},
+                    Kind:    &wit.Freestanding{},
                     Params:  nil,
                     Results: {
                         {
@@ -233,7 +233,7 @@
                 },
                 "foo": &wit.Function{
                     Name:   "foo",
-                    Kind:   &wit.FunctionKindFreestanding{},
+                    Kind:   &wit.Freestanding{},
                     Params: {
                         {
                             Name: "a",
@@ -253,7 +253,7 @@
             Exports: {
                 "bar": &wit.Function{
                     Name:   "bar",
-                    Kind:   &wit.FunctionKindFreestanding{},
+                    Kind:   &wit.Freestanding{},
                     Params: {
                         {
                             Name: "a",

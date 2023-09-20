@@ -7,7 +7,7 @@
             Functions: {
                 "get-random-bytes": &wit.Function{
                     Name:   "get-random-bytes",
-                    Kind:   &wit.FunctionKindFreestanding{},
+                    Kind:   &wit.Freestanding{},
                     Params: {
                         {
                             Name: "len",
@@ -35,7 +35,7 @@
                 },
                 "get-random-u64": &wit.Function{
                     Name:    "get-random-u64",
-                    Kind:    &wit.FunctionKindFreestanding{},
+                    Kind:    &wit.Freestanding{},
                     Params:  nil,
                     Results: {
                         {

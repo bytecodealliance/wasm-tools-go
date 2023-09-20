@@ -16,7 +16,7 @@
             Functions: {
                 "t1": &wit.Function{
                     Name:   "t1",
-                    Kind:   &wit.FunctionKindFreestanding{},
+                    Kind:   &wit.Freestanding{},
                     Params: {
                         {
                             Name: "a",
@@ -39,7 +39,7 @@
                 },
                 "t2": &wit.Function{
                     Name:   "t2",
-                    Kind:   &wit.FunctionKindFreestanding{},
+                    Kind:   &wit.Freestanding{},
                     Params: {
                         {
                             Name: "a",

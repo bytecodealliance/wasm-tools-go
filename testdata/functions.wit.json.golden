@@ -7,7 +7,7 @@
             Functions: {
                 "f1": &wit.Function{
                     Name:       "f1",
-                    Kind:       &wit.FunctionKindFreestanding{},
+                    Kind:       &wit.Freestanding{},
                     Params:     nil,
                     Results:    nil,
                     Docs:       wit.Docs{},
@@ -15,7 +15,7 @@
                 },
                 "f10": &wit.Function{
                     Name:    "f10",
-                    Kind:    &wit.FunctionKindFreestanding{},
+                    Kind:    &wit.Freestanding{},
                     Params:  nil,
                     Results: {
                         {
@@ -28,7 +28,7 @@
                 },
                 "f11": &wit.Function{
                     Name:       "f11",
-                    Kind:       &wit.FunctionKindFreestanding{},
+                    Kind:       &wit.Freestanding{},
                     Params:     nil,
                     Results:    nil,
                     Docs:       wit.Docs{},
@@ -36,7 +36,7 @@
                 },
                 "f2": &wit.Function{
                     Name:   "f2",
-                    Kind:   &wit.FunctionKindFreestanding{},
+                    Kind:   &wit.Freestanding{},
                     Params: {
                         {
                             Name: "a",
@@ -49,7 +49,7 @@
                 },
                 "f3": &wit.Function{
                     Name:   "f3",
-                    Kind:   &wit.FunctionKindFreestanding{},
+                    Kind:   &wit.Freestanding{},
                     Params: {
                         {
                             Name: "a",
@@ -62,7 +62,7 @@
                 },
                 "f4": &wit.Function{
                     Name:    "f4",
-                    Kind:    &wit.FunctionKindFreestanding{},
+                    Kind:    &wit.Freestanding{},
                     Params:  nil,
                     Results: {
                         {
@@ -75,7 +75,7 @@
                 },
                 "f6": &wit.Function{
                     Name:    "f6",
-                    Kind:    &wit.FunctionKindFreestanding{},
+                    Kind:    &wit.Freestanding{},
                     Params:  nil,
                     Results: {
                         {
@@ -101,7 +101,7 @@
                 },
                 "f7": &wit.Function{
                     Name:   "f7",
-                    Kind:   &wit.FunctionKindFreestanding{},
+                    Kind:   &wit.Freestanding{},
                     Params: {
                         {
                             Name: "a",
@@ -136,7 +136,7 @@
                 },
                 "f8": &wit.Function{
                     Name:   "f8",
-                    Kind:   &wit.FunctionKindFreestanding{},
+                    Kind:   &wit.Freestanding{},
                     Params: {
                         {
                             Name: "a",
@@ -175,7 +175,7 @@
                 },
                 "f9": &wit.Function{
                     Name:    "f9",
-                    Kind:    &wit.FunctionKindFreestanding{},
+                    Kind:    &wit.Freestanding{},
                     Params:  nil,
                     Results: {
                         {

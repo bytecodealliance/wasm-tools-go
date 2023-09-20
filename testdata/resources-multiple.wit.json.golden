@@ -16,7 +16,7 @@
             Functions: {
                 "[method]r1.f1": &wit.Function{
                     Name: "[method]r1.f1",
-                    Kind: &wit.FunctionKindMethod{
+                    Kind: &wit.Method{
                         Type:          &wit.TypeDef{(CYCLIC REFERENCE)},
                         _functionKind: wit._functionKind{},
                     },
@@ -42,7 +42,7 @@
                 },
                 "[method]r1.f10": &wit.Function{
                     Name: "[method]r1.f10",
-                    Kind: &wit.FunctionKindMethod{
+                    Kind: &wit.Method{
                         Type:          &wit.TypeDef{(CYCLIC REFERENCE)},
                         _functionKind: wit._functionKind{},
                     },
@@ -73,7 +73,7 @@
                 },
                 "[method]r1.f11": &wit.Function{
                     Name: "[method]r1.f11",
-                    Kind: &wit.FunctionKindMethod{
+                    Kind: &wit.Method{
                         Type:          &wit.TypeDef{(CYCLIC REFERENCE)},
                         _functionKind: wit._functionKind{},
                     },
@@ -99,7 +99,7 @@
                 },
                 "[method]r1.f2": &wit.Function{
                     Name: "[method]r1.f2",
-                    Kind: &wit.FunctionKindMethod{
+                    Kind: &wit.Method{
                         Type:          &wit.TypeDef{(CYCLIC REFERENCE)},
                         _functionKind: wit._functionKind{},
                     },
@@ -129,7 +129,7 @@
                 },
                 "[method]r1.f3": &wit.Function{
                     Name: "[method]r1.f3",
-                    Kind: &wit.FunctionKindMethod{
+                    Kind: &wit.Method{
                         Type:          &wit.TypeDef{(CYCLIC REFERENCE)},
                         _functionKind: wit._functionKind{},
                     },
@@ -159,7 +159,7 @@
                 },
                 "[method]r1.f4": &wit.Function{
                     Name: "[method]r1.f4",
-                    Kind: &wit.FunctionKindMethod{
+                    Kind: &wit.Method{
                         Type:          &wit.TypeDef{(CYCLIC REFERENCE)},
                         _functionKind: wit._functionKind{},
                     },
@@ -190,7 +190,7 @@
                 },
                 "[method]r1.f6": &wit.Function{
                     Name: "[method]r1.f6",
-                    Kind: &wit.FunctionKindMethod{
+                    Kind: &wit.Method{
                         Type:          &wit.TypeDef{(CYCLIC REFERENCE)},
                         _functionKind: wit._functionKind{},
                     },
@@ -234,7 +234,7 @@
                 },
                 "[method]r1.f7": &wit.Function{
                     Name: "[method]r1.f7",
-                    Kind: &wit.FunctionKindMethod{
+                    Kind: &wit.Method{
                         Type:          &wit.TypeDef{(CYCLIC REFERENCE)},
                         _functionKind: wit._functionKind{},
                     },
@@ -286,7 +286,7 @@
                 },
                 "[method]r1.f8": &wit.Function{
                     Name: "[method]r1.f8",
-                    Kind: &wit.FunctionKindMethod{
+                    Kind: &wit.Method{
                         Type:          &wit.TypeDef{(CYCLIC REFERENCE)},
                         _functionKind: wit._functionKind{},
                     },
@@ -342,7 +342,7 @@
                 },
                 "[method]r1.f9": &wit.Function{
                     Name: "[method]r1.f9",
-                    Kind: &wit.FunctionKindMethod{
+                    Kind: &wit.Method{
                         Type:          &wit.TypeDef{(CYCLIC REFERENCE)},
                         _functionKind: wit._functionKind{},
                     },
@@ -377,7 +377,7 @@
                 },
                 "t1": &wit.Function{
                     Name:   "t1",
-                    Kind:   &wit.FunctionKindFreestanding{},
+                    Kind:   &wit.Freestanding{},
                     Params: {
                         {
                             Name: "a",
@@ -400,7 +400,7 @@
                 },
                 "t2": &wit.Function{
                     Name:   "t2",
-                    Kind:   &wit.FunctionKindFreestanding{},
+                    Kind:   &wit.Freestanding{},
                     Params: {
                         {
                             Name: "a",

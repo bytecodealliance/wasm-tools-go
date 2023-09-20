@@ -5,7 +5,7 @@
             Imports: {
                 "[constructor]c": &wit.Function{
                     Name: "[constructor]c",
-                    Kind: &wit.FunctionKindConstructor{
+                    Kind: &wit.Constructor{
                         Type: &wit.TypeDef{
                             Name:       &"c",
                             Kind:       nil,
@@ -115,7 +115,7 @@
             Functions: {
                 "[constructor]b": &wit.Function{
                     Name: "[constructor]b",
-                    Kind: &wit.FunctionKindConstructor{
+                    Kind: &wit.Constructor{
                         Type:          &wit.TypeDef{(CYCLIC REFERENCE)},
                         _functionKind: wit._functionKind{},
                     },
@@ -141,7 +141,7 @@
                 },
                 "[constructor]c": &wit.Function{
                     Name: "[constructor]c",
-                    Kind: &wit.FunctionKindConstructor{
+                    Kind: &wit.Constructor{
                         Type:          &wit.TypeDef{(CYCLIC REFERENCE)},
                         _functionKind: wit._functionKind{},
                     },
@@ -172,7 +172,7 @@
                 },
                 "[constructor]d": &wit.Function{
                     Name: "[constructor]d",
-                    Kind: &wit.FunctionKindConstructor{
+                    Kind: &wit.Constructor{
                         Type:          &wit.TypeDef{(CYCLIC REFERENCE)},
                         _functionKind: wit._functionKind{},
                     },
@@ -203,7 +203,7 @@
                 },
                 "[constructor]e": &wit.Function{
                     Name: "[constructor]e",
-                    Kind: &wit.FunctionKindConstructor{
+                    Kind: &wit.Constructor{
                         Type:          &wit.TypeDef{(CYCLIC REFERENCE)},
                         _functionKind: wit._functionKind{},
                     },
@@ -258,7 +258,7 @@
                 },
                 "[method]d.a": &wit.Function{
                     Name: "[method]d.a",
-                    Kind: &wit.FunctionKindMethod{
+                    Kind: &wit.Method{
                         Type:          &wit.TypeDef{(CYCLIC REFERENCE)},
                         _functionKind: wit._functionKind{},
                     },
@@ -284,7 +284,7 @@
                 },
                 "[method]e.method": &wit.Function{
                     Name: "[method]e.method",
-                    Kind: &wit.FunctionKindMethod{
+                    Kind: &wit.Method{
                         Type:          &wit.TypeDef{(CYCLIC REFERENCE)},
                         _functionKind: wit._functionKind{},
                     },
@@ -338,7 +338,7 @@
                 },
                 "[static]d.b": &wit.Function{
                     Name: "[static]d.b",
-                    Kind: &wit.FunctionKindStatic{
+                    Kind: &wit.Static{
                         Type:          &wit.TypeDef{(CYCLIC REFERENCE)},
                         _functionKind: wit._functionKind{},
                     },

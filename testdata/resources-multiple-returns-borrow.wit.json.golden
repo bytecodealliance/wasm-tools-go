@@ -16,7 +16,7 @@
             Functions: {
                 "[method]r1.f1": &wit.Function{
                     Name: "[method]r1.f1",
-                    Kind: &wit.FunctionKindMethod{
+                    Kind: &wit.Method{
                         Type:          &wit.TypeDef{(CYCLIC REFERENCE)},
                         _functionKind: wit._functionKind{},
                     },
@@ -61,7 +61,7 @@
                 },
                 "t1": &wit.Function{
                     Name:   "t1",
-                    Kind:   &wit.FunctionKindFreestanding{},
+                    Kind:   &wit.Freestanding{},
                     Params: {
                         {
                             Name: "a",

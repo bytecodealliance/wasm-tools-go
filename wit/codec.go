@@ -448,7 +448,7 @@ type functionKindCodec struct {
 func (c *functionKindCodec) DecodeString(s string) error {
 	switch s {
 	case "freestanding":
-		*c.v = &FunctionKindFreestanding{}
+		*c.v = &Freestanding{}
 	}
 	return nil
 }
@@ -457,13 +457,13 @@ func (c *functionKindCodec) DecodeField(dec codec.Decoder, name string) error {
 	var err error
 	switch name {
 	case "method":
-		v := &FunctionKindMethod{}
+		v := &Method{}
 		*c.v, err = v, dec.Decode(&v.Type)
 	case "static":
-		v := &FunctionKindStatic{}
+		v := &Static{}
 		*c.v, err = v, dec.Decode(&v.Type)
 	case "constructor":
-		v := &FunctionKindConstructor{}
+		v := &Constructor{}
 		*c.v, err = v, dec.Decode(&v.Type)
 	}
 	return err
