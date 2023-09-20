@@ -10,13 +10,13 @@ import (
 
 	"github.com/kr/pretty"
 	"github.com/sergi/go-diff/diffmatchpatch"
-	"github.com/ydnar/wasm-tools-go/internal/testutil"
+	"github.com/ydnar/wasm-tools-go/internal/callerfs"
 )
 
 var update = flag.Bool("update", false, "update golden files")
 
 func TestDecodeJSON(t *testing.T) {
-	err := filepath.WalkDir(testutil.Path("../testdata"), func(path string, d fs.DirEntry, err error) error {
+	err := filepath.WalkDir(callerfs.Path("../testdata"), func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return fs.SkipDir
 		}
