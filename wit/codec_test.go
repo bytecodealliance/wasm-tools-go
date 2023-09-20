@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/kr/pretty"
+	"github.com/k0kubun/pp/v3"
 	"github.com/sergi/go-diff/diffmatchpatch"
 	"github.com/ydnar/wasm-tools-go/internal/callerfs"
 )
@@ -16,6 +16,10 @@ import (
 var update = flag.Bool("update", false, "update golden files")
 
 func TestDecodeJSON(t *testing.T) {
+	p := pp.New()
+	p.SetExportedOnly(true)
+	p.SetColoringEnabled(false)
+
 	err := filepath.WalkDir(callerfs.Path("../testdata"), func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return fs.SkipDir
@@ -35,11 +39,12 @@ func TestDecodeJSON(t *testing.T) {
 				t.Error(err)
 				return
 			}
-			data := pretty.Sprint(res)
+			data := p.Sprint(res)
 			compareOrWrite(t, path, data)
 		})
 		return nil
 	})
+
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -62,6 +67,5 @@ func compareOrWrite(t *testing.T, path, data string) {
 		dmp.PatchMargin = 3
 		diffs := dmp.DiffMain(string(want), data, false)
 		t.Errorf("value for %s did not match golden value %s:\n%v", path, golden, dmp.DiffPrettyText(diffs))
-		// fmt.Fprintln(os.Stderr, dmp.DiffPrettyText(diffs))
 	}
 }

@@ -1,17 +1,25 @@
 &wit.Resolve{
-    Worlds:     nil,
-    Interfaces: nil,
-    TypeDefs:   nil,
-    Packages:   {
-        &wit.Package{
-            Name: wit.PackageName{
-                Namespace: "foo",
-                Name:      "bar",
-                Version:   &semver.Version{Major:2, Minor:0, Patch:0, PreRelease:"", Metadata:""},
-            },
-            Interfaces: {},
-            Worlds:     {},
-            Docs:       wit.Docs{},
+  Worlds:     []*wit.World(nil),
+  Interfaces: []*wit.Interface(nil),
+  TypeDefs:   []*wit.TypeDef(nil),
+  Packages:   []*wit.Package{
+    &wit.Package{
+      Name: wit.PackageName{
+        Namespace: "foo",
+        Name:      "bar",
+        Version:   &semver.Version{
+          Major:      2,
+          Minor:      0,
+          Patch:      0,
+          PreRelease: "",
+          Metadata:   "",
         },
+      },
+      Interfaces: map[string]*wit.Interface{},
+      Worlds:     map[string]*wit.World{},
+      Docs:       wit.Docs{
+        Contents: "",
+      },
     },
+  },
 }

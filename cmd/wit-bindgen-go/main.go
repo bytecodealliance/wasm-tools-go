@@ -6,7 +6,7 @@ import (
 	"io"
 	"os"
 
-	"github.com/kr/pretty"
+	"github.com/k0kubun/pp/v3"
 	"github.com/ydnar/wasm-tools-go/wit"
 )
 
@@ -55,7 +55,9 @@ func describe(r io.Reader, name string) error {
 		len(res.Worlds), len(res.Packages), len(res.Interfaces), len(res.TypeDefs))
 	fmt.Println()
 
-	pretty.Println(res)
+	p := pp.New()
+	p.SetExportedOnly(true)
+	p.Print(res)
 
 	return nil
 }
