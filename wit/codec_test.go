@@ -23,17 +23,21 @@ func TestDecodeJSON(t *testing.T) {
 		if !strings.HasSuffix(path, ".wit.json") {
 			return nil
 		}
-		f, err := os.Open(path)
-		if err != nil {
-			return err
-		}
-		defer f.Close()
-		res, err := DecodeJSON(f)
-		if err != nil {
-			return err
-		}
-		data := pretty.Sprint(res)
-		compareOrWrite(t, path, data)
+		t.Run(path, func(t *testing.T) {
+			f, err := os.Open(path)
+			if err != nil {
+				t.Error(err)
+				return
+			}
+			defer f.Close()
+			res, err := DecodeJSON(f)
+			if err != nil {
+				t.Error(err)
+				return
+			}
+			data := pretty.Sprint(res)
+			compareOrWrite(t, path, data)
+		})
 		return nil
 	})
 	if err != nil {
