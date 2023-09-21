@@ -1,0 +1,378 @@
+&wit.Resolve{
+  Worlds: []*wit.World{
+    &wit.World{
+      Name:    "example-world",
+      Imports: map[string]wit.WorldItem{
+        "interface-0": &wit.Interface{
+          Name:     &"poll",
+          TypeDefs: map[string]*wit.TypeDef{
+            "pollable": &wit.TypeDef{
+              Name:  &"pollable",
+              Kind:  wit.U32{},
+              Owner: &wit.Interface{...},
+              Docs:  wit.Docs{
+                Contents: "",
+              },
+            },
+          },
+          Functions: map[string]*wit.Function{
+            "drop-pollable": &wit.Function{
+              Name:   "drop-pollable",
+              Kind:   &wit.Freestanding{},
+              Params: []wit.Param{
+                wit.Param{
+                  Name: "this",
+                  Type: &wit.TypeDef{...},
+                },
+              },
+              Results: []wit.Param(nil),
+              Docs:    wit.Docs{
+                Contents: "",
+              },
+            },
+            "poll-oneoff": &wit.Function{
+              Name:   "poll-oneoff",
+              Kind:   &wit.Freestanding{...},
+              Params: []wit.Param{
+                wit.Param{
+                  Name: "in",
+                  Type: &wit.TypeDef{
+                    Name: (*string)(nil),
+                    Kind: &wit.List{
+                      Type: &wit.TypeDef{...},
+                    },
+                    Owner: nil,
+                    Docs:  wit.Docs{
+                      Contents: "",
+                    },
+                  },
+                },
+              },
+              Results: []wit.Param{
+                wit.Param{
+                  Name: "",
+                  Type: &wit.TypeDef{
+                    Name: (*string)(nil),
+                    Kind: &wit.List{
+                      Type: wit.Bool{},
+                    },
+                    Owner: nil,
+                    Docs:  wit.Docs{
+                      Contents: "",
+                    },
+                  },
+                },
+              },
+              Docs: wit.Docs{
+                Contents: "",
+              },
+            },
+          },
+          Package: &wit.Package{
+            Name: wit.PackageName{
+              Namespace: "wasi",
+              Name:      "poll",
+              Version:   (*semver.Version)(nil),
+            },
+            Interfaces: map[string]*wit.Interface{
+              "poll": &wit.Interface{...},
+            },
+            Worlds: map[string]*wit.World{
+              "example-world": &wit.World{...},
+            },
+            Docs: wit.Docs{
+              Contents: "",
+            },
+          },
+          Docs: wit.Docs{
+            Contents: "",
+          },
+        },
+      },
+      Exports: map[string]wit.WorldItem{},
+      Package: (*wit.Package)(nil),
+      Docs:    wit.Docs{
+        Contents: "",
+      },
+    },
+    &wit.World{
+      Name:    "imports",
+      Imports: map[string]wit.WorldItem{
+        "interface-0": &wit.Interface{...},
+        "interface-1": &wit.Interface{
+          Name:     &"monotonic-clock",
+          TypeDefs: map[string]*wit.TypeDef{
+            "instant": &wit.TypeDef{
+              Name:  &"instant",
+              Kind:  wit.U64{},
+              Owner: &wit.Interface{...},
+              Docs:  wit.Docs{
+                Contents: "",
+              },
+            },
+            "pollable": &wit.TypeDef{
+              Name:  &"pollable",
+              Kind:  &wit.TypeDef{...},
+              Owner: &wit.Interface{...},
+              Docs:  wit.Docs{
+                Contents: "",
+              },
+            },
+          },
+          Functions: map[string]*wit.Function{
+            "now": &wit.Function{
+              Name:    "now",
+              Kind:    &wit.Freestanding{...},
+              Params:  []wit.Param(nil),
+              Results: []wit.Param{
+                wit.Param{
+                  Name: "",
+                  Type: &wit.TypeDef{...},
+                },
+              },
+              Docs: wit.Docs{
+                Contents: "",
+              },
+            },
+            "resolution": &wit.Function{
+              Name:    "resolution",
+              Kind:    &wit.Freestanding{...},
+              Params:  []wit.Param(nil),
+              Results: []wit.Param{
+                wit.Param{
+                  Name: "",
+                  Type: &wit.TypeDef{...},
+                },
+              },
+              Docs: wit.Docs{
+                Contents: "",
+              },
+            },
+            "subscribe": &wit.Function{
+              Name:   "subscribe",
+              Kind:   &wit.Freestanding{...},
+              Params: []wit.Param{
+                wit.Param{
+                  Name: "when",
+                  Type: &wit.TypeDef{...},
+                },
+                wit.Param{
+                  Name: "absolute",
+                  Type: wit.Bool{},
+                },
+              },
+              Results: []wit.Param{
+                wit.Param{
+                  Name: "",
+                  Type: &wit.TypeDef{...},
+                },
+              },
+              Docs: wit.Docs{
+                Contents: "",
+              },
+            },
+          },
+          Package: &wit.Package{
+            Name: wit.PackageName{
+              Namespace: "wasi",
+              Name:      "clocks",
+              Version:   (*semver.Version)(nil),
+            },
+            Interfaces: map[string]*wit.Interface{
+              "monotonic-clock": &wit.Interface{...},
+              "timezone":        &wit.Interface{
+                Name:     &"timezone",
+                TypeDefs: map[string]*wit.TypeDef{
+                  "datetime": &wit.TypeDef{
+                    Name: &"datetime",
+                    Kind: &wit.TypeDef{
+                      Name: &"datetime",
+                      Kind: &wit.Record{
+                        Fields: []wit.Field{
+                          wit.Field{
+                            Name: "seconds",
+                            Type: wit.U64{},
+                            Docs: wit.Docs{
+                              Contents: "",
+                            },
+                          },
+                          wit.Field{
+                            Name: "nanoseconds",
+                            Type: wit.U32{},
+                            Docs: wit.Docs{
+                              Contents: "",
+                            },
+                          },
+                        },
+                      },
+                      Owner: &wit.Interface{
+                        Name:     &"wall-clock",
+                        TypeDefs: map[string]*wit.TypeDef{
+                          "datetime": &wit.TypeDef{...},
+                        },
+                        Functions: map[string]*wit.Function{
+                          "now": &wit.Function{
+                            Name:    "now",
+                            Kind:    &wit.Freestanding{...},
+                            Params:  []wit.Param(nil),
+                            Results: []wit.Param{
+                              wit.Param{
+                                Name: "",
+                                Type: &wit.TypeDef{...},
+                              },
+                            },
+                            Docs: wit.Docs{
+                              Contents: "",
+                            },
+                          },
+                          "resolution": &wit.Function{
+                            Name:    "resolution",
+                            Kind:    &wit.Freestanding{...},
+                            Params:  []wit.Param(nil),
+                            Results: []wit.Param{
+                              wit.Param{
+                                Name: "",
+                                Type: &wit.TypeDef{...},
+                              },
+                            },
+                            Docs: wit.Docs{
+                              Contents: "",
+                            },
+                          },
+                        },
+                        Package: &wit.Package{...},
+                        Docs:    wit.Docs{
+                          Contents: "",
+                        },
+                      },
+                      Docs: wit.Docs{
+                        Contents: "",
+                      },
+                    },
+                    Owner: &wit.Interface{...},
+                    Docs:  wit.Docs{
+                      Contents: "",
+                    },
+                  },
+                  "timezone-display": &wit.TypeDef{
+                    Name: &"timezone-display",
+                    Kind: &wit.Record{
+                      Fields: []wit.Field{
+                        wit.Field{
+                          Name: "utc-offset",
+                          Type: wit.S32{},
+                          Docs: wit.Docs{
+                            Contents: "",
+                          },
+                        },
+                        wit.Field{
+                          Name: "name",
+                          Type: wit.String{},
+                          Docs: wit.Docs{
+                            Contents: "",
+                          },
+                        },
+                        wit.Field{
+                          Name: "in-daylight-saving-time",
+                          Type: wit.Bool{},
+                          Docs: wit.Docs{
+                            Contents: "",
+                          },
+                        },
+                      },
+                    },
+                    Owner: &wit.Interface{...},
+                    Docs:  wit.Docs{
+                      Contents: "",
+                    },
+                  },
+                },
+                Functions: map[string]*wit.Function{
+                  "display": &wit.Function{
+                    Name:   "display",
+                    Kind:   &wit.Freestanding{...},
+                    Params: []wit.Param{
+                      wit.Param{
+                        Name: "when",
+                        Type: &wit.TypeDef{...},
+                      },
+                    },
+                    Results: []wit.Param{
+                      wit.Param{
+                        Name: "",
+                        Type: &wit.TypeDef{...},
+                      },
+                    },
+                    Docs: wit.Docs{
+                      Contents: "",
+                    },
+                  },
+                  "utc-offset": &wit.Function{
+                    Name:   "utc-offset",
+                    Kind:   &wit.Freestanding{...},
+                    Params: []wit.Param{
+                      wit.Param{
+                        Name: "when",
+                        Type: &wit.TypeDef{...},
+                      },
+                    },
+                    Results: []wit.Param{
+                      wit.Param{
+                        Name: "",
+                        Type: wit.S32{},
+                      },
+                    },
+                    Docs: wit.Docs{
+                      Contents: "",
+                    },
+                  },
+                },
+                Package: &wit.Package{...},
+                Docs:    wit.Docs{
+                  Contents: "",
+                },
+              },
+              "wall-clock": &wit.Interface{...},
+            },
+            Worlds: map[string]*wit.World{
+              "imports": &wit.World{...},
+            },
+            Docs: wit.Docs{
+              Contents: "",
+            },
+          },
+          Docs: wit.Docs{
+            Contents: "",
+          },
+        },
+        "interface-2": &wit.Interface{...},
+        "interface-3": &wit.Interface{...},
+      },
+      Exports: map[string]wit.WorldItem{},
+      Package: (*wit.Package)(nil),
+      Docs:    wit.Docs{
+        Contents: "",
+      },
+    },
+  },
+  Interfaces: []*wit.Interface{
+    &wit.Interface{...},
+    &wit.Interface{...},
+    &wit.Interface{...},
+    &wit.Interface{...},
+  },
+  TypeDefs: []*wit.TypeDef{
+    &wit.TypeDef{...},
+    &wit.TypeDef{...},
+    &wit.TypeDef{...},
+    &wit.TypeDef{...},
+    &wit.TypeDef{...},
+    &wit.TypeDef{...},
+    &wit.TypeDef{...},
+    &wit.TypeDef{...},
+  },
+  Packages: []*wit.Package{
+    &wit.Package{...},
+    &wit.Package{...},
+  },
+}
