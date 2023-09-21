@@ -24,7 +24,7 @@ func TestDecodeJSON(t *testing.T) {
 		if err != nil {
 			return fs.SkipDir
 		}
-		if !strings.HasSuffix(path, ".wit.json") {
+		if !strings.HasSuffix(path, ".wit.json") && !strings.HasSuffix(path, ".wit.md.json") {
 			return nil
 		}
 		t.Run(path, func(t *testing.T) {
