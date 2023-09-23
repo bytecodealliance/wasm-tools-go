@@ -8,7 +8,7 @@
           Kind: &wit.Constructor{
             Type: &wit.TypeDef{
               Name:  &"c",
-              Kind:  nil,
+              Kind:  &wit.Resource{},
               Owner: &wit.World{...},
               Docs:  wit.Docs{
                 Contents: "",
@@ -37,7 +37,7 @@
         },
         "a": &wit.TypeDef{
           Name:  &"a",
-          Kind:  nil,
+          Kind:  &wit.Resource{...},
           Owner: &wit.World{...},
           Docs:  wit.Docs{
             Contents: "",
@@ -45,7 +45,7 @@
         },
         "b": &wit.TypeDef{
           Name:  &"b",
-          Kind:  nil,
+          Kind:  &wit.Resource{...},
           Owner: &wit.World{...},
           Docs:  wit.Docs{
             Contents: "",
@@ -66,7 +66,7 @@
       TypeDefs: map[string]*wit.TypeDef{
         "a": &wit.TypeDef{
           Name:  &"a",
-          Kind:  nil,
+          Kind:  &wit.Resource{...},
           Owner: &wit.Interface{...},
           Docs:  wit.Docs{
             Contents: "",
@@ -74,7 +74,7 @@
         },
         "b": &wit.TypeDef{
           Name:  &"b",
-          Kind:  nil,
+          Kind:  &wit.Resource{...},
           Owner: &wit.Interface{...},
           Docs:  wit.Docs{
             Contents: "",
@@ -82,7 +82,7 @@
         },
         "c": &wit.TypeDef{
           Name:  &"c",
-          Kind:  nil,
+          Kind:  &wit.Resource{...},
           Owner: &wit.Interface{...},
           Docs:  wit.Docs{
             Contents: "",
@@ -90,7 +90,7 @@
         },
         "d": &wit.TypeDef{
           Name:  &"d",
-          Kind:  nil,
+          Kind:  &wit.Resource{...},
           Owner: &wit.Interface{...},
           Docs:  wit.Docs{
             Contents: "",
@@ -98,7 +98,7 @@
         },
         "e": &wit.TypeDef{
           Name:  &"e",
-          Kind:  nil,
+          Kind:  &wit.Resource{...},
           Owner: &wit.Interface{...},
           Docs:  wit.Docs{
             Contents: "",
@@ -308,7 +308,7 @@
             TypeDefs: map[string]*wit.TypeDef{
               "a": &wit.TypeDef{
                 Name:  &"a",
-                Kind:  nil,
+                Kind:  &wit.Resource{...},
                 Owner: &wit.Interface{...},
                 Docs:  wit.Docs{
                   Contents: "",

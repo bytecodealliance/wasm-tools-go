@@ -258,13 +258,21 @@ type typeDefKindCodec struct {
 	v *TypeDefKind
 }
 
+func (c *typeDefKindCodec) DecodeString(s string) error {
+	switch s {
+	case "resource":
+		*c.v = &Resource{}
+	}
+	return nil
+}
+
 func (c *typeDefKindCodec) DecodeField(dec codec.Decoder, name string) error {
 	var err error
 	switch name {
 	case "record":
 		v := &Record{}
 		*c.v, err = v, dec.Decode(v)
-	case "resource":
+	case "resource": // TODO: this might not be necessary
 		v := &Resource{}
 		*c.v, err = v, dec.Decode(v)
 	case "handle":

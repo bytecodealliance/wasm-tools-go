@@ -6,7 +6,7 @@
       TypeDefs: map[string]*wit.TypeDef{
         "a": &wit.TypeDef{
           Name:  &"a",
-          Kind:  nil,
+          Kind:  &wit.Resource{},
           Owner: &wit.Interface{...},
           Docs:  wit.Docs{
             Contents: "",

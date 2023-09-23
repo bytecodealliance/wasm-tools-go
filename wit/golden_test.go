@@ -3,6 +3,7 @@ package wit
 import (
 	"flag"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/k0kubun/pp/v3"
@@ -17,7 +18,7 @@ func TestGoldenFiles(t *testing.T) {
 	p.SetColoringEnabled(false)
 
 	err := loadTestdata(func(path string, res *Resolve) error {
-		t.Run(path, func(t *testing.T) {
+		t.Run(strings.TrimPrefix(path, testdataDir), func(t *testing.T) {
 			data := p.Sprint(res)
 			compareOrWrite(t, path, data)
 		})

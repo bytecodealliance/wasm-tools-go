@@ -8,7 +8,7 @@
           TypeDefs: map[string]*wit.TypeDef{
             "request": &wit.TypeDef{
               Name:  &"request",
-              Kind:  nil,
+              Kind:  &wit.Resource{},
               Owner: &wit.Interface{...},
               Docs:  wit.Docs{
                 Contents: "",
@@ -16,7 +16,7 @@
             },
             "response": &wit.TypeDef{
               Name:  &"response",
-              Kind:  nil,
+              Kind:  &wit.Resource{...},
               Owner: &wit.Interface{...},
               Docs:  wit.Docs{
                 Contents: "",
@@ -154,7 +154,7 @@
                 Functions: map[string]*wit.Function{
                   "handle": &wit.Function{
                     Name:   "handle",
-                    Kind:   &wit.Freestanding{},
+                    Kind:   &wit.Freestanding{...},
                     Params: []wit.Param{
                       wit.Param{
                         Name: "some",
