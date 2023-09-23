@@ -2,43 +2,22 @@ package wit
 
 import (
 	"flag"
-	"io/fs"
 	"os"
-	"path/filepath"
-	"strings"
 	"testing"
 
 	"github.com/k0kubun/pp/v3"
 	"github.com/sergi/go-diff/diffmatchpatch"
-	"github.com/ydnar/wasm-tools-go/internal/callerfs"
 )
 
 var update = flag.Bool("update", false, "update golden files")
 
-func TestDecodeJSON(t *testing.T) {
+func TestGoldenFiles(t *testing.T) {
 	p := pp.New()
 	p.SetExportedOnly(true)
 	p.SetColoringEnabled(false)
 
-	err := filepath.WalkDir(callerfs.Path("../testdata"), func(path string, d fs.DirEntry, err error) error {
-		if err != nil {
-			return fs.SkipDir
-		}
-		if !strings.HasSuffix(path, ".wit.json") && !strings.HasSuffix(path, ".wit.md.json") {
-			return nil
-		}
+	err := loadTestdata(func(path string, res *Resolve) error {
 		t.Run(path, func(t *testing.T) {
-			f, err := os.Open(path)
-			if err != nil {
-				t.Error(err)
-				return
-			}
-			defer f.Close()
-			res, err := DecodeJSON(f)
-			if err != nil {
-				t.Error(err)
-				return
-			}
 			data := p.Sprint(res)
 			compareOrWrite(t, path, data)
 		})
@@ -46,7 +25,7 @@ func TestDecodeJSON(t *testing.T) {
 	})
 
 	if err != nil {
-		t.Fatal(err)
+		t.Error(err)
 	}
 }
 
@@ -57,10 +36,12 @@ func compareOrWrite(t *testing.T, path, data string) {
 		if err != nil {
 			t.Error(err)
 		}
+		return
 	}
 	want, err := os.ReadFile(golden)
 	if err != nil {
 		t.Error(err)
+		return
 	}
 	if string(want) != data {
 		dmp := diffmatchpatch.New()
