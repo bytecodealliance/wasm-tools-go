@@ -75,7 +75,6 @@ type TypeDef struct {
 }
 
 // TypeName returns the type name of t, if present.
-// This partially implements the [Type] interface.
 func (t *TypeDef) TypeName() string {
 	if t.Name != nil {
 		return *t.Name
@@ -113,14 +112,12 @@ type Field struct {
 // [resource type]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md#item-resource
 type Resource struct{ _typeDefKind }
 
-func (Resource) UnmarshalText() ([]byte, error) { return []byte("resource"), nil }
-
 // Handle represents a WIT [handle type].
 //
 // [handle type]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md#handles
 type Handle interface {
-	isHandle()
 	TypeDefKind
+	isHandle()
 }
 
 // _handle is an embeddable type that conforms to the [Handle] interface.
@@ -271,8 +268,6 @@ type _type struct{ _typeDefKind }
 
 func (_type) isType() {}
 
-func (_type) TypeName() string { return "" }
-
 // Primitive is a type constriant of the Go equivalents of WIT [primitive types].
 //
 // [primitive types]: https://component-model.bytecodealliance.org/wit-overview.html#primitive-types
@@ -322,8 +317,9 @@ func (_primitive[T]) TypeName() string {
 		return "char"
 	case string:
 		return "string"
+	default:
+		panic(fmt.Sprintf("unknown primitive type %T", v)) // should never reach here
 	}
-	return "<undefined>"
 }
 
 // Bool represents the WIT [primitive type] bool, a boolean value either true or false.
