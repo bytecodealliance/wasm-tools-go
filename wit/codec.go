@@ -7,7 +7,7 @@ import (
 	"github.com/ydnar/wasm-tools-go/internal/codec/json"
 )
 
-// DecodeJSON decodes JSON from r into a Resolve struct.
+// DecodeJSON decodes JSON from r into a [Resolve] struct.
 // It returns any error that may occur during decoding.
 func DecodeJSON(r io.Reader) (*Resolve, error) {
 	res := &Resolve{}
@@ -16,7 +16,7 @@ func DecodeJSON(r io.Reader) (*Resolve, error) {
 	return res, err
 }
 
-// ResolveCodec implements the codec.Resolver interface,
+// ResolveCodec implements the [codec.Resolver] interface
 // translating types to decoding/encoding-aware versions.
 func (res *Resolve) ResolveCodec(v any) codec.Codec {
 	switch v := v.(type) {
@@ -68,6 +68,8 @@ func (c *Resolve) getPackage(i int) *Package {
 	return mustElement(&c.Packages, i)
 }
 
+// DecodeField implements the [codec.FieldDecoder] interface
+// to decode a struct or JSON object.
 func (c *Resolve) DecodeField(dec codec.Decoder, name string) error {
 	switch name {
 	case "worlds":
@@ -186,6 +188,8 @@ func (c *packageCodec) DecodeField(dec codec.Decoder, name string) error {
 	return nil
 }
 
+// DecodeString implements the [codec.StringDecoder] interface
+// to decode a string value into a valid [PackageName].
 func (pn *PackageName) DecodeString(s string) error {
 	var err error
 	*pn, err = ParsePackageName(s)
@@ -198,7 +202,7 @@ type worldItemCodec struct {
 	v *WorldItem
 }
 
-func (c worldItemCodec) DecodeField(dec codec.Decoder, name string) error {
+func (c *worldItemCodec) DecodeField(dec codec.Decoder, name string) error {
 	var err error
 	switch name {
 	case "interface":
@@ -220,22 +224,19 @@ type typeCodec struct {
 	*Resolve
 }
 
-// DecodeString translates a into to a primitive WIT type.
-// c.f is called with the resulting Type, if any.
+// DecodeString translates s into to a primitive WIT type.
 func (c *typeCodec) DecodeString(s string) error {
 	var err error
 	*c.t, err = ParseType(s)
 	return err
 }
 
-// DecodeInt translates a TypeDef reference into a pointer to a TypeDef
-// in the parent Resolve struct.
 func (c *typeCodec) DecodeInt(i int) error {
 	*c.t = c.getTypeDef(i)
 	return nil
 }
 
-// typeOwnerCodec translates WIT type owner enums into a TypeOwner.
+// typeOwnerCodec translates WIT type owner enums into a [TypeOwner].
 type typeOwnerCodec struct {
 	v *TypeOwner
 }
@@ -253,7 +254,7 @@ func (c *typeOwnerCodec) DecodeField(dec codec.Decoder, name string) error {
 	return err
 }
 
-// typeDefKindCodec translates WIT type owner enums into a TypeOwner.
+// typeDefKindCodec translates WIT type owner enums into a [TypeDefKind].
 type typeDefKindCodec struct {
 	v *TypeDefKind
 }
@@ -312,6 +313,8 @@ func (c *typeDefKindCodec) DecodeField(dec codec.Decoder, name string) error {
 	return err
 }
 
+// DecodeField implements the [codec.FieldDecoder] interface
+// to decode a struct or JSON object.
 func (r *Record) DecodeField(dec codec.Decoder, name string) error {
 	switch name {
 	case "fields":
@@ -320,6 +323,8 @@ func (r *Record) DecodeField(dec codec.Decoder, name string) error {
 	return nil
 }
 
+// DecodeField implements the [codec.FieldDecoder] interface
+// to decode a struct or JSON object.
 func (f *Field) DecodeField(dec codec.Decoder, name string) error {
 	switch name {
 	case "name":
@@ -332,6 +337,8 @@ func (f *Field) DecodeField(dec codec.Decoder, name string) error {
 	return nil
 }
 
+// DecodeField implements the [codec.FieldDecoder] interface
+// to decode a struct or JSON object.
 func (f *Flags) DecodeField(dec codec.Decoder, name string) error {
 	switch name {
 	case "flags":
@@ -340,6 +347,8 @@ func (f *Flags) DecodeField(dec codec.Decoder, name string) error {
 	return nil
 }
 
+// DecodeField implements the [codec.FieldDecoder] interface
+// to decode a struct or JSON object.
 func (f *Flag) DecodeField(dec codec.Decoder, name string) error {
 	switch name {
 	case "name":
@@ -350,6 +359,8 @@ func (f *Flag) DecodeField(dec codec.Decoder, name string) error {
 	return nil
 }
 
+// DecodeField implements the [codec.FieldDecoder] interface
+// to decode a struct or JSON object.
 func (t *Tuple) DecodeField(dec codec.Decoder, name string) error {
 	switch name {
 	case "types":
@@ -358,6 +369,8 @@ func (t *Tuple) DecodeField(dec codec.Decoder, name string) error {
 	return nil
 }
 
+// DecodeField implements the [codec.FieldDecoder] interface
+// to decode a struct or JSON object.
 func (v *Variant) DecodeField(dec codec.Decoder, name string) error {
 	switch name {
 	case "cases":
@@ -366,6 +379,8 @@ func (v *Variant) DecodeField(dec codec.Decoder, name string) error {
 	return nil
 }
 
+// DecodeField implements the [codec.FieldDecoder] interface
+// to decode a struct or JSON object.
 func (c *Case) DecodeField(dec codec.Decoder, name string) error {
 	switch name {
 	case "name":
@@ -395,6 +410,8 @@ func (c *handleCodec) DecodeField(dec codec.Decoder, name string) error {
 	return err
 }
 
+// DecodeField implements the [codec.FieldDecoder] interface
+// to decode a struct or JSON object.
 func (e *Enum) DecodeField(dec codec.Decoder, name string) error {
 	switch name {
 	case "cases":
@@ -403,6 +420,8 @@ func (e *Enum) DecodeField(dec codec.Decoder, name string) error {
 	return nil
 }
 
+// DecodeField implements the [codec.FieldDecoder] interface
+// to decode a struct or JSON object.
 func (r *Result) DecodeField(dec codec.Decoder, name string) error {
 	switch name {
 	case "ok":
@@ -413,6 +432,8 @@ func (r *Result) DecodeField(dec codec.Decoder, name string) error {
 	return nil
 }
 
+// DecodeField implements the [codec.FieldDecoder] interface
+// to decode a struct or JSON object.
 func (s *Stream) DecodeField(dec codec.Decoder, name string) error {
 	switch name {
 	case "element":
@@ -423,6 +444,8 @@ func (s *Stream) DecodeField(dec codec.Decoder, name string) error {
 	return nil
 }
 
+// DecodeField implements the [codec.FieldDecoder] interface
+// to decode a struct or JSON object.
 func (c *EnumCase) DecodeField(dec codec.Decoder, name string) error {
 	switch name {
 	case "name":
@@ -433,6 +456,8 @@ func (c *EnumCase) DecodeField(dec codec.Decoder, name string) error {
 	return nil
 }
 
+// DecodeField implements the [codec.FieldDecoder] interface
+// to decode a struct or JSON object.
 func (f *Function) DecodeField(dec codec.Decoder, name string) error {
 	switch name {
 	case "name":
@@ -477,6 +502,8 @@ func (c *functionKindCodec) DecodeField(dec codec.Decoder, name string) error {
 	return err
 }
 
+// DecodeField implements the [codec.FieldDecoder] interface
+// to decode a struct or JSON object.
 func (p *Param) DecodeField(dec codec.Decoder, name string) error {
 	switch name {
 	case "name":
