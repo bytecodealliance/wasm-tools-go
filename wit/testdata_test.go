@@ -9,8 +9,10 @@ import (
 	"github.com/ydnar/wasm-tools-go/internal/callerfs"
 )
 
+const testdataDir = "../testdata/"
+
 func loadTestdata(f func(path string, res *Resolve) error) error {
-	return filepath.WalkDir(callerfs.Path("../testdata"), func(path string, d fs.DirEntry, err error) error {
+	return filepath.WalkDir(callerfs.Path(testdataDir), func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return fs.SkipDir
 		}
