@@ -3,6 +3,7 @@ package wit
 import (
 	"errors"
 	"fmt"
+	"strconv"
 	"strings"
 	"unsafe"
 
@@ -236,23 +237,29 @@ type Tuple struct {
 	_typeDefKind
 }
 
+// Despecialize despecializes [Tuple] e into a [Record] with 0-based integer field names.
+// See the [canonical ABI documentation] for more information.
+//
+// [canonical ABI documentation]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#despecialization
+func (t *Tuple) Despecialize() TypeDefKind {
+	r := &Record{
+		Fields: make([]Field, len(t.Types)),
+	}
+	for i := range t.Types {
+		r.Fields[i].Name = strconv.Itoa(i)
+		r.Fields[i].Type = t.Types[i]
+	}
+	return r
+}
+
 // Size returns the ABI byte size for [Tuple] t.
 func (t *Tuple) Size() uintptr {
-	var s uintptr
-	for _, t := range t.Types {
-		s = Align(s, t.Align())
-		s += t.Size()
-	}
-	return s
+	return t.Despecialize().Size()
 }
 
 // Align returns the ABI byte alignment for [Tuple] t.
 func (t *Tuple) Align() uintptr {
-	var a uintptr = 1
-	for _, t := range t.Types {
-		a = max(a, t.Align())
-	}
-	return a
+	return t.Despecialize().Align()
 }
 
 // Variant represents a WIT [variant type], a tagged/discriminated union.
