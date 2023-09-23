@@ -92,7 +92,10 @@ func Align(ptr, align uintptr) uintptr {
 	return ((ptr + align - 1) / align) * align
 }
 
-// Sized is the interface implemented by any type that reports its ABI byte size and alignment.
+// Sized is the interface implemented by any type that reports its [ABI byte size] and [alignment].
+//
+// [ABI byte size]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#size
+// [alignment]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#alignment
 type Sized interface {
 	Size() uintptr
 	Align() uintptr
@@ -121,7 +124,9 @@ type Record struct {
 	_typeDefKind
 }
 
-// Size returns the ABI byte size for [Record] r.
+// Size returns the [ABI byte size] for [Record] r.
+//
+// [ABI byte size]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#size
 func (r *Record) Size() uintptr {
 	var s uintptr
 	for _, f := range r.Fields {
@@ -131,7 +136,9 @@ func (r *Record) Size() uintptr {
 	return s
 }
 
-// Align returns the ABI byte alignment for [Record] r.
+// Align returns the [ABI byte alignment] for [Record] r.
+//
+// [ABI byte alignment]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#alignment
 func (r *Record) Align() uintptr {
 	var a uintptr = 1
 	for _, f := range r.Fields {
@@ -152,10 +159,14 @@ type Field struct {
 // [resource type]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md#item-resource
 type Resource struct{ _typeDefKind }
 
-// Size returns the ABI byte size for [Resource] r.
+// Size returns the [ABI byte size] for [Resource] r.
+//
+// [ABI byte size]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#size
 func (r *Resource) Size() uintptr { return 4 }
 
-// Align returns the ABI byte alignment for [Resource] r.
+// Align returns the [ABI byte alignment] for [Resource] r.
+//
+// [ABI byte alignment]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#alignment
 func (r *Resource) Align() uintptr { return 4 }
 
 // Handle represents a WIT [handle type].
@@ -252,12 +263,20 @@ func (t *Tuple) Despecialize() TypeDefKind {
 	return r
 }
 
-// Size returns the ABI byte size for [Tuple] t.
+// Size returns the [ABI byte size] for [Tuple] t.
+// It is first [despecialized] into a [Record] with 0-based integer field names, then sized.
+//
+// [ABI byte size]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#size
+// [despecialized]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#despecialization
 func (t *Tuple) Size() uintptr {
 	return t.Despecialize().Size()
 }
 
-// Align returns the ABI byte alignment for [Tuple] t.
+// Align returns the [ABI byte alignment] for [Tuple] t.
+// It is first [despecialized] into a [Record] with 0-based integer field names, then aligned.
+//
+// [ABI byte alignment]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#alignment
+// [despecialized]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#despecialization
 func (t *Tuple) Align() uintptr {
 	return t.Despecialize().Align()
 }
@@ -272,7 +291,9 @@ type Variant struct {
 	_typeDefKind
 }
 
-// Size returns the ABI byte size for [Variant] v.
+// Size returns the [ABI byte size] for [Variant] v.
+//
+// [ABI byte size]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#size
 func (v *Variant) Size() uintptr {
 	s := Discriminant(len(v.Cases)).Size()
 	s = Align(s, v.maxCaseAlign())
@@ -280,7 +301,9 @@ func (v *Variant) Size() uintptr {
 	return Align(s, v.Align())
 }
 
-// Align returns the ABI byte alignment for [Variant] v.
+// Align returns the [ABI byte alignment] for [Variant] v.
+//
+// [ABI byte alignment]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#alignment
 func (v *Variant) Align() uintptr {
 	return max(Discriminant(len(v.Cases)).Align(), v.maxCaseAlign())
 }
@@ -336,13 +359,21 @@ func (e *Enum) Despecialize() TypeDefKind {
 	return v
 }
 
-// Size returns the ABI byte size for [Enum] e, the smallest integer
-// type that can represent [0, len(e.Cases)).
+// Size returns the [ABI byte size] for [Enum] e, the smallest integer
+// type that can represent 0...len(e.Cases).
+// It is first [despecialized] into a [Variant] with no associated types, then sized.
+//
+// [ABI byte size]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#size
+// [despecialized]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#despecialization
 func (e *Enum) Size() uintptr {
 	return e.Despecialize().Size()
 }
 
-// Align returns the ABI byte alignment for [Enum] e.
+// Align returns the [ABI byte alignment] for [Enum] e.
+// It is first [despecialized] into a [Variant] with no associated types, then aligned.
+//
+// [ABI byte alignment]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#alignment
+// [despecialized]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#despecialization
 func (e *Enum) Align() uintptr {
 	return e.Despecialize().Align()
 }
@@ -363,7 +394,7 @@ type Option struct {
 	_typeDefKind
 }
 
-// Despecialize despecializes [Option] o into a [Variant] with "none" and "some" cases.
+// Despecialize despecializes [Option] o into a [Variant] with two cases, "none" and "some".
 // See the [canonical ABI documentation] for more information.
 //
 // [canonical ABI documentation]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#despecialization
@@ -376,12 +407,20 @@ func (o *Option) Despecialize() TypeDefKind {
 	}
 }
 
-// Size returns the ABI byte size for [Option] o.
+// Size returns the [ABI byte size] for [Option] o.
+// It is first [despecialized] into a [Variant] with two cases, "none" and "some(T)", then sized.
+//
+// [ABI byte size]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#size
+// [despecialized]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#despecialization
 func (o *Option) Size() uintptr {
 	return o.Despecialize().Size()
 }
 
-// Align returns the ABI byte alignment for [Option] o.
+// Align returns the [ABI byte alignment] for [Option] o.
+// It is first [despecialized] into a [Variant] with two cases, "none" and "some(T)", then aligned.
+//
+// [ABI byte alignment]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#alignment
+// [despecialized]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#despecialization
 func (o *Option) Align() uintptr {
 	return o.Despecialize().Align()
 }
@@ -397,7 +436,7 @@ type Result struct {
 	_typeDefKind
 }
 
-// Despecialize despecializes [Result] o into a [Variant] with "none" and "some" cases.
+// Despecialize despecializes [Result] o into a [Variant] with two cases, "ok" and "error".
 // See the [canonical ABI documentation] for more information.
 //
 // [canonical ABI documentation]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#despecialization
@@ -410,12 +449,20 @@ func (r *Result) Despecialize() TypeDefKind {
 	}
 }
 
-// Size returns the ABI byte size for [Result] r.
+// Size returns the [ABI byte size] for [Result] r.
+// It is first [despecialized] into a [Variant] with two cases "ok" and "error", then sized.
+//
+// [ABI byte size]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#size
+// [despecialized]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#despecialization
 func (r *Result) Size() uintptr {
 	return r.Despecialize().Size()
 }
 
-// Align returns the ABI byte alignment for [Result] r.
+// Align returns the [ABI byte alignment] for [Result] r.
+// It is first [despecialized] into a [Variant] with two cases "ok" and "error", then aligned.
+//
+// [ABI byte alignment]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#alignment
+// [despecialized]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#despecialization
 func (r *Result) Align() uintptr {
 	return r.Despecialize().Align()
 }
@@ -428,10 +475,14 @@ type List struct {
 	_typeDefKind
 }
 
-// Size returns the ABI byte size for a [List].
+// Size returns the [ABI byte size] for a [List].
+//
+// [ABI byte size]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#size
 func (*List) Size() uintptr { return 8 } // [2]int32
 
-// Align returns the ABI byte alignment a [List].
+// Align returns the [ABI byte alignment] a [List].
+//
+// [ABI byte alignment]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#alignment
 func (*List) Align() uintptr { return 8 } // [2]int32
 
 // Future represents a WIT [future type], expected to be part of [WASI Preview 3].
@@ -443,12 +494,16 @@ type Future struct {
 	_typeDefKind
 }
 
-// Size returns the ABI byte size for a [Future].
+// Size returns the [ABI byte size] for a [Future].
 // TODO: what is the ABI size of a future?
+//
+// [ABI byte size]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#size
 func (*Future) Size() uintptr { return 0 }
 
-// Align returns the ABI byte alignment a [Future].
+// Align returns the [ABI byte alignment] a [Future].
 // TODO: what is the ABI alignment of a future?
+//
+// [ABI byte alignment]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#alignment
 func (*Future) Align() uintptr { return 0 }
 
 // Stream represents a WIT [stream type], expected to be part of [WASI Preview 3].
@@ -461,12 +516,16 @@ type Stream struct {
 	_typeDefKind
 }
 
-// Size returns the ABI byte size for a [Stream].
+// Size returns the [ABI byte size] for a [Stream].
 // TODO: what is the ABI size of a stream?
+//
+// [ABI byte size]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#size
 func (*Stream) Size() uintptr { return 0 }
 
-// Align returns the ABI byte alignment a [Stream].
+// Align returns the [ABI byte alignment] a [Stream].
 // TODO: what is the ABI alignment of a stream?
+//
+// [ABI byte alignment]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#alignment
 func (*Stream) Align() uintptr { return 0 }
 
 // TypeOwner is the interface implemented by any type that can own a TypeDef,
@@ -697,7 +756,7 @@ type Char struct{ _primitive[char] }
 // [string]: https://pkg.go.dev/builtin#string
 type String struct{ _primitive[string] }
 
-// Discriminant returns the smallest integer type that can represent [0, n).
+// Discriminant returns the smallest integer type that can represent 0...n.
 func Discriminant(n int) Type {
 	switch {
 	case n <= 1<<8:
