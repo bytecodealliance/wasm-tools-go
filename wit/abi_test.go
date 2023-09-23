@@ -6,7 +6,36 @@ import (
 	"testing"
 )
 
-func TestGoldenFilesABI(t *testing.T) {
+func TestAlign(t *testing.T) {
+	tests := []struct {
+		ptr   uintptr
+		align uintptr
+		want  uintptr
+	}{
+		{0, 1, 0}, {0, 2, 0}, {0, 4, 0}, {0, 8, 0},
+		{1, 1, 1}, {1, 2, 2}, {1, 4, 4}, {1, 8, 8},
+		{2, 1, 2}, {2, 2, 2}, {2, 4, 4}, {2, 8, 8},
+		{3, 1, 3}, {3, 2, 4}, {3, 4, 4}, {3, 8, 8},
+		{4, 1, 4}, {4, 2, 4}, {4, 4, 4}, {4, 8, 8},
+		{5, 1, 5}, {5, 2, 6}, {5, 4, 8}, {5, 8, 8},
+		{6, 1, 6}, {6, 2, 6}, {6, 4, 8}, {6, 8, 8},
+		{7, 1, 7}, {7, 2, 8}, {7, 4, 8}, {7, 8, 8},
+		{8, 1, 8}, {8, 2, 8}, {8, 4, 8}, {8, 8, 8},
+		{9, 1, 9}, {9, 2, 10}, {9, 4, 12}, {9, 8, 16},
+		{10, 1, 10}, {10, 2, 10}, {10, 4, 12}, {10, 8, 16},
+	}
+	for _, tt := range tests {
+		name := fmt.Sprintf("%d,%d=%d", tt.ptr, tt.align, tt.want)
+		t.Run(name, func(t *testing.T) {
+			got := Align(tt.ptr, tt.align)
+			if got != tt.want {
+				t.Errorf("Align(%d, %d): expected %d, got %d", tt.ptr, tt.align, tt.want, got)
+			}
+		})
+	}
+}
+
+func TestSizeAndAlign(t *testing.T) {
 	err := loadTestdata(func(path string, res *Resolve) error {
 		t.Run(strings.TrimPrefix(path, testdataDir), func(t *testing.T) {
 			for i := range res.TypeDefs {
