@@ -74,23 +74,43 @@ type TypeDef struct {
 	_type
 }
 
-// TypeName returns the type name of t, if present.
-func (t *TypeDef) TypeName() string {
-	if t.Name != nil {
-		return *t.Name
-	}
-	return ""
+// Size returns the byte size for values of type t.
+func (t *TypeDef) Size() uintptr {
+	return t.Kind.Size()
+}
+
+// Align returns the byte alignment for values of type t.
+func (t *TypeDef) Align() uintptr {
+	return t.Kind.Align()
+}
+
+// Align aligns ptr with alignment align.
+func Align(ptr, align uintptr) uintptr {
+	// (dividend + divisor - 1) / divisor
+	// http://www.cs.nott.ac.uk/~rcb/G51MPC/slides/NumberLogic.pdf
+	return ((ptr + align - 1) / align) * align
+}
+
+// Sized is the interface implemented by any type that reports its ABI byte size and alignment.
+type Sized interface {
+	Size() uintptr
+	Align() uintptr
 }
 
 // TypeDefKind represents the underlying type in a [TypeDef], which can be one of
 // [Record], [Resource], [Handle], [Flags], [Tuple], [Variant], [Enum],
 // [Option], [Result], [List], [Future], [Stream], or [Type].
-type TypeDefKind interface{ isTypeDefKind() }
+type TypeDefKind interface {
+	Sized
+	isTypeDefKind()
+}
 
 // _typeDefKind is an embeddable type that conforms to the [TypeDefKind] interface.
 type _typeDefKind struct{}
 
 func (_typeDefKind) isTypeDefKind() {}
+func (_typeDefKind) Size() uintptr  { panic("unimplemented") }
+func (_typeDefKind) Align() uintptr { panic("unimplemented") }
 
 // Record represents a WIT [record type], akin to a struct.
 //
@@ -98,6 +118,25 @@ func (_typeDefKind) isTypeDefKind() {}
 type Record struct {
 	Fields []Field
 	_typeDefKind
+}
+
+// Size returns the ABI byte size for [Record] r.
+func (r *Record) Size() uintptr {
+	var s uintptr
+	for _, f := range r.Fields {
+		s = Align(s, f.Type.Align())
+		s += f.Type.Size()
+	}
+	return s
+}
+
+// Align returns the ABI byte alignment for [Record] r.
+func (r *Record) Align() uintptr {
+	var a uintptr = 1
+	for _, f := range r.Fields {
+		a = max(a, f.Type.Align())
+	}
+	return a
 }
 
 // Field represents a field in a [Record].
@@ -112,6 +151,12 @@ type Field struct {
 // [resource type]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md#item-resource
 type Resource struct{ _typeDefKind }
 
+// Size returns the ABI byte size for [Resource] r.
+func (r *Resource) Size() uintptr { return 4 }
+
+// Align returns the ABI byte alignment for [Resource] r.
+func (r *Resource) Align() uintptr { return 4 }
+
 // Handle represents a WIT [handle type].
 //
 // [handle type]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md#handles
@@ -123,7 +168,9 @@ type Handle interface {
 // _handle is an embeddable type that conforms to the [Handle] interface.
 type _handle struct{ _typeDefKind }
 
-func (_handle) isHandle() {}
+func (_handle) isHandle()      {}
+func (_handle) Size() uintptr  { return 4 }
+func (_handle) Align() uintptr { return 4 }
 
 // OwnedHandle represents an WIT [owned handle].
 //
@@ -149,6 +196,30 @@ type Flags struct {
 	_typeDefKind
 }
 
+// Size returns the byte size of [Flags] f.
+func (f *Flags) Size() uintptr {
+	n := len(f.Flags)
+	switch {
+	case n <= 8:
+		return 1
+	case n <= 16:
+		return 2
+	}
+	return 4 * uintptr((n+31)>>5)
+}
+
+// Align returns the byte alignment of [Flags] f.
+func (f *Flags) Align() uintptr {
+	n := len(f.Flags)
+	switch {
+	case n <= 8:
+		return 1
+	case n <= 16:
+		return 2
+	}
+	return 4
+}
+
 // Flag represents a single flag value in a [Flags] type.
 type Flag struct {
 	Name string
@@ -165,6 +236,25 @@ type Tuple struct {
 	_typeDefKind
 }
 
+// Size returns the ABI byte size for [Tuple] t.
+func (t *Tuple) Size() uintptr {
+	var s uintptr
+	for _, t := range t.Types {
+		s = Align(s, t.Align())
+		s += t.Size()
+	}
+	return s
+}
+
+// Align returns the ABI byte alignment for [Tuple] t.
+func (t *Tuple) Align() uintptr {
+	var a uintptr = 1
+	for _, t := range t.Types {
+		a = max(a, t.Align())
+	}
+	return a
+}
+
 // Variant represents a WIT [variant type], a tagged/discriminated union.
 // A variant type declares one or more cases. Each case has a name and, optionally,
 // a type of data associated with that case.
@@ -173,6 +263,39 @@ type Tuple struct {
 type Variant struct {
 	Cases []Case
 	_typeDefKind
+}
+
+// Size returns the ABI byte size for [Variant] v.
+func (v *Variant) Size() uintptr {
+	s := Discriminant(len(v.Cases)).Size()
+	s = Align(s, v.maxCaseAlign())
+	s += v.maxCaseSize()
+	return Align(s, v.Align())
+}
+
+// Align returns the ABI byte alignment for [Variant] v.
+func (v *Variant) Align() uintptr {
+	return max(Discriminant(len(v.Cases)).Align(), v.maxCaseAlign())
+}
+
+func (v *Variant) maxCaseSize() uintptr {
+	var s uintptr
+	for _, c := range v.Cases {
+		if c.Type != nil {
+			s = max(s, c.Type.Size())
+		}
+	}
+	return s
+}
+
+func (v *Variant) maxCaseAlign() uintptr {
+	var a uintptr = 1
+	for _, c := range v.Cases {
+		if c.Type != nil {
+			a = max(a, c.Type.Align())
+		}
+	}
+	return a
 }
 
 // Case represents a single case in a [Variant].
@@ -191,6 +314,32 @@ type Enum struct {
 	_typeDefKind
 }
 
+// Despecialize despecializes [Enum] e into a [Variant] with no associated types.
+// See the [canonical ABI documentation] for more information.
+//
+// [canonical ABI documentation]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#despecialization
+func (e *Enum) Despecialize() TypeDefKind {
+	v := &Variant{
+		Cases: make([]Case, len(e.Cases)),
+	}
+	for i := range e.Cases {
+		v.Cases[i].Name = e.Cases[i].Name
+		v.Cases[i].Docs = e.Cases[i].Docs
+	}
+	return v
+}
+
+// Size returns the ABI byte size for [Enum] e, the smallest integer
+// type that can represent [0, len(e.Cases)).
+func (e *Enum) Size() uintptr {
+	return e.Despecialize().Size()
+}
+
+// Align returns the ABI byte alignment for [Enum] e.
+func (e *Enum) Align() uintptr {
+	return e.Despecialize().Align()
+}
+
 // EnumCase represents a single case in an [Enum].
 type EnumCase struct {
 	Name string
@@ -207,6 +356,29 @@ type Option struct {
 	_typeDefKind
 }
 
+// Despecialize despecializes [Option] o into a [Variant] with "none" and "some" cases.
+// See the [canonical ABI documentation] for more information.
+//
+// [canonical ABI documentation]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#despecialization
+func (o *Option) Despecialize() TypeDefKind {
+	return &Variant{
+		Cases: []Case{
+			{Name: "none"},
+			{Name: "some", Type: o.Type},
+		},
+	}
+}
+
+// Size returns the ABI byte size for [Option] o.
+func (o *Option) Size() uintptr {
+	return o.Despecialize().Size()
+}
+
+// Align returns the ABI byte alignment for [Option] o.
+func (o *Option) Align() uintptr {
+	return o.Despecialize().Align()
+}
+
 // Result represents a WIT [result type], which is the result of a function call,
 // returning an optional value and/or an optional error. It is roughly equivalent to
 // the Go pattern of returning (T, error).
@@ -218,6 +390,29 @@ type Result struct {
 	_typeDefKind
 }
 
+// Despecialize despecializes [Result] o into a [Variant] with "none" and "some" cases.
+// See the [canonical ABI documentation] for more information.
+//
+// [canonical ABI documentation]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#despecialization
+func (r *Result) Despecialize() TypeDefKind {
+	return &Variant{
+		Cases: []Case{
+			{Name: "ok", Type: r.OK},
+			{Name: "error", Type: r.Err},
+		},
+	}
+}
+
+// Size returns the ABI byte size for [Result] r.
+func (r *Result) Size() uintptr {
+	return r.Despecialize().Size()
+}
+
+// Align returns the ABI byte alignment for [Result] r.
+func (r *Result) Align() uintptr {
+	return r.Despecialize().Align()
+}
+
 // List represents a WIT [list type], which is an ordered vector of an arbitrary type.
 //
 // [list type]: https://component-model.bytecodealliance.org/wit-overview.html#lists
@@ -225,6 +420,12 @@ type List struct {
 	Type Type
 	_typeDefKind
 }
+
+// Size returns the ABI byte size for a [List].
+func (*List) Size() uintptr { return 8 } // [2]int32
+
+// Align returns the ABI byte alignment a [List].
+func (*List) Align() uintptr { return 8 } // [2]int32
 
 // Future represents a WIT [future type], expected to be part of [WASI Preview 3].
 //
@@ -235,6 +436,14 @@ type Future struct {
 	_typeDefKind
 }
 
+// Size returns the ABI byte size for a [Future].
+// TODO: what is the ABI size of a future?
+func (*Future) Size() uintptr { return 0 }
+
+// Align returns the ABI byte alignment a [Future].
+// TODO: what is the ABI alignment of a future?
+func (*Future) Align() uintptr { return 0 }
+
 // Stream represents a WIT [stream type], expected to be part of [WASI Preview 3].
 //
 // [stream type]: https://github.com/WebAssembly/WASI/blob/main/docs/WitInWasi.md#streams
@@ -244,6 +453,14 @@ type Stream struct {
 	End     Type // Represented in Rust as Option<Type>, so Type field could be nil
 	_typeDefKind
 }
+
+// Size returns the ABI byte size for a [Stream].
+// TODO: what is the ABI size of a stream?
+func (*Stream) Size() uintptr { return 0 }
+
+// Align returns the ABI byte alignment a [Stream].
+// TODO: what is the ABI alignment of a stream?
+func (*Stream) Align() uintptr { return 0 }
 
 // TypeOwner is the interface implemented by any type that can own a TypeDef,
 // currently [World] and [Interface].
@@ -258,15 +475,52 @@ func (_typeOwner) isTypeOwner() {}
 //
 // [primitive type]: https://component-model.bytecodealliance.org/wit-overview.html#primitive-types
 type Type interface {
-	TypeName() string
-	isType()
+	Sized
 	TypeDefKind
+	isType()
 }
 
 // _type is an embeddable type that conforms to the [Type] interface.
 type _type struct{ _typeDefKind }
 
 func (_type) isType() {}
+
+// ParseType parses a WIT [primitive type] string into
+// the associated Type implementation from this package.
+// It returns an error if the type string is not recoginized.
+//
+// [primitive type]: https://component-model.bytecodealliance.org/wit-overview.html#primitive-types
+func ParseType(s string) (Type, error) {
+	switch s {
+	case "bool":
+		return Bool{}, nil
+	case "s8":
+		return S8{}, nil
+	case "u8":
+		return U8{}, nil
+	case "s16":
+		return S16{}, nil
+	case "u16":
+		return U16{}, nil
+	case "s32":
+		return S32{}, nil
+	case "u32":
+		return U32{}, nil
+	case "s64":
+		return S64{}, nil
+	case "u64":
+		return U64{}, nil
+	case "float32":
+		return Float32{}, nil
+	case "float64":
+		return Float64{}, nil
+	case "char":
+		return Char{}, nil
+	case "string":
+		return String{}, nil
+	}
+	return nil, fmt.Errorf("unknown primitive type %q", s)
+}
 
 // Primitive is a type constriant of the Go equivalents of WIT [primitive types].
 //
@@ -287,7 +541,29 @@ type _primitive[T Primitive] struct{ _type }
 // _primitive is a generic embeddable type that conforms to the [Type] interface.
 func (_primitive[T]) isType() {}
 
-// TypeName partially implements the [Type] interface.
+// Size returns the byte size for values of primitive type T.
+func (_primitive[T]) Size() uintptr {
+	var v T
+	switch any(v).(type) {
+	case string:
+		return 8 // [2]int32
+	default:
+		return unsafe.Sizeof(v)
+	}
+}
+
+// Align returns the byte alignment for values of type T.
+func (_primitive[T]) Align() uintptr {
+	var v T
+	switch any(v).(type) {
+	case string:
+		return 4 // int32
+	default:
+		return unsafe.Alignof(v)
+	}
+}
+
+// TypeName returns the primitive type name for T.
 func (_primitive[T]) TypeName() string {
 	var v T
 	switch any(v).(type) {
@@ -414,41 +690,15 @@ type Char struct{ _primitive[char] }
 // [string]: https://pkg.go.dev/builtin#string
 type String struct{ _primitive[string] }
 
-// ParseType parses a WIT [primitive type] string into
-// the associated Type implementation from this package.
-// It returns an error if the type string is not recoginized.
-//
-// [primitive type]: https://component-model.bytecodealliance.org/wit-overview.html#primitive-types
-func ParseType(s string) (Type, error) {
-	switch s {
-	case "bool":
-		return Bool{}, nil
-	case "s8":
-		return S8{}, nil
-	case "u8":
-		return U8{}, nil
-	case "s16":
-		return S16{}, nil
-	case "u16":
-		return U16{}, nil
-	case "s32":
-		return S32{}, nil
-	case "u32":
-		return U32{}, nil
-	case "s64":
-		return S64{}, nil
-	case "u64":
-		return U64{}, nil
-	case "float32":
-		return Float32{}, nil
-	case "float64":
-		return Float64{}, nil
-	case "char":
-		return Char{}, nil
-	case "string":
-		return String{}, nil
+// Discriminant returns the smallest integer type that can represent [0, n).
+func Discriminant(n int) Type {
+	switch {
+	case n <= 1<<8:
+		return U8{}
+	case n <= 1<<16:
+		return U16{}
 	}
-	return nil, fmt.Errorf("unknown type %q", s)
+	return U32{}
 }
 
 // Function represents a WIT [function].
