@@ -2,6 +2,7 @@ package wit
 
 import (
 	"fmt"
+	"math"
 	"strings"
 	"testing"
 )
@@ -30,6 +31,26 @@ func TestAlign(t *testing.T) {
 			got := Align(tt.ptr, tt.align)
 			if got != tt.want {
 				t.Errorf("Align(%d, %d): expected %d, got %d", tt.ptr, tt.align, tt.want, got)
+			}
+		})
+	}
+}
+
+func TestDiscriminant(t *testing.T) {
+	tests := []struct {
+		n    int
+		want Type
+	}{
+		{0, U8{}}, {1, U8{}}, {5, U8{}}, {8, U8{}}, {255, U8{}}, {256, U8{}},
+		{257, U16{}}, {10000, U16{}}, {32768, U16{}}, {65536, U16{}},
+		{65537, U32{}}, {1 << 24, U32{}}, {math.MaxInt32, U32{}}, {math.MaxUint32, U32{}},
+	}
+	for _, tt := range tests {
+		name := fmt.Sprintf("%d", tt.n)
+		t.Run(name, func(t *testing.T) {
+			got := Discriminant(tt.n)
+			if got != tt.want {
+				t.Errorf("Discriminant(%d): expected %T, got %T", tt.n, tt.want, got)
 			}
 		})
 	}
