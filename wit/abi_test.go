@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestTypeDefSize(t *testing.T) {
+func TestGoldenFilesABI(t *testing.T) {
 	err := loadTestdata(func(path string, res *Resolve) error {
 		t.Run(strings.TrimPrefix(path, testdataDir), func(t *testing.T) {
 			for i := range res.TypeDefs {
@@ -22,10 +22,15 @@ func TestTypeDefSize(t *testing.T) {
 							t.Fatalf("panic: %v", err)
 						}
 					}()
-					s := td.Size()
-					ks := td.Kind.Size()
-					if s != ks {
-						t.Errorf("(*TypeDef).Size(): got %d, expected %d", s, ks)
+
+					got, want := td.Size(), td.Kind.Size()
+					if got != want {
+						t.Errorf("(*TypeDef).Size(): got %d, expected %d", got, want)
+					}
+
+					got, want = td.Align(), td.Kind.Align()
+					if got != want {
+						t.Errorf("(*TypeDef).Align(): got %d, expected %d", got, want)
 					}
 				})
 			}
