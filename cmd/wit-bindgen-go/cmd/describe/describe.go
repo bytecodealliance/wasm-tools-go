@@ -25,6 +25,9 @@ func action(ctx *cli.Context) error {
 		return err
 	}
 
+	fmt.Println(res.WIT())
+	return nil
+
 	p := &printer{w: os.Stdout}
 
 	for i, w := range res.Worlds {
@@ -123,8 +126,8 @@ func printType(p *printer, t wit.Type) {
 			p.Printf("%s", *t.Name)
 			return
 		}
-	case interface{ TypeName() string }:
-		p.Printf("%s", t.TypeName())
+	case interface{ WIT() string }:
+		p.Printf("%s", t.WIT())
 		return
 	}
 	p.Print("T")

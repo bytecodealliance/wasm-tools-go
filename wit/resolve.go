@@ -43,7 +43,10 @@ type World struct {
 
 // A WorldItem is any item that can be exported from or imported into a [World],
 // currently either an [Interface], [TypeDef], or [Function].
-type WorldItem interface{ isWorldItem() }
+type WorldItem interface {
+	Syntax
+	isWorldItem()
+}
 
 // _worldItem is an embeddable type that conforms to the [WorldItem] interface.
 type _worldItem struct{}
@@ -545,6 +548,7 @@ func (_typeOwner) isTypeOwner() {}
 // [primitive type]: https://component-model.bytecodealliance.org/wit-overview.html#primitive-types
 type Type interface {
 	Sized
+	Syntax
 	TypeDefKind
 	isType()
 }
@@ -632,8 +636,10 @@ func (_primitive[T]) Align() uintptr {
 	}
 }
 
-// TypeName returns the primitive type name for T.
-func (_primitive[T]) TypeName() string {
+// WIT returns the WIT representation of [primitive type] T.
+//
+// [primitive type]: https://component-model.bytecodealliance.org/wit-overview.html#primitive-types
+func (_primitive[T]) WIT() string {
 	var v T
 	switch any(v).(type) {
 	case bool:
