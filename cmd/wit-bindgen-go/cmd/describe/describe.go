@@ -80,28 +80,28 @@ func printWorldItem(p *printer, name string, item wit.WorldItem) {
 	}
 }
 
-func printInterface(p *printer, name string, iface *wit.Interface) {
-	if iface.Name != nil {
-		name = iface.Package.Name.String() + "/" + *iface.Name
+func printInterface(p *printer, name string, i *wit.Interface) {
+	if i.Name != nil {
+		name = i.Package.Name.String() + "/" + *i.Name
 	}
 	// TODO: print Interface.Docs
 	p.Printf("%s {", name)
-	if len(iface.TypeDefs) > 0 || len(iface.Functions) > 0 {
+	if len(i.TypeDefs) > 0 || len(i.Functions) > 0 {
 		p.Println()
 		p := p.Indent()
 		n := 0
-		for _, name := range codec.SortedKeys(iface.TypeDefs) {
+		for _, name := range codec.SortedKeys(i.TypeDefs) {
 			if n > 0 {
 				fmt.Println()
 			}
-			printTypeDef(p, name, iface.TypeDefs[name])
+			printTypeDef(p, name, i.TypeDefs[name])
 			n++
 		}
-		for _, name := range codec.SortedKeys(iface.Functions) {
+		for _, name := range codec.SortedKeys(i.Functions) {
 			if n > 0 {
 				fmt.Println()
 			}
-			printFunction(p, name, iface.Functions[name])
+			printFunction(p, name, i.Functions[name])
 			n++
 		}
 	}
@@ -109,11 +109,24 @@ func printInterface(p *printer, name string, iface *wit.Interface) {
 }
 
 func printTypeDef(p *printer, name string, t *wit.TypeDef) {
+	if t.Name != nil {
+		name = *t.Name // TODO: can we figure out if a type is imported from elsewhere?
+	}
 	p.Printf("type %s = ", name)
 	p.Println("TypeDef(TODO)")
 }
 
 func printType(p *printer, t wit.Type) {
+	switch t := t.(type) {
+	case *wit.TypeDef:
+		if t.Name != nil {
+			p.Printf("%s", *t.Name)
+			return
+		}
+	case interface{ TypeName() string }:
+		p.Printf("%s", t.TypeName())
+		return
+	}
 	p.Print("T")
 }
 
