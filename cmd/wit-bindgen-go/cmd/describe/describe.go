@@ -36,84 +36,96 @@ func action(ctx *cli.Context) error {
 func describeWorld(p *printer, w *wit.World) {
 	name := w.Package.Name.String() + "/" + w.Name
 	if len(w.Imports) == 0 && len(w.Exports) == 0 {
-		p.Printf("world %s {}", name)
+		p.Printf("world %s {}\n", name)
 		return
 	}
 	// TODO: print World.Docs
 	p.Printf("world %s {", name)
-	{
-		p := p.indent()
+	if len(w.Imports) > 0 || len(w.Exports) > 0 {
+		p.Println()
+		p := p.Indent()
 		for name, item := range w.Imports {
-			describeWorldItem(p, "import ", name, item)
+			p.Print("import ")
+			describeWorldItem(p, name, item)
 		}
 		for name, item := range w.Exports {
-			describeWorldItem(p, "export ", name, item)
+			p.Print("export ")
+			describeWorldItem(p, name, item)
 		}
 	}
 	p.Println("}")
 	p.Println()
 }
 
-func describeWorldItem(p *printer, pfx, name string, item wit.WorldItem) {
+func describeWorldItem(p *printer, name string, item wit.WorldItem) {
 	switch v := item.(type) {
 	case *wit.Interface:
-		describeWorldInterface(p, pfx, name, v)
+		describeWorldInterface(p, name, v)
 	case *wit.TypeDef:
-		describeWorldTypeDef(p, pfx, name, v)
+		describeWorldTypeDef(p, name, v)
 	case *wit.Function:
-		describeWorldFunction(p, pfx, name, v)
+		describeWorldFunction(p, name, v)
 	}
 }
 
-func describeWorldInterface(p *printer, pfx, name string, i *wit.Interface) {
+func describeWorldInterface(p *printer, name string, i *wit.Interface) {
 	if i.Name != nil {
 		name = i.Package.Name.String() + "/" + *i.Name
 	}
 	// TODO: print Interface.Docs
-	if len(i.TypeDefs) == 0 && len(i.Functions) == 0 {
-		p.Printf("%s%s {}", pfx, name)
-		return
-	}
-	p.Printf("%s%s {", pfx, name)
-	{
-
+	p.Printf("%s {", name)
+	if len(i.TypeDefs) > 0 || len(i.Functions) > 0 {
+		p.Println()
+		p := p.Indent()
+		var _ = p
 	}
 	p.Println("}")
 }
 
-func describeWorldTypeDef(p *printer, pfx, name string, t *wit.TypeDef) {
+func describeWorldTypeDef(p *printer, name string, t *wit.TypeDef) {
 	// TODO
 }
 
-func describeWorldFunction(p *printer, pfx, name string, t *wit.Function) {
+func describeWorldFunction(p *printer, name string, t *wit.Function) {
 	// TODO
 }
 
 type printer struct {
-	w     io.Writer
-	depth int
+	w        io.Writer
+	depth    int
+	indented int
 }
 
-func (p *printer) indent() *printer {
+func (p *printer) Indent() *printer {
 	pi := *p
 	pi.depth++
 	return &pi
 }
 
-func (p *printer) println(s string) {
-	fmt.Fprintln(p.w, strings.Repeat("\t", p.depth), s)
+func (p *printer) Print(a ...any) {
+	p.print(fmt.Sprint(a...))
 }
 
 func (p *printer) Println(a ...any) {
-	s := fmt.Sprint(a...)
-	for _, line := range strings.Split(s, "\n") {
-		p.println(line)
-	}
+	p.print(fmt.Sprintln(a...))
 }
 
 func (p *printer) Printf(format string, a ...any) {
-	s := fmt.Sprintf(format, a...)
-	for _, line := range strings.Split(s, "\n") {
-		p.println(line)
+	p.print(fmt.Sprintf(format, a...))
+}
+
+func (p *printer) print(s string) {
+	lines := strings.Split(s, "\n")
+	for i, line := range lines {
+		if i == len(lines)-1 && line == "" {
+			return
+		}
+		fmt.Fprint(p.w, strings.Repeat("\t", p.depth-p.indented))
+		p.indented = p.depth
+		fmt.Fprint(p.w, line)
+		if i < len(lines)-1 {
+			fmt.Fprint(p.w, "\n")
+			p.indented = 0
+		}
 	}
 }
