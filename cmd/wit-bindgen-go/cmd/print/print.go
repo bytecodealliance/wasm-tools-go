@@ -1,4 +1,4 @@
-package describe
+package print
 
 import (
 	"fmt"
@@ -10,8 +10,8 @@ import (
 
 // Command is the CLI command for describe.
 var Command = &cli.Command{
-	Name:   "describe",
-	Usage:  "describes a WIT JSON file",
+	Name:   "print",
+	Usage:  "pretty-prints a Resolve struct loaded from a WIT JSON file",
 	Action: action,
 }
 
