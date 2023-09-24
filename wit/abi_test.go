@@ -150,6 +150,39 @@ func TestFunctionNameConsistency(t *testing.T) {
 					}
 				})
 			}
+
+			for i, w := range res.Worlds {
+				if len(w.Imports) == 0 && len(w.Exports) == 0 {
+					continue
+				}
+				name := fmt.Sprintf("Worlds[%d]#%s", i, w.Name)
+				t.Run(name, func(t *testing.T) {
+					for name, item := range w.Imports {
+						f, ok := item.(*Function)
+						if !ok {
+							continue
+						}
+						t.Run(fmt.Sprintf("Imports[%q]==%q", name, f.Name), func(t *testing.T) {
+							if name != f.Name {
+								// A world can rename an imported function, so disable this
+								// t.Errorf("Imports[%q] != %q", name, f.Name)
+							}
+						})
+					}
+					for name, item := range w.Exports {
+						f, ok := item.(*Function)
+						if !ok {
+							continue
+						}
+						t.Run(fmt.Sprintf("Exports[%q]==%q", name, f.Name), func(t *testing.T) {
+							if name != f.Name {
+								// TODO: can a world rename an exported function?
+								t.Errorf("Exports[%q] != %q", name, f.Name)
+							}
+						})
+					}
+				})
+			}
 		})
 		return nil
 	})
