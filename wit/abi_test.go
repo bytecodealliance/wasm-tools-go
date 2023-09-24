@@ -95,11 +95,10 @@ func TestTypeSize(t *testing.T) {
 func TestSizeAndAlign(t *testing.T) {
 	err := loadTestdata(func(path string, res *Resolve) error {
 		t.Run(strings.TrimPrefix(path, testdataDir), func(t *testing.T) {
-			for i := range res.TypeDefs {
-				td := res.TypeDefs[i]
-				name := fmt.Sprintf("types/%d", i)
+			for i, td := range res.TypeDefs {
+				name := fmt.Sprintf("TypeDefs[%d]", i)
 				if td.Name != nil {
-					name += "/" + *td.Name
+					name += "#" + *td.Name
 				}
 				t.Run(name, func(t *testing.T) {
 					defer func() {
