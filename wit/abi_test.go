@@ -126,3 +126,34 @@ func TestSizeAndAlign(t *testing.T) {
 		t.Error(err)
 	}
 }
+
+// TestFunctionNameConsistency tests to see if the names in the map[string]*Function in
+// each [Interface] in a [Resolve] is identical to its Name field.
+func TestFunctionNameConsistency(t *testing.T) {
+	err := loadTestdata(func(path string, res *Resolve) error {
+		t.Run(strings.TrimPrefix(path, testdataDir), func(t *testing.T) {
+			for i, face := range res.Interfaces {
+				if len(face.Functions) == 0 {
+					continue
+				}
+				name := fmt.Sprintf("Interfaces[%d]", i)
+				if face.Name != nil {
+					name += "#" + *face.Name
+				}
+				t.Run(name, func(t *testing.T) {
+					for name, f := range face.Functions {
+						t.Run(name, func(t *testing.T) {
+							if name != f.Name {
+								t.Errorf("Interface.Functions[%q] != %q", name, f.Name)
+							}
+						})
+					}
+				})
+			}
+		})
+		return nil
+	})
+	if err != nil {
+		t.Error(err)
+	}
+}
