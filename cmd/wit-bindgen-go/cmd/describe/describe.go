@@ -31,13 +31,13 @@ func action(ctx *cli.Context) error {
 		if i > 0 {
 			p.Println()
 		}
-		describeWorld(p, w)
+		printWorld(p, w)
 	}
 
 	return nil
 }
 
-func describeWorld(p *printer, w *wit.World) {
+func printWorld(p *printer, w *wit.World) {
 	name := w.Package.Name.String() + "/" + w.Name
 	if len(w.Imports) == 0 && len(w.Exports) == 0 {
 		p.Printf("world %s {}\n", name)
@@ -48,36 +48,39 @@ func describeWorld(p *printer, w *wit.World) {
 	if len(w.Imports) > 0 || len(w.Exports) > 0 {
 		p.Println()
 		p := p.Indent()
-		for i, name := range codec.SortedKeys(w.Imports) {
-			if i > 0 {
+		n := 0
+		for _, name := range codec.SortedKeys(w.Imports) {
+			if n > 0 {
 				p.Println()
 			}
 			p.Print("import ")
-			describeWorldItem(p, name, w.Imports[name])
+			printWorldItem(p, name, w.Imports[name])
+			n++
 		}
-		for i, name := range codec.SortedKeys(w.Exports) {
-			if i > 0 {
+		for _, name := range codec.SortedKeys(w.Exports) {
+			if n > 0 {
 				p.Println()
 			}
 			p.Print("export ")
-			describeWorldItem(p, name, w.Exports[name])
+			printWorldItem(p, name, w.Exports[name])
+			n++
 		}
 	}
 	p.Println("}")
 }
 
-func describeWorldItem(p *printer, name string, item wit.WorldItem) {
+func printWorldItem(p *printer, name string, item wit.WorldItem) {
 	switch v := item.(type) {
 	case *wit.Interface:
-		describeInterface(p, name, v)
+		printInterface(p, name, v)
 	case *wit.TypeDef:
-		describeTypeDef(p, name, v)
+		printTypeDef(p, name, v)
 	case *wit.Function:
-		describeFunction(p, name, v)
+		printFunction(p, name, v)
 	}
 }
 
-func describeInterface(p *printer, name string, iface *wit.Interface) {
+func printInterface(p *printer, name string, iface *wit.Interface) {
 	if iface.Name != nil {
 		name = iface.Package.Name.String() + "/" + *iface.Name
 	}
@@ -86,43 +89,47 @@ func describeInterface(p *printer, name string, iface *wit.Interface) {
 	if len(iface.TypeDefs) > 0 || len(iface.Functions) > 0 {
 		p.Println()
 		p := p.Indent()
-		for i, name := range codec.SortedKeys(iface.TypeDefs) {
-			if i > 0 {
+		n := 0
+		for _, name := range codec.SortedKeys(iface.TypeDefs) {
+			if n > 0 {
 				fmt.Println()
 			}
-			describeTypeDef(p, name, iface.TypeDefs[name])
+			printTypeDef(p, name, iface.TypeDefs[name])
+			n++
 		}
-		if len(iface.TypeDefs) > 0 && len(iface.Functions) > 0 {
-			fmt.Println()
-		}
-		for i, name := range codec.SortedKeys(iface.Functions) {
-			if i > 0 {
+		for _, name := range codec.SortedKeys(iface.Functions) {
+			if n > 0 {
 				fmt.Println()
 			}
-			describeFunction(p, name, iface.Functions[name])
+			printFunction(p, name, iface.Functions[name])
+			n++
 		}
 	}
 	p.Println("}")
 }
 
-func describeTypeDef(p *printer, name string, t *wit.TypeDef) {
+func printTypeDef(p *printer, name string, t *wit.TypeDef) {
 	p.Printf("type %s = ", name)
 	p.Println("TypeDef(TODO)")
 }
 
-func describeFunction(p *printer, name string, f *wit.Function) {
+func printType(p *printer, t wit.Type) {
+	p.Print("T")
+}
+
+func printFunction(p *printer, name string, f *wit.Function) {
 	// TODO: print Function.Docs
 	p.Printf("%s: func(", name)
-	describeParams(p, f.Params)
+	printParams(p, f.Params)
 	p.Printf(")")
 	if len(f.Results) > 0 {
 		p.Printf(" -> ")
-		describeParams(p, f.Results)
+		printParams(p, f.Results)
 	}
 	p.Println()
 }
 
-func describeParams(p *printer, params []wit.Param) {
+func printParams(p *printer, params []wit.Param) {
 	for i, param := range params {
 		if i > 0 {
 			p.Print(", ")
@@ -130,12 +137,8 @@ func describeParams(p *printer, params []wit.Param) {
 		if param.Name != "" {
 			p.Printf("%s: ", param.Name)
 		}
-		describeType(p, param.Type)
+		printType(p, param.Type)
 	}
-}
-
-func describeType(p *printer, t wit.Type) {
-	p.Print("T")
 }
 
 type printer struct {
