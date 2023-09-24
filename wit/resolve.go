@@ -35,7 +35,7 @@ type World struct {
 	Name    string
 	Imports map[string]WorldItem
 	Exports map[string]WorldItem
-	Package *Package
+	Package *Package // optional [Package] that this World belongs to (can be nil)
 	Docs    Docs
 	_typeOwner
 }
@@ -331,7 +331,7 @@ func (v *Variant) maxCaseAlign() uintptr {
 // Case represents a single case in a [Variant].
 type Case struct {
 	Name string
-	Type Type // Represented in Rust as Option<Type>, so Type field could be nil
+	Type Type // optional associated [Type] (can be nil)
 	Docs Docs
 }
 
@@ -431,8 +431,8 @@ func (o *Option) Align() uintptr {
 //
 // [result type]: https://component-model.bytecodealliance.org/wit-overview.html#results
 type Result struct {
-	OK  Type // Represented in Rust as Option<Type>, so Type field could be nil
-	Err Type // Represented in Rust as Option<Type>, so Type field could be nil
+	OK  Type // optional associated [Type] (can be nil)
+	Err Type // optional associated [Type] (can be nil)
 	_typeDefKind
 }
 
@@ -490,7 +490,7 @@ func (*List) Align() uintptr { return 8 } // [2]int32
 // [future type]: https://github.com/bytecodealliance/wit-bindgen/issues/270
 // [WASI Preview 3]: https://bytecodealliance.org/articles/webassembly-the-updated-roadmap-for-developers
 type Future struct {
-	Type Type // Represented in Rust as Option<Type>, so Type field could be nil
+	Type Type // optional associated [Type] (can be nil)
 	_typeDefKind
 }
 
@@ -511,8 +511,8 @@ func (*Future) Align() uintptr { return 0 }
 // [stream type]: https://github.com/WebAssembly/WASI/blob/main/docs/WitInWasi.md#streams
 // [WASI Preview 3]: https://bytecodealliance.org/articles/webassembly-the-updated-roadmap-for-developers
 type Stream struct {
-	Element Type // Represented in Rust as Option<Type>, so Type field could be nil
-	End     Type // Represented in Rust as Option<Type>, so Type field could be nil
+	Element Type // optional associated [Type] (can be nil)
+	End     Type // optional associated [Type] (can be nil)
 	_typeDefKind
 }
 
