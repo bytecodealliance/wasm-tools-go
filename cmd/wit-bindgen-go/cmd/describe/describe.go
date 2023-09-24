@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/urfave/cli/v3"
+	"github.com/ydnar/wasm-tools-go/internal/codec"
 	"github.com/ydnar/wasm-tools-go/internal/witcli"
 	"github.com/ydnar/wasm-tools-go/wit"
 )
@@ -26,7 +27,10 @@ func action(ctx *cli.Context) error {
 
 	p := &printer{w: os.Stdout}
 
-	for _, w := range res.Worlds {
+	for i, w := range res.Worlds {
+		if i > 0 {
+			p.Println()
+		}
 		describeWorld(p, w)
 	}
 
@@ -44,17 +48,22 @@ func describeWorld(p *printer, w *wit.World) {
 	if len(w.Imports) > 0 || len(w.Exports) > 0 {
 		p.Println()
 		p := p.Indent()
-		for name, item := range w.Imports {
+		for i, name := range codec.SortedKeys(w.Imports) {
+			if i > 0 {
+				p.Println()
+			}
 			p.Print("import ")
-			describeWorldItem(p, name, item)
+			describeWorldItem(p, name, w.Imports[name])
 		}
-		for name, item := range w.Exports {
+		for i, name := range codec.SortedKeys(w.Exports) {
+			if i > 0 {
+				p.Println()
+			}
 			p.Print("export ")
-			describeWorldItem(p, name, item)
+			describeWorldItem(p, name, w.Exports[name])
 		}
 	}
 	p.Println("}")
-	p.Println()
 }
 
 func describeWorldItem(p *printer, name string, item wit.WorldItem) {
