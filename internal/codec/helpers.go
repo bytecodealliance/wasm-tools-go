@@ -1,5 +1,10 @@
 package codec
 
+import (
+	"cmp"
+	"slices"
+)
+
 // Must ensures that the pointer at *p is non-nil.
 // If *p is nil, a new value of type T will be allocated.
 func Must[T any](p **T) *T {
@@ -69,4 +74,21 @@ func (m *mapCodec[K, V]) DecodeField(dec Decoder, name string) error {
 	}
 	(*m)[K(name)] = v
 	return nil
+}
+
+// Keys returns a slice of keys for map m.
+func Keys[K comparable, V any](m map[K]V) []K {
+	keys := make([]K, 0, len(m))
+	for key := range m {
+		keys = append(keys, key)
+	}
+	return keys
+}
+
+// SortedKeys returns a slice of keys for map m.
+// Map keys must conform to cmp.Ordered.
+func SortedKeys[K cmp.Ordered, V any](m map[K]V) []K {
+	keys := Keys(m)
+	slices.Sort(keys)
+	return keys
 }
