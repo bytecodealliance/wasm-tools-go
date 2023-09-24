@@ -191,7 +191,7 @@ func TestPackageFieldIsNotNil(t *testing.T) {
 				}
 				t.Run(name, func(t *testing.T) {
 					if face.Package == nil {
-						t.Error("nil Package field")
+						t.Error("Package is nil")
 					}
 				})
 			}
@@ -199,7 +199,36 @@ func TestPackageFieldIsNotNil(t *testing.T) {
 				name := fmt.Sprintf("Worlds[%d]#%s", i, w.Name)
 				t.Run(name, func(t *testing.T) {
 					if w.Package == nil {
-						t.Error("nil Package field")
+						t.Error("Package is nil")
+					}
+				})
+			}
+		})
+		return nil
+	})
+	if err != nil {
+		t.Error(err)
+	}
+}
+
+// TestTypeDefNamesNotNil verifies that all [Record], [Variant], [Enum], and [Flags]
+// types have a non-nil Name.
+func TestTypeDefNamesNotNil(t *testing.T) {
+	err := loadTestdata(func(path string, res *Resolve) error {
+		t.Run(strings.TrimPrefix(path, testdataDir), func(t *testing.T) {
+			for i, v := range res.TypeDefs {
+				switch v.Kind.(type) {
+				case *Record, *Variant, *Enum, *Flags:
+				default:
+					continue
+				}
+				name := fmt.Sprintf("TypeDefs[%d]", i)
+				if v.Name != nil {
+					name += "#" + *v.Name
+				}
+				t.Run(name, func(t *testing.T) {
+					if v.Name == nil {
+						t.Error("Name is nil")
 					}
 				})
 			}
