@@ -11,14 +11,13 @@ import (
 )
 
 // Resolve represents a fully resolved set of WIT ([WebAssembly Interface Type])
-// packages.
+// packages and worlds.
 //
 // This structure contains a graph of WIT packages and their contents
 // merged together into slices organized by type. Items are sorted
 // topologically and everything is fully resolved.
 //
-// Each item in a [Resolve] has a parent link to trace it back to the original
-// package as necessary.
+// Each [World], [Interface], [TypeDef], or [Package] in a Resolve must be non-nil.
 //
 // [WebAssembly Interface Type]: https://component-model.bytecodealliance.org/wit-overview.html
 type Resolve struct {
@@ -35,7 +34,9 @@ type World struct {
 	Name    string
 	Imports map[string]WorldItem
 	Exports map[string]WorldItem
-	Package *Package // optional [Package] that this World belongs to (can be nil)
+
+	// The [Package] that this World belongs to. It must be non-nil when fully-resolved.
+	Package *Package
 	Docs    Docs
 	_typeOwner
 }
@@ -58,8 +59,10 @@ type Interface struct {
 	Name      *string
 	TypeDefs  map[string]*TypeDef
 	Functions map[string]*Function
-	Package   *Package
-	Docs      Docs
+
+	// The [Package] that this Interface belongs to. It must be non-nil when fully-resolved.
+	Package *Package
+	Docs    Docs
 	_worldItem
 	_typeOwner
 }
