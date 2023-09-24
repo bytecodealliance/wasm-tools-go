@@ -258,7 +258,7 @@
                   "x":           &wit.TypeDef{...},
                 },
                 Exports: map[string]wit.WorldItem{},
-                Package: (*wit.Package)(nil),
+                Package: &wit.Package{...},
                 Docs:    wit.Docs{
                   Contents: "",
                 },
@@ -276,7 +276,7 @@
       Exports: map[string]wit.WorldItem{
         "interface-3": &wit.Interface{...},
       },
-      Package: (*wit.Package)(nil),
+      Package: &wit.Package{...},
       Docs:    wit.Docs{
         Contents: "",
       },

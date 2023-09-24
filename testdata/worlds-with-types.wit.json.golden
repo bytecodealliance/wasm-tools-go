@@ -41,163 +41,163 @@
           },
         },
       },
-      Package: (*wit.Package)(nil),
-      Docs:    wit.Docs{
-        Contents: "",
-      },
-    },
-    &wit.World{
-      Name:    "bar",
-      Imports: map[string]wit.WorldItem{
-        "interface-0": &wit.Interface{
-          Name:     &"disambiguate",
-          TypeDefs: map[string]*wit.TypeDef{
-            "t": &wit.TypeDef{
-              Name:  &"t",
-              Kind:  wit.U32{},
-              Owner: &wit.Interface{...},
-              Docs:  wit.Docs{
-                Contents: "",
-              },
-            },
-          },
-          Functions: map[string]*wit.Function{},
-          Package:   &wit.Package{
-            Name: wit.PackageName{
-              Namespace: "foo",
-              Name:      "foo",
-              Version:   (*semver.Version)(nil),
-            },
-            Interfaces: map[string]*wit.Interface{
-              "disambiguate": &wit.Interface{...},
-            },
-            Worlds: map[string]*wit.World{
-              "bar":      &wit.World{...},
-              "foo":      &wit.World{...},
-              "the-test": &wit.World{
-                Name:    "the-test",
-                Imports: map[string]wit.WorldItem{
-                  "a": &wit.TypeDef{
-                    Name: &"a",
-                    Kind: &wit.Record{
-                      Fields: []wit.Field{
-                        wit.Field{
-                          Name: "x",
-                          Type: wit.U32{},
-                          Docs: wit.Docs{
-                            Contents: "",
-                          },
-                        },
-                      },
-                    },
-                    Owner: &wit.World{...},
-                    Docs:  wit.Docs{
-                      Contents: "",
-                    },
-                  },
-                  "b": &wit.TypeDef{
-                    Name: &"b",
-                    Kind: &wit.Variant{
-                      Cases: []wit.Case{
-                        wit.Case{
-                          Name: "c",
-                          Type: &wit.TypeDef{...},
-                          Docs: wit.Docs{
-                            Contents: "",
-                          },
-                        },
-                      },
-                    },
-                    Owner: &wit.World{...},
-                    Docs:  wit.Docs{
-                      Contents: "",
-                    },
-                  },
-                  "foo": &wit.Function{
-                    Name:   "foo",
-                    Kind:   &wit.Freestanding{...},
-                    Params: []wit.Param{
-                      wit.Param{
-                        Name: "a",
-                        Type: &wit.TypeDef{...},
-                      },
-                    },
-                    Results: []wit.Param{
-                      wit.Param{
-                        Name: "",
-                        Type: &wit.TypeDef{...},
-                      },
-                    },
-                    Docs: wit.Docs{
-                      Contents: "",
-                    },
-                  },
-                },
-                Exports: map[string]wit.WorldItem{
-                  "bar": &wit.Function{
-                    Name:   "bar",
-                    Kind:   &wit.Freestanding{...},
-                    Params: []wit.Param{
-                      wit.Param{
-                        Name: "a",
-                        Type: &wit.TypeDef{...},
-                      },
-                    },
-                    Results: []wit.Param{
-                      wit.Param{
-                        Name: "",
-                        Type: &wit.TypeDef{...},
-                      },
-                    },
-                    Docs: wit.Docs{
-                      Contents: "",
-                    },
-                  },
-                },
-                Package: (*wit.Package)(nil),
-                Docs:    wit.Docs{
+      Package: &wit.Package{
+        Name: wit.PackageName{
+          Namespace: "foo",
+          Name:      "foo",
+          Version:   (*semver.Version)(nil),
+        },
+        Interfaces: map[string]*wit.Interface{
+          "disambiguate": &wit.Interface{
+            Name:     &"disambiguate",
+            TypeDefs: map[string]*wit.TypeDef{
+              "t": &wit.TypeDef{
+                Name:  &"t",
+                Kind:  wit.U32{},
+                Owner: &wit.Interface{...},
+                Docs:  wit.Docs{
                   Contents: "",
                 },
               },
             },
-            Docs: wit.Docs{
+            Functions: map[string]*wit.Function{},
+            Package:   &wit.Package{...},
+            Docs:      wit.Docs{
               Contents: "",
             },
           },
-          Docs: wit.Docs{
-            Contents: "",
-          },
         },
-        "t": &wit.TypeDef{
-          Name:  &"t",
-          Kind:  &wit.TypeDef{...},
-          Owner: &wit.World{...},
-          Docs:  wit.Docs{
-            Contents: "",
-          },
-        },
-      },
-      Exports: map[string]wit.WorldItem{
-        "foo": &wit.Function{
-          Name:    "foo",
-          Kind:    &wit.Freestanding{...},
-          Params:  []wit.Param(nil),
-          Results: []wit.Param{
-            wit.Param{
-              Name: "",
-              Type: &wit.TypeDef{...},
+        Worlds: map[string]*wit.World{
+          "bar": &wit.World{
+            Name:    "bar",
+            Imports: map[string]wit.WorldItem{
+              "interface-0": &wit.Interface{...},
+              "t":           &wit.TypeDef{
+                Name:  &"t",
+                Kind:  &wit.TypeDef{...},
+                Owner: &wit.World{...},
+                Docs:  wit.Docs{
+                  Contents: "",
+                },
+              },
+            },
+            Exports: map[string]wit.WorldItem{
+              "foo": &wit.Function{
+                Name:    "foo",
+                Kind:    &wit.Freestanding{...},
+                Params:  []wit.Param(nil),
+                Results: []wit.Param{
+                  wit.Param{
+                    Name: "",
+                    Type: &wit.TypeDef{...},
+                  },
+                },
+                Docs: wit.Docs{
+                  Contents: "",
+                },
+              },
+            },
+            Package: &wit.Package{...},
+            Docs:    wit.Docs{
+              Contents: "",
             },
           },
-          Docs: wit.Docs{
-            Contents: "",
+          "foo":      &wit.World{...},
+          "the-test": &wit.World{
+            Name:    "the-test",
+            Imports: map[string]wit.WorldItem{
+              "a": &wit.TypeDef{
+                Name: &"a",
+                Kind: &wit.Record{
+                  Fields: []wit.Field{
+                    wit.Field{
+                      Name: "x",
+                      Type: wit.U32{},
+                      Docs: wit.Docs{
+                        Contents: "",
+                      },
+                    },
+                  },
+                },
+                Owner: &wit.World{...},
+                Docs:  wit.Docs{
+                  Contents: "",
+                },
+              },
+              "b": &wit.TypeDef{
+                Name: &"b",
+                Kind: &wit.Variant{
+                  Cases: []wit.Case{
+                    wit.Case{
+                      Name: "c",
+                      Type: &wit.TypeDef{...},
+                      Docs: wit.Docs{
+                        Contents: "",
+                      },
+                    },
+                  },
+                },
+                Owner: &wit.World{...},
+                Docs:  wit.Docs{
+                  Contents: "",
+                },
+              },
+              "foo": &wit.Function{
+                Name:   "foo",
+                Kind:   &wit.Freestanding{...},
+                Params: []wit.Param{
+                  wit.Param{
+                    Name: "a",
+                    Type: &wit.TypeDef{...},
+                  },
+                },
+                Results: []wit.Param{
+                  wit.Param{
+                    Name: "",
+                    Type: &wit.TypeDef{...},
+                  },
+                },
+                Docs: wit.Docs{
+                  Contents: "",
+                },
+              },
+            },
+            Exports: map[string]wit.WorldItem{
+              "bar": &wit.Function{
+                Name:   "bar",
+                Kind:   &wit.Freestanding{...},
+                Params: []wit.Param{
+                  wit.Param{
+                    Name: "a",
+                    Type: &wit.TypeDef{...},
+                  },
+                },
+                Results: []wit.Param{
+                  wit.Param{
+                    Name: "",
+                    Type: &wit.TypeDef{...},
+                  },
+                },
+                Docs: wit.Docs{
+                  Contents: "",
+                },
+              },
+            },
+            Package: &wit.Package{...},
+            Docs:    wit.Docs{
+              Contents: "",
+            },
           },
         },
+        Docs: wit.Docs{
+          Contents: "",
+        },
       },
-      Package: (*wit.Package)(nil),
-      Docs:    wit.Docs{
+      Docs: wit.Docs{
         Contents: "",
       },
     },
+    &wit.World{...},
     &wit.World{...},
   },
   Interfaces: []*wit.Interface{

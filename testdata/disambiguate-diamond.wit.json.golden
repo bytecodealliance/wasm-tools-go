@@ -93,7 +93,7 @@
         "interface-1": &wit.Interface{...},
       },
       Exports: map[string]wit.WorldItem{},
-      Package: (*wit.Package)(nil),
+      Package: &wit.Package{...},
       Docs:    wit.Docs{
         Contents: "",
       },

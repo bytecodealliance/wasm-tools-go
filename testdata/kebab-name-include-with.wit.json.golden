@@ -14,77 +14,77 @@
         },
       },
       Exports: map[string]wit.WorldItem{},
-      Package: (*wit.Package)(nil),
-      Docs:    wit.Docs{
-        Contents: "",
-      },
-    },
-    &wit.World{
-      Name:    "bar",
-      Imports: map[string]wit.WorldItem{
-        "a": &wit.Function{
-          Name:    "a",
-          Kind:    &wit.Freestanding{...},
-          Params:  []wit.Param(nil),
-          Results: []wit.Param(nil),
-          Docs:    wit.Docs{
-            Contents: "",
-          },
+      Package: &wit.Package{
+        Name: wit.PackageName{
+          Namespace: "foo",
+          Name:      "foo",
+          Version:   (*semver.Version)(nil),
         },
-      },
-      Exports: map[string]wit.WorldItem{},
-      Package: (*wit.Package)(nil),
-      Docs:    wit.Docs{
-        Contents: "",
-      },
-    },
-    &wit.World{
-      Name:    "baz",
-      Imports: map[string]wit.WorldItem{
-        "a": &wit.Function{
-          Name:    "a",
-          Kind:    &wit.Freestanding{...},
-          Params:  []wit.Param(nil),
-          Results: []wit.Param(nil),
-          Docs:    wit.Docs{
-            Contents: "",
+        Interfaces: map[string]*wit.Interface{},
+        Worlds:     map[string]*wit.World{
+          "bar": &wit.World{
+            Name:    "bar",
+            Imports: map[string]wit.WorldItem{
+              "a": &wit.Function{
+                Name:    "a",
+                Kind:    &wit.Freestanding{...},
+                Params:  []wit.Param(nil),
+                Results: []wit.Param(nil),
+                Docs:    wit.Docs{
+                  Contents: "",
+                },
+              },
+            },
+            Exports: map[string]wit.WorldItem{},
+            Package: &wit.Package{...},
+            Docs:    wit.Docs{
+              Contents: "",
+            },
           },
-        },
-        "b": &wit.Function{
-          Name:    "a",
-          Kind:    &wit.Freestanding{...},
-          Params:  []wit.Param(nil),
-          Results: []wit.Param(nil),
-          Docs:    wit.Docs{
-            Contents: "",
+          "baz": &wit.World{
+            Name:    "baz",
+            Imports: map[string]wit.WorldItem{
+              "a": &wit.Function{
+                Name:    "a",
+                Kind:    &wit.Freestanding{...},
+                Params:  []wit.Param(nil),
+                Results: []wit.Param(nil),
+                Docs:    wit.Docs{
+                  Contents: "",
+                },
+              },
+              "b": &wit.Function{
+                Name:    "a",
+                Kind:    &wit.Freestanding{...},
+                Params:  []wit.Param(nil),
+                Results: []wit.Param(nil),
+                Docs:    wit.Docs{
+                  Contents: "",
+                },
+              },
+            },
+            Exports: map[string]wit.WorldItem{},
+            Package: &wit.Package{...},
+            Docs:    wit.Docs{
+              Contents: "",
+            },
           },
+          "foo": &wit.World{...},
         },
-      },
-      Exports: map[string]wit.WorldItem{},
-      Package: (*wit.Package)(nil),
-      Docs:    wit.Docs{
-        Contents: "",
-      },
-    },
-  },
-  Interfaces: []*wit.Interface(nil),
-  TypeDefs:   []*wit.TypeDef(nil),
-  Packages:   []*wit.Package{
-    &wit.Package{
-      Name: wit.PackageName{
-        Namespace: "foo",
-        Name:      "foo",
-        Version:   (*semver.Version)(nil),
-      },
-      Interfaces: map[string]*wit.Interface{},
-      Worlds:     map[string]*wit.World{
-        "bar": &wit.World{...},
-        "baz": &wit.World{...},
-        "foo": &wit.World{...},
+        Docs: wit.Docs{
+          Contents: "",
+        },
       },
       Docs: wit.Docs{
         Contents: "",
       },
     },
+    &wit.World{...},
+    &wit.World{...},
+  },
+  Interfaces: []*wit.Interface(nil),
+  TypeDefs:   []*wit.TypeDef(nil),
+  Packages:   []*wit.Package{
+    &wit.Package{...},
   },
 }

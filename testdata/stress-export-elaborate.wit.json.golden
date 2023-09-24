@@ -930,7 +930,7 @@
       Exports: map[string]wit.WorldItem{
         "interface-9": &wit.Interface{...},
       },
-      Package: (*wit.Package)(nil),
+      Package: &wit.Package{...},
       Docs:    wit.Docs{
         Contents: "",
       },

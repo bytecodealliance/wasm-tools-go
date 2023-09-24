@@ -54,247 +54,6 @@
         "c": &wit.TypeDef{...},
       },
       Exports: map[string]wit.WorldItem{},
-      Package: (*wit.Package)(nil),
-      Docs:    wit.Docs{
-        Contents: "",
-      },
-    },
-  },
-  Interfaces: []*wit.Interface{
-    &wit.Interface{
-      Name:     &"foo",
-      TypeDefs: map[string]*wit.TypeDef{
-        "a": &wit.TypeDef{
-          Name:  &"a",
-          Kind:  &wit.Resource{...},
-          Owner: &wit.Interface{...},
-          Docs:  wit.Docs{
-            Contents: "",
-          },
-        },
-        "b": &wit.TypeDef{
-          Name:  &"b",
-          Kind:  &wit.Resource{...},
-          Owner: &wit.Interface{...},
-          Docs:  wit.Docs{
-            Contents: "",
-          },
-        },
-        "c": &wit.TypeDef{
-          Name:  &"c",
-          Kind:  &wit.Resource{...},
-          Owner: &wit.Interface{...},
-          Docs:  wit.Docs{
-            Contents: "",
-          },
-        },
-        "d": &wit.TypeDef{
-          Name:  &"d",
-          Kind:  &wit.Resource{...},
-          Owner: &wit.Interface{...},
-          Docs:  wit.Docs{
-            Contents: "",
-          },
-        },
-        "e": &wit.TypeDef{
-          Name:  &"e",
-          Kind:  &wit.Resource{...},
-          Owner: &wit.Interface{...},
-          Docs:  wit.Docs{
-            Contents: "",
-          },
-        },
-      },
-      Functions: map[string]*wit.Function{
-        "[constructor]b": &wit.Function{
-          Name: "[constructor]b",
-          Kind: &wit.Constructor{
-            Type: &wit.TypeDef{...},
-          },
-          Params:  []wit.Param(nil),
-          Results: []wit.Param{
-            wit.Param{
-              Name: "",
-              Type: &wit.TypeDef{
-                Name: (*string)(nil),
-                Kind: &wit.OwnedHandle{
-                  Type: &wit.TypeDef{...},
-                },
-                Owner: nil,
-                Docs:  wit.Docs{
-                  Contents: "",
-                },
-              },
-            },
-          },
-          Docs: wit.Docs{
-            Contents: "",
-          },
-        },
-        "[constructor]c": &wit.Function{
-          Name: "[constructor]c",
-          Kind: &wit.Constructor{
-            Type: &wit.TypeDef{...},
-          },
-          Params: []wit.Param{
-            wit.Param{
-              Name: "x",
-              Type: wit.U32{},
-            },
-          },
-          Results: []wit.Param{
-            wit.Param{
-              Name: "",
-              Type: &wit.TypeDef{
-                Name: (*string)(nil),
-                Kind: &wit.OwnedHandle{
-                  Type: &wit.TypeDef{...},
-                },
-                Owner: nil,
-                Docs:  wit.Docs{
-                  Contents: "",
-                },
-              },
-            },
-          },
-          Docs: wit.Docs{
-            Contents: "",
-          },
-        },
-        "[constructor]d": &wit.Function{
-          Name: "[constructor]d",
-          Kind: &wit.Constructor{
-            Type: &wit.TypeDef{...},
-          },
-          Params: []wit.Param{
-            wit.Param{
-              Name: "x",
-              Type: wit.U32{},
-            },
-          },
-          Results: []wit.Param{
-            wit.Param{
-              Name: "",
-              Type: &wit.TypeDef{
-                Name: (*string)(nil),
-                Kind: &wit.OwnedHandle{
-                  Type: &wit.TypeDef{...},
-                },
-                Owner: nil,
-                Docs:  wit.Docs{
-                  Contents: "",
-                },
-              },
-            },
-          },
-          Docs: wit.Docs{
-            Contents: "",
-          },
-        },
-        "[constructor]e": &wit.Function{
-          Name: "[constructor]e",
-          Kind: &wit.Constructor{
-            Type: &wit.TypeDef{...},
-          },
-          Params: []wit.Param{
-            wit.Param{
-              Name: "other",
-              Type: &wit.TypeDef{
-                Name: (*string)(nil),
-                Kind: &wit.OwnedHandle{
-                  Type: &wit.TypeDef{...},
-                },
-                Owner: nil,
-                Docs:  wit.Docs{
-                  Contents: "",
-                },
-              },
-            },
-            wit.Param{
-              Name: "other2",
-              Type: &wit.TypeDef{
-                Name: (*string)(nil),
-                Kind: &wit.BorrowedHandle{
-                  Type: &wit.TypeDef{...},
-                },
-                Owner: nil,
-                Docs:  wit.Docs{
-                  Contents: "",
-                },
-              },
-            },
-          },
-          Results: []wit.Param{
-            wit.Param{
-              Name: "",
-              Type: &wit.TypeDef{...},
-            },
-          },
-          Docs: wit.Docs{
-            Contents: "",
-          },
-        },
-        "[method]d.a": &wit.Function{
-          Name: "[method]d.a",
-          Kind: &wit.Method{
-            Type: &wit.TypeDef{...},
-          },
-          Params: []wit.Param{
-            wit.Param{
-              Name: "self",
-              Type: &wit.TypeDef{
-                Name: (*string)(nil),
-                Kind: &wit.BorrowedHandle{
-                  Type: &wit.TypeDef{...},
-                },
-                Owner: nil,
-                Docs:  wit.Docs{
-                  Contents: "",
-                },
-              },
-            },
-          },
-          Results: []wit.Param(nil),
-          Docs:    wit.Docs{
-            Contents: "",
-          },
-        },
-        "[method]e.method": &wit.Function{
-          Name: "[method]e.method",
-          Kind: &wit.Method{
-            Type: &wit.TypeDef{...},
-          },
-          Params: []wit.Param{
-            wit.Param{
-              Name: "self",
-              Type: &wit.TypeDef{...},
-            },
-            wit.Param{
-              Name: "thing",
-              Type: &wit.TypeDef{...},
-            },
-            wit.Param{
-              Name: "thing2",
-              Type: &wit.TypeDef{...},
-            },
-          },
-          Results: []wit.Param(nil),
-          Docs:    wit.Docs{
-            Contents: "",
-          },
-        },
-        "[static]d.b": &wit.Function{
-          Name: "[static]d.b",
-          Kind: &wit.Static{
-            Type: &wit.TypeDef{...},
-          },
-          Params:  []wit.Param(nil),
-          Results: []wit.Param(nil),
-          Docs:    wit.Docs{
-            Contents: "",
-          },
-        },
-      },
       Package: &wit.Package{
         Name: wit.PackageName{
           Namespace: "foo",
@@ -302,8 +61,246 @@
           Version:   (*semver.Version)(nil),
         },
         Interfaces: map[string]*wit.Interface{
-          "foo": &wit.Interface{...},
-          "i":   &wit.Interface{
+          "foo": &wit.Interface{
+            Name:     &"foo",
+            TypeDefs: map[string]*wit.TypeDef{
+              "a": &wit.TypeDef{
+                Name:  &"a",
+                Kind:  &wit.Resource{...},
+                Owner: &wit.Interface{...},
+                Docs:  wit.Docs{
+                  Contents: "",
+                },
+              },
+              "b": &wit.TypeDef{
+                Name:  &"b",
+                Kind:  &wit.Resource{...},
+                Owner: &wit.Interface{...},
+                Docs:  wit.Docs{
+                  Contents: "",
+                },
+              },
+              "c": &wit.TypeDef{
+                Name:  &"c",
+                Kind:  &wit.Resource{...},
+                Owner: &wit.Interface{...},
+                Docs:  wit.Docs{
+                  Contents: "",
+                },
+              },
+              "d": &wit.TypeDef{
+                Name:  &"d",
+                Kind:  &wit.Resource{...},
+                Owner: &wit.Interface{...},
+                Docs:  wit.Docs{
+                  Contents: "",
+                },
+              },
+              "e": &wit.TypeDef{
+                Name:  &"e",
+                Kind:  &wit.Resource{...},
+                Owner: &wit.Interface{...},
+                Docs:  wit.Docs{
+                  Contents: "",
+                },
+              },
+            },
+            Functions: map[string]*wit.Function{
+              "[constructor]b": &wit.Function{
+                Name: "[constructor]b",
+                Kind: &wit.Constructor{
+                  Type: &wit.TypeDef{...},
+                },
+                Params:  []wit.Param(nil),
+                Results: []wit.Param{
+                  wit.Param{
+                    Name: "",
+                    Type: &wit.TypeDef{
+                      Name: (*string)(nil),
+                      Kind: &wit.OwnedHandle{
+                        Type: &wit.TypeDef{...},
+                      },
+                      Owner: nil,
+                      Docs:  wit.Docs{
+                        Contents: "",
+                      },
+                    },
+                  },
+                },
+                Docs: wit.Docs{
+                  Contents: "",
+                },
+              },
+              "[constructor]c": &wit.Function{
+                Name: "[constructor]c",
+                Kind: &wit.Constructor{
+                  Type: &wit.TypeDef{...},
+                },
+                Params: []wit.Param{
+                  wit.Param{
+                    Name: "x",
+                    Type: wit.U32{},
+                  },
+                },
+                Results: []wit.Param{
+                  wit.Param{
+                    Name: "",
+                    Type: &wit.TypeDef{
+                      Name: (*string)(nil),
+                      Kind: &wit.OwnedHandle{
+                        Type: &wit.TypeDef{...},
+                      },
+                      Owner: nil,
+                      Docs:  wit.Docs{
+                        Contents: "",
+                      },
+                    },
+                  },
+                },
+                Docs: wit.Docs{
+                  Contents: "",
+                },
+              },
+              "[constructor]d": &wit.Function{
+                Name: "[constructor]d",
+                Kind: &wit.Constructor{
+                  Type: &wit.TypeDef{...},
+                },
+                Params: []wit.Param{
+                  wit.Param{
+                    Name: "x",
+                    Type: wit.U32{},
+                  },
+                },
+                Results: []wit.Param{
+                  wit.Param{
+                    Name: "",
+                    Type: &wit.TypeDef{
+                      Name: (*string)(nil),
+                      Kind: &wit.OwnedHandle{
+                        Type: &wit.TypeDef{...},
+                      },
+                      Owner: nil,
+                      Docs:  wit.Docs{
+                        Contents: "",
+                      },
+                    },
+                  },
+                },
+                Docs: wit.Docs{
+                  Contents: "",
+                },
+              },
+              "[constructor]e": &wit.Function{
+                Name: "[constructor]e",
+                Kind: &wit.Constructor{
+                  Type: &wit.TypeDef{...},
+                },
+                Params: []wit.Param{
+                  wit.Param{
+                    Name: "other",
+                    Type: &wit.TypeDef{
+                      Name: (*string)(nil),
+                      Kind: &wit.OwnedHandle{
+                        Type: &wit.TypeDef{...},
+                      },
+                      Owner: nil,
+                      Docs:  wit.Docs{
+                        Contents: "",
+                      },
+                    },
+                  },
+                  wit.Param{
+                    Name: "other2",
+                    Type: &wit.TypeDef{
+                      Name: (*string)(nil),
+                      Kind: &wit.BorrowedHandle{
+                        Type: &wit.TypeDef{...},
+                      },
+                      Owner: nil,
+                      Docs:  wit.Docs{
+                        Contents: "",
+                      },
+                    },
+                  },
+                },
+                Results: []wit.Param{
+                  wit.Param{
+                    Name: "",
+                    Type: &wit.TypeDef{...},
+                  },
+                },
+                Docs: wit.Docs{
+                  Contents: "",
+                },
+              },
+              "[method]d.a": &wit.Function{
+                Name: "[method]d.a",
+                Kind: &wit.Method{
+                  Type: &wit.TypeDef{...},
+                },
+                Params: []wit.Param{
+                  wit.Param{
+                    Name: "self",
+                    Type: &wit.TypeDef{
+                      Name: (*string)(nil),
+                      Kind: &wit.BorrowedHandle{
+                        Type: &wit.TypeDef{...},
+                      },
+                      Owner: nil,
+                      Docs:  wit.Docs{
+                        Contents: "",
+                      },
+                    },
+                  },
+                },
+                Results: []wit.Param(nil),
+                Docs:    wit.Docs{
+                  Contents: "",
+                },
+              },
+              "[method]e.method": &wit.Function{
+                Name: "[method]e.method",
+                Kind: &wit.Method{
+                  Type: &wit.TypeDef{...},
+                },
+                Params: []wit.Param{
+                  wit.Param{
+                    Name: "self",
+                    Type: &wit.TypeDef{...},
+                  },
+                  wit.Param{
+                    Name: "thing",
+                    Type: &wit.TypeDef{...},
+                  },
+                  wit.Param{
+                    Name: "thing2",
+                    Type: &wit.TypeDef{...},
+                  },
+                },
+                Results: []wit.Param(nil),
+                Docs:    wit.Docs{
+                  Contents: "",
+                },
+              },
+              "[static]d.b": &wit.Function{
+                Name: "[static]d.b",
+                Kind: &wit.Static{
+                  Type: &wit.TypeDef{...},
+                },
+                Params:  []wit.Param(nil),
+                Results: []wit.Param(nil),
+                Docs:    wit.Docs{
+                  Contents: "",
+                },
+              },
+            },
+            Package: &wit.Package{...},
+            Docs:    wit.Docs{
+              Contents: "",
+            },
+          },
+          "i": &wit.Interface{
             Name:     &"i",
             TypeDefs: map[string]*wit.TypeDef{
               "a": &wit.TypeDef{
@@ -361,6 +358,9 @@
         Contents: "",
       },
     },
+  },
+  Interfaces: []*wit.Interface{
+    &wit.Interface{...},
     &wit.Interface{...},
   },
   TypeDefs: []*wit.TypeDef{

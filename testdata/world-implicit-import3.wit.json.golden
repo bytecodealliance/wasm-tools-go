@@ -61,7 +61,7 @@
           },
         },
       },
-      Package: (*wit.Package)(nil),
+      Package: &wit.Package{...},
       Docs:    wit.Docs{
         Contents: "",
       },

@@ -104,6 +104,8 @@ func (c *worldCodec) DecodeField(dec codec.Decoder, name string) error {
 		return codec.DecodeMap(dec, &w.Imports)
 	case "exports":
 		return codec.DecodeMap(dec, &w.Exports)
+	case "package":
+		return dec.Decode(&w.Package)
 	case "docs":
 		return dec.Decode(&w.Docs)
 	}

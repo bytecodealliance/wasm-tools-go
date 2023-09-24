@@ -27,8 +27,21 @@
         },
       },
       Exports: map[string]wit.WorldItem{},
-      Package: (*wit.Package)(nil),
-      Docs:    wit.Docs{
+      Package: &wit.Package{
+        Name: wit.PackageName{
+          Namespace: "foo",
+          Name:      "foo",
+          Version:   (*semver.Version)(nil),
+        },
+        Interfaces: map[string]*wit.Interface{},
+        Worlds:     map[string]*wit.World{
+          "foo": &wit.World{...},
+        },
+        Docs: wit.Docs{
+          Contents: "",
+        },
+      },
+      Docs: wit.Docs{
         Contents: "",
       },
     },
@@ -39,19 +52,6 @@
   TypeDefs: []*wit.TypeDef(nil),
   Packages: []*wit.Package{
     &wit.Package{...},
-    &wit.Package{
-      Name: wit.PackageName{
-        Namespace: "foo",
-        Name:      "foo",
-        Version:   (*semver.Version)(nil),
-      },
-      Interfaces: map[string]*wit.Interface{},
-      Worlds:     map[string]*wit.World{
-        "foo": &wit.World{...},
-      },
-      Docs: wit.Docs{
-        Contents: "",
-      },
-    },
+    &wit.Package{...},
   },
 }

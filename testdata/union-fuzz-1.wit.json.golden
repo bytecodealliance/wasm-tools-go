@@ -4,48 +4,48 @@
       Name:    "xo",
       Imports: map[string]wit.WorldItem{},
       Exports: map[string]wit.WorldItem{},
-      Package: (*wit.Package)(nil),
-      Docs:    wit.Docs{
-        Contents: "",
-      },
-    },
-    &wit.World{
-      Name:    "name",
-      Imports: map[string]wit.WorldItem{},
-      Exports: map[string]wit.WorldItem{},
-      Package: (*wit.Package)(nil),
-      Docs:    wit.Docs{
-        Contents: "",
-      },
-    },
-    &wit.World{
-      Name:    "x",
-      Imports: map[string]wit.WorldItem{},
-      Exports: map[string]wit.WorldItem{},
-      Package: (*wit.Package)(nil),
-      Docs:    wit.Docs{
-        Contents: "",
-      },
-    },
-  },
-  Interfaces: []*wit.Interface(nil),
-  TypeDefs:   []*wit.TypeDef(nil),
-  Packages:   []*wit.Package{
-    &wit.Package{
-      Name: wit.PackageName{
-        Namespace: "foo",
-        Name:      "bar",
-        Version:   (*semver.Version)(nil),
-      },
-      Interfaces: map[string]*wit.Interface{},
-      Worlds:     map[string]*wit.World{
-        "name": &wit.World{...},
-        "x":    &wit.World{...},
-        "xo":   &wit.World{...},
+      Package: &wit.Package{
+        Name: wit.PackageName{
+          Namespace: "foo",
+          Name:      "bar",
+          Version:   (*semver.Version)(nil),
+        },
+        Interfaces: map[string]*wit.Interface{},
+        Worlds:     map[string]*wit.World{
+          "name": &wit.World{
+            Name:    "name",
+            Imports: map[string]wit.WorldItem{},
+            Exports: map[string]wit.WorldItem{},
+            Package: &wit.Package{...},
+            Docs:    wit.Docs{
+              Contents: "",
+            },
+          },
+          "x": &wit.World{
+            Name:    "x",
+            Imports: map[string]wit.WorldItem{},
+            Exports: map[string]wit.WorldItem{},
+            Package: &wit.Package{...},
+            Docs:    wit.Docs{
+              Contents: "",
+            },
+          },
+          "xo": &wit.World{...},
+        },
+        Docs: wit.Docs{
+          Contents: "",
+        },
       },
       Docs: wit.Docs{
         Contents: "",
       },
     },
+    &wit.World{...},
+    &wit.World{...},
+  },
+  Interfaces: []*wit.Interface(nil),
+  TypeDefs:   []*wit.TypeDef(nil),
+  Packages:   []*wit.Package{
+    &wit.Package{...},
   },
 }

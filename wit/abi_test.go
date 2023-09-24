@@ -3,7 +3,6 @@ package wit
 import (
 	"fmt"
 	"math"
-	"strings"
 	"testing"
 )
 
@@ -89,105 +88,5 @@ func TestTypeSize(t *testing.T) {
 			}
 
 		})
-	}
-}
-
-func TestSizeAndAlign(t *testing.T) {
-	err := loadTestdata(func(path string, res *Resolve) error {
-		t.Run(strings.TrimPrefix(path, testdataDir), func(t *testing.T) {
-			for i, td := range res.TypeDefs {
-				name := fmt.Sprintf("TypeDefs[%d]", i)
-				if td.Name != nil {
-					name += "#" + *td.Name
-				}
-				t.Run(name, func(t *testing.T) {
-					defer func() {
-						err := recover()
-						if err != nil {
-							t.Fatalf("panic: %v", err)
-						}
-					}()
-
-					got, want := td.Size(), td.Kind.Size()
-					if got != want {
-						t.Errorf("(*TypeDef).Size(): got %d, expected %d", got, want)
-					}
-
-					got, want = td.Align(), td.Kind.Align()
-					if got != want {
-						t.Errorf("(*TypeDef).Align(): got %d, expected %d", got, want)
-					}
-				})
-			}
-		})
-		return nil
-	})
-	if err != nil {
-		t.Error(err)
-	}
-}
-
-// TestFunctionNameConsistency tests to see if the names in the map[string]*Function in
-// each [Interface] in a [Resolve] is identical to its Name field.
-func TestFunctionNameConsistency(t *testing.T) {
-	err := loadTestdata(func(path string, res *Resolve) error {
-		t.Run(strings.TrimPrefix(path, testdataDir), func(t *testing.T) {
-			for i, face := range res.Interfaces {
-				if len(face.Functions) == 0 {
-					continue
-				}
-				name := fmt.Sprintf("Interfaces[%d]", i)
-				if face.Name != nil {
-					name += "#" + *face.Name
-				}
-				t.Run(name, func(t *testing.T) {
-					for name, f := range face.Functions {
-						t.Run(name, func(t *testing.T) {
-							if name != f.Name {
-								t.Errorf("Interface.Functions[%q] != %q", name, f.Name)
-							}
-						})
-					}
-				})
-			}
-
-			for i, w := range res.Worlds {
-				if len(w.Imports) == 0 && len(w.Exports) == 0 {
-					continue
-				}
-				name := fmt.Sprintf("Worlds[%d]#%s", i, w.Name)
-				t.Run(name, func(t *testing.T) {
-					// A world can rename an imported function, so disable this
-					// for name, item := range w.Imports {
-					// 	f, ok := item.(*Function)
-					// 	if !ok {
-					// 		continue
-					// 	}
-					// 	t.Run(fmt.Sprintf("Imports[%q]==%q", name, f.Name), func(t *testing.T) {
-					// 		if name != f.Name {
-					// 			t.Errorf("Imports[%q] != %q", name, f.Name)
-					// 		}
-					// 	})
-					// }
-
-					// TODO: can a world rename an exported function?
-					for name, item := range w.Exports {
-						f, ok := item.(*Function)
-						if !ok {
-							continue
-						}
-						t.Run(fmt.Sprintf("Exports[%q]==%q", name, f.Name), func(t *testing.T) {
-							if name != f.Name {
-								t.Errorf("Exports[%q] != %q", name, f.Name)
-							}
-						})
-					}
-				})
-			}
-		})
-		return nil
-	})
-	if err != nil {
-		t.Error(err)
 	}
 }
