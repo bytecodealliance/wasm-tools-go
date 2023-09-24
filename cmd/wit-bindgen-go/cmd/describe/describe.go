@@ -69,34 +69,73 @@ func describeWorld(p *printer, w *wit.World) {
 func describeWorldItem(p *printer, name string, item wit.WorldItem) {
 	switch v := item.(type) {
 	case *wit.Interface:
-		describeWorldInterface(p, name, v)
+		describeInterface(p, name, v)
 	case *wit.TypeDef:
-		describeWorldTypeDef(p, name, v)
+		describeTypeDef(p, name, v)
 	case *wit.Function:
-		describeWorldFunction(p, name, v)
+		describeFunction(p, name, v)
 	}
 }
 
-func describeWorldInterface(p *printer, name string, i *wit.Interface) {
-	if i.Name != nil {
-		name = i.Package.Name.String() + "/" + *i.Name
+func describeInterface(p *printer, name string, iface *wit.Interface) {
+	if iface.Name != nil {
+		name = iface.Package.Name.String() + "/" + *iface.Name
 	}
 	// TODO: print Interface.Docs
 	p.Printf("%s {", name)
-	if len(i.TypeDefs) > 0 || len(i.Functions) > 0 {
+	if len(iface.TypeDefs) > 0 || len(iface.Functions) > 0 {
 		p.Println()
 		p := p.Indent()
-		var _ = p
+		for i, name := range codec.SortedKeys(iface.TypeDefs) {
+			if i > 0 {
+				fmt.Println()
+			}
+			describeTypeDef(p, name, iface.TypeDefs[name])
+		}
+		if len(iface.TypeDefs) > 0 && len(iface.Functions) > 0 {
+			fmt.Println()
+		}
+		for i, name := range codec.SortedKeys(iface.Functions) {
+			if i > 0 {
+				fmt.Println()
+			}
+			describeFunction(p, name, iface.Functions[name])
+		}
 	}
 	p.Println("}")
 }
 
-func describeWorldTypeDef(p *printer, name string, t *wit.TypeDef) {
-	// TODO
+func describeTypeDef(p *printer, name string, t *wit.TypeDef) {
+	p.Printf("type %s = ", name)
+	p.Println("TypeDef(TODO)")
 }
 
-func describeWorldFunction(p *printer, name string, t *wit.Function) {
-	// TODO
+func describeFunction(p *printer, name string, f *wit.Function) {
+	// TODO: print Function.Docs
+	p.Printf("%s: func(", name)
+	describeParams(p, f.Params)
+	p.Printf(")")
+	if len(f.Results) > 0 {
+		p.Printf(" -> ")
+		describeParams(p, f.Results)
+	}
+	p.Println()
+}
+
+func describeParams(p *printer, params []wit.Param) {
+	for i, param := range params {
+		if i > 0 {
+			p.Print(", ")
+		}
+		if param.Name != "" {
+			p.Printf("%s: ", param.Name)
+		}
+		describeType(p, param.Type)
+	}
+}
+
+func describeType(p *printer, t wit.Type) {
+	p.Print("T")
 }
 
 type printer struct {
