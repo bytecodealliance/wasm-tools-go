@@ -35,7 +35,7 @@ type World struct {
 	Imports map[string]WorldItem
 	Exports map[string]WorldItem
 
-	// The [Package] that this World belongs to. It must be non-nil when fully-resolved.
+	// The [Package] that this World belongs to. It must be non-nil when fully resolved.
 	Package *Package
 	Docs    Docs
 	_typeOwner
@@ -60,7 +60,7 @@ type Interface struct {
 	TypeDefs  map[string]*TypeDef
 	Functions map[string]*Function
 
-	// The [Package] that this Interface belongs to. It must be non-nil when fully-resolved.
+	// The [Package] that this Interface belongs to. It must be non-nil when fully resolved.
 	Package *Package
 	Docs    Docs
 	_worldItem
