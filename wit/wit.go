@@ -26,7 +26,7 @@ func indent(s string) string {
 
 // WIT returns the WIT representation of r.
 func (r *Resolve) WIT(_ Node, _ string) string {
-	b := &strings.Builder{}
+	var b strings.Builder
 	for i, p := range r.Packages {
 		if i > 0 {
 			b.WriteRune('\n')
