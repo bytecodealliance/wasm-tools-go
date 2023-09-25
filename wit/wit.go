@@ -222,6 +222,30 @@ func (h *BorrowedHandle) WIT(ctx Node, name string) string {
 	return b.String()
 }
 
+func (f *Flags) WIT(ctx Node, name string) string {
+	var b strings.Builder
+	b.WriteString("flags ")
+	b.WriteString(name)
+	b.WriteString(" {")
+	if len(f.Flags) > 0 {
+		for i := range f.Flags {
+			if i > 0 {
+				b.WriteString(", ")
+			}
+			b.WriteString(f.Flags[i].WIT(f, ""))
+		}
+	}
+	b.WriteRune('}')
+	return b.String()
+}
+
+const wrapFlags = 3
+
+func (f *Flag) WIT(_ Node, _ string) string {
+	// TODO: docs
+	return f.Name
+}
+
 func (t *Tuple) WIT(ctx Node, _ string) string {
 	var b strings.Builder
 	b.WriteString("tuple<")

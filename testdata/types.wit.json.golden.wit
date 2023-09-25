@@ -38,9 +38,9 @@ interface types {
     tuple<u32>
     tuple<u32, u64>
     type t3 = u32
-    /* TODO(t30) */
-    /* TODO(t31) */
-    /* TODO(t32) */
+    flags t30 {}
+    flags t31 {a, b, c}
+    flags t32 {a, b, c}
     /* TODO(t33) */
     /* TODO(t34) */
     /* TODO(t35) */
