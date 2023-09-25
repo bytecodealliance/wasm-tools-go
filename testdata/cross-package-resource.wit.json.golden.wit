@@ -1,7 +1,7 @@
 package some:dep
 
 interface foo {
-    /* TODO(r) */
+    resource r {} // TODO: constructor, methods, and static functions
 }
 
 

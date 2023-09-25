@@ -1,7 +1,7 @@
 package foo:resources-multiple
 
 interface resources-multiple {
-    /* TODO(r1) */
+    resource r1 {} // TODO: constructor, methods, and static functions
     [method]r1.f1: func(self: /* TODO() */)
     [method]r1.f10: func(self: /* TODO() */) -> u: u32
     [method]r1.f11: func(self: /* TODO() */)

@@ -8,8 +8,8 @@ interface handler {
 }
 
 interface types {
-    /* TODO(request) */
-    /* TODO(response) */
+    resource request {} // TODO: constructor, methods, and static functions
+    resource response {} // TODO: constructor, methods, and static functions
     [method]request.bar: func(self: /* TODO() */, arg: list<u32>)
     [method]request.foo: func(self: /* TODO() */)
     [method]response.bar: func(self: /* TODO() */, arg: list<u32>)

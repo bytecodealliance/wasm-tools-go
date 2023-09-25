@@ -1,11 +1,11 @@
 package foo:bar
 
 interface foo {
-    /* TODO(a) */
-    /* TODO(b) */
-    /* TODO(c) */
-    /* TODO(d) */
-    /* TODO(e) */
+    resource a {} // TODO: constructor, methods, and static functions
+    resource b {} // TODO: constructor, methods, and static functions
+    resource c {} // TODO: constructor, methods, and static functions
+    resource d {} // TODO: constructor, methods, and static functions
+    resource e {} // TODO: constructor, methods, and static functions
     [constructor]b: func() -> /* TODO() */
     [constructor]c: func(x: u32) -> /* TODO() */
     [constructor]d: func(x: u32) -> /* TODO() */
@@ -16,7 +16,7 @@ interface foo {
 }
 
 interface i {
-    /* TODO(a) */
+    resource a {} // TODO: constructor, methods, and static functions
     type t1 = a
     /* TODO(t2) */
     /* TODO(t3) */
@@ -24,7 +24,7 @@ interface i {
 
 world w {
     import [constructor]c: func() -> /* TODO() */
-    /* TODO(a) */
-    /* TODO(b) */
-    /* TODO(c) */
+    resource a {} // TODO: constructor, methods, and static functions
+    resource b {} // TODO: constructor, methods, and static functions
+    resource c {} // TODO: constructor, methods, and static functions
 }
