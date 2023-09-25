@@ -320,6 +320,29 @@ func (o *Option) WIT(_ Node, name string) string {
 	return b.String()
 }
 
+func (r *Result) WIT(_ Node, name string) string {
+	var b strings.Builder
+	if name != "" {
+		b.WriteString("type ")
+		b.WriteString(name)
+		b.WriteString(" = ")
+	}
+	b.WriteString("result<")
+	if r.OK != nil {
+		b.WriteString(r.OK.WIT(r, ""))
+		b.WriteString(", ")
+	} else {
+		b.WriteString("_, ")
+	}
+	if r.Err != nil {
+		b.WriteString(r.Err.WIT(r, ""))
+	} else {
+		b.WriteRune('_')
+	}
+	b.WriteRune('>')
+	return b.String()
+}
+
 func (l *List) WIT(ctx Node, _ string) string {
 	return "list<" + l.Type.WIT(l, "") + ">"
 }

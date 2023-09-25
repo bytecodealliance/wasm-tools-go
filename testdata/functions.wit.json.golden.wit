@@ -9,6 +9,6 @@ interface functions {
     f4: func() -> u32
     f6: func() -> tuple<u32, u32>
     f7: func(a: float32, b: float32) -> tuple<u32, u32>
-    f8: func(a: option<u32>) -> /* TODO() */
+    f8: func(a: option<u32>) -> result<u32, float32>
     f9: func() -> u: u32, f: float32
 }
