@@ -24,6 +24,26 @@ func indent(s string) string {
 	return strings.TrimSuffix(ws+strings.ReplaceAll(s, "\n", "\n"+ws), ws)
 }
 
+// unwrap unwraps a multiline string into a single line, if:
+// 1. its length is <= 50 chars
+// 2. its line count is <= 5
+// This is used for single-line [Record], [Flags], [Variant], and [Enum] declarations.
+func unwrap(s string) string {
+	const chars = 50
+	const lines = 5
+	if len(s) > chars || strings.Count(s, "\n") > lines {
+		return s
+	}
+	var b strings.Builder
+	for i, line := range strings.Split(s, "\n") {
+		if i > 0 {
+			b.WriteRune(' ')
+		}
+		b.WriteString(strings.Trim(line, " \t\r\n"))
+	}
+	return b.String()
+}
+
 // WIT returns the WIT representation of r.
 func (r *Resolve) WIT(_ Node, _ string) string {
 	var b strings.Builder
