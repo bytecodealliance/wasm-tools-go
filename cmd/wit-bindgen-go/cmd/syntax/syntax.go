@@ -7,7 +7,7 @@ import (
 	"github.com/ydnar/wasm-tools-go/internal/witcli"
 )
 
-// Command is the CLI command for describe.
+// Command is the CLI command for wit.
 var Command = &cli.Command{
 	Name:   "wit",
 	Usage:  "reverses a WIT JSON file into WIT syntax",
