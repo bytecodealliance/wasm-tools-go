@@ -358,6 +358,29 @@ func (l *List) WIT(_ Node, name string) string {
 	return b.String()
 }
 
+func (s *Stream) WIT(_ Node, name string) string {
+	var b strings.Builder
+	if name != "" {
+		b.WriteString("type ")
+		b.WriteString(name)
+		b.WriteString(" = ")
+	}
+	b.WriteString("stream<")
+	if s.Element != nil {
+		b.WriteString(s.Element.WIT(s, ""))
+		b.WriteString(", ")
+	} else {
+		b.WriteString("_, ")
+	}
+	if s.End != nil {
+		b.WriteString(s.End.WIT(s, ""))
+	} else {
+		b.WriteRune('_')
+	}
+	b.WriteRune('>')
+	return b.String()
+}
+
 // WIT returns the WIT representation of [primitive type] T.
 //
 // [primitive type]: https://component-model.bytecodealliance.org/wit-overview.html#primitive-types
