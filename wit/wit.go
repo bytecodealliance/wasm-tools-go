@@ -86,11 +86,14 @@ func (i *Interface) WIT(ctx Node, name string) string {
 		b.WriteRune(' ')
 	case *World:
 		if i.Package != ctx.Package {
+			// Import by name from another package
 			// TODO: check i.Name != nil
 			return fmt.Sprintf("%s/%s", i.Package.Name.String(), *i.Name)
 		} else if i.Name != nil {
+			// Import by name within same package
 			return *i.Name
 		}
+		// Otherwise, this is an inline interface decl
 		b.WriteString("interface ")
 		b.WriteString(name)
 		b.WriteRune(' ')
