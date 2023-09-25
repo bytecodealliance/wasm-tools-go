@@ -12,17 +12,6 @@ func indent(s string) string {
 	return strings.TrimSuffix(ws+strings.Replace(s, "\n", "\n"+ws, -1), ws)
 }
 
-// SyntaxContext is the interface implemented by any type that be a WIT syntax context.
-// For example the WIT representation of a [Type] may vary if called in
-// an [Interface] or [World] context versus as a [Function] parameter or [Param].
-type SyntaxContext interface {
-	isContext()
-}
-
-type _syntaxContext struct{}
-
-func (_syntaxContext) isContext() {}
-
 // WIT returns the WIT representation of r.
 func (r *Resolve) WIT(_ WIT, _ string) string {
 	b := &strings.Builder{}
