@@ -1,0 +1,22 @@
+package foo:foo
+
+interface i1 {
+    use foo:foo/shared-items.{foo}
+    a: func() -> foo
+}
+
+interface i2 {
+    use foo:foo/shared-items.{foo}
+    a: func() -> foo
+}
+
+interface shared-items {
+    type foo = u32
+}
+
+world the-world {
+    import a: func()
+    import shared-items
+    import i1
+    import i2
+}

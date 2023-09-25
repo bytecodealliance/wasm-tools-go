@@ -1,0 +1,11 @@
+package foo:foo
+
+interface foo {
+    type g = char
+}
+
+world w {
+    import foo: func() -> g
+    use foo:foo/foo.{g}
+    import foo
+}

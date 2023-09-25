@@ -1,0 +1,6 @@
+package foo:comments
+
+interface foo {
+    // TODO(bar)
+    type x = u32
+}

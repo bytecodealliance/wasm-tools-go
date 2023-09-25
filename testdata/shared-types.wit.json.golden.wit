@@ -1,0 +1,10 @@
+package foo:shared-items
+
+world foo {
+    import interface foo {
+        a: func() -> list<u8>
+    }
+    export interface bar {
+        a: func() -> tuple<list<u8>>
+    }
+}

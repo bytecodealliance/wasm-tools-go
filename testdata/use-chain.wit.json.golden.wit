@@ -1,0 +1,9 @@
+package foo:name
+
+interface foo {
+    record foo {}
+}
+
+interface name {
+    use foo:name/foo.{foo}
+}

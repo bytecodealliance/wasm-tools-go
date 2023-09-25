@@ -78,6 +78,24 @@ func TestGoldenFiles(t *testing.T) {
 	}
 }
 
+func TestWITGoldenFiles(t *testing.T) {
+	p := pp.New()
+	p.SetExportedOnly(true)
+	p.SetColoringEnabled(false)
+
+	err := loadTestdata(func(path string, res *Resolve) error {
+		t.Run(strings.TrimPrefix(path, testdataDir), func(t *testing.T) {
+			data := res.WIT(nil, "")
+			compareOrWrite(t, path, path+".golden.wit", data)
+		})
+		return nil
+	})
+
+	if err != nil {
+		t.Error(err)
+	}
+}
+
 func TestSizeAndAlign(t *testing.T) {
 	err := loadTestdata(func(path string, res *Resolve) error {
 		t.Run(strings.TrimPrefix(path, testdataDir), func(t *testing.T) {

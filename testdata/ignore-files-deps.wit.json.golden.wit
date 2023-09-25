@@ -1,0 +1,10 @@
+package foo:bar
+
+interface types {}
+
+
+package foo:foo
+
+world foo {
+    import foo:bar/types
+}

@@ -1,0 +1,56 @@
+package foo:multi-file
+
+interface bar {
+    use foo:multi-file/irrelevant-name.{a-name}
+    use foo:multi-file/foo.{x}
+    use foo:multi-file/foo.{x as x2}
+    use foo:multi-file/foo.{x as x3}
+    use foo:multi-file/depend-on-me.{x as x4}
+    use foo:multi-file/something-else.{y}
+    use foo:multi-file/something-else.{y as y2}
+}
+
+interface cycle1 {
+    type t = u32
+}
+
+interface cycle2 {
+    use foo:multi-file/cycle1.{t}
+}
+
+interface cycle3 {
+    use foo:multi-file/cycle2.{t}
+}
+
+interface depend-on-me {
+    type x = u32
+}
+
+interface depends-on-later-item {
+    use foo:multi-file/depend-on-me.{x}
+}
+
+interface foo {
+    type x = u32
+}
+
+interface irrelevant-name {
+    record a-name {}
+}
+
+interface later-interface {}
+
+interface something-else {
+    type y = u64
+}
+
+world more-depends-on-later-things {
+    import later-interface
+    export later-interface
+}
+
+world the-world {
+    import foo: func() -> x
+    import depend-on-me
+    use foo:multi-file/depend-on-me.{x}
+}

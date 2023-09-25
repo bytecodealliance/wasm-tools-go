@@ -1,0 +1,20 @@
+package foo:diamond
+
+interface shared1 {
+    type the-type = u32
+}
+
+interface shared2 {
+    type the-type = u32
+}
+
+world foo {
+    import interface bar {
+        use foo:diamond/shared2.{the-type}
+    }
+    import interface foo {
+        use foo:diamond/shared1.{the-type}
+    }
+    import shared1
+    import shared2
+}

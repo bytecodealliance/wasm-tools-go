@@ -1,0 +1,7 @@
+package foo:bar
+
+world name {}
+
+world x {}
+
+world xo {}

@@ -1,0 +1,17 @@
+package foo:resources-multiple
+
+interface resources-multiple {
+    // TODO(r1)
+    [method]r1.f1: func(self: // TODO())
+    [method]r1.f10: func(self: // TODO()) -> u: u32
+    [method]r1.f11: func(self: // TODO())
+    [method]r1.f2: func(self: // TODO(), a: u32)
+    [method]r1.f3: func(self: // TODO(), a: u32)
+    [method]r1.f4: func(self: // TODO()) -> u32
+    [method]r1.f6: func(self: // TODO()) -> tuple<u32, u32>
+    [method]r1.f7: func(self: // TODO(), a: float32, b: float32) -> tuple<u32, u32>
+    [method]r1.f8: func(self: // TODO(), a: // TODO()) -> // TODO()
+    [method]r1.f9: func(self: // TODO()) -> u: u32, f: float32
+    t1: func(a: // TODO())
+    t2: func(a: // TODO())
+}

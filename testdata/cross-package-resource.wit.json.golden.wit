@@ -1,0 +1,13 @@
+package some:dep
+
+interface foo {
+    // TODO(r)
+}
+
+
+package foo:bar
+
+interface foo {
+    use some:dep/foo.{r}
+    // TODO(t)
+}

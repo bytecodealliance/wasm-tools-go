@@ -1,0 +1,13 @@
+package foo:foo
+
+interface foo {
+    type a = u32
+}
+
+world the-world {
+    import interface bar {
+        use foo:foo/foo.{a}
+    }
+    import interface foo {}
+    import foo
+}

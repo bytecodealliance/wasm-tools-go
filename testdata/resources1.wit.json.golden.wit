@@ -1,0 +1,9 @@
+package foo:resources1
+
+interface resources1 {
+    // TODO(r1)
+    [method]r1.f1: func(self: // TODO())
+    t1: func(a: // TODO())
+    t2: func(a: // TODO())
+    t3: func(a: // TODO())
+}

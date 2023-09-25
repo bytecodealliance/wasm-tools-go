@@ -1,0 +1,7 @@
+package wasi:filesystem
+
+interface wasi {
+    // TODO(clockid)
+    // TODO(errno)
+    type timestamp = u64
+}
