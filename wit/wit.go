@@ -358,6 +358,22 @@ func (l *List) WIT(_ Node, name string) string {
 	return b.String()
 }
 
+func (f *Future) WIT(_ Node, name string) string {
+	var b strings.Builder
+	if name != "" {
+		b.WriteString("type ")
+		b.WriteString(name)
+		b.WriteString(" = ")
+	}
+	b.WriteString("future")
+	if f.Type != nil {
+		b.WriteRune('<')
+		b.WriteString(f.Type.WIT(f, ""))
+		b.WriteRune('>')
+	}
+	return b.String()
+}
+
 func (s *Stream) WIT(_ Node, name string) string {
 	var b strings.Builder
 	if name != "" {

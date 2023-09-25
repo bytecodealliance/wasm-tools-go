@@ -47,8 +47,8 @@ interface types {
     type t5 = s8
     type t50 = stream<u32, _>
     type t51 = stream<_, _>
-    /* TODO(t52) */
-    /* TODO(t53) */
+    type t52 = future<u32>
+    type t53 = future
     type t6 = s16
     type t7 = s32
     type t8 = s64
