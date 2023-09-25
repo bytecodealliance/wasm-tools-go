@@ -165,6 +165,29 @@ func (t *TypeDef) WIT(ctx WIT, name string) string {
 	return t.Kind.WIT(ctx, name)
 }
 
+func (r *Record) WIT(ctx WIT, name string) string {
+	var b strings.Builder
+	b.WriteString("record ")
+	b.WriteString(name)
+	b.WriteString(" {")
+	if len(r.Fields) > 0 {
+		b.WriteRune('\n')
+		for i := range r.Fields {
+			if i > 0 {
+				b.WriteString(",\n")
+			}
+			b.WriteString(indent(r.Fields[i].WIT(ctx, "")))
+		}
+		b.WriteRune('\n')
+	}
+	b.WriteString("}")
+	return b.String()
+}
+
+func (f *Field) WIT(ctx WIT, name string) string {
+	return f.Name + ": " + f.Type.WIT(f, "")
+}
+
 func (t *Tuple) WIT(ctx WIT, _ string) string {
 	var b strings.Builder
 	b.WriteString("tuple<")
