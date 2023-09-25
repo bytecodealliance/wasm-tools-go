@@ -29,5 +29,5 @@ type Sized interface {
 
 type _sized struct{}
 
-func (_sized) Size() uintptr  { panic("unimplemented") }
-func (_sized) Align() uintptr { panic("unimplemented") }
+func (_sized) Size() uintptr  { panic("BUG: unimplemented") }
+func (_sized) Align() uintptr { panic("BUG: unimplemented") }
