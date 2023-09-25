@@ -3,17 +3,17 @@ package foo:foo
 interface handler {
     use foo:foo/types.{request}
     use foo:foo/types.{response}
-    handle: func(some: /* TODO() */) -> /* TODO() */
-    handle-owned: func(some: /* TODO() */) -> /* TODO() */
+    handle: func(some: borrow<request>) -> borrow<response>
+    handle-owned: func(some: own<request>) -> own<response>
 }
 
 interface types {
     resource request {} // TODO: constructor, methods, and static functions
     resource response {} // TODO: constructor, methods, and static functions
-    [method]request.bar: func(self: /* TODO() */, arg: list<u32>)
-    [method]request.foo: func(self: /* TODO() */)
-    [method]response.bar: func(self: /* TODO() */, arg: list<u32>)
-    [method]response.foo: func(self: /* TODO() */)
+    [method]request.bar: func(self: borrow<request>, arg: list<u32>)
+    [method]request.foo: func(self: borrow<request>)
+    [method]response.bar: func(self: borrow<response>, arg: list<u32>)
+    [method]response.foo: func(self: borrow<response>)
 }
 
 world proxy {

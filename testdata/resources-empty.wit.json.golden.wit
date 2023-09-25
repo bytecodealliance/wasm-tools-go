@@ -2,6 +2,6 @@ package foo:resources-empty
 
 interface resources-empty {
     resource r1 {} // TODO: constructor, methods, and static functions
-    t1: func(a: /* TODO() */)
-    t2: func(a: /* TODO() */)
+    t1: func(a: own<r1>)
+    t2: func(a: borrow<r1>)
 }

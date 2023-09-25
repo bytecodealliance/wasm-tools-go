@@ -196,6 +196,32 @@ func (r *Resource) WIT(ctx Node, name string) string {
 	return b.String()
 }
 
+func (h *OwnedHandle) WIT(ctx Node, name string) string {
+	var b strings.Builder
+	if name != "" {
+		b.WriteString("type ")
+		b.WriteString(name)
+		b.WriteString(" = ")
+	}
+	b.WriteString("own<")
+	b.WriteString(h.Type.WIT(h, ""))
+	b.WriteRune('>')
+	return b.String()
+}
+
+func (h *BorrowedHandle) WIT(ctx Node, name string) string {
+	var b strings.Builder
+	if name != "" {
+		b.WriteString("type ")
+		b.WriteString(name)
+		b.WriteString(" = ")
+	}
+	b.WriteString("borrow<")
+	b.WriteString(h.Type.WIT(h, ""))
+	b.WriteRune('>')
+	return b.String()
+}
+
 func (t *Tuple) WIT(ctx Node, _ string) string {
 	var b strings.Builder
 	b.WriteString("tuple<")
