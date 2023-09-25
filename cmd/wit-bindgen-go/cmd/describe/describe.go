@@ -25,7 +25,7 @@ func action(ctx *cli.Context) error {
 		return err
 	}
 
-	fmt.Println(res.WIT())
+	fmt.Println(res.WIT(nil, ""))
 	return nil
 
 	p := &printer{w: os.Stdout}
@@ -126,8 +126,8 @@ func printType(p *printer, t wit.Type) {
 			p.Printf("%s", *t.Name)
 			return
 		}
-	case interface{ WIT() string }:
-		p.Printf("%s", t.WIT())
+	case wit.WIT:
+		p.Printf("%s", t.WIT(nil, ""))
 		return
 	}
 	p.Print("T")
