@@ -126,15 +126,19 @@ func (i *Interface) WIT(ctx WIT, name string) string {
 	return b.String()
 }
 
-// WIT returns the WIT representation of t.
+// WIT returns the WIT representation of [TypeDef] t.
 func (t *TypeDef) WIT(ctx WIT, name string) string {
 	if t.Name != nil && name == "" {
 		name = *t.Name
 	}
-	switch ctx.(type) {
+	switch ctx := ctx.(type) {
 	// If context is another TypeDef, then this is an imported type.
-	// Emit a use statement.
 	case *TypeDef:
+		// Emit an type alias if same Owner.
+		if t.Owner == ctx.Owner && t.Name != nil {
+			return "type " + name + " = " + *t.Name
+		}
+
 		// TODO: add a TypeOwnerName method to TypeDef.
 		var ownerName string
 		var pkg *Package
