@@ -59,12 +59,10 @@ func (w *World) WIT(ctx Node, name string) string {
 
 func (w *World) itemWIT(motion, name string, v WorldItem) string {
 	switch v := v.(type) {
-	case *Interface:
-		return fmt.Sprintf("%s %s", motion, v.WIT(w, name))
+	case *Interface, *Function:
+		return motion + " " + v.WIT(w, name)
 	case *TypeDef:
 		return v.WIT(w, name) // no motion, in Imports only
-	case *Function:
-		return fmt.Sprintf("%s %s", motion, v.WIT(w, name))
 	}
 	panic("BUG: unknown WorldItem")
 }
@@ -204,7 +202,7 @@ func (t *Tuple) WIT(ctx Node, _ string) string {
 }
 
 func (l *List) WIT(ctx Node, _ string) string {
-	return fmt.Sprintf("list<%s>", l.Type.WIT(l, ""))
+	return "list<" + l.Type.WIT(l, "") + ">"
 }
 
 // WIT returns the WIT representation of [primitive type] T.
@@ -261,7 +259,6 @@ func (p *Package) WIT(ctx Node, _ string) string {
 			if i > 0 {
 				b.WriteRune('\n')
 			}
-			// b.WriteString(fmt.Sprintf("interface %s %s", name, p.Interfaces[name].WIT(p, name)))
 			b.WriteString(p.Interfaces[name].WIT(p, name))
 			b.WriteRune('\n')
 		}
