@@ -21,7 +21,7 @@ func (_node) WIT(ctx Node, name string) string { return fmt.Sprintf("// TODO(%s)
 
 func indent(s string) string {
 	const ws = "    "
-	return strings.TrimSuffix(ws+strings.Replace(s, "\n", "\n"+ws, -1), ws)
+	return strings.TrimSuffix(ws+strings.ReplaceAll(s, "\n", "\n"+ws), ws)
 }
 
 // WIT returns the WIT representation of r.
