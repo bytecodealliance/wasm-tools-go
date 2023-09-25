@@ -16,9 +16,7 @@ interface foo {
 }
 
 interface trailing-comma {
-    record the-foo {
-        a: the-type
-    }
+    record the-foo { a: the-type }
     use foo:foo/foo.{the-type}
 }
 

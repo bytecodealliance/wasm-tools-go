@@ -201,7 +201,7 @@ func (r *Record) WIT(ctx Node, name string) string {
 		b.WriteRune('\n')
 	}
 	b.WriteRune('}')
-	return b.String()
+	return unwrap(b.String())
 }
 
 func (f *Field) WIT(ctx Node, name string) string {
@@ -256,7 +256,7 @@ func (f *Flags) WIT(ctx Node, name string) string {
 		}
 	}
 	b.WriteRune('}')
-	return b.String()
+	return unwrap(b.String())
 }
 
 func (f *Flag) WIT(_ Node, _ string) string {
@@ -293,7 +293,7 @@ func (v *Variant) WIT(ctx Node, name string) string {
 		b.WriteRune('\n')
 	}
 	b.WriteRune('}')
-	return b.String()
+	return unwrap(b.String())
 }
 
 func (c *Case) WIT(_ Node, _ string) string {

@@ -16,23 +16,11 @@ interface types {
     /* TODO(t18) */
     type t2 = u16
     record t20 {}
-    record t21 {
-        a: u32
-    }
-    record t22 {
-        a: u32
-    }
-    record t23 {
-        a: u32,
-        b: u64
-    }
-    record t24 {
-        a: u32,
-        b: u64
-    }
-    record t25 {
-        x: u32
-    }
+    record t21 { a: u32 }
+    record t22 { a: u32 }
+    record t23 { a: u32, b: u64 }
+    record t24 { a: u32, b: u64 }
+    record t25 { x: u32 }
     tuple<>
     tuple<u32>
     tuple<u32>
@@ -41,25 +29,11 @@ interface types {
     flags t30 {}
     flags t31 {a, b, c}
     flags t32 {a, b, c}
-    variant t33 {
-        a
-    }
-    variant t34 {
-        a,
-        b
-    }
-    variant t35 {
-        a,
-        b
-    }
-    variant t36 {
-        a,
-        b(u32)
-    }
-    variant t37 {
-        a,
-        b(/* TODO() */)
-    }
+    variant t33 { a }
+    variant t34 { a, b }
+    variant t35 { a, b }
+    variant t36 { a, b(u32) }
+    variant t37 { a, b(/* TODO() */) }
     type t4 = u64
     /* TODO(t41) */
     /* TODO(t42) */

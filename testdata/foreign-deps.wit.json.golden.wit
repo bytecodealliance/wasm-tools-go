@@ -42,9 +42,7 @@ interface clocks {
 }
 
 interface filesystem {
-    record stat {
-        ino: u64
-    }
+    record stat { ino: u64 }
 }
 
 
