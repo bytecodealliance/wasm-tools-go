@@ -1,4 +1,4 @@
-package describe
+package syntax
 
 import (
 	"fmt"
@@ -9,8 +9,8 @@ import (
 
 // Command is the CLI command for describe.
 var Command = &cli.Command{
-	Name:   "describe",
-	Usage:  "describes a WIT JSON file",
+	Name:   "wit",
+	Usage:  "reverses a WIT JSON file into WIT syntax",
 	Action: action,
 }
 
