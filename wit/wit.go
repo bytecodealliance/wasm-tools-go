@@ -7,46 +7,38 @@ import (
 	"github.com/ydnar/wasm-tools-go/internal/codec"
 )
 
+// Node is the interface implemented by the WIT ([WebAssembly Interface Type])
+// types in this package.
+//
+// [WebAssembly Interface Type]: https://component-model.bytecodealliance.org/wit-overview.html
+type Node interface {
+	WIT(ctx Node, name string) string
+}
+
+type _node struct{}
+
+func (_node) WIT(ctx Node, name string) string { return fmt.Sprintf("// TODO(%s)", name) }
+
 func indent(s string) string {
 	const ws = "    "
 	return strings.TrimSuffix(ws+strings.Replace(s, "\n", "\n"+ws, -1), ws)
 }
 
 // WIT returns the WIT representation of r.
-func (r *Resolve) WIT(_ WIT, _ string) string {
+func (r *Resolve) WIT(_ Node, _ string) string {
 	b := &strings.Builder{}
 	for i, p := range r.Packages {
 		if i > 0 {
 			b.WriteRune('\n')
 			b.WriteRune('\n')
 		}
-		fmt.Fprintf(b, "package %s\n", p.Name.String())
-		if len(p.Interfaces) > 0 {
-			b.WriteRune('\n')
-			for i, name := range codec.SortedKeys(p.Interfaces) {
-				if i > 0 {
-					b.WriteRune('\n')
-				}
-				b.WriteString(fmt.Sprintf("interface %s %s", name, p.Interfaces[name].WIT(r, name)))
-				b.WriteRune('\n')
-			}
-		}
-		if len(p.Worlds) > 0 {
-			b.WriteRune('\n')
-			for i, name := range codec.SortedKeys(p.Worlds) {
-				if i > 0 {
-					b.WriteRune('\n')
-				}
-				b.WriteString(p.Worlds[name].WIT(r, name))
-				b.WriteRune('\n')
-			}
-		}
+		b.WriteString(p.WIT(r, ""))
 	}
 	return b.String()
 }
 
 // WIT returns the WIT representation of w.
-func (w *World) WIT(ctx WIT, name string) string {
+func (w *World) WIT(ctx Node, name string) string {
 	var b strings.Builder
 	// TODO: docs
 	fmt.Fprintf(&b, "world %s {", name) // TODO: compare to w.Name?
@@ -78,18 +70,32 @@ func (w *World) itemWIT(motion, name string, v WorldItem) string {
 }
 
 // WIT returns the WIT representation of i.
-func (i *Interface) WIT(ctx WIT, name string) string {
-	// TODO: check i.Name == nil
-	switch ctx := ctx.(type) {
-	case *World:
-		if i.Package == ctx.Package {
-			return *i.Name
-		}
-		return fmt.Sprintf("%s/%s", i.Package.Name.String(), *i.Name)
+func (i *Interface) WIT(ctx Node, name string) string {
+	if i.Name != nil && name == "" {
+		name = *i.Name
 	}
 
 	var b strings.Builder
+
 	// TODO: docs
+
+	switch ctx := ctx.(type) {
+	case *Package:
+		b.WriteString("interface ")
+		b.WriteString(name)
+		b.WriteRune(' ')
+	case *World:
+		if i.Package != ctx.Package {
+			// TODO: check i.Name != nil
+			return fmt.Sprintf("%s/%s", i.Package.Name.String(), *i.Name)
+		} else if i.Name != nil {
+			return *i.Name
+		}
+		b.WriteString("interface ")
+		b.WriteString(name)
+		b.WriteRune(' ')
+	}
+
 	b.WriteRune('{')
 	if len(i.TypeDefs) > 0 || len(i.Functions) > 0 {
 		b.WriteRune('\n')
@@ -116,7 +122,7 @@ func (i *Interface) WIT(ctx WIT, name string) string {
 }
 
 // WIT returns the WIT representation of [TypeDef] t.
-func (t *TypeDef) WIT(ctx WIT, name string) string {
+func (t *TypeDef) WIT(ctx Node, name string) string {
 	if t.Name != nil && name == "" {
 		name = *t.Name
 	}
@@ -158,7 +164,7 @@ func (t *TypeDef) WIT(ctx WIT, name string) string {
 	return t.Kind.WIT(ctx, name)
 }
 
-func (r *Record) WIT(ctx WIT, name string) string {
+func (r *Record) WIT(ctx Node, name string) string {
 	var b strings.Builder
 	b.WriteString("record ")
 	b.WriteString(name)
@@ -177,11 +183,11 @@ func (r *Record) WIT(ctx WIT, name string) string {
 	return b.String()
 }
 
-func (f *Field) WIT(ctx WIT, name string) string {
+func (f *Field) WIT(ctx Node, name string) string {
 	return f.Name + ": " + f.Type.WIT(f, "")
 }
 
-func (t *Tuple) WIT(ctx WIT, _ string) string {
+func (t *Tuple) WIT(ctx Node, _ string) string {
 	var b strings.Builder
 	b.WriteString("tuple<")
 	for i := range t.Types {
@@ -194,14 +200,14 @@ func (t *Tuple) WIT(ctx WIT, _ string) string {
 	return b.String()
 }
 
-func (l *List) WIT(ctx WIT, _ string) string {
+func (l *List) WIT(ctx Node, _ string) string {
 	return fmt.Sprintf("list<%s>", l.Type.WIT(l, ""))
 }
 
 // WIT returns the WIT representation of [primitive type] T.
 //
 // [primitive type]: https://component-model.bytecodealliance.org/wit-overview.html#primitive-types
-func (p _primitive[T]) WIT(ctx WIT, name string) string {
+func (p _primitive[T]) WIT(ctx Node, name string) string {
 	if name != "" {
 		return "type " + name + " = " + p.String()
 	}
@@ -209,7 +215,7 @@ func (p _primitive[T]) WIT(ctx WIT, name string) string {
 }
 
 // WIT returns the WIT representation of f.
-func (f *Function) WIT(ctx WIT, name string) string {
+func (f *Function) WIT(ctx Node, name string) string {
 	var b strings.Builder
 	// TODO: docs
 	b.WriteString(name)
@@ -229,11 +235,43 @@ func paramsWIT(params []Param) string {
 		if i > 0 {
 			b.WriteString(", ")
 		}
-		if param.Name != "" {
-			b.WriteString(param.Name)
-			b.WriteString(": ")
+		b.WriteString(param.WIT(nil, ""))
+	}
+	return b.String()
+}
+
+func (p *Param) WIT(_ Node, _ string) string {
+	if p.Name == "" {
+		return p.Type.WIT(p, "")
+	}
+	return p.Name + ": " + p.Type.WIT(p, "")
+}
+
+func (p *Package) WIT(ctx Node, _ string) string {
+	var b strings.Builder
+	b.WriteString("package ")
+	b.WriteString(p.Name.String())
+	b.WriteRune('\n')
+	if len(p.Interfaces) > 0 {
+		b.WriteRune('\n')
+		for i, name := range codec.SortedKeys(p.Interfaces) {
+			if i > 0 {
+				b.WriteRune('\n')
+			}
+			// b.WriteString(fmt.Sprintf("interface %s %s", name, p.Interfaces[name].WIT(p, name)))
+			b.WriteString(p.Interfaces[name].WIT(p, name))
+			b.WriteRune('\n')
 		}
-		b.WriteString(param.Type.WIT(param, ""))
+	}
+	if len(p.Worlds) > 0 {
+		b.WriteRune('\n')
+		for i, name := range codec.SortedKeys(p.Worlds) {
+			if i > 0 {
+				b.WriteRune('\n')
+			}
+			b.WriteString(p.Worlds[name].WIT(p, name))
+			b.WriteRune('\n')
+		}
 	}
 	return b.String()
 }

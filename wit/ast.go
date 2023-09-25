@@ -10,18 +10,6 @@ import (
 	"github.com/coreos/go-semver/semver"
 )
 
-// WIT is the interface implemented by the WIT ([WebAssembly Interface Type])
-// types in this package.
-//
-// [WebAssembly Interface Type]: https://component-model.bytecodealliance.org/wit-overview.html
-type WIT interface {
-	WIT(ctx WIT, name string) string
-}
-
-type _wit struct{}
-
-func (_wit) WIT(ctx WIT, name string) string { return "TODO" }
-
 // Resolve represents a fully resolved set of WIT ([WebAssembly Interface Type])
 // packages and worlds.
 //
@@ -37,8 +25,6 @@ type Resolve struct {
 	Interfaces []*Interface
 	TypeDefs   []*TypeDef
 	Packages   []*Package
-
-	_wit
 }
 
 // A World represents all of the imports and exports of a [WebAssembly component].
@@ -59,12 +45,12 @@ type World struct {
 // A WorldItem is any item that can be exported from or imported into a [World],
 // currently either an [Interface], [TypeDef], or [Function].
 type WorldItem interface {
-	WIT
+	Node
 	isWorldItem()
 }
 
 // _worldItem is an embeddable type that conforms to the [WorldItem] interface.
-type _worldItem struct{}
+type _worldItem struct{ _node }
 
 func (_worldItem) isWorldItem() {}
 
@@ -113,14 +99,14 @@ func (t *TypeDef) Align() uintptr {
 // [Option], [Result], [List], [Future], [Stream], or [Type].
 type TypeDefKind interface {
 	Sized
-	WIT
+	Node
 	isTypeDefKind()
 }
 
 // _typeDefKind is an embeddable type that conforms to the [TypeDefKind] interface.
 type _typeDefKind struct {
 	_sized
-	_wit
+	_node
 }
 
 func (_typeDefKind) isTypeDefKind() {}
@@ -161,7 +147,6 @@ type Field struct {
 	Name string
 	Type Type
 	Docs Docs
-	_wit
 }
 
 // Resource represents a WIT [resource type].
@@ -542,7 +527,7 @@ func (*Stream) Align() uintptr { return 0 }
 // currently [World] and [Interface].
 type TypeOwner interface{ isTypeOwner() }
 
-type _typeOwner struct{ _wit }
+type _typeOwner struct{ _node }
 
 func (_typeOwner) isTypeOwner() {}
 
@@ -791,7 +776,7 @@ type FunctionKind interface {
 }
 
 // _functionKind is an embeddable type that conforms to the [FunctionKind] interface.
-type _functionKind struct{ _wit }
+type _functionKind struct{ _node }
 
 func (_functionKind) isFunctionKind() {}
 
@@ -824,8 +809,6 @@ type Constructor struct {
 type Param struct {
 	Name string
 	Type Type
-
-	_wit
 }
 
 // Package represents a [WIT package] within a [Resolve].
@@ -841,7 +824,7 @@ type Package struct {
 	Worlds     map[string]*World
 	Docs       Docs
 
-	_wit
+	_node
 }
 
 // PackageName represents a [WebAssembly Component Model] package name,
@@ -861,7 +844,7 @@ type PackageName struct {
 	// Version contains optional major/minor version information.
 	Version *semver.Version
 
-	_wit
+	_node
 }
 
 // ParsePackageName parses a package string into a [PackageName],
@@ -905,5 +888,5 @@ func (pn *PackageName) String() string {
 // Docs represent WIT documentation text extracted from comments.
 type Docs struct {
 	Contents string // may be empty
-	_wit
+	_node
 }
