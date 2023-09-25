@@ -239,8 +239,6 @@ func (f *Flags) WIT(ctx Node, name string) string {
 	return b.String()
 }
 
-const wrapFlags = 3
-
 func (f *Flag) WIT(_ Node, _ string) string {
 	// TODO: docs
 	return f.Name
@@ -256,6 +254,36 @@ func (t *Tuple) WIT(ctx Node, _ string) string {
 		b.WriteString(t.Types[i].WIT(t, ""))
 	}
 	b.WriteString(">")
+	return b.String()
+}
+
+func (v *Variant) WIT(ctx Node, name string) string {
+	var b strings.Builder
+	b.WriteString("variant ")
+	b.WriteString(name)
+	b.WriteString(" {")
+	if len(v.Cases) > 0 {
+		b.WriteRune('\n')
+		for i := range v.Cases {
+			if i > 0 {
+				b.WriteString(",\n")
+			}
+			b.WriteString(indent(v.Cases[i].WIT(ctx, "")))
+		}
+		b.WriteRune('\n')
+	}
+	b.WriteRune('}')
+	return b.String()
+}
+
+func (c *Case) WIT(_ Node, _ string) string {
+	var b strings.Builder
+	b.WriteString(c.Name)
+	if c.Type != nil {
+		b.WriteRune('(')
+		b.WriteString(c.Type.WIT(c, ""))
+		b.WriteRune(')')
+	}
 	return b.String()
 }
 

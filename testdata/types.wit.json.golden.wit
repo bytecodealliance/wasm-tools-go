@@ -41,11 +41,25 @@ interface types {
     flags t30 {}
     flags t31 {a, b, c}
     flags t32 {a, b, c}
-    /* TODO(t33) */
-    /* TODO(t34) */
-    /* TODO(t35) */
-    /* TODO(t36) */
-    /* TODO(t37) */
+    variant t33 {
+        a
+    }
+    variant t34 {
+        a,
+        b
+    }
+    variant t35 {
+        a,
+        b
+    }
+    variant t36 {
+        a,
+        b(u32)
+    }
+    variant t37 {
+        a,
+        b(/* TODO() */)
+    }
     type t4 = u64
     /* TODO(t41) */
     /* TODO(t42) */
