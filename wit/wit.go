@@ -205,6 +205,7 @@ func (r *Record) WIT(ctx Node, name string) string {
 }
 
 func (f *Field) WIT(ctx Node, name string) string {
+	// TODO: docs
 	return f.Name + ": " + f.Type.WIT(f, "")
 }
 
@@ -297,6 +298,7 @@ func (v *Variant) WIT(ctx Node, name string) string {
 }
 
 func (c *Case) WIT(_ Node, _ string) string {
+	// TODO: docs
 	var b strings.Builder
 	b.WriteString(c.Name)
 	if c.Type != nil {
@@ -359,7 +361,7 @@ func (l *List) WIT(_ Node, name string) string {
 // WIT returns the WIT representation of [primitive type] T.
 //
 // [primitive type]: https://component-model.bytecodealliance.org/wit-overview.html#primitive-types
-func (p _primitive[T]) WIT(ctx Node, name string) string {
+func (p _primitive[T]) WIT(_ Node, name string) string {
 	if name != "" {
 		return "type " + name + " = " + p.String()
 	}
@@ -367,9 +369,9 @@ func (p _primitive[T]) WIT(ctx Node, name string) string {
 }
 
 // WIT returns the WIT representation of f.
-func (f *Function) WIT(ctx Node, name string) string {
-	var b strings.Builder
+func (f *Function) WIT(_ Node, name string) string {
 	// TODO: docs
+	var b strings.Builder
 	b.WriteString(name)
 	b.WriteString(": func(")
 	b.WriteString(paramsWIT(f.Params))
@@ -400,6 +402,7 @@ func (p *Param) WIT(_ Node, _ string) string {
 }
 
 func (p *Package) WIT(ctx Node, _ string) string {
+	// TODO: docs
 	var b strings.Builder
 	b.WriteString("package ")
 	b.WriteString(p.Name.String())
