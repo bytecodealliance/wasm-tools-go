@@ -91,22 +91,6 @@ func (t *TypeDef) Align() uintptr {
 	return t.Kind.Align()
 }
 
-// Align aligns ptr with alignment align.
-func Align(ptr, align uintptr) uintptr {
-	// (dividend + divisor - 1) / divisor
-	// http://www.cs.nott.ac.uk/~rcb/G51MPC/slides/NumberLogic.pdf
-	return ((ptr + align - 1) / align) * align
-}
-
-// Sized is the interface implemented by any type that reports its [ABI byte size] and [alignment].
-//
-// [ABI byte size]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#size
-// [alignment]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#alignment
-type Sized interface {
-	Size() uintptr
-	Align() uintptr
-}
-
 // TypeDefKind represents the underlying type in a [TypeDef], which can be one of
 // [Record], [Resource], [Handle], [Flags], [Tuple], [Variant], [Enum],
 // [Option], [Result], [List], [Future], [Stream], or [Type].
@@ -764,17 +748,6 @@ type Char struct{ _primitive[char] }
 // [primitive type]: https://component-model.bytecodealliance.org/wit-overview.html#primitive-types
 // [string]: https://pkg.go.dev/builtin#string
 type String struct{ _primitive[string] }
-
-// Discriminant returns the smallest integer type that can represent 0...n.
-func Discriminant(n int) Type {
-	switch {
-	case n <= 1<<8:
-		return U8{}
-	case n <= 1<<16:
-		return U16{}
-	}
-	return U32{}
-}
 
 // Function represents a WIT [function].
 // Functions can be freestanding, methods, constructors or static.
