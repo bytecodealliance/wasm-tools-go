@@ -278,7 +278,7 @@ func (t *Tuple) WIT(ctx Node, _ string) string {
 	return b.String()
 }
 
-func (v *Variant) WIT(ctx Node, name string) string {
+func (v *Variant) WIT(_ Node, name string) string {
 	var b strings.Builder
 	b.WriteString("variant ")
 	b.WriteString(name)
@@ -289,7 +289,7 @@ func (v *Variant) WIT(ctx Node, name string) string {
 			if i > 0 {
 				b.WriteString(",\n")
 			}
-			b.WriteString(indent(v.Cases[i].WIT(ctx, "")))
+			b.WriteString(indent(v.Cases[i].WIT(v, "")))
 		}
 		b.WriteRune('\n')
 	}
@@ -307,6 +307,30 @@ func (c *Case) WIT(_ Node, _ string) string {
 		b.WriteRune(')')
 	}
 	return b.String()
+}
+
+func (e *Enum) WIT(_ Node, name string) string {
+	var b strings.Builder
+	b.WriteString("enum ")
+	b.WriteString(name)
+	b.WriteString(" {")
+	if len(e.Cases) > 0 {
+		b.WriteRune('\n')
+		for i := range e.Cases {
+			if i > 0 {
+				b.WriteString(",\n")
+			}
+			b.WriteString(indent(e.Cases[i].WIT(e, "")))
+		}
+		b.WriteRune('\n')
+	}
+	b.WriteRune('}')
+	return unwrap(b.String())
+}
+
+func (c *EnumCase) WIT(_ Node, _ string) string {
+	// TODO: docs
+	return c.Name
 }
 
 func (o *Option) WIT(_ Node, name string) string {

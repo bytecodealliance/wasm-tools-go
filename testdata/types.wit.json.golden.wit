@@ -35,8 +35,8 @@ interface types {
     variant t36 { a, b(u32) }
     variant t37 { a, b(option<u32>) }
     type t4 = u64
-    /* TODO(t41) */
-    /* TODO(t42) */
+    enum t41 { a, b, c }
+    enum t42 { a, b, c }
     type t43 = bool
     type t44 = string
     type t45 = list<list<list<t32>>>
