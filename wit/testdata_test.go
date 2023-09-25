@@ -216,19 +216,45 @@ func TestPackageFieldIsNotNil(t *testing.T) {
 func TestTypeDefNamesNotNil(t *testing.T) {
 	err := loadTestdata(func(path string, res *Resolve) error {
 		t.Run(strings.TrimPrefix(path, testdataDir), func(t *testing.T) {
-			for i, v := range res.TypeDefs {
-				switch v.Kind.(type) {
+			for i, td := range res.TypeDefs {
+				switch td.Kind.(type) {
 				case *Record, *Variant, *Enum, *Flags:
 				default:
 					continue
 				}
 				name := fmt.Sprintf("TypeDefs[%d]", i)
-				if v.Name != nil {
-					name += "#" + *v.Name
+				if td.Name != nil {
+					name += "#" + *td.Name
 				}
 				t.Run(name, func(t *testing.T) {
-					if v.Name == nil {
+					if td.Name == nil {
 						t.Error("Name is nil")
+					}
+				})
+			}
+		})
+		return nil
+	})
+	if err != nil {
+		t.Error(err)
+	}
+}
+
+// TestNoExportedTypeDefs verifies that any [TypeDef] instances in a [World] are
+// referenced in Imports, and not Exports.
+func TestNoExportedTypeDefs(t *testing.T) {
+	err := loadTestdata(func(path string, res *Resolve) error {
+		t.Run(strings.TrimPrefix(path, testdataDir), func(t *testing.T) {
+			for i, w := range res.Worlds {
+				if len(w.Imports) == 0 && len(w.Exports) == 0 {
+					continue
+				}
+				name := fmt.Sprintf("Worlds[%d]#%s", i, w.Name)
+				t.Run(name, func(t *testing.T) {
+					for name, item := range w.Exports {
+						if _, ok := item.(*TypeDef); ok {
+							t.Errorf("found TypeDef in World.Exports: %s", name)
+						}
 					}
 				})
 			}
