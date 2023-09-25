@@ -9,7 +9,7 @@ interface types {
     type t11 = char
     list<char>
     type t13 = string
-    option<u32>
+    type t14 = option<u32>
     /* TODO(t15) */
     /* TODO(t16) */
     /* TODO(t17) */

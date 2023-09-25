@@ -307,8 +307,17 @@ func (c *Case) WIT(_ Node, _ string) string {
 	return b.String()
 }
 
-func (o *Option) WIT(ctx Node, _ string) string {
-	return "option<" + o.Type.WIT(o, "") + ">"
+func (o *Option) WIT(_ Node, name string) string {
+	var b strings.Builder
+	if name != "" {
+		b.WriteString("type ")
+		b.WriteString(name)
+		b.WriteString(" = ")
+	}
+	b.WriteString("option<")
+	b.WriteString(o.Type.WIT(o, ""))
+	b.WriteRune('>')
+	return b.String()
 }
 
 func (l *List) WIT(ctx Node, _ string) string {
