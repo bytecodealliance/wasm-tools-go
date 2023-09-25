@@ -823,8 +823,6 @@ type Package struct {
 	Interfaces map[string]*Interface
 	Worlds     map[string]*World
 	Docs       Docs
-
-	_node
 }
 
 // PackageName represents a [WebAssembly Component Model] package name,

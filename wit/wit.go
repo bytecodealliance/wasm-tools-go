@@ -180,12 +180,20 @@ func (r *Record) WIT(ctx Node, name string) string {
 		}
 		b.WriteRune('\n')
 	}
-	b.WriteString("}")
+	b.WriteRune('}')
 	return b.String()
 }
 
 func (f *Field) WIT(ctx Node, name string) string {
 	return f.Name + ": " + f.Type.WIT(f, "")
+}
+
+func (r *Resource) WIT(ctx Node, name string) string {
+	var b strings.Builder
+	b.WriteString("resource ")
+	b.WriteString(name)
+	b.WriteString(" {} // TODO: constructor, methods, and static functions")
+	return b.String()
 }
 
 func (t *Tuple) WIT(ctx Node, _ string) string {
