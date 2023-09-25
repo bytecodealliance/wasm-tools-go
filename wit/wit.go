@@ -343,8 +343,17 @@ func (r *Result) WIT(_ Node, name string) string {
 	return b.String()
 }
 
-func (l *List) WIT(ctx Node, _ string) string {
-	return "list<" + l.Type.WIT(l, "") + ">"
+func (l *List) WIT(_ Node, name string) string {
+	var b strings.Builder
+	if name != "" {
+		b.WriteString("type ")
+		b.WriteString(name)
+		b.WriteString(" = ")
+	}
+	b.WriteString("list<")
+	b.WriteString(l.Type.WIT(l, ""))
+	b.WriteRune('>')
+	return b.String()
 }
 
 // WIT returns the WIT representation of [primitive type] T.

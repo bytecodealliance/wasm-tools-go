@@ -7,7 +7,7 @@ interface types {
     type t1 = u8
     type t10 = float64
     type t11 = char
-    list<char>
+    type t12 = list<char>
     type t13 = string
     type t14 = option<u32>
     type t15 = result<u32, u32>
@@ -39,7 +39,7 @@ interface types {
     /* TODO(t42) */
     type t43 = bool
     type t44 = string
-    list<list<list<t32>>>
+    type t45 = list<list<list<t32>>>
     type t46 = t44
     type t47 = t44
     /* TODO(t48) */
