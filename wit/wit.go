@@ -219,7 +219,10 @@ func (p _primitive[T]) WIT(ctx WIT, name string) string {
 func (f *Function) WIT(ctx WIT, name string) string {
 	var b strings.Builder
 	// TODO: docs
-	fmt.Fprintf(&b, "%s: func(%s)", name, paramsWIT(f.Params))
+	b.WriteString(name)
+	b.WriteString(": func(")
+	b.WriteString(paramsWIT(f.Params))
+	b.WriteRune(')')
 	if len(f.Results) > 0 {
 		b.WriteString(" -> ")
 		b.WriteString(paramsWIT(f.Results))
