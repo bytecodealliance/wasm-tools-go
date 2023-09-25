@@ -9,11 +9,11 @@ interface types {
     type t11 = char
     list<char>
     type t13 = string
-    // TODO(t14)
-    // TODO(t15)
-    // TODO(t16)
-    // TODO(t17)
-    // TODO(t18)
+    /* TODO(t14) */
+    /* TODO(t15) */
+    /* TODO(t16) */
+    /* TODO(t17) */
+    /* TODO(t18) */
     type t2 = u16
     record t20 {}
     record t21 {
@@ -38,29 +38,29 @@ interface types {
     tuple<u32>
     tuple<u32, u64>
     type t3 = u32
-    // TODO(t30)
-    // TODO(t31)
-    // TODO(t32)
-    // TODO(t33)
-    // TODO(t34)
-    // TODO(t35)
-    // TODO(t36)
-    // TODO(t37)
+    /* TODO(t30) */
+    /* TODO(t31) */
+    /* TODO(t32) */
+    /* TODO(t33) */
+    /* TODO(t34) */
+    /* TODO(t35) */
+    /* TODO(t36) */
+    /* TODO(t37) */
     type t4 = u64
-    // TODO(t41)
-    // TODO(t42)
+    /* TODO(t41) */
+    /* TODO(t42) */
     type t43 = bool
     type t44 = string
     list<list<list<t32>>>
     type t46 = t44
     type t47 = t44
-    // TODO(t48)
-    // TODO(t49)
+    /* TODO(t48) */
+    /* TODO(t49) */
     type t5 = s8
-    // TODO(t50)
-    // TODO(t51)
-    // TODO(t52)
-    // TODO(t53)
+    /* TODO(t50) */
+    /* TODO(t51) */
+    /* TODO(t52) */
+    /* TODO(t53) */
     type t6 = s16
     type t7 = s32
     type t8 = s64

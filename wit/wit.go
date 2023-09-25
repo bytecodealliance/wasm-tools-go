@@ -17,7 +17,7 @@ type Node interface {
 
 type _node struct{}
 
-func (_node) WIT(ctx Node, name string) string { return fmt.Sprintf("// TODO(%s)", name) }
+func (_node) WIT(ctx Node, name string) string { return "/* TODO(" + name + ") */" }
 
 func indent(s string) string {
 	const ws = "    "

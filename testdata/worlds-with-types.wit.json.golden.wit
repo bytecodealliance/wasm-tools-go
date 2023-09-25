@@ -20,7 +20,7 @@ world the-test {
     record a {
         x: u32
     }
-    // TODO(b)
+    /* TODO(b) */
     import foo: func(a: a) -> b
     export bar: func(a: a) -> b
 }

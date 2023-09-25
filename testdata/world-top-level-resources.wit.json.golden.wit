@@ -3,17 +3,17 @@ package foo:foo
 interface handler {
     use foo:foo/types.{request}
     use foo:foo/types.{response}
-    handle: func(some: // TODO()) -> // TODO()
-    handle-owned: func(some: // TODO()) -> // TODO()
+    handle: func(some: /* TODO() */) -> /* TODO() */
+    handle-owned: func(some: /* TODO() */) -> /* TODO() */
 }
 
 interface types {
-    // TODO(request)
-    // TODO(response)
-    [method]request.bar: func(self: // TODO(), arg: list<u32>)
-    [method]request.foo: func(self: // TODO())
-    [method]response.bar: func(self: // TODO(), arg: list<u32>)
-    [method]response.foo: func(self: // TODO())
+    /* TODO(request) */
+    /* TODO(response) */
+    [method]request.bar: func(self: /* TODO() */, arg: list<u32>)
+    [method]request.foo: func(self: /* TODO() */)
+    [method]response.bar: func(self: /* TODO() */, arg: list<u32>)
+    [method]response.foo: func(self: /* TODO() */)
 }
 
 world proxy {

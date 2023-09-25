@@ -1,30 +1,30 @@
 package foo:bar
 
 interface foo {
-    // TODO(a)
-    // TODO(b)
-    // TODO(c)
-    // TODO(d)
-    // TODO(e)
-    [constructor]b: func() -> // TODO()
-    [constructor]c: func(x: u32) -> // TODO()
-    [constructor]d: func(x: u32) -> // TODO()
-    [constructor]e: func(other: // TODO(), other2: // TODO()) -> // TODO()
-    [method]d.a: func(self: // TODO())
-    [method]e.method: func(self: // TODO(), thing: // TODO(), thing2: // TODO())
+    /* TODO(a) */
+    /* TODO(b) */
+    /* TODO(c) */
+    /* TODO(d) */
+    /* TODO(e) */
+    [constructor]b: func() -> /* TODO() */
+    [constructor]c: func(x: u32) -> /* TODO() */
+    [constructor]d: func(x: u32) -> /* TODO() */
+    [constructor]e: func(other: /* TODO() */, other2: /* TODO() */) -> /* TODO() */
+    [method]d.a: func(self: /* TODO() */)
+    [method]e.method: func(self: /* TODO() */, thing: /* TODO() */, thing2: /* TODO() */)
     [static]d.b: func()
 }
 
 interface i {
-    // TODO(a)
+    /* TODO(a) */
     type t1 = a
-    // TODO(t2)
-    // TODO(t3)
+    /* TODO(t2) */
+    /* TODO(t3) */
 }
 
 world w {
-    import [constructor]c: func() -> // TODO()
-    // TODO(a)
-    // TODO(b)
-    // TODO(c)
+    import [constructor]c: func() -> /* TODO() */
+    /* TODO(a) */
+    /* TODO(b) */
+    /* TODO(c) */
 }

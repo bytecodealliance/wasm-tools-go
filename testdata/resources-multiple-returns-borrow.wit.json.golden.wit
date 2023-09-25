@@ -1,7 +1,7 @@
 package foo:resources1
 
 interface resources1 {
-    // TODO(r1)
-    [method]r1.f1: func(self: // TODO()) -> a: s32, handle: // TODO()
-    t1: func(a: // TODO())
+    /* TODO(r1) */
+    [method]r1.f1: func(self: /* TODO() */) -> a: s32, handle: /* TODO() */
+    t1: func(a: /* TODO() */)
 }
