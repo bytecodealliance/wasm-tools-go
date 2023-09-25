@@ -9,7 +9,7 @@ interface types {
     type t11 = char
     list<char>
     type t13 = string
-    /* TODO(t14) */
+    option<u32>
     /* TODO(t15) */
     /* TODO(t16) */
     /* TODO(t17) */
@@ -33,7 +33,7 @@ interface types {
     variant t34 { a, b }
     variant t35 { a, b }
     variant t36 { a, b(u32) }
-    variant t37 { a, b(/* TODO() */) }
+    variant t37 { a, b(option<u32>) }
     type t4 = u64
     /* TODO(t41) */
     /* TODO(t42) */
