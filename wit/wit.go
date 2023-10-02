@@ -87,13 +87,6 @@ func (w *World) itemWIT(motion, name string, v WorldItem) string {
 	panic("BUG: unknown WorldItem")
 }
 
-func (w *World) RelativeName(p *Package) string {
-	if w.Package == p {
-		return w.Name
-	}
-	return w.Package.Name.String() + "/" + w.Name
-}
-
 // WIT returns the WIT representation of i.
 func (i *Interface) WIT(ctx Node, name string) string {
 	if i.Name != nil && name == "" {
@@ -110,7 +103,7 @@ func (i *Interface) WIT(ctx Node, name string) string {
 		b.WriteString(name)
 		b.WriteRune(' ')
 	case *World:
-		rname := i.RelativeName(ctx.Package)
+		rname := relativeName(i, ctx.Package)
 		if rname != "" {
 			return rname
 		}
@@ -145,16 +138,6 @@ func (i *Interface) WIT(ctx Node, name string) string {
 	return b.String()
 }
 
-func (i *Interface) RelativeName(p *Package) string {
-	if i.Name == nil {
-		return ""
-	}
-	if i.Package == p {
-		return *i.Name
-	}
-	return i.Package.Name.String() + "/" + *i.Name
-}
-
 // WIT returns the WIT representation of [TypeDef] t.
 func (t *TypeDef) WIT(ctx Node, name string) string {
 	if t.Name != nil && name == "" {
@@ -167,7 +150,7 @@ func (t *TypeDef) WIT(ctx Node, name string) string {
 		if t.Owner == ctx.Owner && t.Name != nil {
 			return "type " + name + " = " + *t.Name
 		}
-		ownerName := t.Owner.RelativeName(ctx.Package())
+		ownerName := relativeName(t.Owner, ctx.Package())
 		if t.Name != nil && *t.Name != name {
 			return fmt.Sprintf("use %s.{%s as %s}", ownerName, *t.Name, name)
 		}
@@ -184,6 +167,30 @@ func (t *TypeDef) WIT(ctx Node, name string) string {
 		return name
 	}
 	return t.Kind.WIT(ctx, name)
+}
+
+func relativeName(o TypeOwner, p *Package) string {
+	var op *Package
+	var name string
+	switch o := o.(type) {
+	case *Interface:
+		if o.Name == nil {
+			return ""
+		}
+		op = o.Package
+		name = *o.Name
+
+	case *World:
+		op = o.Package
+		name = o.Name
+	}
+	if op == p {
+		return name
+	}
+	if op == nil {
+		return ""
+	}
+	return op.Name.String() + "/" + name
 }
 
 func (r *Record) WIT(ctx Node, name string) string {
