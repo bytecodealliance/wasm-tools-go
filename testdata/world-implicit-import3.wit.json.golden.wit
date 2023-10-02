@@ -1,11 +1,11 @@
-package foo:foo
+package foo:foo;
 
 interface foo {
-    type g = char
+    type g = char;
 }
 
 world w {
-    use foo:foo/foo.{g}
-    import foo
-    export foo: func() -> g
+    use foo:foo/foo.{g};
+    import foo;
+    export foo: func() -> g;
 }

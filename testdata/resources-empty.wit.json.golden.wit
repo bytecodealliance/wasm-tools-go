@@ -1,7 +1,7 @@
-package foo:resources-empty
+package foo:resources-empty;
 
 interface resources-empty {
-    resource r1 {} // TODO: constructor, methods, and static functions
-    t1: func(a: own<r1>)
-    t2: func(a: borrow<r1>)
+    resource r1 {} // TODO: constructor, methods, and static functions;
+    t1: func(a: own<r1>);
+    t2: func(a: borrow<r1>);
 }

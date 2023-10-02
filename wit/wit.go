@@ -66,11 +66,11 @@ func (w *World) WIT(ctx Node, name string) string {
 		b.WriteRune('\n')
 		for _, name := range codec.SortedKeys(w.Imports) {
 			b.WriteString(indent(w.itemWIT("import", name, w.Imports[name])))
-			b.WriteRune('\n')
+			b.WriteString(";\n")
 		}
 		for _, name := range codec.SortedKeys(w.Exports) {
 			b.WriteString(indent(w.itemWIT("export", name, w.Exports[name])))
-			b.WriteRune('\n')
+			b.WriteString(";\n")
 		}
 	}
 	b.WriteRune('}')
@@ -126,7 +126,7 @@ func (i *Interface) WIT(ctx Node, name string) string {
 			// 	b.WriteRune('\n')
 			// }
 			b.WriteString(indent(i.TypeDefs[name].WIT(i, name)))
-			b.WriteRune('\n')
+			b.WriteString(";\n")
 			n++
 		}
 		for _, name := range codec.SortedKeys(i.Functions) {
@@ -134,7 +134,7 @@ func (i *Interface) WIT(ctx Node, name string) string {
 			// 	b.WriteRune('\n')
 			// }
 			b.WriteString(indent(i.Functions[name].WIT(i, name)))
-			b.WriteRune('\n')
+			b.WriteString(";\n")
 			n++
 		}
 	}
@@ -469,7 +469,7 @@ func (p *Package) WIT(ctx Node, _ string) string {
 	var b strings.Builder
 	b.WriteString("package ")
 	b.WriteString(p.Name.String())
-	b.WriteRune('\n')
+	b.WriteString(";\n")
 	if len(p.Interfaces) > 0 {
 		b.WriteRune('\n')
 		for i, name := range codec.SortedKeys(p.Interfaces) {

@@ -1,7 +1,7 @@
-package foo:name
+package foo:name;
 
 interface x {}
 
 world name {
-    import interface name {}
+    import interface name {};
 }

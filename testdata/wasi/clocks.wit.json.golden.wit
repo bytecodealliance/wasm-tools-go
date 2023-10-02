@@ -1,49 +1,49 @@
-package wasi:poll
+package wasi:poll;
 
 interface poll {
-    type pollable = u32
-    drop-pollable: func(this: pollable)
-    poll-oneoff: func(in: list<pollable>) -> list<bool>
+    type pollable = u32;
+    drop-pollable: func(this: pollable);
+    poll-oneoff: func(in: list<pollable>) -> list<bool>;
 }
 
 world example-world {
-    import poll
+    import poll;
 }
 
 
-package wasi:clocks
+package wasi:clocks;
 
 interface monotonic-clock {
-    type instant = u64
-    use wasi:poll/poll.{pollable}
-    now: func() -> instant
-    resolution: func() -> instant
-    subscribe: func(when: instant, absolute: bool) -> pollable
+    type instant = u64;
+    use wasi:poll/poll.{pollable};
+    now: func() -> instant;
+    resolution: func() -> instant;
+    subscribe: func(when: instant, absolute: bool) -> pollable;
 }
 
 interface timezone {
-    use wasi:clocks/wall-clock.{datetime}
+    use wasi:clocks/wall-clock.{datetime};
     record timezone-display {
         utc-offset: s32,
         name: string,
         in-daylight-saving-time: bool
-    }
-    display: func(when: datetime) -> timezone-display
-    utc-offset: func(when: datetime) -> s32
+    };
+    display: func(when: datetime) -> timezone-display;
+    utc-offset: func(when: datetime) -> s32;
 }
 
 interface wall-clock {
     record datetime {
         seconds: u64,
         nanoseconds: u32
-    }
-    now: func() -> datetime
-    resolution: func() -> datetime
+    };
+    now: func() -> datetime;
+    resolution: func() -> datetime;
 }
 
 world imports {
-    import wasi:poll/poll
-    import monotonic-clock
-    import wall-clock
-    import timezone
+    import wasi:poll/poll;
+    import monotonic-clock;
+    import wall-clock;
+    import timezone;
 }

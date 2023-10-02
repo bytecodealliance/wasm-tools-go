@@ -1,20 +1,20 @@
-package a:a@1.0.0
+package a:a@1.0.0;
 
 interface foo {
-    type t = u32
+    type t = u32;
 }
 
 
-package a:a@2.0.0
+package a:a@2.0.0;
 
 interface foo {
-    type t = u32
+    type t = u32;
 }
 
 
-package foo:versions
+package foo:versions;
 
 interface foo {
-    use a:a@1.0.0/foo.{t}
-    use a:a@2.0.0/foo.{t as t2}
+    use a:a@1.0.0/foo.{t};
+    use a:a@2.0.0/foo.{t as t2};
 }

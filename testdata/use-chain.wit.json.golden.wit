@@ -1,9 +1,9 @@
-package foo:name
+package foo:name;
 
 interface foo {
-    record foo {}
+    record foo {};
 }
 
 interface name {
-    use foo:name/foo.{foo}
+    use foo:name/foo.{foo};
 }

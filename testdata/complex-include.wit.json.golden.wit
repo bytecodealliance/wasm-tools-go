@@ -1,53 +1,53 @@
-package foo:bar
+package foo:bar;
 
 interface a {}
 
 interface b {}
 
 world bar-a {
-    import a
-    import b
+    import a;
+    import b;
 }
 
 
-package foo:baz
+package foo:baz;
 
 interface a {}
 
 interface b {}
 
 world baz-a {
-    import a
-    import b
+    import a;
+    import b;
 }
 
 
-package foo:root
+package foo:root;
 
 interface ai {}
 
 interface bi {}
 
 world a {
-    import ai
-    import bi
+    import ai;
+    import bi;
 }
 
 world b {
-    import foo:bar/a
-    import foo:bar/b
+    import foo:bar/a;
+    import foo:bar/b;
 }
 
 world c {
-    import foo:bar/a
-    import foo:bar/b
+    import foo:bar/a;
+    import foo:bar/b;
 }
 
 world union-world {
-    import foo:bar/a
-    import foo:bar/b
-    import foo:baz/a
-    import foo:baz/b
-    import ai
-    import bi
+    import foo:bar/a;
+    import foo:bar/b;
+    import foo:baz/a;
+    import foo:baz/b;
+    import ai;
+    import bi;
 }
