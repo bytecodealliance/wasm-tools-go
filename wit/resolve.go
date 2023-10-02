@@ -186,11 +186,19 @@ type Handle interface {
 // _handle is an embeddable type that conforms to the [Handle] interface.
 type _handle struct{ _typeDefKind }
 
-func (_handle) isHandle()      {}
-func (_handle) Size() uintptr  { return 4 }
+func (_handle) isHandle() {}
+
+// Size returns the [ABI byte size] for this [Handle].
+//
+// [ABI byte size]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#size
+func (_handle) Size() uintptr { return 4 }
+
+// Align returns the [ABI byte alignment] for this [Handle].
+//
+// [ABI byte alignment]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#alignment
 func (_handle) Align() uintptr { return 4 }
 
-// OwnedHandle represents an WIT [owned handle].
+// OwnedHandle represents an WIT [owned handle]. It implements the [Handle] interface.
 //
 // [owned handle]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md#handles
 type OwnedHandle struct {
@@ -198,7 +206,7 @@ type OwnedHandle struct {
 	_handle
 }
 
-// BorrowedHandle represents a WIT [borrowed handle].
+// BorrowedHandle represents a WIT [borrowed handle]. It implements the [Handle] interface.
 //
 // [borrowed handle]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md#handles
 type BorrowedHandle struct {
@@ -214,7 +222,9 @@ type Flags struct {
 	_typeDefKind
 }
 
-// Size returns the byte size of [Flags] f.
+// Size returns the [ABI byte size] of [Flags] f.
+//
+// [ABI byte size]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#size
 func (f *Flags) Size() uintptr {
 	n := len(f.Flags)
 	switch {
@@ -226,7 +236,9 @@ func (f *Flags) Size() uintptr {
 	return 4 * uintptr((n+31)>>5)
 }
 
-// Align returns the byte alignment of [Flags] f.
+// Align returns the [ABI byte alignment] of [Flags] f.
+//
+// [ABI byte alignment]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#alignment
 func (f *Flags) Align() uintptr {
 	n := len(f.Flags)
 	switch {
@@ -615,7 +627,7 @@ type _primitive[T Primitive] struct{ _type }
 // _primitive is a generic embeddable type that conforms to the [Type] interface.
 func (_primitive[T]) isType() {}
 
-// Size returns the byte size for values of primitive type T.
+// Size returns the byte size for values of this type.
 func (_primitive[T]) Size() uintptr {
 	var v T
 	switch any(v).(type) {
@@ -626,7 +638,7 @@ func (_primitive[T]) Size() uintptr {
 	}
 }
 
-// Align returns the byte alignment for values of type T.
+// Align returns the byte alignment for values of this type.
 func (_primitive[T]) Align() uintptr {
 	var v T
 	switch any(v).(type) {
@@ -637,8 +649,9 @@ func (_primitive[T]) Align() uintptr {
 	}
 }
 
-// String returns the WIT type name of [primitive type] T.
+// String returns the canonical [primitive type] name in [WIT] text format.
 //
+// [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
 // [primitive type]: https://component-model.bytecodealliance.org/wit-overview.html#primitive-types
 func (_primitive[T]) String() string {
 	var v T

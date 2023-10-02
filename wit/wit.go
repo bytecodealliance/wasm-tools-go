@@ -44,7 +44,10 @@ func unwrap(s string) string {
 	return b.String()
 }
 
-// WIT returns the WIT representation of r.
+// WIT returns the [WIT] text format for [Resolve] r. Note that the return value could
+// represent multiple files, so may not be precisely valid WIT text.
+//
+// [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
 func (r *Resolve) WIT(_ Node, _ string) string {
 	var b strings.Builder
 	for i, p := range r.Packages {
@@ -57,7 +60,9 @@ func (r *Resolve) WIT(_ Node, _ string) string {
 	return b.String()
 }
 
-// WIT returns the WIT representation of w.
+// WIT returns the [WIT] text format for [World] w.
+//
+// [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
 func (w *World) WIT(ctx Node, name string) string {
 	if name == "" {
 		name = w.Name
@@ -90,7 +95,9 @@ func (w *World) itemWIT(motion, name string, v WorldItem) string {
 	panic("BUG: unknown WorldItem")
 }
 
-// WIT returns the WIT representation of i.
+// WIT returns the [WIT] text format for [Interface] i.
+//
+// [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
 func (i *Interface) WIT(ctx Node, name string) string {
 	if i.Name != nil && name == "" {
 		name = *i.Name
@@ -141,7 +148,9 @@ func (i *Interface) WIT(ctx Node, name string) string {
 	return b.String()
 }
 
-// WIT returns the WIT representation of [TypeDef] t.
+// WIT returns the [WIT] text format for [TypeDef] t.
+//
+// [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
 func (t *TypeDef) WIT(ctx Node, name string) string {
 	if t.Name != nil && name == "" {
 		name = *t.Name
@@ -196,6 +205,9 @@ func relativeName(o TypeOwner, p *Package) string {
 	return op.Name.String() + "/" + name
 }
 
+// WIT returns the [WIT] text format for [Record] r.
+//
+// [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
 func (r *Record) WIT(ctx Node, name string) string {
 	var b strings.Builder
 	b.WriteString("record ")
@@ -215,11 +227,17 @@ func (r *Record) WIT(ctx Node, name string) string {
 	return unwrap(b.String())
 }
 
+// WIT returns the [WIT] text format for [Field] f.
+//
+// [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
 func (f *Field) WIT(ctx Node, name string) string {
 	// TODO: docs
 	return f.Name + ": " + f.Type.WIT(f, "")
 }
 
+// WIT returns the [WIT] text format for [Resource] r.
+//
+// [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
 func (r *Resource) WIT(ctx Node, name string) string {
 	var b strings.Builder
 	b.WriteString("resource ")
@@ -228,6 +246,9 @@ func (r *Resource) WIT(ctx Node, name string) string {
 	return b.String()
 }
 
+// WIT returns the [WIT] text format for [OwnedHandle] h.
+//
+// [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
 func (h *OwnedHandle) WIT(ctx Node, name string) string {
 	var b strings.Builder
 	if name != "" {
@@ -241,6 +262,9 @@ func (h *OwnedHandle) WIT(ctx Node, name string) string {
 	return b.String()
 }
 
+// WIT returns the [WIT] text format for [BorrowedHandle] h.
+//
+// [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
 func (h *BorrowedHandle) WIT(ctx Node, name string) string {
 	var b strings.Builder
 	if name != "" {
@@ -254,6 +278,9 @@ func (h *BorrowedHandle) WIT(ctx Node, name string) string {
 	return b.String()
 }
 
+// WIT returns the [WIT] text format for [Flags] f.
+//
+// [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
 func (f *Flags) WIT(ctx Node, name string) string {
 	var b strings.Builder
 	b.WriteString("flags ")
@@ -271,11 +298,17 @@ func (f *Flags) WIT(ctx Node, name string) string {
 	return unwrap(b.String())
 }
 
+// WIT returns the [WIT] text format for [Flag] f.
+//
+// [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
 func (f *Flag) WIT(_ Node, _ string) string {
 	// TODO: docs
 	return f.Name
 }
 
+// WIT returns the [WIT] text format for [Tuple] t.
+//
+// [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
 func (t *Tuple) WIT(ctx Node, _ string) string {
 	var b strings.Builder
 	b.WriteString("tuple<")
@@ -289,6 +322,9 @@ func (t *Tuple) WIT(ctx Node, _ string) string {
 	return b.String()
 }
 
+// WIT returns the [WIT] text format for [Variant] v.
+//
+// [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
 func (v *Variant) WIT(_ Node, name string) string {
 	var b strings.Builder
 	b.WriteString("variant ")
@@ -308,6 +344,9 @@ func (v *Variant) WIT(_ Node, name string) string {
 	return unwrap(b.String())
 }
 
+// WIT returns the [WIT] text format for [Case] c.
+//
+// [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
 func (c *Case) WIT(_ Node, _ string) string {
 	// TODO: docs
 	var b strings.Builder
@@ -320,6 +359,9 @@ func (c *Case) WIT(_ Node, _ string) string {
 	return b.String()
 }
 
+// WIT returns the [WIT] text format for [Enum] e.
+//
+// [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
 func (e *Enum) WIT(_ Node, name string) string {
 	var b strings.Builder
 	b.WriteString("enum ")
@@ -339,11 +381,17 @@ func (e *Enum) WIT(_ Node, name string) string {
 	return unwrap(b.String())
 }
 
+// WIT returns the [WIT] text format for [EnumCase] c.
+//
+// [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
 func (c *EnumCase) WIT(_ Node, _ string) string {
 	// TODO: docs
 	return c.Name
 }
 
+// WIT returns the [WIT] text format for [Option] o.
+//
+// [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
 func (o *Option) WIT(_ Node, name string) string {
 	var b strings.Builder
 	if name != "" {
@@ -357,6 +405,9 @@ func (o *Option) WIT(_ Node, name string) string {
 	return b.String()
 }
 
+// WIT returns the [WIT] text format for [Result] r.
+//
+// [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
 func (r *Result) WIT(_ Node, name string) string {
 	var b strings.Builder
 	if name != "" {
@@ -380,6 +431,9 @@ func (r *Result) WIT(_ Node, name string) string {
 	return b.String()
 }
 
+// WIT returns the [WIT] text format for [List] l.
+//
+// [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
 func (l *List) WIT(_ Node, name string) string {
 	var b strings.Builder
 	if name != "" {
@@ -393,6 +447,9 @@ func (l *List) WIT(_ Node, name string) string {
 	return b.String()
 }
 
+// WIT returns the [WIT] text format for [Future] f.
+//
+// [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
 func (f *Future) WIT(_ Node, name string) string {
 	var b strings.Builder
 	if name != "" {
@@ -409,6 +466,9 @@ func (f *Future) WIT(_ Node, name string) string {
 	return b.String()
 }
 
+// WIT returns the [WIT] text format for [Stream] s.
+//
+// [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
 func (s *Stream) WIT(_ Node, name string) string {
 	var b strings.Builder
 	if name != "" {
@@ -432,9 +492,9 @@ func (s *Stream) WIT(_ Node, name string) string {
 	return b.String()
 }
 
-// WIT returns the WIT representation of [primitive type] T.
+// WIT returns the [WIT] text format for this [TypeDefKind].
 //
-// [primitive type]: https://component-model.bytecodealliance.org/wit-overview.html#primitive-types
+// [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
 func (p _primitive[T]) WIT(_ Node, name string) string {
 	if name != "" {
 		return "type " + name + " = " + p.String()
@@ -442,7 +502,9 @@ func (p _primitive[T]) WIT(_ Node, name string) string {
 	return p.String()
 }
 
-// WIT returns the WIT representation of f.
+// WIT returns the [WIT] text format for [Function] f.
+//
+// [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
 func (f *Function) WIT(_ Node, name string) string {
 	// TODO: docs
 	var b strings.Builder
@@ -468,6 +530,9 @@ func paramsWIT(params []Param) string {
 	return b.String()
 }
 
+// WIT returns the [WIT] text format of [Param] p.
+//
+// [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
 func (p *Param) WIT(_ Node, _ string) string {
 	if p.Name == "" {
 		return p.Type.WIT(p, "")
@@ -475,6 +540,9 @@ func (p *Param) WIT(_ Node, _ string) string {
 	return p.Name + ": " + p.Type.WIT(p, "")
 }
 
+// WIT returns the [WIT] text format of [Package] p.
+//
+// [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
 func (p *Package) WIT(ctx Node, _ string) string {
 	// TODO: docs
 	var b strings.Builder
