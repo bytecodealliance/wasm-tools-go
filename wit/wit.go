@@ -112,9 +112,8 @@ func (i *Interface) WIT(ctx Node, name string) string {
 			return *i.Name
 		}
 		// Otherwise, this is an inline interface decl
-		b.WriteString("interface ")
 		b.WriteString(name)
-		b.WriteRune(' ')
+		b.WriteString(": interface ")
 	}
 
 	b.WriteRune('{')

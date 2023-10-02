@@ -9,10 +9,10 @@ interface shared2 {
 }
 
 world foo {
-    import interface bar {
+    import bar: interface {
         use foo:diamond/shared2.{the-type};
     };
-    import interface foo {
+    import foo: interface {
         use foo:diamond/shared1.{the-type};
     };
     import shared1;

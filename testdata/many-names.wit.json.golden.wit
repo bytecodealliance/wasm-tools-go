@@ -3,5 +3,5 @@ package foo:name;
 interface x {}
 
 world name {
-    import interface name {};
+    import name: interface {};
 }
