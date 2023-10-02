@@ -59,6 +59,9 @@ func (r *Resolve) WIT(_ Node, _ string) string {
 
 // WIT returns the WIT representation of w.
 func (w *World) WIT(ctx Node, name string) string {
+	if name == "" {
+		name = w.Name
+	}
 	var b strings.Builder
 	// TODO: docs
 	fmt.Fprintf(&b, "world %s {", name) // TODO: compare to w.Name?
