@@ -1,0 +1,6 @@
+package foo:comments;
+
+interface foo {
+    type bar = stream<x, _>;
+    type x = u32;
+}

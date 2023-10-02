@@ -1,0 +1,144 @@
+package foo:bar;
+
+interface i1 {
+    type t1 = u32;
+    type t10 = u32;
+    type t2 = u32;
+    type t3 = u32;
+    type t4 = u32;
+    type t5 = u32;
+    type t6 = u32;
+    type t7 = u32;
+    type t8 = u32;
+    type t9 = u32;
+}
+
+interface i10 {
+    use i9.{t1};
+    use i9.{t10};
+    use i9.{t2};
+    use i9.{t3};
+    use i9.{t4};
+    use i9.{t5};
+    use i9.{t6};
+    use i9.{t7};
+    use i9.{t8};
+    use i9.{t9};
+}
+
+interface i2 {
+    use i1.{t1};
+    use i1.{t10};
+    use i1.{t2};
+    use i1.{t3};
+    use i1.{t4};
+    use i1.{t5};
+    use i1.{t6};
+    use i1.{t7};
+    use i1.{t8};
+    use i1.{t9};
+}
+
+interface i3 {
+    use i2.{t1};
+    use i2.{t10};
+    use i2.{t2};
+    use i2.{t3};
+    use i2.{t4};
+    use i2.{t5};
+    use i2.{t6};
+    use i2.{t7};
+    use i2.{t8};
+    use i2.{t9};
+}
+
+interface i4 {
+    use i3.{t1};
+    use i3.{t10};
+    use i3.{t2};
+    use i3.{t3};
+    use i3.{t4};
+    use i3.{t5};
+    use i3.{t6};
+    use i3.{t7};
+    use i3.{t8};
+    use i3.{t9};
+}
+
+interface i5 {
+    use i4.{t1};
+    use i4.{t10};
+    use i4.{t2};
+    use i4.{t3};
+    use i4.{t4};
+    use i4.{t5};
+    use i4.{t6};
+    use i4.{t7};
+    use i4.{t8};
+    use i4.{t9};
+}
+
+interface i6 {
+    use i5.{t1};
+    use i5.{t10};
+    use i5.{t2};
+    use i5.{t3};
+    use i5.{t4};
+    use i5.{t5};
+    use i5.{t6};
+    use i5.{t7};
+    use i5.{t8};
+    use i5.{t9};
+}
+
+interface i7 {
+    use i6.{t1};
+    use i6.{t10};
+    use i6.{t2};
+    use i6.{t3};
+    use i6.{t4};
+    use i6.{t5};
+    use i6.{t6};
+    use i6.{t7};
+    use i6.{t8};
+    use i6.{t9};
+}
+
+interface i8 {
+    use i7.{t1};
+    use i7.{t10};
+    use i7.{t2};
+    use i7.{t3};
+    use i7.{t4};
+    use i7.{t5};
+    use i7.{t6};
+    use i7.{t7};
+    use i7.{t8};
+    use i7.{t9};
+}
+
+interface i9 {
+    use i8.{t1};
+    use i8.{t10};
+    use i8.{t2};
+    use i8.{t3};
+    use i8.{t4};
+    use i8.{t5};
+    use i8.{t6};
+    use i8.{t7};
+    use i8.{t8};
+    use i8.{t9};
+}
+
+world foo {
+    import i1;
+    import i2;
+    import i3;
+    import i4;
+    import i5;
+    import i6;
+    import i7;
+    import i8;
+    import i9;
+    export i10;
+}

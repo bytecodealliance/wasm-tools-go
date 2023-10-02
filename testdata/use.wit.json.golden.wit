@@ -1,0 +1,29 @@
+package foo:foo;
+
+interface bar {
+    type the-type = u32;
+}
+
+interface baz {
+    use bar.{the-type as test};
+    use foo.{the-type};
+}
+
+interface empty {}
+
+interface foo {
+    use bar.{the-type};
+}
+
+interface trailing-comma {
+    record the-foo { a: the-type };
+    use foo.{the-type};
+}
+
+interface use-from-empty {}
+
+interface use-multiple {
+    use baz.{test};
+    use baz.{the-type};
+    some-function: func(x: the-type) -> test;
+}

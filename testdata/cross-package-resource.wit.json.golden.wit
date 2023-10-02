@@ -1,0 +1,13 @@
+package some:dep;
+
+interface foo {
+    resource r {} // TODO: constructor, methods, and static functions;
+}
+
+
+package foo:bar;
+
+interface foo {
+    use some:dep/foo.{r};
+    type t = own<r>;
+}

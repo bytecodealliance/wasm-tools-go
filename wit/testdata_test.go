@@ -16,8 +16,7 @@ import (
 
 var update = flag.Bool("update", false, "update golden files")
 
-func compareOrWrite(t *testing.T, path, data string) {
-	golden := path + ".golden"
+func compareOrWrite(t *testing.T, path, golden, data string) {
 	if *update {
 		err := os.WriteFile(golden, []byte(data), 0644)
 		if err != nil {
@@ -69,7 +68,25 @@ func TestGoldenFiles(t *testing.T) {
 	err := loadTestdata(func(path string, res *Resolve) error {
 		t.Run(strings.TrimPrefix(path, testdataDir), func(t *testing.T) {
 			data := p.Sprint(res)
-			compareOrWrite(t, path, data)
+			compareOrWrite(t, path, path+".golden", data)
+		})
+		return nil
+	})
+
+	if err != nil {
+		t.Error(err)
+	}
+}
+
+func TestWITGoldenFiles(t *testing.T) {
+	p := pp.New()
+	p.SetExportedOnly(true)
+	p.SetColoringEnabled(false)
+
+	err := loadTestdata(func(path string, res *Resolve) error {
+		t.Run(strings.TrimPrefix(path, testdataDir), func(t *testing.T) {
+			data := res.WIT(nil, "")
+			compareOrWrite(t, path, path+".golden.wit", data)
 		})
 		return nil
 	})

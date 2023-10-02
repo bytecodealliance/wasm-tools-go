@@ -7,113 +7,140 @@ import (
 	"github.com/ydnar/wasm-tools-go/internal/codec"
 )
 
-const witIndent = "    "
+// Node is the interface implemented by the WIT ([WebAssembly Interface Type])
+// types in this package.
+//
+// [WebAssembly Interface Type]: https://component-model.bytecodealliance.org/wit-overview.html
+type Node interface {
+	WIT(ctx Node, name string) string
+}
+
+type _node struct{}
+
+func (_node) WIT(ctx Node, name string) string { return "/* TODO(" + name + ") */" }
 
 func indent(s string) string {
-	return strings.TrimSuffix(witIndent+strings.Replace(s, "\n", "\n"+witIndent, 0), witIndent)
+	const ws = "    "
+	return strings.TrimSuffix(ws+strings.ReplaceAll(s, "\n", "\n"+ws), ws)
 }
 
-// Syntax represents any type that can return a WIT representation of itself.
-type Syntax interface {
-	WIT() string
+// unwrap unwraps a multiline string into a single line, if:
+// 1. its length is <= 50 chars
+// 2. its line count is <= 5
+// This is used for single-line [Record], [Flags], [Variant], and [Enum] declarations.
+func unwrap(s string) string {
+	const chars = 50
+	const lines = 5
+	if len(s) > chars || strings.Count(s, "\n") > lines {
+		return s
+	}
+	var b strings.Builder
+	for i, line := range strings.Split(s, "\n") {
+		if i > 0 {
+			b.WriteRune(' ')
+		}
+		b.WriteString(strings.Trim(line, " \t\r\n"))
+	}
+	return b.String()
 }
 
-// WIT returns the WIT representation of r.
-func (r *Resolve) WIT() string {
-	b := &strings.Builder{}
+// WIT returns the [WIT] text format for [Resolve] r. Note that the return value could
+// represent multiple files, so may not be precisely valid WIT text.
+//
+// [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
+func (r *Resolve) WIT(_ Node, _ string) string {
+	var b strings.Builder
 	for i, p := range r.Packages {
 		if i > 0 {
 			b.WriteRune('\n')
 			b.WriteRune('\n')
 		}
-		fmt.Fprintf(b, "package %s\n", p.Name.String())
-		if len(p.Interfaces) > 0 {
-			b.WriteRune('\n')
-			for i, name := range codec.SortedKeys(p.Interfaces) {
-				if i > 0 {
-					b.WriteRune('\n')
-				}
-				b.WriteString(fmt.Sprintf("interface %s %s\n", name, p.Interfaces[name].WIT()))
-			}
-		}
-		if len(p.Worlds) > 0 {
-			b.WriteRune('\n')
-			for i, name := range codec.SortedKeys(p.Worlds) {
-				if i > 0 {
-					b.WriteRune('\n')
-				}
-				b.WriteString(fmt.Sprintf("world %s %s\n", name, p.Worlds[name].WIT()))
-			}
-		}
+		b.WriteString(p.WIT(r, ""))
 	}
 	return b.String()
 }
 
-// WIT returns the WIT representation of w.
-func (w *World) WIT() string {
+// WIT returns the [WIT] text format for [World] w.
+//
+// [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
+func (w *World) WIT(ctx Node, name string) string {
+	if name == "" {
+		name = w.Name
+	}
 	var b strings.Builder
 	// TODO: docs
-	b.WriteRune('{')
+	fmt.Fprintf(&b, "world %s {", name) // TODO: compare to w.Name?
 	if len(w.Imports) > 0 || len(w.Exports) > 0 {
 		b.WriteRune('\n')
 		for _, name := range codec.SortedKeys(w.Imports) {
-			b.WriteString(indent(fmt.Sprintf("import %s\n", worldItemWIT(name, w.Imports[name]))))
+			b.WriteString(indent(w.itemWIT("import", name, w.Imports[name])))
+			b.WriteString(";\n")
 		}
 		for _, name := range codec.SortedKeys(w.Exports) {
-			b.WriteString(indent(fmt.Sprintf("export %s\n", worldItemWIT(name, w.Exports[name]))))
+			b.WriteString(indent(w.itemWIT("export", name, w.Exports[name])))
+			b.WriteString(";\n")
 		}
 	}
 	b.WriteRune('}')
 	return b.String()
 }
 
-func worldItemWIT(name string, v WorldItem) string {
+func (w *World) itemWIT(motion, name string, v WorldItem) string {
 	switch v := v.(type) {
-	case *Interface:
-		if v.Name != nil {
-			return fmt.Sprintf("%s/%s", v.Package.Name.String(), *v.Name)
-		}
-		return fmt.Sprintf("%s %s", name, v.WIT())
+	case *Interface, *Function:
+		return motion + " " + v.WIT(w, name)
 	case *TypeDef:
-		switch owner := v.Owner.(type) {
-		case *World:
-			if v.Name != nil {
-				// TODO: is this right?
-				name = fmt.Sprintf("%s (%s???)", name, *v.Name)
-			}
-		case *Interface:
-			if v.Name != nil {
-				// TODO: is this right?
-				return fmt.Sprintf("%s/%s", owner.Package.Name.String(), *v.Name)
-			}
-		}
-		return fmt.Sprintf("%s %s", name, v.WIT())
-	case *Function:
-		return fmt.Sprintf("%s: %s", name, v.WIT())
+		return v.WIT(w, name) // no motion, in Imports only
 	}
 	panic("BUG: unknown WorldItem")
 }
 
-// WIT returns the WIT representation of i.
-func (i *Interface) WIT() string {
+// WIT returns the [WIT] text format for [Interface] i.
+//
+// [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
+func (i *Interface) WIT(ctx Node, name string) string {
+	if i.Name != nil && name == "" {
+		name = *i.Name
+	}
+
 	var b strings.Builder
+
 	// TODO: docs
+
+	switch ctx := ctx.(type) {
+	case *Package:
+		b.WriteString("interface ")
+		b.WriteString(name)
+		b.WriteRune(' ')
+	case *World:
+		rname := relativeName(i, ctx.Package)
+		if rname != "" {
+			return rname
+		}
+
+		// Otherwise, this is an inline interface decl.
+		b.WriteString(name)
+		b.WriteString(": interface ")
+	}
+
 	b.WriteRune('{')
 	if len(i.TypeDefs) > 0 || len(i.Functions) > 0 {
 		b.WriteRune('\n')
 		n := 0
 		for _, name := range codec.SortedKeys(i.TypeDefs) {
-			if n > 0 {
-				b.WriteRune('\n')
-			}
-			b.WriteString(indent(fmt.Sprintf("type %s = %s\n", name, i.TypeDefs[name].WIT())))
+			// if n > 0 {
+			// 	b.WriteRune('\n')
+			// }
+			b.WriteString(indent(i.TypeDefs[name].WIT(i, name)))
+			b.WriteString(";\n")
 			n++
 		}
 		for _, name := range codec.SortedKeys(i.Functions) {
-			if n > 0 {
-				b.WriteRune('\n')
-			}
-			b.WriteString(indent(fmt.Sprintf("%s: %s\n", name, i.Functions[name].WIT())))
+			// if n > 0 {
+			// 	b.WriteRune('\n')
+			// }
+			b.WriteString(indent(i.Functions[name].WIT(i, name)))
+			b.WriteString(";\n")
 			n++
 		}
 	}
@@ -121,20 +148,368 @@ func (i *Interface) WIT() string {
 	return b.String()
 }
 
-// WIT returns the WIT representation of t.
-func (t *TypeDef) WIT() string {
-	return "TODO<TypeDef>"
+// WIT returns the [WIT] text format for [TypeDef] t.
+//
+// [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
+func (t *TypeDef) WIT(ctx Node, name string) string {
+	if t.Name != nil && name == "" {
+		name = *t.Name
+	}
+	switch ctx := ctx.(type) {
+	// If context is another TypeDef, then this is an imported type.
+	case *TypeDef:
+		// Emit an type alias if same Owner.
+		if t.Owner == ctx.Owner && t.Name != nil {
+			return "type " + name + " = " + *t.Name
+		}
+		ownerName := relativeName(t.Owner, ctx.Package())
+		if t.Name != nil && *t.Name != name {
+			return fmt.Sprintf("use %s.{%s as %s}", ownerName, *t.Name, name)
+		}
+		return fmt.Sprintf("use %s.{%s}", ownerName, name)
+
+	case *World, *Interface:
+		switch t.Kind.(type) {
+		case *TypeDef:
+			return t.Kind.WIT(t, name)
+		}
+		return t.Kind.WIT(ctx, name)
+	}
+	if name != "" {
+		return name
+	}
+	return t.Kind.WIT(ctx, name)
 }
 
-func (_type) WIT() string {
-	return "TODO<_type>"
+func relativeName(o TypeOwner, p *Package) string {
+	var op *Package
+	var name string
+	switch o := o.(type) {
+	case *Interface:
+		if o.Name == nil {
+			return ""
+		}
+		op = o.Package
+		name = *o.Name
+
+	case *World:
+		op = o.Package
+		name = o.Name
+	}
+	if op == p {
+		return name
+	}
+	if op == nil {
+		return ""
+	}
+	return op.Name.String() + "/" + name
 }
 
-// WIT returns the WIT representation of f.
-func (f *Function) WIT() string {
+// WIT returns the [WIT] text format for [Record] r.
+//
+// [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
+func (r *Record) WIT(ctx Node, name string) string {
 	var b strings.Builder
+	b.WriteString("record ")
+	b.WriteString(name)
+	b.WriteString(" {")
+	if len(r.Fields) > 0 {
+		b.WriteRune('\n')
+		for i := range r.Fields {
+			if i > 0 {
+				b.WriteString(",\n")
+			}
+			b.WriteString(indent(r.Fields[i].WIT(ctx, "")))
+		}
+		b.WriteRune('\n')
+	}
+	b.WriteRune('}')
+	return unwrap(b.String())
+}
+
+// WIT returns the [WIT] text format for [Field] f.
+//
+// [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
+func (f *Field) WIT(ctx Node, name string) string {
 	// TODO: docs
-	b.WriteString("func(")
+	return f.Name + ": " + f.Type.WIT(f, "")
+}
+
+// WIT returns the [WIT] text format for [Resource] r.
+//
+// [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
+func (r *Resource) WIT(ctx Node, name string) string {
+	var b strings.Builder
+	b.WriteString("resource ")
+	b.WriteString(name)
+	b.WriteString(" {} // TODO: constructor, methods, and static functions")
+	return b.String()
+}
+
+// WIT returns the [WIT] text format for [OwnedHandle] h.
+//
+// [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
+func (h *OwnedHandle) WIT(ctx Node, name string) string {
+	var b strings.Builder
+	if name != "" {
+		b.WriteString("type ")
+		b.WriteString(name)
+		b.WriteString(" = ")
+	}
+	b.WriteString("own<")
+	b.WriteString(h.Type.WIT(h, ""))
+	b.WriteRune('>')
+	return b.String()
+}
+
+// WIT returns the [WIT] text format for [BorrowedHandle] h.
+//
+// [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
+func (h *BorrowedHandle) WIT(ctx Node, name string) string {
+	var b strings.Builder
+	if name != "" {
+		b.WriteString("type ")
+		b.WriteString(name)
+		b.WriteString(" = ")
+	}
+	b.WriteString("borrow<")
+	b.WriteString(h.Type.WIT(h, ""))
+	b.WriteRune('>')
+	return b.String()
+}
+
+// WIT returns the [WIT] text format for [Flags] f.
+//
+// [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
+func (f *Flags) WIT(ctx Node, name string) string {
+	var b strings.Builder
+	b.WriteString("flags ")
+	b.WriteString(name)
+	b.WriteString(" {")
+	if len(f.Flags) > 0 {
+		for i := range f.Flags {
+			if i > 0 {
+				b.WriteString(", ")
+			}
+			b.WriteString(f.Flags[i].WIT(f, ""))
+		}
+	}
+	b.WriteRune('}')
+	return unwrap(b.String())
+}
+
+// WIT returns the [WIT] text format for [Flag] f.
+//
+// [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
+func (f *Flag) WIT(_ Node, _ string) string {
+	// TODO: docs
+	return f.Name
+}
+
+// WIT returns the [WIT] text format for [Tuple] t.
+//
+// [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
+func (t *Tuple) WIT(ctx Node, _ string) string {
+	var b strings.Builder
+	b.WriteString("tuple<")
+	for i := range t.Types {
+		if i > 0 {
+			b.WriteString(", ")
+		}
+		b.WriteString(t.Types[i].WIT(t, ""))
+	}
+	b.WriteString(">")
+	return b.String()
+}
+
+// WIT returns the [WIT] text format for [Variant] v.
+//
+// [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
+func (v *Variant) WIT(_ Node, name string) string {
+	var b strings.Builder
+	b.WriteString("variant ")
+	b.WriteString(name)
+	b.WriteString(" {")
+	if len(v.Cases) > 0 {
+		b.WriteRune('\n')
+		for i := range v.Cases {
+			if i > 0 {
+				b.WriteString(",\n")
+			}
+			b.WriteString(indent(v.Cases[i].WIT(v, "")))
+		}
+		b.WriteRune('\n')
+	}
+	b.WriteRune('}')
+	return unwrap(b.String())
+}
+
+// WIT returns the [WIT] text format for [Case] c.
+//
+// [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
+func (c *Case) WIT(_ Node, _ string) string {
+	// TODO: docs
+	var b strings.Builder
+	b.WriteString(c.Name)
+	if c.Type != nil {
+		b.WriteRune('(')
+		b.WriteString(c.Type.WIT(c, ""))
+		b.WriteRune(')')
+	}
+	return b.String()
+}
+
+// WIT returns the [WIT] text format for [Enum] e.
+//
+// [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
+func (e *Enum) WIT(_ Node, name string) string {
+	var b strings.Builder
+	b.WriteString("enum ")
+	b.WriteString(name)
+	b.WriteString(" {")
+	if len(e.Cases) > 0 {
+		b.WriteRune('\n')
+		for i := range e.Cases {
+			if i > 0 {
+				b.WriteString(",\n")
+			}
+			b.WriteString(indent(e.Cases[i].WIT(e, "")))
+		}
+		b.WriteRune('\n')
+	}
+	b.WriteRune('}')
+	return unwrap(b.String())
+}
+
+// WIT returns the [WIT] text format for [EnumCase] c.
+//
+// [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
+func (c *EnumCase) WIT(_ Node, _ string) string {
+	// TODO: docs
+	return c.Name
+}
+
+// WIT returns the [WIT] text format for [Option] o.
+//
+// [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
+func (o *Option) WIT(_ Node, name string) string {
+	var b strings.Builder
+	if name != "" {
+		b.WriteString("type ")
+		b.WriteString(name)
+		b.WriteString(" = ")
+	}
+	b.WriteString("option<")
+	b.WriteString(o.Type.WIT(o, ""))
+	b.WriteRune('>')
+	return b.String()
+}
+
+// WIT returns the [WIT] text format for [Result] r.
+//
+// [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
+func (r *Result) WIT(_ Node, name string) string {
+	var b strings.Builder
+	if name != "" {
+		b.WriteString("type ")
+		b.WriteString(name)
+		b.WriteString(" = ")
+	}
+	b.WriteString("result<")
+	if r.OK != nil {
+		b.WriteString(r.OK.WIT(r, ""))
+		b.WriteString(", ")
+	} else {
+		b.WriteString("_, ")
+	}
+	if r.Err != nil {
+		b.WriteString(r.Err.WIT(r, ""))
+	} else {
+		b.WriteRune('_')
+	}
+	b.WriteRune('>')
+	return b.String()
+}
+
+// WIT returns the [WIT] text format for [List] l.
+//
+// [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
+func (l *List) WIT(_ Node, name string) string {
+	var b strings.Builder
+	if name != "" {
+		b.WriteString("type ")
+		b.WriteString(name)
+		b.WriteString(" = ")
+	}
+	b.WriteString("list<")
+	b.WriteString(l.Type.WIT(l, ""))
+	b.WriteRune('>')
+	return b.String()
+}
+
+// WIT returns the [WIT] text format for [Future] f.
+//
+// [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
+func (f *Future) WIT(_ Node, name string) string {
+	var b strings.Builder
+	if name != "" {
+		b.WriteString("type ")
+		b.WriteString(name)
+		b.WriteString(" = ")
+	}
+	b.WriteString("future")
+	if f.Type != nil {
+		b.WriteRune('<')
+		b.WriteString(f.Type.WIT(f, ""))
+		b.WriteRune('>')
+	}
+	return b.String()
+}
+
+// WIT returns the [WIT] text format for [Stream] s.
+//
+// [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
+func (s *Stream) WIT(_ Node, name string) string {
+	var b strings.Builder
+	if name != "" {
+		b.WriteString("type ")
+		b.WriteString(name)
+		b.WriteString(" = ")
+	}
+	b.WriteString("stream<")
+	if s.Element != nil {
+		b.WriteString(s.Element.WIT(s, ""))
+		b.WriteString(", ")
+	} else {
+		b.WriteString("_, ")
+	}
+	if s.End != nil {
+		b.WriteString(s.End.WIT(s, ""))
+	} else {
+		b.WriteRune('_')
+	}
+	b.WriteRune('>')
+	return b.String()
+}
+
+// WIT returns the [WIT] text format for this [TypeDefKind].
+//
+// [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
+func (p _primitive[T]) WIT(_ Node, name string) string {
+	if name != "" {
+		return "type " + name + " = " + p.String()
+	}
+	return p.String()
+}
+
+// WIT returns the [WIT] text format for [Function] f.
+//
+// [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
+func (f *Function) WIT(_ Node, name string) string {
+	// TODO: docs
+	var b strings.Builder
+	b.WriteString(name)
+	b.WriteString(": func(")
 	b.WriteString(paramsWIT(f.Params))
 	b.WriteRune(')')
 	if len(f.Results) > 0 {
@@ -150,11 +525,49 @@ func paramsWIT(params []Param) string {
 		if i > 0 {
 			b.WriteString(", ")
 		}
-		if param.Name != "" {
-			b.WriteString(param.Name)
-			b.WriteString(": ")
+		b.WriteString(param.WIT(nil, ""))
+	}
+	return b.String()
+}
+
+// WIT returns the [WIT] text format of [Param] p.
+//
+// [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
+func (p *Param) WIT(_ Node, _ string) string {
+	if p.Name == "" {
+		return p.Type.WIT(p, "")
+	}
+	return p.Name + ": " + p.Type.WIT(p, "")
+}
+
+// WIT returns the [WIT] text format of [Package] p.
+//
+// [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
+func (p *Package) WIT(ctx Node, _ string) string {
+	// TODO: docs
+	var b strings.Builder
+	b.WriteString("package ")
+	b.WriteString(p.Name.String())
+	b.WriteString(";\n")
+	if len(p.Interfaces) > 0 {
+		b.WriteRune('\n')
+		for i, name := range codec.SortedKeys(p.Interfaces) {
+			if i > 0 {
+				b.WriteRune('\n')
+			}
+			b.WriteString(p.Interfaces[name].WIT(p, name))
+			b.WriteRune('\n')
 		}
-		b.WriteString(param.Type.WIT())
+	}
+	if len(p.Worlds) > 0 {
+		b.WriteRune('\n')
+		for i, name := range codec.SortedKeys(p.Worlds) {
+			if i > 0 {
+				b.WriteRune('\n')
+			}
+			b.WriteString(p.Worlds[name].WIT(p, name))
+			b.WriteRune('\n')
+		}
 	}
 	return b.String()
 }

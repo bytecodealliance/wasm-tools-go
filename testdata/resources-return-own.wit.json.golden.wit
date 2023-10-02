@@ -1,0 +1,7 @@
+package foo:resources1;
+
+interface resources1 {
+    resource r1 {} // TODO: constructor, methods, and static functions;
+    [method]r1.f1: func(self: borrow<r1>) -> own<r1>;
+    t1: func(a: own<r1>);
+}

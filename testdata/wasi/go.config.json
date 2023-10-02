@@ -1,6 +1,0 @@
-{
-	"wasi:clocks": "github.com/ydnar/wit-bindgen-go/generated/wasi/clocks",
-	"wasi:clocks/monotonic-clock": "github.com/ydnar/wit-bindgen-go/generated/wasi/clocks/monotonic",
-	"wasi:clocks/wall-clock": "github.com/ydnar/wit-bindgen-go/generated/wasi/clocks/wall",
-	"wasi:clocks/wall-clock.datetime": "github.com/ydnar/wit-bindgen-go/generated/wasi/clocks/wall.DateTime"
-}
