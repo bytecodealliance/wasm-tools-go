@@ -1,13 +1,13 @@
 package foo:multi-file;
 
 interface bar {
-    use foo:multi-file/irrelevant-name.{a-name};
-    use foo:multi-file/foo.{x};
-    use foo:multi-file/foo.{x as x2};
-    use foo:multi-file/foo.{x as x3};
-    use foo:multi-file/depend-on-me.{x as x4};
-    use foo:multi-file/something-else.{y};
-    use foo:multi-file/something-else.{y as y2};
+    use irrelevant-name.{a-name};
+    use foo.{x};
+    use foo.{x as x2};
+    use foo.{x as x3};
+    use depend-on-me.{x as x4};
+    use something-else.{y};
+    use something-else.{y as y2};
 }
 
 interface cycle1 {
@@ -15,11 +15,11 @@ interface cycle1 {
 }
 
 interface cycle2 {
-    use foo:multi-file/cycle1.{t};
+    use cycle1.{t};
 }
 
 interface cycle3 {
-    use foo:multi-file/cycle2.{t};
+    use cycle2.{t};
 }
 
 interface depend-on-me {
@@ -27,7 +27,7 @@ interface depend-on-me {
 }
 
 interface depends-on-later-item {
-    use foo:multi-file/depend-on-me.{x};
+    use depend-on-me.{x};
 }
 
 interface foo {
@@ -52,5 +52,5 @@ world more-depends-on-later-things {
 world the-world {
     import foo: func() -> x;
     import depend-on-me;
-    use foo:multi-file/depend-on-me.{x};
+    use depend-on-me.{x};
 }

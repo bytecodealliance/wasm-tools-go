@@ -8,6 +8,6 @@ world foo {
     import shared-items;
     import shared-items: interface {};
     export a-name: interface {
-        use foo:foo/shared-items.{a};
+        use shared-items.{a};
     };
 }

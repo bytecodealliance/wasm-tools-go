@@ -5,5 +5,5 @@ interface foo {
 }
 
 interface name {
-    use foo:name/foo.{foo};
+    use foo.{foo};
 }

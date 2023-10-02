@@ -6,7 +6,7 @@ interface disambiguate {
 
 world bar {
     import disambiguate;
-    use foo:foo/disambiguate.{t};
+    use disambiguate.{t};
     export foo: func() -> t;
 }
 

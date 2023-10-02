@@ -1,12 +1,12 @@
 package foo:foo;
 
 interface i1 {
-    use foo:foo/shared-items.{foo};
+    use shared-items.{foo};
     a: func() -> foo;
 }
 
 interface i2 {
-    use foo:foo/shared-items.{foo};
+    use shared-items.{foo};
     a: func() -> foo;
 }
 

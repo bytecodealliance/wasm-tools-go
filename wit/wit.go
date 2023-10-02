@@ -87,6 +87,13 @@ func (w *World) itemWIT(motion, name string, v WorldItem) string {
 	panic("BUG: unknown WorldItem")
 }
 
+func (w *World) RelativeName(p *Package) string {
+	if w.Package == p {
+		return w.Name
+	}
+	return w.Package.Name.String() + "/" + w.Name
+}
+
 // WIT returns the WIT representation of i.
 func (i *Interface) WIT(ctx Node, name string) string {
 	if i.Name != nil && name == "" {
@@ -103,15 +110,12 @@ func (i *Interface) WIT(ctx Node, name string) string {
 		b.WriteString(name)
 		b.WriteRune(' ')
 	case *World:
-		if i.Package != ctx.Package {
-			// Import by name from another package
-			// TODO: check i.Name != nil
-			return fmt.Sprintf("%s/%s", i.Package.Name.String(), *i.Name)
-		} else if i.Name != nil {
-			// Import by name within same package
-			return *i.Name
+		rname := i.RelativeName(ctx.Package)
+		if rname != "" {
+			return rname
 		}
-		// Otherwise, this is an inline interface decl
+
+		// Otherwise, this is an inline interface decl.
 		b.WriteString(name)
 		b.WriteString(": interface ")
 	}
@@ -141,6 +145,16 @@ func (i *Interface) WIT(ctx Node, name string) string {
 	return b.String()
 }
 
+func (i *Interface) RelativeName(p *Package) string {
+	if i.Name == nil {
+		return ""
+	}
+	if i.Package == p {
+		return *i.Name
+	}
+	return i.Package.Name.String() + "/" + *i.Name
+}
+
 // WIT returns the WIT representation of [TypeDef] t.
 func (t *TypeDef) WIT(ctx Node, name string) string {
 	if t.Name != nil && name == "" {
@@ -153,23 +167,11 @@ func (t *TypeDef) WIT(ctx Node, name string) string {
 		if t.Owner == ctx.Owner && t.Name != nil {
 			return "type " + name + " = " + *t.Name
 		}
-
-		// TODO: add a TypeOwnerName method to TypeDef.
-		var ownerName string
-		var pkg *Package
-		switch owner := t.Owner.(type) {
-		case *Interface:
-			ownerName = *owner.Name
-			pkg = owner.Package
-		case *World:
-			ownerName = owner.Name
-			pkg = owner.Package
-		}
-		// TODO: use less-qualified name (without package) if this is an import within the same package.
+		ownerName := t.Owner.RelativeName(ctx.Package())
 		if t.Name != nil && *t.Name != name {
-			return fmt.Sprintf("use %s/%s.{%s as %s}", pkg.Name.String(), ownerName, *t.Name, name)
+			return fmt.Sprintf("use %s.{%s as %s}", ownerName, *t.Name, name)
 		}
-		return fmt.Sprintf("use %s/%s.{%s}", pkg.Name.String(), ownerName, name)
+		return fmt.Sprintf("use %s.{%s}", ownerName, name)
 
 	case *World, *Interface:
 		switch t.Kind.(type) {

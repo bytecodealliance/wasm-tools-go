@@ -22,7 +22,7 @@ interface monotonic-clock {
 }
 
 interface timezone {
-    use wasi:clocks/wall-clock.{datetime};
+    use wall-clock.{datetime};
     record timezone-display {
         utc-offset: s32,
         name: string,

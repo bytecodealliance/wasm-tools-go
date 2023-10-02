@@ -1,8 +1,8 @@
 package foo:foo;
 
 interface handler {
-    use foo:foo/types.{request};
-    use foo:foo/types.{response};
+    use types.{request};
+    use types.{response};
     handle: func(some: borrow<request>) -> borrow<response>;
     handle-owned: func(some: own<request>) -> own<response>;
 }

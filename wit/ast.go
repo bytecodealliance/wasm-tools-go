@@ -84,6 +84,17 @@ type TypeDef struct {
 	_type
 }
 
+// Package returns the [Package] that t is associated with, if any.
+func (t *TypeDef) Package() *Package {
+	switch owner := t.Owner.(type) {
+	case *Interface:
+		return owner.Package
+	case *World:
+		return owner.Package
+	}
+	return nil
+}
+
 // Size returns the byte size for values of type t.
 func (t *TypeDef) Size() uintptr {
 	return t.Kind.Size()
@@ -525,7 +536,10 @@ func (*Stream) Align() uintptr { return 0 }
 
 // TypeOwner is the interface implemented by any type that can own a TypeDef,
 // currently [World] and [Interface].
-type TypeOwner interface{ isTypeOwner() }
+type TypeOwner interface {
+	RelativeName(*Package) string
+	isTypeOwner()
+}
 
 type _typeOwner struct{ _node }
 
