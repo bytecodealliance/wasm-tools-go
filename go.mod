@@ -1,6 +1,6 @@
 module github.com/ydnar/wasm-tools-go
 
-go 1.21.1
+go 1.21.2
 
 require (
 	github.com/coreos/go-semver v0.3.1
