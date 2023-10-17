@@ -38,33 +38,36 @@ func TestAlign(t *testing.T) {
 
 func TestRealloc(t *testing.T) {
 	const threshold = 16
+
 	tests := []struct {
 		name    string
-		ptr     unsafe.Pointer
+		ptr     uintptr
 		size    uintptr
 		align   uintptr
 		newsize uintptr
-		want    unsafe.Pointer
+		want    uintptr
 	}{
-		{"nil", nil, 0, 1, 0, nil},
-		{"nil with align", nil, 0, 2, 0, nil},
-		{"align to 2", up(1), 0, 2, 0, up(2)},
-		{"align to 8", up(1), 0, 8, 0, up(8)},
-		{"align to 8", up(1), 0, 8, 0, up(8)},
-		{"alloc 100 bytes", nil, 0, 1, 100, unsafe.Pointer(unsafe.SliceData(make([]byte, 100)))},
+		{"nil", 0, 0, 1, 0, 0},
+		{"nil with align", 0, 0, 2, 0, 0},
+		{"align to 2", 1, 0, 2, 0, 2},
+		{"align to 8", 1, 0, 8, 0, 8},
+		{"align to 8", 1, 0, 8, 0, 8},
+		{"alloc 100 bytes", 0, 0, 1, 100, unsafeSlice(hundred)},
+		{"preserve 5 bytes", stringData("hello"), 5, 1, 5, stringData("hello")},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := Realloc(tt.ptr, tt.size, tt.align, tt.newsize)
-			if (uintptr(tt.want) < threshold && got != tt.want) || (uintptr(tt.want) >= threshold && uintptr(got) < threshold) {
+			got := Realloc(unsafePointer(tt.ptr), tt.size, tt.align, tt.newsize)
+			if (tt.want < threshold && uintptr(got) != tt.want) || (tt.want >= threshold && uintptr(got) < threshold) {
 				t.Errorf("Realloc(%d, %d, %d, %d): expected %d, got %d",
 					tt.ptr, tt.size, tt.align, tt.newsize, tt.want, got)
 			}
 			if uintptr(got) < threshold {
 				return // it didn’t allocate
 			}
-			if tt.ptr == nil {
-				wants := unsafe.Slice((*byte)(tt.want), tt.newsize)
+			if tt.ptr == 0 {
+				wants := unsafe.Slice((*byte)(unsafePointer(tt.want)), tt.newsize)
 				gots := unsafe.Slice((*byte)(got), tt.newsize)
 				if slices.Compare(wants, gots) != 0 {
 					t.Errorf("expected %v, got %v", wants, gots)
@@ -74,7 +77,17 @@ func TestRealloc(t *testing.T) {
 	}
 }
 
+var hundred = make([]byte, 100)
+
 // Appease vet, see https://github.com/golang/go/issues/58625
-func up(p uintptr) unsafe.Pointer {
+func unsafePointer(p uintptr) unsafe.Pointer {
 	return *(*unsafe.Pointer)(unsafe.Pointer(&p))
+}
+
+func unsafeSlice[T any](s []T) uintptr {
+	return uintptr(unsafe.Pointer(unsafe.SliceData(s)))
+}
+
+func stringData(s string) uintptr {
+	return uintptr(unsafe.Pointer(unsafe.StringData(s)))
 }
