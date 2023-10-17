@@ -15,14 +15,14 @@ func offset(ptr, align uintptr) uintptr {
 	return Align(ptr, align) - ptr
 }
 
-// Realloc allocates or reallocates memory for Component Model calls across
+// realloc allocates or reallocates memory for Component Model calls across
 // the host-guest boundary.
 //
 // Note: the use of uintptr assumes 32-bit pointers, e.g. GOOS=wasm32 when compiled for WebAssembly.
 //
 //go:export cabi_realloc
 //go:wasmexport cabi_realloc
-func Realloc(ptr unsafe.Pointer, size, align, newsize uintptr) unsafe.Pointer {
+func realloc(ptr unsafe.Pointer, size, align, newsize uintptr) unsafe.Pointer {
 	p := uintptr(ptr)
 	if p == 0 {
 		if newsize == 0 {
