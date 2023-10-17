@@ -3,10 +3,12 @@ package abi
 import "unsafe"
 
 // Align aligns ptr with alignment align.
-func Align(ptr, align uintptr) uintptr {
+func Align(ptr unsafe.Pointer, align uintptr) unsafe.Pointer {
 	// (dividend + divisor - 1) / divisor
 	// http://www.cs.nott.ac.uk/~rcb/G51MPC/slides/NumberLogic.pdf
-	return ((ptr + align - 1) / align) * align
+	p := (uintptr(unsafe.Add(ptr, align-1)) / align) * align
+	// Appease vet, see https://github.com/golang/go/issues/58625
+	return *(*unsafe.Pointer)(unsafe.Pointer(&p))
 }
 
 // Realloc allocates or reallocates memory for Component Model calls across
@@ -15,16 +17,17 @@ func Align(ptr, align uintptr) uintptr {
 // Note: the use of uintptr assumes 32-bit pointers, e.g. GOOS=wasm32 when compiled for WebAssembly.
 //
 //go:wasmexport cabi_realloc
-func Realloc(ptr, size, align, newsize uintptr) uintptr {
-	if ptr == 0 {
+func Realloc(ptr unsafe.Pointer, size, align, newsize uintptr) unsafe.Pointer {
+	p := uintptr(ptr)
+	if p == 0 {
 		if newsize == 0 {
-			return Align(ptr, align)
+			return unsafe.Pointer(Align(ptr, align))
 		}
-		return uintptr(alloc(newsize, align))
+		return alloc(newsize, align)
 	}
 
 	if newsize <= size {
-		return Align(ptr, align)
+		return unsafe.Pointer(Align(ptr, align))
 	}
 
 	newptr := alloc(newsize, align)
@@ -33,7 +36,7 @@ func Realloc(ptr, size, align, newsize uintptr) uintptr {
 		src := *(*unsafe.Pointer)(unsafe.Pointer(&ptr))
 		copy(unsafe.Slice((*byte)(newptr), newsize), unsafe.Slice((*byte)(src), size))
 	}
-	return uintptr(newptr)
+	return newptr
 }
 
 func alloc(size, align uintptr) unsafe.Pointer {

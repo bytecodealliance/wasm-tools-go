@@ -3,6 +3,7 @@ package abi
 import (
 	"fmt"
 	"testing"
+	"unsafe"
 )
 
 func TestAlign(t *testing.T) {
@@ -26,8 +27,8 @@ func TestAlign(t *testing.T) {
 	for _, tt := range tests {
 		name := fmt.Sprintf("%d,%d=%d", tt.ptr, tt.align, tt.want)
 		t.Run(name, func(t *testing.T) {
-			got := Align(tt.ptr, tt.align)
-			if got != tt.want {
+			got := Align(unsafe.Pointer(tt.ptr), tt.align)
+			if got != unsafe.Pointer(tt.want) {
 				t.Errorf("Align(%d, %d): expected %d, got %d", tt.ptr, tt.align, tt.want, got)
 			}
 		})
@@ -53,8 +54,8 @@ func TestRealloc(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := Realloc(tt.ptr, tt.size, tt.align, tt.newsize)
-			if got != tt.want {
+			got := Realloc(unsafe.Pointer(tt.ptr), tt.size, tt.align, tt.newsize)
+			if got != unsafe.Pointer(tt.want) {
 				t.Errorf("Realloc(%d, %d, %d, %d): expected %d, got %d",
 					tt.ptr, tt.size, tt.align, tt.newsize, tt.want, got)
 			}
