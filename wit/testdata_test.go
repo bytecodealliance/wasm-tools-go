@@ -6,6 +6,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 
@@ -61,6 +62,13 @@ func loadTestdata(f func(path string, res *Resolve) error) error {
 }
 
 func TestGoldenFiles(t *testing.T) {
+	if runtime.Compiler == "tinygo" {
+		t.Skip("output differs on TinyGo")
+		// TinyGo does not support runtime.Goexit yet
+		// https://github.com/tinygo-org/tinygo/blob/release/src/runtime/scheduler.go
+		return
+	}
+
 	p := pp.New()
 	p.SetExportedOnly(true)
 	p.SetColoringEnabled(false)
