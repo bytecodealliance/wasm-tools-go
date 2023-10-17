@@ -54,8 +54,8 @@ func TestRealloc(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := Realloc(unsafe.Pointer(tt.ptr), tt.size, tt.align, tt.newsize)
-			if got != unsafe.Pointer(tt.want) {
+			got := Realloc(unsafePointer(tt.ptr), tt.size, tt.align, tt.newsize)
+			if got != unsafePointer(tt.want) {
 				t.Errorf("Realloc(%d, %d, %d, %d): expected %d, got %d",
 					tt.ptr, tt.size, tt.align, tt.newsize, tt.want, got)
 			}

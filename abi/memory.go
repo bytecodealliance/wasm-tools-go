@@ -7,8 +7,7 @@ func Align(ptr unsafe.Pointer, align uintptr) unsafe.Pointer {
 	// (dividend + divisor - 1) / divisor
 	// http://www.cs.nott.ac.uk/~rcb/G51MPC/slides/NumberLogic.pdf
 	p := (uintptr(unsafe.Add(ptr, align-1)) / align) * align
-	// Appease vet, see https://github.com/golang/go/issues/58625
-	return *(*unsafe.Pointer)(unsafe.Pointer(&p))
+	return unsafePointer(p)
 }
 
 // Realloc allocates or reallocates memory for Component Model calls across
@@ -32,9 +31,7 @@ func Realloc(ptr unsafe.Pointer, size, align, newsize uintptr) unsafe.Pointer {
 
 	newptr := alloc(newsize, align)
 	if size > 0 {
-		// Appease vet, see https://github.com/golang/go/issues/58625
-		src := *(*unsafe.Pointer)(unsafe.Pointer(&ptr))
-		copy(unsafe.Slice((*byte)(newptr), newsize), unsafe.Slice((*byte)(src), size))
+		copy(unsafe.Slice((*byte)(newptr), newsize), unsafe.Slice((*byte)(ptr), size))
 	}
 	return newptr
 }
@@ -57,4 +54,9 @@ func alloc(size, align uintptr) unsafe.Pointer {
 		s := make([][16]uint8, min(size/align, 1))
 		return unsafe.Pointer(unsafe.SliceData(s))
 	}
+}
+
+// Appease vet, see https://github.com/golang/go/issues/58625
+func unsafePointer(p uintptr) unsafe.Pointer {
+	return *(*unsafe.Pointer)(unsafe.Pointer(&p))
 }
