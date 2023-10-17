@@ -2,6 +2,7 @@ package abi
 
 import (
 	"fmt"
+	"slices"
 	"testing"
 	"unsafe"
 )
@@ -54,12 +55,20 @@ func TestRealloc(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotp := Realloc(tt.ptr, tt.size, tt.align, tt.newsize)
-			got := uintptr(gotp)
-			want := uintptr(tt.want)
-			if (want < threshold && got != want) || (want >= threshold && got < threshold) {
+			got := Realloc(tt.ptr, tt.size, tt.align, tt.newsize)
+			if (uintptr(tt.want) < threshold && got != tt.want) || (uintptr(tt.want) >= threshold && uintptr(got) < threshold) {
 				t.Errorf("Realloc(%d, %d, %d, %d): expected %d, got %d",
-					tt.ptr, tt.size, tt.align, tt.newsize, want, got)
+					tt.ptr, tt.size, tt.align, tt.newsize, tt.want, got)
+			}
+			if uintptr(got) < threshold {
+				return // it didn’t allocate
+			}
+			if tt.ptr == nil {
+				wants := unsafe.Slice((*byte)(tt.want), tt.newsize)
+				gots := unsafe.Slice((*byte)(got), tt.newsize)
+				if slices.Compare(wants, gots) != 0 {
+					t.Errorf("expected %v, got %v", wants, gots)
+				}
 			}
 		})
 	}
