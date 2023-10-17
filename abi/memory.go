@@ -33,6 +33,10 @@ func realloc(ptr unsafe.Pointer, size, align, newsize uintptr) unsafe.Pointer {
 	return newptr
 }
 
+// alloc allocates a block of memory with size bytes.
+// It attempts to align the allocated memory by allocating a slice of
+// a type that matches the desired alignment. It aligns to 16 bytes for
+// values of align other than 1, 2, 4, or 8.
 func alloc(size, align uintptr) unsafe.Pointer {
 	switch align {
 	case 1:
