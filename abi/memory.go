@@ -20,6 +20,7 @@ func offset(ptr, align uintptr) uintptr {
 //
 // Note: the use of uintptr assumes 32-bit pointers, e.g. GOOS=wasm32 when compiled for WebAssembly.
 //
+//go:export cabi_realloc
 //go:wasmexport cabi_realloc
 func Realloc(ptr unsafe.Pointer, size, align, newsize uintptr) unsafe.Pointer {
 	p := uintptr(ptr)
