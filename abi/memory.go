@@ -3,11 +3,16 @@ package abi
 import "unsafe"
 
 // Align aligns ptr with alignment align.
-func Align(ptr unsafe.Pointer, align uintptr) unsafe.Pointer {
+func Align(ptr, align uintptr) uintptr {
 	// (dividend + divisor - 1) / divisor
 	// http://www.cs.nott.ac.uk/~rcb/G51MPC/slides/NumberLogic.pdf
-	p := (uintptr(unsafe.Add(ptr, align-1)) / align) * align
-	return unsafePointer(p)
+	return ((ptr + align - 1) / align) * align
+}
+
+// offset returns the delta between the aligned value of ptr and ptr
+// so it can be passed to unsafe.Add. The return value is guaranteed to be >= 0.
+func offset(ptr, align uintptr) uintptr {
+	return Align(ptr, align) - ptr
 }
 
 // Realloc allocates or reallocates memory for Component Model calls across
@@ -20,13 +25,13 @@ func Realloc(ptr unsafe.Pointer, size, align, newsize uintptr) unsafe.Pointer {
 	p := uintptr(ptr)
 	if p == 0 {
 		if newsize == 0 {
-			return unsafe.Pointer(Align(ptr, align))
+			return unsafe.Add(ptr, offset(p, align))
 		}
 		return alloc(newsize, align)
 	}
 
 	if newsize <= size {
-		return unsafe.Pointer(Align(ptr, align))
+		return unsafe.Add(ptr, offset(p, align))
 	}
 
 	newptr := alloc(newsize, align)
@@ -54,9 +59,4 @@ func alloc(size, align uintptr) unsafe.Pointer {
 		s := make([][16]uint8, min(size/align, 1))
 		return unsafe.Pointer(unsafe.SliceData(s))
 	}
-}
-
-// Appease vet, see https://github.com/golang/go/issues/58625
-func unsafePointer(p uintptr) unsafe.Pointer {
-	return *(*unsafe.Pointer)(unsafe.Pointer(&p))
 }

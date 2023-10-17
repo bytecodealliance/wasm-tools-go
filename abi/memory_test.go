@@ -27,8 +27,8 @@ func TestAlign(t *testing.T) {
 	for _, tt := range tests {
 		name := fmt.Sprintf("%d,%d=%d", tt.ptr, tt.align, tt.want)
 		t.Run(name, func(t *testing.T) {
-			got := Align(unsafe.Pointer(tt.ptr), tt.align)
-			if got != unsafe.Pointer(tt.want) {
+			got := Align(tt.ptr, tt.align)
+			if got != tt.want {
 				t.Errorf("Align(%d, %d): expected %d, got %d", tt.ptr, tt.align, tt.want, got)
 			}
 		})
@@ -61,4 +61,9 @@ func TestRealloc(t *testing.T) {
 			}
 		})
 	}
+}
+
+// Appease vet, see https://github.com/golang/go/issues/58625
+func unsafePointer(p uintptr) unsafe.Pointer {
+	return *(*unsafe.Pointer)(unsafe.Pointer(&p))
 }
