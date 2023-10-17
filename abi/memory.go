@@ -2,19 +2,6 @@ package abi
 
 import "unsafe"
 
-// Align aligns ptr with alignment align.
-func Align(ptr, align uintptr) uintptr {
-	// (dividend + divisor - 1) / divisor
-	// http://www.cs.nott.ac.uk/~rcb/G51MPC/slides/NumberLogic.pdf
-	return ((ptr + align - 1) / align) * align
-}
-
-// offset returns the delta between the aligned value of ptr and ptr
-// so it can be passed to unsafe.Add. The return value is guaranteed to be >= 0.
-func offset(ptr, align uintptr) uintptr {
-	return Align(ptr, align) - ptr
-}
-
 // realloc allocates or reallocates memory for Component Model calls across
 // the host-guest boundary.
 //
@@ -31,6 +18,15 @@ func realloc(ptr unsafe.Pointer, size, align, newsize uintptr) unsafe.Pointer {
 		copy(unsafe.Slice((*byte)(newptr), newsize), unsafe.Slice((*byte)(ptr), size))
 	}
 	return newptr
+}
+
+// offset returns the delta between the aligned value of ptr and ptr
+// so it can be passed to unsafe.Add. The return value is guaranteed to be >= 0.
+func offset(ptr, align uintptr) uintptr {
+	// (dividend + divisor - 1) / divisor
+	// http://www.cs.nott.ac.uk/~rcb/G51MPC/slides/NumberLogic.pdf
+	newptr := ((ptr + align - 1) / align) * align
+	return newptr - ptr
 }
 
 // alloc allocates a block of memory with size bytes.
