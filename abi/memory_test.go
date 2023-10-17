@@ -36,34 +36,36 @@ func TestAlign(t *testing.T) {
 }
 
 func TestRealloc(t *testing.T) {
-	var sentinel uintptr
-	sentinel -= 1 // wraparound
+	const threshold = 16
 	tests := []struct {
 		name    string
-		ptr     uintptr
+		ptr     unsafe.Pointer
 		size    uintptr
 		align   uintptr
 		newsize uintptr
-		want    uintptr
+		want    unsafe.Pointer
 	}{
-		{"nil", 0, 0, 1, 0, 0},
-		{"nil with align", 0, 0, 2, 0, 0},
-		{"align to 2", 1, 0, 2, 0, 2},
-		{"align to 8", 1, 0, 8, 0, 8},
-		{"align to 8", 1, 0, 8, 0, 8},
+		{"nil", nil, 0, 1, 0, nil},
+		{"nil with align", nil, 0, 2, 0, nil},
+		{"align to 2", up(1), 0, 2, 0, up(2)},
+		{"align to 8", up(1), 0, 8, 0, up(8)},
+		{"align to 8", up(1), 0, 8, 0, up(8)},
+		{"alloc 100 bytes", nil, 0, 1, 100, unsafe.Pointer(unsafe.SliceData(make([]byte, 100)))},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := Realloc(unsafePointer(tt.ptr), tt.size, tt.align, tt.newsize)
-			if got != unsafePointer(tt.want) {
+			gotp := Realloc(tt.ptr, tt.size, tt.align, tt.newsize)
+			got := uintptr(gotp)
+			want := uintptr(tt.want)
+			if (want < threshold && got != want) || (want >= threshold && got < threshold) {
 				t.Errorf("Realloc(%d, %d, %d, %d): expected %d, got %d",
-					tt.ptr, tt.size, tt.align, tt.newsize, tt.want, got)
+					tt.ptr, tt.size, tt.align, tt.newsize, want, got)
 			}
 		})
 	}
 }
 
 // Appease vet, see https://github.com/golang/go/issues/58625
-func unsafePointer(p uintptr) unsafe.Pointer {
+func up(p uintptr) unsafe.Pointer {
 	return *(*unsafe.Pointer)(unsafe.Pointer(&p))
 }
