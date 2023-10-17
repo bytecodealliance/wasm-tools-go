@@ -23,18 +23,9 @@ func offset(ptr, align uintptr) uintptr {
 //go:export cabi_realloc
 //go:wasmexport cabi_realloc
 func realloc(ptr unsafe.Pointer, size, align, newsize uintptr) unsafe.Pointer {
-	p := uintptr(ptr)
-	if p == 0 {
-		if newsize == 0 {
-			return unsafe.Add(ptr, offset(p, align))
-		}
-		return alloc(newsize, align)
-	}
-
 	if newsize <= size {
-		return unsafe.Add(ptr, offset(p, align))
+		return unsafe.Add(ptr, offset(uintptr(ptr), align))
 	}
-
 	newptr := alloc(newsize, align)
 	if size > 0 {
 		copy(unsafe.Slice((*byte)(newptr), newsize), unsafe.Slice((*byte)(ptr), size))
