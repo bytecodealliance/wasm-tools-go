@@ -51,9 +51,13 @@ func TestRealloc(t *testing.T) {
 		{"nil with align", 0, 0, 2, 0, 0},
 		{"align to 2", 1, 0, 2, 0, 2},
 		{"align to 8", 1, 0, 8, 0, 8},
-		{"align to 8", 1, 0, 8, 0, 8},
-		{"alloc 100 bytes", 0, 0, 1, 100, unsafeSlice(hundred)},
+		{"align to 8", 3, 0, 8, 0, 8},
+		{"align to 8", 9, 0, 16, 0, 16},
+		{"alloc 100 bytes", 0, 0, 1, 100, sliceData(hundred)},
 		{"preserve 5 bytes", stringData("hello"), 5, 1, 5, stringData("hello")},
+		{"shrink 8 bytes to 4", stringData("fourfour"), 8, 1, 4, stringData("four")},
+		{"expand 4 bytes to 8", stringData("zero"), 4, 1, 8, stringData("zero\u0000\u0000\u0000\u0000")},
+		{"cut down lorem ipsum", stringData(lorem), 4, 1, 200, stringData(lorem[:200])},
 	}
 
 	for _, tt := range tests {
@@ -78,13 +82,14 @@ func TestRealloc(t *testing.T) {
 }
 
 var hundred = make([]byte, 100)
+var lorem = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut volutpat arcu eu est tristique suscipit. Nulla laoreet purus magna, at feugiat tortor fermentum non. Integer semper et magna id placerat. Quisque purus lorem, mollis vel convallis eu, ullamcorper sit amet justo. Duis tempus gravida lacus, vel dapibus augue. Nunc sed condimentum lacus. Cras vulputate cursus dictum. Etiam felis metus, volutpat id luctus ac, ultrices nec metus. Proin sagittis nulla a pretium sagittis. Nullam tristique sapien sed semper faucibus. Fusce condimentum nulla dui. Donec egestas nunc in blandit mollis.`
 
 // Appease vet, see https://github.com/golang/go/issues/58625
 func unsafePointer(p uintptr) unsafe.Pointer {
 	return *(*unsafe.Pointer)(unsafe.Pointer(&p))
 }
 
-func unsafeSlice[T any](s []T) uintptr {
+func sliceData[T any](s []T) uintptr {
 	return uintptr(unsafe.Pointer(unsafe.SliceData(s)))
 }
 
