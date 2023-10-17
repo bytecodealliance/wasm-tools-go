@@ -23,9 +23,7 @@ func realloc(ptr unsafe.Pointer, size, align, newsize uintptr) unsafe.Pointer {
 // offset returns the delta between the aligned value of ptr and ptr
 // so it can be passed to unsafe.Add. The return value is guaranteed to be >= 0.
 func offset(ptr, align uintptr) uintptr {
-	// (dividend + divisor - 1) / divisor
-	// http://www.cs.nott.ac.uk/~rcb/G51MPC/slides/NumberLogic.pdf
-	newptr := ((ptr + align - 1) / align) * align
+	newptr := (ptr + align - 1) &^ (align - 1)
 	return newptr - ptr
 }
 

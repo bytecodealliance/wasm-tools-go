@@ -2,9 +2,7 @@ package wit
 
 // Align aligns ptr with alignment align.
 func Align(ptr, align uintptr) uintptr {
-	// (dividend + divisor - 1) / divisor
-	// http://www.cs.nott.ac.uk/~rcb/G51MPC/slides/NumberLogic.pdf
-	return ((ptr + align - 1) / align) * align
+	return (ptr + align - 1) &^ (align - 1)
 }
 
 // Discriminant returns the smallest WIT integer type that can represent 0...n.
