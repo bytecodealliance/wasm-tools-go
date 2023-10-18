@@ -209,13 +209,16 @@ func (c *worldItemCodec) DecodeField(dec codec.Decoder, name string) error {
 	switch name {
 	case "interface":
 		var v *Interface
-		err, *c.v = dec.Decode(&v), v
+		err = dec.Decode(&v)
+		*c.v = v
 	case "function":
 		var v *Function
-		err, *c.v = dec.Decode(&v), v
+		err = dec.Decode(&v)
+		*c.v = v
 	case "type":
 		var v *TypeDef
-		err, *c.v = dec.Decode(&v), v
+		err = dec.Decode(&v)
+		*c.v = v
 	}
 	return err
 }
@@ -248,10 +251,12 @@ func (c *typeOwnerCodec) DecodeField(dec codec.Decoder, name string) error {
 	switch name {
 	case "interface":
 		var v *Interface
-		err, *c.v = dec.Decode(&v), v
+		err = dec.Decode(&v)
+		*c.v = v
 	case "world":
 		var v *World
-		err, *c.v = dec.Decode(&v), v
+		err = dec.Decode(&v)
+		*c.v = v
 	}
 	return err
 }
@@ -274,43 +279,56 @@ func (c *typeDefKindCodec) DecodeField(dec codec.Decoder, name string) error {
 	switch name {
 	case "record":
 		v := &Record{}
-		err, *c.v = dec.Decode(v), v
+		err = dec.Decode(v)
+		*c.v = v
 	case "resource": // TODO: this might not be necessary
 		v := &Resource{}
-		err, *c.v = dec.Decode(v), v
+		err = dec.Decode(v)
+		*c.v = v
 	case "handle":
 		var v Handle
-		err, *c.v = dec.Decode(&v), v
+		err = dec.Decode(&v)
+		*c.v = v
 	case "flags":
 		v := &Flags{}
-		err, *c.v = dec.Decode(v), v
+		err = dec.Decode(v)
+		*c.v = v
 	case "tuple":
 		v := &Tuple{}
-		err, *c.v = dec.Decode(v), v
+		err = dec.Decode(v)
+		*c.v = v
 	case "variant":
 		v := &Variant{}
-		err, *c.v = dec.Decode(v), v
+		err = dec.Decode(v)
+		*c.v = v
 	case "enum":
 		v := &Enum{}
-		err, *c.v = dec.Decode(v), v
+		err = dec.Decode(v)
+		*c.v = v
 	case "option":
 		v := &Option{}
-		err, *c.v = dec.Decode(&v.Type), v
+		err = dec.Decode(&v.Type)
+		*c.v = v
 	case "result":
 		v := &Result{}
-		err, *c.v = dec.Decode(v), v
+		err = dec.Decode(v)
+		*c.v = v
 	case "list":
 		v := &List{}
-		err, *c.v = dec.Decode(&v.Type), v
+		err = dec.Decode(&v.Type)
+		*c.v = v
 	case "future":
 		v := &Future{}
-		err, *c.v = dec.Decode(&v.Type), v
+		err = dec.Decode(&v.Type)
+		*c.v = v
 	case "stream":
 		v := &Stream{}
-		err, *c.v = dec.Decode(v), v
+		err = dec.Decode(v)
+		*c.v = v
 	case "type":
 		var v Type
-		err, *c.v = dec.Decode(&v), v
+		err = dec.Decode(&v)
+		*c.v = v
 	}
 	return err
 }
@@ -404,10 +422,12 @@ func (c *handleCodec) DecodeField(dec codec.Decoder, name string) error {
 	switch name {
 	case "own":
 		v := &OwnedHandle{}
-		err, *c.v = dec.Decode(&v.Type), v
+		err = dec.Decode(&v.Type)
+		*c.v = v
 	case "borrow":
 		v := &BorrowedHandle{}
-		err, *c.v = dec.Decode(&v.Type), v
+		err = dec.Decode(&v.Type)
+		*c.v = v
 	}
 	return err
 }
@@ -493,13 +513,16 @@ func (c *functionKindCodec) DecodeField(dec codec.Decoder, name string) error {
 	switch name {
 	case "method":
 		v := &Method{}
-		err, *c.v = dec.Decode(&v.Type), v
+		err = dec.Decode(&v.Type)
+		*c.v = v
 	case "static":
 		v := &Static{}
-		err, *c.v = dec.Decode(&v.Type), v
+		err = dec.Decode(&v.Type)
+		*c.v = v
 	case "constructor":
 		v := &Constructor{}
-		err, *c.v = dec.Decode(&v.Type), v
+		err = dec.Decode(&v.Type)
+		*c.v = v
 	}
 	return err
 }
