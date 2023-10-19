@@ -1,812 +1,1411 @@
 &wit.Resolve{
-  Worlds:     []*wit.World(nil),
-  Interfaces: []*wit.Interface{
-    &wit.Interface{
-      Name:     &"types",
-      TypeDefs: map[string]*wit.TypeDef{
-        "bar": &wit.TypeDef{
-          Name:  &"bar",
-          Kind:  wit.U32{},
-          Owner: &wit.Interface{...},
-          Docs:  wit.Docs{
-            Contents: "",
-          },
-        },
-        "foo": &wit.TypeDef{
-          Name:  &"foo",
-          Kind:  &wit.TypeDef{...},
-          Owner: &wit.Interface{...},
-          Docs:  wit.Docs{
-            Contents: "",
-          },
-        },
-        "record": &wit.TypeDef{
-          Name: &"record",
-          Kind: &wit.Record{
-            Fields: []wit.Field(nil),
-          },
-          Owner: &wit.Interface{...},
-          Docs:  wit.Docs{
-            Contents: "",
-          },
-        },
-        "t1": &wit.TypeDef{
-          Name:  &"t1",
-          Kind:  wit.U8{},
-          Owner: &wit.Interface{...},
-          Docs:  wit.Docs{
-            Contents: "",
-          },
-        },
-        "t10": &wit.TypeDef{
-          Name:  &"t10",
-          Kind:  wit.Float64{},
-          Owner: &wit.Interface{...},
-          Docs:  wit.Docs{
-            Contents: "",
-          },
-        },
-        "t11": &wit.TypeDef{
-          Name:  &"t11",
-          Kind:  wit.Char{},
-          Owner: &wit.Interface{...},
-          Docs:  wit.Docs{
-            Contents: "",
-          },
-        },
-        "t12": &wit.TypeDef{
-          Name: &"t12",
-          Kind: &wit.List{
-            Type: wit.Char{},
-          },
-          Owner: &wit.Interface{...},
-          Docs:  wit.Docs{
-            Contents: "",
-          },
-        },
-        "t13": &wit.TypeDef{
-          Name:  &"t13",
-          Kind:  wit.String{},
-          Owner: &wit.Interface{...},
-          Docs:  wit.Docs{
-            Contents: "",
-          },
-        },
-        "t14": &wit.TypeDef{
-          Name: &"t14",
-          Kind: &wit.Option{
-            Type: wit.U32{},
-          },
-          Owner: &wit.Interface{...},
-          Docs:  wit.Docs{
-            Contents: "",
-          },
-        },
-        "t15": &wit.TypeDef{
-          Name: &"t15",
-          Kind: &wit.Result{
-            OK:  wit.U32{},
-            Err: wit.U32{},
-          },
-          Owner: &wit.Interface{...},
-          Docs:  wit.Docs{
-            Contents: "",
-          },
-        },
-        "t16": &wit.TypeDef{
-          Name: &"t16",
-          Kind: &wit.Result{
-            OK:  nil,
-            Err: wit.U32{},
-          },
-          Owner: &wit.Interface{...},
-          Docs:  wit.Docs{
-            Contents: "",
-          },
-        },
-        "t17": &wit.TypeDef{
-          Name: &"t17",
-          Kind: &wit.Result{
-            OK:  wit.U32{},
-            Err: nil,
-          },
-          Owner: &wit.Interface{...},
-          Docs:  wit.Docs{
-            Contents: "",
-          },
-        },
-        "t18": &wit.TypeDef{
-          Name: &"t18",
-          Kind: &wit.Result{
-            OK:  nil,
-            Err: nil,
-          },
-          Owner: &wit.Interface{...},
-          Docs:  wit.Docs{
-            Contents: "",
-          },
-        },
-        "t2": &wit.TypeDef{
-          Name:  &"t2",
-          Kind:  wit.U16{},
-          Owner: &wit.Interface{...},
-          Docs:  wit.Docs{
-            Contents: "",
-          },
-        },
-        "t20": &wit.TypeDef{
-          Name: &"t20",
-          Kind: &wit.Record{
-            Fields: []wit.Field(nil),
-          },
-          Owner: &wit.Interface{...},
-          Docs:  wit.Docs{
-            Contents: "",
-          },
-        },
-        "t21": &wit.TypeDef{
-          Name: &"t21",
-          Kind: &wit.Record{
-            Fields: []wit.Field{
-              wit.Field{
-                Name: "a",
-                Type: wit.U32{},
-                Docs: wit.Docs{
-                  Contents: "",
+    Worlds:     nil,
+    Interfaces: {
+        &wit.Interface{
+            Name:     &"types",
+            TypeDefs: {
+                "bar": &wit.TypeDef{
+                    Name:       &"bar",
+                    Kind:       wit.U32{},
+                    Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                    _type:      wit._type{},
                 },
-              },
+                "foo": &wit.TypeDef{
+                    Name:       &"foo",
+                    Kind:       &wit.TypeDef{(CYCLIC REFERENCE)},
+                    Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                    _type:      wit._type{},
+                },
+                "record": &wit.TypeDef{
+                    Name:       &"record",
+                    Kind:       &wit.Record{},
+                    Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                    _type:      wit._type{},
+                },
+                "t1": &wit.TypeDef{
+                    Name:       &"t1",
+                    Kind:       wit.U8{},
+                    Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                    _type:      wit._type{},
+                },
+                "t10": &wit.TypeDef{
+                    Name:       &"t10",
+                    Kind:       wit.Float64{},
+                    Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                    _type:      wit._type{},
+                },
+                "t11": &wit.TypeDef{
+                    Name:       &"t11",
+                    Kind:       wit.Char{},
+                    Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                    _type:      wit._type{},
+                },
+                "t12": &wit.TypeDef{
+                    Name: &"t12",
+                    Kind: &wit.List{
+                        Type:         wit.Char{},
+                        _typeDefKind: wit._typeDefKind{},
+                    },
+                    Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                    _type:      wit._type{},
+                },
+                "t13": &wit.TypeDef{
+                    Name:       &"t13",
+                    Kind:       wit.String{},
+                    Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                    _type:      wit._type{},
+                },
+                "t14": &wit.TypeDef{
+                    Name: &"t14",
+                    Kind: &wit.Option{
+                        Type:         wit.U32{},
+                        _typeDefKind: wit._typeDefKind{},
+                    },
+                    Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                    _type:      wit._type{},
+                },
+                "t15": &wit.TypeDef{
+                    Name: &"t15",
+                    Kind: &wit.Result{
+                        OK:           wit.U32{},
+                        Err:          wit.U32{},
+                        _typeDefKind: wit._typeDefKind{},
+                    },
+                    Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                    _type:      wit._type{},
+                },
+                "t16": &wit.TypeDef{
+                    Name: &"t16",
+                    Kind: &wit.Result{
+                        OK:           nil,
+                        Err:          wit.U32{},
+                        _typeDefKind: wit._typeDefKind{},
+                    },
+                    Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                    _type:      wit._type{},
+                },
+                "t17": &wit.TypeDef{
+                    Name: &"t17",
+                    Kind: &wit.Result{
+                        OK:           wit.U32{},
+                        Err:          nil,
+                        _typeDefKind: wit._typeDefKind{},
+                    },
+                    Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                    _type:      wit._type{},
+                },
+                "t18": &wit.TypeDef{
+                    Name:       &"t18",
+                    Kind:       &wit.Result{},
+                    Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                    _type:      wit._type{},
+                },
+                "t2": &wit.TypeDef{
+                    Name:       &"t2",
+                    Kind:       wit.U16{},
+                    Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                    _type:      wit._type{},
+                },
+                "t20": &wit.TypeDef{
+                    Name:       &"t20",
+                    Kind:       &wit.Record{},
+                    Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                    _type:      wit._type{},
+                },
+                "t21": &wit.TypeDef{
+                    Name: &"t21",
+                    Kind: &wit.Record{
+                        Fields: {
+                            {
+                                Name: "a",
+                                Type: wit.U32{},
+                                Docs: wit.Docs{},
+                            },
+                        },
+                        _typeDefKind: wit._typeDefKind{},
+                    },
+                    Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                    _type:      wit._type{},
+                },
+                "t22": &wit.TypeDef{
+                    Name: &"t22",
+                    Kind: &wit.Record{
+                        Fields: {
+                            {
+                                Name: "a",
+                                Type: wit.U32{},
+                                Docs: wit.Docs{},
+                            },
+                        },
+                        _typeDefKind: wit._typeDefKind{},
+                    },
+                    Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                    _type:      wit._type{},
+                },
+                "t23": &wit.TypeDef{
+                    Name: &"t23",
+                    Kind: &wit.Record{
+                        Fields: {
+                            {
+                                Name: "a",
+                                Type: wit.U32{},
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "b",
+                                Type: wit.U64{},
+                                Docs: wit.Docs{},
+                            },
+                        },
+                        _typeDefKind: wit._typeDefKind{},
+                    },
+                    Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                    _type:      wit._type{},
+                },
+                "t24": &wit.TypeDef{
+                    Name: &"t24",
+                    Kind: &wit.Record{
+                        Fields: {
+                            {
+                                Name: "a",
+                                Type: wit.U32{},
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "b",
+                                Type: wit.U64{},
+                                Docs: wit.Docs{},
+                            },
+                        },
+                        _typeDefKind: wit._typeDefKind{},
+                    },
+                    Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                    _type:      wit._type{},
+                },
+                "t25": &wit.TypeDef{
+                    Name: &"t25",
+                    Kind: &wit.Record{
+                        Fields: {
+                            {
+                                Name: "x",
+                                Type: wit.U32{},
+                                Docs: wit.Docs{},
+                            },
+                        },
+                        _typeDefKind: wit._typeDefKind{},
+                    },
+                    Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                    _type:      wit._type{},
+                },
+                "t26": &wit.TypeDef{
+                    Name:       &"t26",
+                    Kind:       &wit.Tuple{},
+                    Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                    _type:      wit._type{},
+                },
+                "t27": &wit.TypeDef{
+                    Name: &"t27",
+                    Kind: &wit.Tuple{
+                        Types: {
+                            wit.U32{},
+                        },
+                        _typeDefKind: wit._typeDefKind{},
+                    },
+                    Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                    _type:      wit._type{},
+                },
+                "t28": &wit.TypeDef{
+                    Name: &"t28",
+                    Kind: &wit.Tuple{
+                        Types: {
+                            wit.U32{},
+                        },
+                        _typeDefKind: wit._typeDefKind{},
+                    },
+                    Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                    _type:      wit._type{},
+                },
+                "t29": &wit.TypeDef{
+                    Name: &"t29",
+                    Kind: &wit.Tuple{
+                        Types: {
+                            wit.U32{},
+                            wit.U64{},
+                        },
+                        _typeDefKind: wit._typeDefKind{},
+                    },
+                    Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                    _type:      wit._type{},
+                },
+                "t3": &wit.TypeDef{
+                    Name:       &"t3",
+                    Kind:       wit.U32{},
+                    Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                    _type:      wit._type{},
+                },
+                "t30": &wit.TypeDef{
+                    Name:       &"t30",
+                    Kind:       &wit.Flags{},
+                    Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                    _type:      wit._type{},
+                },
+                "t31": &wit.TypeDef{
+                    Name: &"t31",
+                    Kind: &wit.Flags{
+                        Flags: {
+                            {
+                                Name: "a",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "b",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "c",
+                                Docs: wit.Docs{},
+                            },
+                        },
+                        _typeDefKind: wit._typeDefKind{},
+                    },
+                    Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                    _type:      wit._type{},
+                },
+                "t32": &wit.TypeDef{
+                    Name: &"t32",
+                    Kind: &wit.Flags{
+                        Flags: {
+                            {
+                                Name: "a",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "b",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "c",
+                                Docs: wit.Docs{},
+                            },
+                        },
+                        _typeDefKind: wit._typeDefKind{},
+                    },
+                    Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                    _type:      wit._type{},
+                },
+                "t33": &wit.TypeDef{
+                    Name: &"t33",
+                    Kind: &wit.Variant{
+                        Cases: {
+                            {
+                                Name: "a",
+                                Type: nil,
+                                Docs: wit.Docs{},
+                            },
+                        },
+                        _typeDefKind: wit._typeDefKind{},
+                    },
+                    Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                    _type:      wit._type{},
+                },
+                "t34": &wit.TypeDef{
+                    Name: &"t34",
+                    Kind: &wit.Variant{
+                        Cases: {
+                            {
+                                Name: "a",
+                                Type: nil,
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "b",
+                                Type: nil,
+                                Docs: wit.Docs{},
+                            },
+                        },
+                        _typeDefKind: wit._typeDefKind{},
+                    },
+                    Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                    _type:      wit._type{},
+                },
+                "t35": &wit.TypeDef{
+                    Name: &"t35",
+                    Kind: &wit.Variant{
+                        Cases: {
+                            {
+                                Name: "a",
+                                Type: nil,
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "b",
+                                Type: nil,
+                                Docs: wit.Docs{},
+                            },
+                        },
+                        _typeDefKind: wit._typeDefKind{},
+                    },
+                    Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                    _type:      wit._type{},
+                },
+                "t36": &wit.TypeDef{
+                    Name: &"t36",
+                    Kind: &wit.Variant{
+                        Cases: {
+                            {
+                                Name: "a",
+                                Type: nil,
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "b",
+                                Type: wit.U32{},
+                                Docs: wit.Docs{},
+                            },
+                        },
+                        _typeDefKind: wit._typeDefKind{},
+                    },
+                    Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                    _type:      wit._type{},
+                },
+                "t37": &wit.TypeDef{
+                    Name: &"t37",
+                    Kind: &wit.Variant{
+                        Cases: {
+                            {
+                                Name: "a",
+                                Type: nil,
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "b",
+                                Type: &wit.TypeDef{
+                                    Name: (*string)(nil),
+                                    Kind: &wit.Option{
+                                        Type:         wit.U32{},
+                                        _typeDefKind: wit._typeDefKind{},
+                                    },
+                                    Owner:      nil,
+                                    Docs:       wit.Docs{},
+                                    _worldItem: wit._worldItem{},
+                                    _type:      wit._type{},
+                                },
+                                Docs: wit.Docs{},
+                            },
+                        },
+                        _typeDefKind: wit._typeDefKind{},
+                    },
+                    Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                    _type:      wit._type{},
+                },
+                "t4": &wit.TypeDef{
+                    Name:       &"t4",
+                    Kind:       wit.U64{},
+                    Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                    _type:      wit._type{},
+                },
+                "t41": &wit.TypeDef{
+                    Name: &"t41",
+                    Kind: &wit.Enum{
+                        Cases: {
+                            {
+                                Name: "a",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "b",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "c",
+                                Docs: wit.Docs{},
+                            },
+                        },
+                        _typeDefKind: wit._typeDefKind{},
+                    },
+                    Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                    _type:      wit._type{},
+                },
+                "t42": &wit.TypeDef{
+                    Name: &"t42",
+                    Kind: &wit.Enum{
+                        Cases: {
+                            {
+                                Name: "a",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "b",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "c",
+                                Docs: wit.Docs{},
+                            },
+                        },
+                        _typeDefKind: wit._typeDefKind{},
+                    },
+                    Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                    _type:      wit._type{},
+                },
+                "t43": &wit.TypeDef{
+                    Name:       &"t43",
+                    Kind:       wit.Bool{},
+                    Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                    _type:      wit._type{},
+                },
+                "t44": &wit.TypeDef{
+                    Name:       &"t44",
+                    Kind:       wit.String{},
+                    Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                    _type:      wit._type{},
+                },
+                "t45": &wit.TypeDef{
+                    Name: &"t45",
+                    Kind: &wit.List{
+                        Type: &wit.TypeDef{
+                            Name: (*string)(nil),
+                            Kind: &wit.List{
+                                Type: &wit.TypeDef{
+                                    Name: (*string)(nil),
+                                    Kind: &wit.List{
+                                        Type:         &wit.TypeDef{(CYCLIC REFERENCE)},
+                                        _typeDefKind: wit._typeDefKind{},
+                                    },
+                                    Owner:      nil,
+                                    Docs:       wit.Docs{},
+                                    _worldItem: wit._worldItem{},
+                                    _type:      wit._type{},
+                                },
+                                _typeDefKind: wit._typeDefKind{},
+                            },
+                            Owner:      nil,
+                            Docs:       wit.Docs{},
+                            _worldItem: wit._worldItem{},
+                            _type:      wit._type{},
+                        },
+                        _typeDefKind: wit._typeDefKind{},
+                    },
+                    Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                    _type:      wit._type{},
+                },
+                "t46": &wit.TypeDef{
+                    Name:       &"t46",
+                    Kind:       &wit.TypeDef{(CYCLIC REFERENCE)},
+                    Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                    _type:      wit._type{},
+                },
+                "t47": &wit.TypeDef{
+                    Name:       &"t47",
+                    Kind:       &wit.TypeDef{(CYCLIC REFERENCE)},
+                    Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                    _type:      wit._type{},
+                },
+                "t48": &wit.TypeDef{
+                    Name: &"t48",
+                    Kind: &wit.Stream{
+                        Element:      wit.U32{},
+                        End:          wit.U32{},
+                        _typeDefKind: wit._typeDefKind{},
+                    },
+                    Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                    _type:      wit._type{},
+                },
+                "t49": &wit.TypeDef{
+                    Name: &"t49",
+                    Kind: &wit.Stream{
+                        Element:      nil,
+                        End:          wit.U32{},
+                        _typeDefKind: wit._typeDefKind{},
+                    },
+                    Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                    _type:      wit._type{},
+                },
+                "t5": &wit.TypeDef{
+                    Name:       &"t5",
+                    Kind:       wit.S8{},
+                    Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                    _type:      wit._type{},
+                },
+                "t50": &wit.TypeDef{
+                    Name: &"t50",
+                    Kind: &wit.Stream{
+                        Element:      wit.U32{},
+                        End:          nil,
+                        _typeDefKind: wit._typeDefKind{},
+                    },
+                    Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                    _type:      wit._type{},
+                },
+                "t51": &wit.TypeDef{
+                    Name:       &"t51",
+                    Kind:       &wit.Stream{},
+                    Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                    _type:      wit._type{},
+                },
+                "t52": &wit.TypeDef{
+                    Name: &"t52",
+                    Kind: &wit.Future{
+                        Type:         wit.U32{},
+                        _typeDefKind: wit._typeDefKind{},
+                    },
+                    Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                    _type:      wit._type{},
+                },
+                "t53": &wit.TypeDef{
+                    Name:       &"t53",
+                    Kind:       &wit.Future{},
+                    Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                    _type:      wit._type{},
+                },
+                "t6": &wit.TypeDef{
+                    Name:       &"t6",
+                    Kind:       wit.S16{},
+                    Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                    _type:      wit._type{},
+                },
+                "t7": &wit.TypeDef{
+                    Name:       &"t7",
+                    Kind:       wit.S32{},
+                    Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                    _type:      wit._type{},
+                },
+                "t8": &wit.TypeDef{
+                    Name:       &"t8",
+                    Kind:       wit.S64{},
+                    Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                    _type:      wit._type{},
+                },
+                "t9": &wit.TypeDef{
+                    Name:       &"t9",
+                    Kind:       wit.Float32{},
+                    Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                    _type:      wit._type{},
+                },
             },
-          },
-          Owner: &wit.Interface{...},
-          Docs:  wit.Docs{
-            Contents: "",
-          },
-        },
-        "t22": &wit.TypeDef{
-          Name: &"t22",
-          Kind: &wit.Record{
-            Fields: []wit.Field{
-              wit.Field{
-                Name: "a",
-                Type: wit.U32{},
-                Docs: wit.Docs{
-                  Contents: "",
+            Functions: {},
+            Package:   &wit.Package{
+                Name: wit.PackageName{
+                    Namespace: "foo",
+                    Name:      "types",
+                    Version:   (*semver.Version)(nil),
+                    _node:     wit._node{},
                 },
-              },
+                Interfaces: {
+                    "types": &wit.Interface{(CYCLIC REFERENCE)},
+                },
+                Worlds: {},
+                Docs:   wit.Docs{},
             },
-          },
-          Owner: &wit.Interface{...},
-          Docs:  wit.Docs{
-            Contents: "",
-          },
+            Docs:       wit.Docs{},
+            _typeOwner: wit._typeOwner{},
+            _worldItem: wit._worldItem{},
         },
-        "t23": &wit.TypeDef{
-          Name: &"t23",
-          Kind: &wit.Record{
-            Fields: []wit.Field{
-              wit.Field{
-                Name: "a",
-                Type: wit.U32{},
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.Field{
-                Name: "b",
-                Type: wit.U64{},
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-            },
-          },
-          Owner: &wit.Interface{...},
-          Docs:  wit.Docs{
-            Contents: "",
-          },
-        },
-        "t24": &wit.TypeDef{
-          Name: &"t24",
-          Kind: &wit.Record{
-            Fields: []wit.Field{
-              wit.Field{
-                Name: "a",
-                Type: wit.U32{},
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.Field{
-                Name: "b",
-                Type: wit.U64{},
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-            },
-          },
-          Owner: &wit.Interface{...},
-          Docs:  wit.Docs{
-            Contents: "",
-          },
-        },
-        "t25": &wit.TypeDef{
-          Name: &"t25",
-          Kind: &wit.Record{
-            Fields: []wit.Field{
-              wit.Field{
-                Name: "x",
-                Type: wit.U32{},
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-            },
-          },
-          Owner: &wit.Interface{...},
-          Docs:  wit.Docs{
-            Contents: "",
-          },
-        },
-        "t26": &wit.TypeDef{
-          Name: &"t26",
-          Kind: &wit.Tuple{
-            Types: []wit.Type(nil),
-          },
-          Owner: &wit.Interface{...},
-          Docs:  wit.Docs{
-            Contents: "",
-          },
-        },
-        "t27": &wit.TypeDef{
-          Name: &"t27",
-          Kind: &wit.Tuple{
-            Types: []wit.Type{
-              wit.U32{},
-            },
-          },
-          Owner: &wit.Interface{...},
-          Docs:  wit.Docs{
-            Contents: "",
-          },
-        },
-        "t28": &wit.TypeDef{
-          Name: &"t28",
-          Kind: &wit.Tuple{
-            Types: []wit.Type{
-              wit.U32{},
-            },
-          },
-          Owner: &wit.Interface{...},
-          Docs:  wit.Docs{
-            Contents: "",
-          },
-        },
-        "t29": &wit.TypeDef{
-          Name: &"t29",
-          Kind: &wit.Tuple{
-            Types: []wit.Type{
-              wit.U32{},
-              wit.U64{},
-            },
-          },
-          Owner: &wit.Interface{...},
-          Docs:  wit.Docs{
-            Contents: "",
-          },
-        },
-        "t3": &wit.TypeDef{
-          Name:  &"t3",
-          Kind:  wit.U32{},
-          Owner: &wit.Interface{...},
-          Docs:  wit.Docs{
-            Contents: "",
-          },
-        },
-        "t30": &wit.TypeDef{
-          Name: &"t30",
-          Kind: &wit.Flags{
-            Flags: []wit.Flag(nil),
-          },
-          Owner: &wit.Interface{...},
-          Docs:  wit.Docs{
-            Contents: "",
-          },
-        },
-        "t31": &wit.TypeDef{
-          Name: &"t31",
-          Kind: &wit.Flags{
-            Flags: []wit.Flag{
-              wit.Flag{
-                Name: "a",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.Flag{
-                Name: "b",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.Flag{
-                Name: "c",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-            },
-          },
-          Owner: &wit.Interface{...},
-          Docs:  wit.Docs{
-            Contents: "",
-          },
-        },
-        "t32": &wit.TypeDef{
-          Name: &"t32",
-          Kind: &wit.Flags{
-            Flags: []wit.Flag{
-              wit.Flag{
-                Name: "a",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.Flag{
-                Name: "b",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.Flag{
-                Name: "c",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-            },
-          },
-          Owner: &wit.Interface{...},
-          Docs:  wit.Docs{
-            Contents: "",
-          },
-        },
-        "t33": &wit.TypeDef{
-          Name: &"t33",
-          Kind: &wit.Variant{
-            Cases: []wit.Case{
-              wit.Case{
-                Name: "a",
-                Type: nil,
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-            },
-          },
-          Owner: &wit.Interface{...},
-          Docs:  wit.Docs{
-            Contents: "",
-          },
-        },
-        "t34": &wit.TypeDef{
-          Name: &"t34",
-          Kind: &wit.Variant{
-            Cases: []wit.Case{
-              wit.Case{
-                Name: "a",
-                Type: nil,
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.Case{
-                Name: "b",
-                Type: nil,
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-            },
-          },
-          Owner: &wit.Interface{...},
-          Docs:  wit.Docs{
-            Contents: "",
-          },
-        },
-        "t35": &wit.TypeDef{
-          Name: &"t35",
-          Kind: &wit.Variant{
-            Cases: []wit.Case{
-              wit.Case{
-                Name: "a",
-                Type: nil,
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.Case{
-                Name: "b",
-                Type: nil,
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-            },
-          },
-          Owner: &wit.Interface{...},
-          Docs:  wit.Docs{
-            Contents: "",
-          },
-        },
-        "t36": &wit.TypeDef{
-          Name: &"t36",
-          Kind: &wit.Variant{
-            Cases: []wit.Case{
-              wit.Case{
-                Name: "a",
-                Type: nil,
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.Case{
-                Name: "b",
-                Type: wit.U32{},
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-            },
-          },
-          Owner: &wit.Interface{...},
-          Docs:  wit.Docs{
-            Contents: "",
-          },
-        },
-        "t37": &wit.TypeDef{
-          Name: &"t37",
-          Kind: &wit.Variant{
-            Cases: []wit.Case{
-              wit.Case{
-                Name: "a",
-                Type: nil,
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.Case{
-                Name: "b",
-                Type: &wit.TypeDef{
-                  Name: (*string)(nil),
-                  Kind: &wit.Option{
-                    Type: wit.U32{},
-                  },
-                  Owner: nil,
-                  Docs:  wit.Docs{
-                    Contents: "",
-                  },
-                },
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-            },
-          },
-          Owner: &wit.Interface{...},
-          Docs:  wit.Docs{
-            Contents: "",
-          },
-        },
-        "t4": &wit.TypeDef{
-          Name:  &"t4",
-          Kind:  wit.U64{},
-          Owner: &wit.Interface{...},
-          Docs:  wit.Docs{
-            Contents: "",
-          },
-        },
-        "t41": &wit.TypeDef{
-          Name: &"t41",
-          Kind: &wit.Enum{
-            Cases: []wit.EnumCase{
-              wit.EnumCase{
-                Name: "a",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "b",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "c",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-            },
-          },
-          Owner: &wit.Interface{...},
-          Docs:  wit.Docs{
-            Contents: "",
-          },
-        },
-        "t42": &wit.TypeDef{
-          Name: &"t42",
-          Kind: &wit.Enum{
-            Cases: []wit.EnumCase{
-              wit.EnumCase{
-                Name: "a",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "b",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "c",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-            },
-          },
-          Owner: &wit.Interface{...},
-          Docs:  wit.Docs{
-            Contents: "",
-          },
-        },
-        "t43": &wit.TypeDef{
-          Name:  &"t43",
-          Kind:  wit.Bool{},
-          Owner: &wit.Interface{...},
-          Docs:  wit.Docs{
-            Contents: "",
-          },
-        },
-        "t44": &wit.TypeDef{
-          Name:  &"t44",
-          Kind:  wit.String{},
-          Owner: &wit.Interface{...},
-          Docs:  wit.Docs{
-            Contents: "",
-          },
-        },
-        "t45": &wit.TypeDef{
-          Name: &"t45",
-          Kind: &wit.List{
-            Type: &wit.TypeDef{
-              Name: (*string)(nil),
-              Kind: &wit.List{
-                Type: &wit.TypeDef{
-                  Name: (*string)(nil),
-                  Kind: &wit.List{
-                    Type: &wit.TypeDef{...},
-                  },
-                  Owner: nil,
-                  Docs:  wit.Docs{
-                    Contents: "",
-                  },
-                },
-              },
-              Owner: nil,
-              Docs:  wit.Docs{
-                Contents: "",
-              },
-            },
-          },
-          Owner: &wit.Interface{...},
-          Docs:  wit.Docs{
-            Contents: "",
-          },
-        },
-        "t46": &wit.TypeDef{
-          Name:  &"t46",
-          Kind:  &wit.TypeDef{...},
-          Owner: &wit.Interface{...},
-          Docs:  wit.Docs{
-            Contents: "",
-          },
-        },
-        "t47": &wit.TypeDef{
-          Name:  &"t47",
-          Kind:  &wit.TypeDef{...},
-          Owner: &wit.Interface{...},
-          Docs:  wit.Docs{
-            Contents: "",
-          },
-        },
-        "t48": &wit.TypeDef{
-          Name: &"t48",
-          Kind: &wit.Stream{
-            Element: wit.U32{},
-            End:     wit.U32{},
-          },
-          Owner: &wit.Interface{...},
-          Docs:  wit.Docs{
-            Contents: "",
-          },
-        },
-        "t49": &wit.TypeDef{
-          Name: &"t49",
-          Kind: &wit.Stream{
-            Element: nil,
-            End:     wit.U32{},
-          },
-          Owner: &wit.Interface{...},
-          Docs:  wit.Docs{
-            Contents: "",
-          },
-        },
-        "t5": &wit.TypeDef{
-          Name:  &"t5",
-          Kind:  wit.S8{},
-          Owner: &wit.Interface{...},
-          Docs:  wit.Docs{
-            Contents: "",
-          },
-        },
-        "t50": &wit.TypeDef{
-          Name: &"t50",
-          Kind: &wit.Stream{
-            Element: wit.U32{},
-            End:     nil,
-          },
-          Owner: &wit.Interface{...},
-          Docs:  wit.Docs{
-            Contents: "",
-          },
-        },
-        "t51": &wit.TypeDef{
-          Name: &"t51",
-          Kind: &wit.Stream{
-            Element: nil,
-            End:     nil,
-          },
-          Owner: &wit.Interface{...},
-          Docs:  wit.Docs{
-            Contents: "",
-          },
-        },
-        "t52": &wit.TypeDef{
-          Name: &"t52",
-          Kind: &wit.Future{
-            Type: wit.U32{},
-          },
-          Owner: &wit.Interface{...},
-          Docs:  wit.Docs{
-            Contents: "",
-          },
-        },
-        "t53": &wit.TypeDef{
-          Name: &"t53",
-          Kind: &wit.Future{
-            Type: nil,
-          },
-          Owner: &wit.Interface{...},
-          Docs:  wit.Docs{
-            Contents: "",
-          },
-        },
-        "t6": &wit.TypeDef{
-          Name:  &"t6",
-          Kind:  wit.S16{},
-          Owner: &wit.Interface{...},
-          Docs:  wit.Docs{
-            Contents: "",
-          },
-        },
-        "t7": &wit.TypeDef{
-          Name:  &"t7",
-          Kind:  wit.S32{},
-          Owner: &wit.Interface{...},
-          Docs:  wit.Docs{
-            Contents: "",
-          },
-        },
-        "t8": &wit.TypeDef{
-          Name:  &"t8",
-          Kind:  wit.S64{},
-          Owner: &wit.Interface{...},
-          Docs:  wit.Docs{
-            Contents: "",
-          },
-        },
-        "t9": &wit.TypeDef{
-          Name:  &"t9",
-          Kind:  wit.Float32{},
-          Owner: &wit.Interface{...},
-          Docs:  wit.Docs{
-            Contents: "",
-          },
-        },
-      },
-      Functions: map[string]*wit.Function{},
-      Package:   &wit.Package{
-        Name: wit.PackageName{
-          Namespace: "foo",
-          Name:      "types",
-          Version:   (*semver.Version)(nil),
-        },
-        Interfaces: map[string]*wit.Interface{
-          "types": &wit.Interface{...},
-        },
-        Worlds: map[string]*wit.World{},
-        Docs:   wit.Docs{
-          Contents: "",
-        },
-      },
-      Docs: wit.Docs{
-        Contents: "",
-      },
     },
-  },
-  TypeDefs: []*wit.TypeDef{
-    &wit.TypeDef{...},
-    &wit.TypeDef{...},
-    &wit.TypeDef{...},
-    &wit.TypeDef{...},
-    &wit.TypeDef{...},
-    &wit.TypeDef{...},
-    &wit.TypeDef{...},
-    &wit.TypeDef{...},
-    &wit.TypeDef{...},
-    &wit.TypeDef{...},
-    &wit.TypeDef{...},
-    &wit.TypeDef{...},
-    &wit.TypeDef{...},
-    &wit.TypeDef{...},
-    &wit.TypeDef{...},
-    &wit.TypeDef{...},
-    &wit.TypeDef{...},
-    &wit.TypeDef{...},
-    &wit.TypeDef{...},
-    &wit.TypeDef{...},
-    &wit.TypeDef{...},
-    &wit.TypeDef{...},
-    &wit.TypeDef{...},
-    &wit.TypeDef{...},
-    &wit.TypeDef{...},
-    &wit.TypeDef{...},
-    &wit.TypeDef{...},
-    &wit.TypeDef{...},
-    &wit.TypeDef{...},
-    &wit.TypeDef{...},
-    &wit.TypeDef{...},
-    &wit.TypeDef{...},
-    &wit.TypeDef{...},
-    &wit.TypeDef{...},
-    &wit.TypeDef{...},
-    &wit.TypeDef{...},
-    &wit.TypeDef{...},
-    &wit.TypeDef{...},
-    &wit.TypeDef{...},
-    &wit.TypeDef{...},
-    &wit.TypeDef{...},
-    &wit.TypeDef{...},
-    &wit.TypeDef{...},
-    &wit.TypeDef{...},
-    &wit.TypeDef{...},
-    &wit.TypeDef{...},
-    &wit.TypeDef{...},
-    &wit.TypeDef{...},
-    &wit.TypeDef{...},
-    &wit.TypeDef{...},
-    &wit.TypeDef{...},
-    &wit.TypeDef{...},
-    &wit.TypeDef{...},
-    &wit.TypeDef{...},
-    &wit.TypeDef{...},
-  },
-  Packages: []*wit.Package{
-    &wit.Package{...},
-  },
+    TypeDefs: {
+        &wit.TypeDef{
+            Name:       &"t1",
+            Kind:       wit.U8{},
+            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name:       &"t2",
+            Kind:       wit.U16{},
+            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name:       &"t3",
+            Kind:       wit.U32{},
+            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name:       &"t4",
+            Kind:       wit.U64{},
+            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name:       &"t5",
+            Kind:       wit.S8{},
+            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name:       &"t6",
+            Kind:       wit.S16{},
+            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name:       &"t7",
+            Kind:       wit.S32{},
+            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name:       &"t8",
+            Kind:       wit.S64{},
+            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name:       &"t9",
+            Kind:       wit.Float32{},
+            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name:       &"t10",
+            Kind:       wit.Float64{},
+            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name:       &"t11",
+            Kind:       wit.Char{},
+            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name: &"t12",
+            Kind: &wit.List{
+                Type:         wit.Char{},
+                _typeDefKind: wit._typeDefKind{},
+            },
+            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name:       &"t13",
+            Kind:       wit.String{},
+            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name: &"t14",
+            Kind: &wit.Option{
+                Type:         wit.U32{},
+                _typeDefKind: wit._typeDefKind{},
+            },
+            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name: &"t15",
+            Kind: &wit.Result{
+                OK:           wit.U32{},
+                Err:          wit.U32{},
+                _typeDefKind: wit._typeDefKind{},
+            },
+            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name: &"t16",
+            Kind: &wit.Result{
+                OK:           nil,
+                Err:          wit.U32{},
+                _typeDefKind: wit._typeDefKind{},
+            },
+            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name: &"t17",
+            Kind: &wit.Result{
+                OK:           wit.U32{},
+                Err:          nil,
+                _typeDefKind: wit._typeDefKind{},
+            },
+            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name:       &"t18",
+            Kind:       &wit.Result{},
+            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name:       &"t20",
+            Kind:       &wit.Record{},
+            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name: &"t21",
+            Kind: &wit.Record{
+                Fields: {
+                    {
+                        Name: "a",
+                        Type: wit.U32{},
+                        Docs: wit.Docs{},
+                    },
+                },
+                _typeDefKind: wit._typeDefKind{},
+            },
+            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name: &"t22",
+            Kind: &wit.Record{
+                Fields: {
+                    {
+                        Name: "a",
+                        Type: wit.U32{},
+                        Docs: wit.Docs{},
+                    },
+                },
+                _typeDefKind: wit._typeDefKind{},
+            },
+            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name: &"t23",
+            Kind: &wit.Record{
+                Fields: {
+                    {
+                        Name: "a",
+                        Type: wit.U32{},
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "b",
+                        Type: wit.U64{},
+                        Docs: wit.Docs{},
+                    },
+                },
+                _typeDefKind: wit._typeDefKind{},
+            },
+            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name: &"t24",
+            Kind: &wit.Record{
+                Fields: {
+                    {
+                        Name: "a",
+                        Type: wit.U32{},
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "b",
+                        Type: wit.U64{},
+                        Docs: wit.Docs{},
+                    },
+                },
+                _typeDefKind: wit._typeDefKind{},
+            },
+            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name: &"t25",
+            Kind: &wit.Record{
+                Fields: {
+                    {
+                        Name: "x",
+                        Type: wit.U32{},
+                        Docs: wit.Docs{},
+                    },
+                },
+                _typeDefKind: wit._typeDefKind{},
+            },
+            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name:       &"record",
+            Kind:       &wit.Record{},
+            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name:       &"t26",
+            Kind:       &wit.Tuple{},
+            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name: &"t27",
+            Kind: &wit.Tuple{
+                Types: {
+                    wit.U32{},
+                },
+                _typeDefKind: wit._typeDefKind{},
+            },
+            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name: &"t28",
+            Kind: &wit.Tuple{
+                Types: {
+                    wit.U32{},
+                },
+                _typeDefKind: wit._typeDefKind{},
+            },
+            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name: &"t29",
+            Kind: &wit.Tuple{
+                Types: {
+                    wit.U32{},
+                    wit.U64{},
+                },
+                _typeDefKind: wit._typeDefKind{},
+            },
+            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name:       &"t30",
+            Kind:       &wit.Flags{},
+            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name: &"t31",
+            Kind: &wit.Flags{
+                Flags: {
+                    {
+                        Name: "a",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "b",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "c",
+                        Docs: wit.Docs{},
+                    },
+                },
+                _typeDefKind: wit._typeDefKind{},
+            },
+            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name: &"t32",
+            Kind: &wit.Flags{
+                Flags: {
+                    {
+                        Name: "a",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "b",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "c",
+                        Docs: wit.Docs{},
+                    },
+                },
+                _typeDefKind: wit._typeDefKind{},
+            },
+            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name: &"t33",
+            Kind: &wit.Variant{
+                Cases: {
+                    {
+                        Name: "a",
+                        Type: nil,
+                        Docs: wit.Docs{},
+                    },
+                },
+                _typeDefKind: wit._typeDefKind{},
+            },
+            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name: &"t34",
+            Kind: &wit.Variant{
+                Cases: {
+                    {
+                        Name: "a",
+                        Type: nil,
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "b",
+                        Type: nil,
+                        Docs: wit.Docs{},
+                    },
+                },
+                _typeDefKind: wit._typeDefKind{},
+            },
+            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name: &"t35",
+            Kind: &wit.Variant{
+                Cases: {
+                    {
+                        Name: "a",
+                        Type: nil,
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "b",
+                        Type: nil,
+                        Docs: wit.Docs{},
+                    },
+                },
+                _typeDefKind: wit._typeDefKind{},
+            },
+            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name: &"t36",
+            Kind: &wit.Variant{
+                Cases: {
+                    {
+                        Name: "a",
+                        Type: nil,
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "b",
+                        Type: wit.U32{},
+                        Docs: wit.Docs{},
+                    },
+                },
+                _typeDefKind: wit._typeDefKind{},
+            },
+            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name: (*string)(nil),
+            Kind: &wit.Option{
+                Type:         wit.U32{},
+                _typeDefKind: wit._typeDefKind{},
+            },
+            Owner:      nil,
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name: &"t37",
+            Kind: &wit.Variant{
+                Cases: {
+                    {
+                        Name: "a",
+                        Type: nil,
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "b",
+                        Type: &wit.TypeDef{(CYCLIC REFERENCE)},
+                        Docs: wit.Docs{},
+                    },
+                },
+                _typeDefKind: wit._typeDefKind{},
+            },
+            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name: &"t41",
+            Kind: &wit.Enum{
+                Cases: {
+                    {
+                        Name: "a",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "b",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "c",
+                        Docs: wit.Docs{},
+                    },
+                },
+                _typeDefKind: wit._typeDefKind{},
+            },
+            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name: &"t42",
+            Kind: &wit.Enum{
+                Cases: {
+                    {
+                        Name: "a",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "b",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "c",
+                        Docs: wit.Docs{},
+                    },
+                },
+                _typeDefKind: wit._typeDefKind{},
+            },
+            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name:       &"t43",
+            Kind:       wit.Bool{},
+            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name:       &"t44",
+            Kind:       wit.String{},
+            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name: (*string)(nil),
+            Kind: &wit.List{
+                Type:         &wit.TypeDef{(CYCLIC REFERENCE)},
+                _typeDefKind: wit._typeDefKind{},
+            },
+            Owner:      nil,
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name: (*string)(nil),
+            Kind: &wit.List{
+                Type:         &wit.TypeDef{(CYCLIC REFERENCE)},
+                _typeDefKind: wit._typeDefKind{},
+            },
+            Owner:      nil,
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name: &"t45",
+            Kind: &wit.List{
+                Type:         &wit.TypeDef{(CYCLIC REFERENCE)},
+                _typeDefKind: wit._typeDefKind{},
+            },
+            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name:       &"t46",
+            Kind:       &wit.TypeDef{(CYCLIC REFERENCE)},
+            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name:       &"t47",
+            Kind:       &wit.TypeDef{(CYCLIC REFERENCE)},
+            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name: &"t48",
+            Kind: &wit.Stream{
+                Element:      wit.U32{},
+                End:          wit.U32{},
+                _typeDefKind: wit._typeDefKind{},
+            },
+            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name: &"t49",
+            Kind: &wit.Stream{
+                Element:      nil,
+                End:          wit.U32{},
+                _typeDefKind: wit._typeDefKind{},
+            },
+            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name: &"t50",
+            Kind: &wit.Stream{
+                Element:      wit.U32{},
+                End:          nil,
+                _typeDefKind: wit._typeDefKind{},
+            },
+            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name:       &"t51",
+            Kind:       &wit.Stream{},
+            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name: &"t52",
+            Kind: &wit.Future{
+                Type:         wit.U32{},
+                _typeDefKind: wit._typeDefKind{},
+            },
+            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name:       &"t53",
+            Kind:       &wit.Future{},
+            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name:       &"bar",
+            Kind:       wit.U32{},
+            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name:       &"foo",
+            Kind:       &wit.TypeDef{(CYCLIC REFERENCE)},
+            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+    },
+    Packages: {
+        &wit.Package{
+            Name: wit.PackageName{
+                Namespace: "foo",
+                Name:      "types",
+                Version:   (*semver.Version)(nil),
+                _node:     wit._node{},
+            },
+            Interfaces: {
+                "types": &wit.Interface{(CYCLIC REFERENCE)},
+            },
+            Worlds: {},
+            Docs:   wit.Docs{},
+        },
+    },
 }

@@ -3,9 +3,10 @@ package print
 import (
 	"fmt"
 
-	"github.com/k0kubun/pp/v3"
-	"github.com/urfave/cli/v3"
 	"github.com/ydnar/wasm-tools-go/internal/witcli"
+
+	"github.com/kr/pretty"
+	"github.com/urfave/cli/v3"
 )
 
 // Command is the CLI command for describe.
@@ -23,9 +24,7 @@ func action(ctx *cli.Context) error {
 
 	fmt.Printf("// %d worlds(s), %d packages(s), %d interfaces(s), %d types(s)\n",
 		len(res.Worlds), len(res.Packages), len(res.Interfaces), len(res.TypeDefs))
-	p := pp.New()
-	p.SetExportedOnly(true)
-	p.Print(res)
+	pretty.Print(res)
 
 	return nil
 }
