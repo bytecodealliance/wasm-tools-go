@@ -1,59 +1,67 @@
 &wit.Resolve{
-  Worlds:     []*wit.World(nil),
-  Interfaces: []*wit.Interface{
-    &wit.Interface{
-      Name:      &"foo",
-      TypeDefs:  map[string]*wit.TypeDef{},
-      Functions: map[string]*wit.Function{
-        "x": &wit.Function{
-          Name:    "x",
-          Kind:    &wit.Freestanding{},
-          Params:  []wit.Param(nil),
-          Results: []wit.Param(nil),
-          Docs:    wit.Docs{
-            Contents: "",
-          },
+    Worlds:     nil,
+    Interfaces: {
+        &wit.Interface{
+            Name:      &"foo",
+            TypeDefs:  {},
+            Functions: {
+                "x": &wit.Function{
+                    Name:       "x",
+                    Kind:       &wit.Freestanding{},
+                    Params:     nil,
+                    Results:    nil,
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                },
+                "y": &wit.Function{
+                    Name:       "y",
+                    Kind:       &wit.Freestanding{},
+                    Params:     nil,
+                    Results:    nil,
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                },
+                "z": &wit.Function{
+                    Name:       "z",
+                    Kind:       &wit.Freestanding{},
+                    Params:     nil,
+                    Results:    nil,
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                },
+            },
+            Package: &wit.Package{
+                Name: wit.PackageName{
+                    Namespace: "foo",
+                    Name:      "foo",
+                    Version:   (*semver.Version)(nil),
+                    _node:     wit._node{},
+                },
+                Interfaces: {
+                    "foo": &wit.Interface{(CYCLIC REFERENCE)},
+                },
+                Worlds: {},
+                Docs:   wit.Docs{},
+            },
+            Docs:       wit.Docs{},
+            _typeOwner: wit._typeOwner{},
+            _worldItem: wit._worldItem{},
         },
-        "y": &wit.Function{
-          Name:    "y",
-          Kind:    &wit.Freestanding{...},
-          Params:  []wit.Param(nil),
-          Results: []wit.Param(nil),
-          Docs:    wit.Docs{
-            Contents: "",
-          },
-        },
-        "z": &wit.Function{
-          Name:    "z",
-          Kind:    &wit.Freestanding{...},
-          Params:  []wit.Param(nil),
-          Results: []wit.Param(nil),
-          Docs:    wit.Docs{
-            Contents: "",
-          },
-        },
-      },
-      Package: &wit.Package{
-        Name: wit.PackageName{
-          Namespace: "foo",
-          Name:      "foo",
-          Version:   (*semver.Version)(nil),
-        },
-        Interfaces: map[string]*wit.Interface{
-          "foo": &wit.Interface{...},
-        },
-        Worlds: map[string]*wit.World{},
-        Docs:   wit.Docs{
-          Contents: "",
-        },
-      },
-      Docs: wit.Docs{
-        Contents: "",
-      },
     },
-  },
-  TypeDefs: []*wit.TypeDef(nil),
-  Packages: []*wit.Package{
-    &wit.Package{...},
-  },
+    TypeDefs: nil,
+    Packages: {
+        &wit.Package{
+            Name: wit.PackageName{
+                Namespace: "foo",
+                Name:      "foo",
+                Version:   (*semver.Version)(nil),
+                _node:     wit._node{},
+            },
+            Interfaces: {
+                "foo": &wit.Interface{(CYCLIC REFERENCE)},
+            },
+            Worlds: {},
+            Docs:   wit.Docs{},
+        },
+    },
 }

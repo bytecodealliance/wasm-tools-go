@@ -1,378 +1,1739 @@
 &wit.Resolve{
-  Worlds: []*wit.World{
-    &wit.World{
-      Name:    "example-world",
-      Imports: map[string]wit.WorldItem{
-        "interface-0": &wit.Interface{
-          Name:     &"poll",
-          TypeDefs: map[string]*wit.TypeDef{
-            "pollable": &wit.TypeDef{
-              Name:  &"pollable",
-              Kind:  wit.U32{},
-              Owner: &wit.Interface{...},
-              Docs:  wit.Docs{
-                Contents: "",
-              },
-            },
-          },
-          Functions: map[string]*wit.Function{
-            "drop-pollable": &wit.Function{
-              Name:   "drop-pollable",
-              Kind:   &wit.Freestanding{},
-              Params: []wit.Param{
-                wit.Param{
-                  Name: "this",
-                  Type: &wit.TypeDef{...},
+    Worlds: {
+        &wit.World{
+            Name:    "example-world",
+            Imports: {
+                "interface-0": &wit.Interface{
+                    Name:     &"poll",
+                    TypeDefs: {
+                        "pollable": &wit.TypeDef{
+                            Name:       &"pollable",
+                            Kind:       wit.U32{},
+                            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                            Docs:       wit.Docs{},
+                            _worldItem: wit._worldItem{},
+                            _type:      wit._type{},
+                        },
+                    },
+                    Functions: {
+                        "drop-pollable": &wit.Function{
+                            Name:   "drop-pollable",
+                            Kind:   &wit.Freestanding{},
+                            Params: {
+                                {
+                                    Name: "this",
+                                    Type: &wit.TypeDef{(CYCLIC REFERENCE)},
+                                },
+                            },
+                            Results:    nil,
+                            Docs:       wit.Docs{},
+                            _worldItem: wit._worldItem{},
+                        },
+                        "poll-oneoff": &wit.Function{
+                            Name:   "poll-oneoff",
+                            Kind:   &wit.Freestanding{},
+                            Params: {
+                                {
+                                    Name: "in",
+                                    Type: &wit.TypeDef{
+                                        Name: (*string)(nil),
+                                        Kind: &wit.List{
+                                            Type:         &wit.TypeDef{(CYCLIC REFERENCE)},
+                                            _typeDefKind: wit._typeDefKind{},
+                                        },
+                                        Owner:      nil,
+                                        Docs:       wit.Docs{},
+                                        _worldItem: wit._worldItem{},
+                                        _type:      wit._type{},
+                                    },
+                                },
+                            },
+                            Results: {
+                                {
+                                    Name: "",
+                                    Type: &wit.TypeDef{
+                                        Name: (*string)(nil),
+                                        Kind: &wit.List{
+                                            Type:         wit.Bool{},
+                                            _typeDefKind: wit._typeDefKind{},
+                                        },
+                                        Owner:      nil,
+                                        Docs:       wit.Docs{},
+                                        _worldItem: wit._worldItem{},
+                                        _type:      wit._type{},
+                                    },
+                                },
+                            },
+                            Docs:       wit.Docs{},
+                            _worldItem: wit._worldItem{},
+                        },
+                    },
+                    Package: &wit.Package{
+                        Name: wit.PackageName{
+                            Namespace: "wasi",
+                            Name:      "poll",
+                            Version:   (*semver.Version)(nil),
+                            _node:     wit._node{},
+                        },
+                        Interfaces: {
+                            "poll": &wit.Interface{(CYCLIC REFERENCE)},
+                        },
+                        Worlds: {
+                            "example-world": &wit.World{(CYCLIC REFERENCE)},
+                        },
+                        Docs: wit.Docs{},
+                    },
+                    Docs:       wit.Docs{},
+                    _typeOwner: wit._typeOwner{},
+                    _worldItem: wit._worldItem{},
                 },
-              },
-              Results: []wit.Param(nil),
-              Docs:    wit.Docs{
-                Contents: "",
-              },
             },
-            "poll-oneoff": &wit.Function{
-              Name:   "poll-oneoff",
-              Kind:   &wit.Freestanding{...},
-              Params: []wit.Param{
-                wit.Param{
-                  Name: "in",
-                  Type: &wit.TypeDef{
-                    Name: (*string)(nil),
-                    Kind: &wit.List{
-                      Type: &wit.TypeDef{...},
-                    },
-                    Owner: nil,
-                    Docs:  wit.Docs{
-                      Contents: "",
-                    },
-                  },
+            Exports: {},
+            Package: &wit.Package{
+                Name: wit.PackageName{
+                    Namespace: "wasi",
+                    Name:      "poll",
+                    Version:   (*semver.Version)(nil),
+                    _node:     wit._node{},
                 },
-              },
-              Results: []wit.Param{
-                wit.Param{
-                  Name: "",
-                  Type: &wit.TypeDef{
-                    Name: (*string)(nil),
-                    Kind: &wit.List{
-                      Type: wit.Bool{},
+                Interfaces: {
+                    "poll": &wit.Interface{
+                        Name:     &"poll",
+                        TypeDefs: {
+                            "pollable": &wit.TypeDef{
+                                Name:       &"pollable",
+                                Kind:       wit.U32{},
+                                Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                                Docs:       wit.Docs{},
+                                _worldItem: wit._worldItem{},
+                                _type:      wit._type{},
+                            },
+                        },
+                        Functions: {
+                            "drop-pollable": &wit.Function{
+                                Name:   "drop-pollable",
+                                Kind:   &wit.Freestanding{},
+                                Params: {
+                                    {
+                                        Name: "this",
+                                        Type: &wit.TypeDef{(CYCLIC REFERENCE)},
+                                    },
+                                },
+                                Results:    nil,
+                                Docs:       wit.Docs{},
+                                _worldItem: wit._worldItem{},
+                            },
+                            "poll-oneoff": &wit.Function{
+                                Name:   "poll-oneoff",
+                                Kind:   &wit.Freestanding{},
+                                Params: {
+                                    {
+                                        Name: "in",
+                                        Type: &wit.TypeDef{
+                                            Name: (*string)(nil),
+                                            Kind: &wit.List{
+                                                Type:         &wit.TypeDef{(CYCLIC REFERENCE)},
+                                                _typeDefKind: wit._typeDefKind{},
+                                            },
+                                            Owner:      nil,
+                                            Docs:       wit.Docs{},
+                                            _worldItem: wit._worldItem{},
+                                            _type:      wit._type{},
+                                        },
+                                    },
+                                },
+                                Results: {
+                                    {
+                                        Name: "",
+                                        Type: &wit.TypeDef{
+                                            Name: (*string)(nil),
+                                            Kind: &wit.List{
+                                                Type:         wit.Bool{},
+                                                _typeDefKind: wit._typeDefKind{},
+                                            },
+                                            Owner:      nil,
+                                            Docs:       wit.Docs{},
+                                            _worldItem: wit._worldItem{},
+                                            _type:      wit._type{},
+                                        },
+                                    },
+                                },
+                                Docs:       wit.Docs{},
+                                _worldItem: wit._worldItem{},
+                            },
+                        },
+                        Package:    &wit.Package{(CYCLIC REFERENCE)},
+                        Docs:       wit.Docs{},
+                        _typeOwner: wit._typeOwner{},
+                        _worldItem: wit._worldItem{},
                     },
-                    Owner: nil,
-                    Docs:  wit.Docs{
-                      Contents: "",
-                    },
-                  },
                 },
-              },
-              Docs: wit.Docs{
-                Contents: "",
-              },
+                Worlds: {
+                    "example-world": &wit.World{(CYCLIC REFERENCE)},
+                },
+                Docs: wit.Docs{},
             },
-          },
-          Package: &wit.Package{
-            Name: wit.PackageName{
-              Namespace: "wasi",
-              Name:      "poll",
-              Version:   (*semver.Version)(nil),
-            },
-            Interfaces: map[string]*wit.Interface{
-              "poll": &wit.Interface{...},
-            },
-            Worlds: map[string]*wit.World{
-              "example-world": &wit.World{...},
-            },
-            Docs: wit.Docs{
-              Contents: "",
-            },
-          },
-          Docs: wit.Docs{
-            Contents: "",
-          },
+            Docs:       wit.Docs{},
+            _typeOwner: wit._typeOwner{},
         },
-      },
-      Exports: map[string]wit.WorldItem{},
-      Package: &wit.Package{...},
-      Docs:    wit.Docs{
-        Contents: "",
-      },
-    },
-    &wit.World{
-      Name:    "imports",
-      Imports: map[string]wit.WorldItem{
-        "interface-0": &wit.Interface{...},
-        "interface-1": &wit.Interface{
-          Name:     &"monotonic-clock",
-          TypeDefs: map[string]*wit.TypeDef{
-            "instant": &wit.TypeDef{
-              Name:  &"instant",
-              Kind:  wit.U64{},
-              Owner: &wit.Interface{...},
-              Docs:  wit.Docs{
-                Contents: "",
-              },
-            },
-            "pollable": &wit.TypeDef{
-              Name:  &"pollable",
-              Kind:  &wit.TypeDef{...},
-              Owner: &wit.Interface{...},
-              Docs:  wit.Docs{
-                Contents: "",
-              },
-            },
-          },
-          Functions: map[string]*wit.Function{
-            "now": &wit.Function{
-              Name:    "now",
-              Kind:    &wit.Freestanding{...},
-              Params:  []wit.Param(nil),
-              Results: []wit.Param{
-                wit.Param{
-                  Name: "",
-                  Type: &wit.TypeDef{...},
-                },
-              },
-              Docs: wit.Docs{
-                Contents: "",
-              },
-            },
-            "resolution": &wit.Function{
-              Name:    "resolution",
-              Kind:    &wit.Freestanding{...},
-              Params:  []wit.Param(nil),
-              Results: []wit.Param{
-                wit.Param{
-                  Name: "",
-                  Type: &wit.TypeDef{...},
-                },
-              },
-              Docs: wit.Docs{
-                Contents: "",
-              },
-            },
-            "subscribe": &wit.Function{
-              Name:   "subscribe",
-              Kind:   &wit.Freestanding{...},
-              Params: []wit.Param{
-                wit.Param{
-                  Name: "when",
-                  Type: &wit.TypeDef{...},
-                },
-                wit.Param{
-                  Name: "absolute",
-                  Type: wit.Bool{},
-                },
-              },
-              Results: []wit.Param{
-                wit.Param{
-                  Name: "",
-                  Type: &wit.TypeDef{...},
-                },
-              },
-              Docs: wit.Docs{
-                Contents: "",
-              },
-            },
-          },
-          Package: &wit.Package{
-            Name: wit.PackageName{
-              Namespace: "wasi",
-              Name:      "clocks",
-              Version:   (*semver.Version)(nil),
-            },
-            Interfaces: map[string]*wit.Interface{
-              "monotonic-clock": &wit.Interface{...},
-              "timezone":        &wit.Interface{
-                Name:     &"timezone",
-                TypeDefs: map[string]*wit.TypeDef{
-                  "datetime": &wit.TypeDef{
-                    Name: &"datetime",
-                    Kind: &wit.TypeDef{
-                      Name: &"datetime",
-                      Kind: &wit.Record{
-                        Fields: []wit.Field{
-                          wit.Field{
-                            Name: "seconds",
-                            Type: wit.U64{},
-                            Docs: wit.Docs{
-                              Contents: "",
-                            },
-                          },
-                          wit.Field{
-                            Name: "nanoseconds",
-                            Type: wit.U32{},
-                            Docs: wit.Docs{
-                              Contents: "",
-                            },
-                          },
+        &wit.World{
+            Name:    "imports",
+            Imports: {
+                "interface-0": &wit.Interface{
+                    Name:     &"poll",
+                    TypeDefs: {
+                        "pollable": &wit.TypeDef{
+                            Name:       &"pollable",
+                            Kind:       wit.U32{},
+                            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                            Docs:       wit.Docs{},
+                            _worldItem: wit._worldItem{},
+                            _type:      wit._type{},
                         },
-                      },
-                      Owner: &wit.Interface{
-                        Name:     &"wall-clock",
-                        TypeDefs: map[string]*wit.TypeDef{
-                          "datetime": &wit.TypeDef{...},
+                    },
+                    Functions: {
+                        "drop-pollable": &wit.Function{
+                            Name:   "drop-pollable",
+                            Kind:   &wit.Freestanding{},
+                            Params: {
+                                {
+                                    Name: "this",
+                                    Type: &wit.TypeDef{(CYCLIC REFERENCE)},
+                                },
+                            },
+                            Results:    nil,
+                            Docs:       wit.Docs{},
+                            _worldItem: wit._worldItem{},
                         },
-                        Functions: map[string]*wit.Function{
-                          "now": &wit.Function{
+                        "poll-oneoff": &wit.Function{
+                            Name:   "poll-oneoff",
+                            Kind:   &wit.Freestanding{},
+                            Params: {
+                                {
+                                    Name: "in",
+                                    Type: &wit.TypeDef{
+                                        Name: (*string)(nil),
+                                        Kind: &wit.List{
+                                            Type:         &wit.TypeDef{(CYCLIC REFERENCE)},
+                                            _typeDefKind: wit._typeDefKind{},
+                                        },
+                                        Owner:      nil,
+                                        Docs:       wit.Docs{},
+                                        _worldItem: wit._worldItem{},
+                                        _type:      wit._type{},
+                                    },
+                                },
+                            },
+                            Results: {
+                                {
+                                    Name: "",
+                                    Type: &wit.TypeDef{
+                                        Name: (*string)(nil),
+                                        Kind: &wit.List{
+                                            Type:         wit.Bool{},
+                                            _typeDefKind: wit._typeDefKind{},
+                                        },
+                                        Owner:      nil,
+                                        Docs:       wit.Docs{},
+                                        _worldItem: wit._worldItem{},
+                                        _type:      wit._type{},
+                                    },
+                                },
+                            },
+                            Docs:       wit.Docs{},
+                            _worldItem: wit._worldItem{},
+                        },
+                    },
+                    Package:    &wit.Package{(CYCLIC REFERENCE)},
+                    Docs:       wit.Docs{},
+                    _typeOwner: wit._typeOwner{},
+                    _worldItem: wit._worldItem{},
+                },
+                "interface-1": &wit.Interface{
+                    Name:     &"monotonic-clock",
+                    TypeDefs: {
+                        "instant": &wit.TypeDef{
+                            Name:       &"instant",
+                            Kind:       wit.U64{},
+                            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                            Docs:       wit.Docs{},
+                            _worldItem: wit._worldItem{},
+                            _type:      wit._type{},
+                        },
+                        "pollable": &wit.TypeDef{
+                            Name:       &"pollable",
+                            Kind:       &wit.TypeDef{(CYCLIC REFERENCE)},
+                            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                            Docs:       wit.Docs{},
+                            _worldItem: wit._worldItem{},
+                            _type:      wit._type{},
+                        },
+                    },
+                    Functions: {
+                        "now": &wit.Function{
                             Name:    "now",
-                            Kind:    &wit.Freestanding{...},
-                            Params:  []wit.Param(nil),
-                            Results: []wit.Param{
-                              wit.Param{
-                                Name: "",
-                                Type: &wit.TypeDef{...},
-                              },
+                            Kind:    &wit.Freestanding{},
+                            Params:  nil,
+                            Results: {
+                                {
+                                    Name: "",
+                                    Type: &wit.TypeDef{(CYCLIC REFERENCE)},
+                                },
                             },
-                            Docs: wit.Docs{
-                              Contents: "",
-                            },
-                          },
-                          "resolution": &wit.Function{
+                            Docs:       wit.Docs{},
+                            _worldItem: wit._worldItem{},
+                        },
+                        "resolution": &wit.Function{
                             Name:    "resolution",
-                            Kind:    &wit.Freestanding{...},
-                            Params:  []wit.Param(nil),
-                            Results: []wit.Param{
-                              wit.Param{
-                                Name: "",
-                                Type: &wit.TypeDef{...},
-                              },
+                            Kind:    &wit.Freestanding{},
+                            Params:  nil,
+                            Results: {
+                                {
+                                    Name: "",
+                                    Type: &wit.TypeDef{(CYCLIC REFERENCE)},
+                                },
                             },
-                            Docs: wit.Docs{
-                              Contents: "",
+                            Docs:       wit.Docs{},
+                            _worldItem: wit._worldItem{},
+                        },
+                        "subscribe": &wit.Function{
+                            Name:   "subscribe",
+                            Kind:   &wit.Freestanding{},
+                            Params: {
+                                {
+                                    Name: "when",
+                                    Type: &wit.TypeDef{(CYCLIC REFERENCE)},
+                                },
+                                {
+                                    Name: "absolute",
+                                    Type: wit.Bool{},
+                                },
                             },
-                          },
+                            Results: {
+                                {
+                                    Name: "",
+                                    Type: &wit.TypeDef{(CYCLIC REFERENCE)},
+                                },
+                            },
+                            Docs:       wit.Docs{},
+                            _worldItem: wit._worldItem{},
                         },
-                        Package: &wit.Package{...},
-                        Docs:    wit.Docs{
-                          Contents: "",
+                    },
+                    Package: &wit.Package{
+                        Name: wit.PackageName{
+                            Namespace: "wasi",
+                            Name:      "clocks",
+                            Version:   (*semver.Version)(nil),
+                            _node:     wit._node{},
                         },
-                      },
-                      Docs: wit.Docs{
-                        Contents: "",
-                      },
+                        Interfaces: {
+                            "monotonic-clock": &wit.Interface{(CYCLIC REFERENCE)},
+                            "timezone":        &wit.Interface{
+                                Name:     &"timezone",
+                                TypeDefs: {
+                                    "datetime": &wit.TypeDef{
+                                        Name: &"datetime",
+                                        Kind: &wit.TypeDef{
+                                            Name: &"datetime",
+                                            Kind: &wit.Record{
+                                                Fields: {
+                                                    {
+                                                        Name: "seconds",
+                                                        Type: wit.U64{},
+                                                        Docs: wit.Docs{},
+                                                    },
+                                                    {
+                                                        Name: "nanoseconds",
+                                                        Type: wit.U32{},
+                                                        Docs: wit.Docs{},
+                                                    },
+                                                },
+                                                _typeDefKind: wit._typeDefKind{},
+                                            },
+                                            Owner: &wit.Interface{
+                                                Name:     &"wall-clock",
+                                                TypeDefs: {
+                                                    "datetime": &wit.TypeDef{(CYCLIC REFERENCE)},
+                                                },
+                                                Functions: {
+                                                    "now": &wit.Function{
+                                                        Name:    "now",
+                                                        Kind:    &!%v(DEPTH EXCEEDED),
+                                                        Params:  nil,
+                                                        Results: {
+                                                            {
+                                                                Name: "",
+                                                                Type: &!%v(DEPTH EXCEEDED),
+                                                            },
+                                                        },
+                                                        Docs:       wit.Docs{},
+                                                        _worldItem: wit._worldItem{},
+                                                    },
+                                                    "resolution": &wit.Function{
+                                                        Name:    "resolution",
+                                                        Kind:    &!%v(DEPTH EXCEEDED),
+                                                        Params:  nil,
+                                                        Results: {
+                                                            {
+                                                                Name: "",
+                                                                Type: &!%v(DEPTH EXCEEDED),
+                                                            },
+                                                        },
+                                                        Docs:       wit.Docs{},
+                                                        _worldItem: wit._worldItem{},
+                                                    },
+                                                },
+                                                Package:    &wit.Package{(CYCLIC REFERENCE)},
+                                                Docs:       wit.Docs{},
+                                                _typeOwner: wit._typeOwner{},
+                                                _worldItem: wit._worldItem{},
+                                            },
+                                            Docs:       wit.Docs{},
+                                            _worldItem: wit._worldItem{},
+                                            _type:      wit._type{},
+                                        },
+                                        Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                                        Docs:       wit.Docs{},
+                                        _worldItem: wit._worldItem{},
+                                        _type:      wit._type{},
+                                    },
+                                    "timezone-display": &wit.TypeDef{
+                                        Name: &"timezone-display",
+                                        Kind: &wit.Record{
+                                            Fields: {
+                                                {
+                                                    Name: "utc-offset",
+                                                    Type: wit.S32{},
+                                                    Docs: wit.Docs{},
+                                                },
+                                                {
+                                                    Name: "name",
+                                                    Type: wit.String{},
+                                                    Docs: wit.Docs{},
+                                                },
+                                                {
+                                                    Name: "in-daylight-saving-time",
+                                                    Type: wit.Bool{},
+                                                    Docs: wit.Docs{},
+                                                },
+                                            },
+                                            _typeDefKind: wit._typeDefKind{},
+                                        },
+                                        Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                                        Docs:       wit.Docs{},
+                                        _worldItem: wit._worldItem{},
+                                        _type:      wit._type{},
+                                    },
+                                },
+                                Functions: {
+                                    "display": &wit.Function{
+                                        Name:   "display",
+                                        Kind:   &wit.Freestanding{(CYCLIC REFERENCE)},
+                                        Params: {
+                                            {
+                                                Name: "when",
+                                                Type: &wit.TypeDef{(CYCLIC REFERENCE)},
+                                            },
+                                        },
+                                        Results: {
+                                            {
+                                                Name: "",
+                                                Type: &wit.TypeDef{(CYCLIC REFERENCE)},
+                                            },
+                                        },
+                                        Docs:       wit.Docs{},
+                                        _worldItem: wit._worldItem{},
+                                    },
+                                    "utc-offset": &wit.Function{
+                                        Name:   "utc-offset",
+                                        Kind:   &wit.Freestanding{(CYCLIC REFERENCE)},
+                                        Params: {
+                                            {
+                                                Name: "when",
+                                                Type: &wit.TypeDef{(CYCLIC REFERENCE)},
+                                            },
+                                        },
+                                        Results: {
+                                            {
+                                                Name: "",
+                                                Type: wit.S32{},
+                                            },
+                                        },
+                                        Docs:       wit.Docs{},
+                                        _worldItem: wit._worldItem{},
+                                    },
+                                },
+                                Package:    &wit.Package{(CYCLIC REFERENCE)},
+                                Docs:       wit.Docs{},
+                                _typeOwner: wit._typeOwner{},
+                                _worldItem: wit._worldItem{},
+                            },
+                            "wall-clock": &wit.Interface{
+                                Name:     &"wall-clock",
+                                TypeDefs: {
+                                    "datetime": &wit.TypeDef{
+                                        Name: &"datetime",
+                                        Kind: &wit.Record{
+                                            Fields: {
+                                                {
+                                                    Name: "seconds",
+                                                    Type: wit.U64{},
+                                                    Docs: wit.Docs{},
+                                                },
+                                                {
+                                                    Name: "nanoseconds",
+                                                    Type: wit.U32{},
+                                                    Docs: wit.Docs{},
+                                                },
+                                            },
+                                            _typeDefKind: wit._typeDefKind{},
+                                        },
+                                        Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                                        Docs:       wit.Docs{},
+                                        _worldItem: wit._worldItem{},
+                                        _type:      wit._type{},
+                                    },
+                                },
+                                Functions: {
+                                    "now": &wit.Function{
+                                        Name:    "now",
+                                        Kind:    &wit.Freestanding{(CYCLIC REFERENCE)},
+                                        Params:  nil,
+                                        Results: {
+                                            {
+                                                Name: "",
+                                                Type: &wit.TypeDef{(CYCLIC REFERENCE)},
+                                            },
+                                        },
+                                        Docs:       wit.Docs{},
+                                        _worldItem: wit._worldItem{},
+                                    },
+                                    "resolution": &wit.Function{
+                                        Name:    "resolution",
+                                        Kind:    &wit.Freestanding{(CYCLIC REFERENCE)},
+                                        Params:  nil,
+                                        Results: {
+                                            {
+                                                Name: "",
+                                                Type: &wit.TypeDef{(CYCLIC REFERENCE)},
+                                            },
+                                        },
+                                        Docs:       wit.Docs{},
+                                        _worldItem: wit._worldItem{},
+                                    },
+                                },
+                                Package:    &wit.Package{(CYCLIC REFERENCE)},
+                                Docs:       wit.Docs{},
+                                _typeOwner: wit._typeOwner{},
+                                _worldItem: wit._worldItem{},
+                            },
+                        },
+                        Worlds: {
+                            "imports": &wit.World{(CYCLIC REFERENCE)},
+                        },
+                        Docs: wit.Docs{},
                     },
-                    Owner: &wit.Interface{...},
-                    Docs:  wit.Docs{
-                      Contents: "",
+                    Docs:       wit.Docs{},
+                    _typeOwner: wit._typeOwner{},
+                    _worldItem: wit._worldItem{},
+                },
+                "interface-2": &wit.Interface{
+                    Name:     &"wall-clock",
+                    TypeDefs: {
+                        "datetime": &wit.TypeDef{
+                            Name: &"datetime",
+                            Kind: &wit.Record{
+                                Fields: {
+                                    {
+                                        Name: "seconds",
+                                        Type: wit.U64{},
+                                        Docs: wit.Docs{},
+                                    },
+                                    {
+                                        Name: "nanoseconds",
+                                        Type: wit.U32{},
+                                        Docs: wit.Docs{},
+                                    },
+                                },
+                                _typeDefKind: wit._typeDefKind{},
+                            },
+                            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                            Docs:       wit.Docs{},
+                            _worldItem: wit._worldItem{},
+                            _type:      wit._type{},
+                        },
                     },
-                  },
-                  "timezone-display": &wit.TypeDef{
+                    Functions: {
+                        "now": &wit.Function{
+                            Name:    "now",
+                            Kind:    &wit.Freestanding{},
+                            Params:  nil,
+                            Results: {
+                                {
+                                    Name: "",
+                                    Type: &wit.TypeDef{(CYCLIC REFERENCE)},
+                                },
+                            },
+                            Docs:       wit.Docs{},
+                            _worldItem: wit._worldItem{},
+                        },
+                        "resolution": &wit.Function{
+                            Name:    "resolution",
+                            Kind:    &wit.Freestanding{},
+                            Params:  nil,
+                            Results: {
+                                {
+                                    Name: "",
+                                    Type: &wit.TypeDef{(CYCLIC REFERENCE)},
+                                },
+                            },
+                            Docs:       wit.Docs{},
+                            _worldItem: wit._worldItem{},
+                        },
+                    },
+                    Package: &wit.Package{
+                        Name: wit.PackageName{
+                            Namespace: "wasi",
+                            Name:      "clocks",
+                            Version:   (*semver.Version)(nil),
+                            _node:     wit._node{},
+                        },
+                        Interfaces: {
+                            "monotonic-clock": &wit.Interface{(CYCLIC REFERENCE)},
+                            "timezone":        &wit.Interface{
+                                Name:     &"timezone",
+                                TypeDefs: {
+                                    "datetime": &wit.TypeDef{
+                                        Name:       &"datetime",
+                                        Kind:       &wit.TypeDef{(CYCLIC REFERENCE)},
+                                        Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                                        Docs:       wit.Docs{},
+                                        _worldItem: wit._worldItem{},
+                                        _type:      wit._type{},
+                                    },
+                                    "timezone-display": &wit.TypeDef{
+                                        Name: &"timezone-display",
+                                        Kind: &wit.Record{
+                                            Fields: {
+                                                {
+                                                    Name: "utc-offset",
+                                                    Type: wit.S32{},
+                                                    Docs: wit.Docs{},
+                                                },
+                                                {
+                                                    Name: "name",
+                                                    Type: wit.String{},
+                                                    Docs: wit.Docs{},
+                                                },
+                                                {
+                                                    Name: "in-daylight-saving-time",
+                                                    Type: wit.Bool{},
+                                                    Docs: wit.Docs{},
+                                                },
+                                            },
+                                            _typeDefKind: wit._typeDefKind{},
+                                        },
+                                        Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                                        Docs:       wit.Docs{},
+                                        _worldItem: wit._worldItem{},
+                                        _type:      wit._type{},
+                                    },
+                                },
+                                Functions: {
+                                    "display": &wit.Function{
+                                        Name:   "display",
+                                        Kind:   &wit.Freestanding{(CYCLIC REFERENCE)},
+                                        Params: {
+                                            {
+                                                Name: "when",
+                                                Type: &wit.TypeDef{(CYCLIC REFERENCE)},
+                                            },
+                                        },
+                                        Results: {
+                                            {
+                                                Name: "",
+                                                Type: &wit.TypeDef{(CYCLIC REFERENCE)},
+                                            },
+                                        },
+                                        Docs:       wit.Docs{},
+                                        _worldItem: wit._worldItem{},
+                                    },
+                                    "utc-offset": &wit.Function{
+                                        Name:   "utc-offset",
+                                        Kind:   &wit.Freestanding{(CYCLIC REFERENCE)},
+                                        Params: {
+                                            {
+                                                Name: "when",
+                                                Type: &wit.TypeDef{(CYCLIC REFERENCE)},
+                                            },
+                                        },
+                                        Results: {
+                                            {
+                                                Name: "",
+                                                Type: wit.S32{},
+                                            },
+                                        },
+                                        Docs:       wit.Docs{},
+                                        _worldItem: wit._worldItem{},
+                                    },
+                                },
+                                Package:    &wit.Package{(CYCLIC REFERENCE)},
+                                Docs:       wit.Docs{},
+                                _typeOwner: wit._typeOwner{},
+                                _worldItem: wit._worldItem{},
+                            },
+                            "wall-clock": &wit.Interface{(CYCLIC REFERENCE)},
+                        },
+                        Worlds: {
+                            "imports": &wit.World{(CYCLIC REFERENCE)},
+                        },
+                        Docs: wit.Docs{},
+                    },
+                    Docs:       wit.Docs{},
+                    _typeOwner: wit._typeOwner{},
+                    _worldItem: wit._worldItem{},
+                },
+                "interface-3": &wit.Interface{
+                    Name:     &"timezone",
+                    TypeDefs: {
+                        "datetime": &wit.TypeDef{
+                            Name:       &"datetime",
+                            Kind:       &wit.TypeDef{(CYCLIC REFERENCE)},
+                            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                            Docs:       wit.Docs{},
+                            _worldItem: wit._worldItem{},
+                            _type:      wit._type{},
+                        },
+                        "timezone-display": &wit.TypeDef{
+                            Name: &"timezone-display",
+                            Kind: &wit.Record{
+                                Fields: {
+                                    {
+                                        Name: "utc-offset",
+                                        Type: wit.S32{},
+                                        Docs: wit.Docs{},
+                                    },
+                                    {
+                                        Name: "name",
+                                        Type: wit.String{},
+                                        Docs: wit.Docs{},
+                                    },
+                                    {
+                                        Name: "in-daylight-saving-time",
+                                        Type: wit.Bool{},
+                                        Docs: wit.Docs{},
+                                    },
+                                },
+                                _typeDefKind: wit._typeDefKind{},
+                            },
+                            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                            Docs:       wit.Docs{},
+                            _worldItem: wit._worldItem{},
+                            _type:      wit._type{},
+                        },
+                    },
+                    Functions: {
+                        "display": &wit.Function{
+                            Name:   "display",
+                            Kind:   &wit.Freestanding{},
+                            Params: {
+                                {
+                                    Name: "when",
+                                    Type: &wit.TypeDef{(CYCLIC REFERENCE)},
+                                },
+                            },
+                            Results: {
+                                {
+                                    Name: "",
+                                    Type: &wit.TypeDef{(CYCLIC REFERENCE)},
+                                },
+                            },
+                            Docs:       wit.Docs{},
+                            _worldItem: wit._worldItem{},
+                        },
+                        "utc-offset": &wit.Function{
+                            Name:   "utc-offset",
+                            Kind:   &wit.Freestanding{},
+                            Params: {
+                                {
+                                    Name: "when",
+                                    Type: &wit.TypeDef{(CYCLIC REFERENCE)},
+                                },
+                            },
+                            Results: {
+                                {
+                                    Name: "",
+                                    Type: wit.S32{},
+                                },
+                            },
+                            Docs:       wit.Docs{},
+                            _worldItem: wit._worldItem{},
+                        },
+                    },
+                    Package: &wit.Package{
+                        Name: wit.PackageName{
+                            Namespace: "wasi",
+                            Name:      "clocks",
+                            Version:   (*semver.Version)(nil),
+                            _node:     wit._node{},
+                        },
+                        Interfaces: {
+                            "monotonic-clock": &wit.Interface{(CYCLIC REFERENCE)},
+                            "timezone":        &wit.Interface{(CYCLIC REFERENCE)},
+                            "wall-clock":      &wit.Interface{(CYCLIC REFERENCE)},
+                        },
+                        Worlds: {
+                            "imports": &wit.World{(CYCLIC REFERENCE)},
+                        },
+                        Docs: wit.Docs{},
+                    },
+                    Docs:       wit.Docs{},
+                    _typeOwner: wit._typeOwner{},
+                    _worldItem: wit._worldItem{},
+                },
+            },
+            Exports: {},
+            Package: &wit.Package{
+                Name: wit.PackageName{
+                    Namespace: "wasi",
+                    Name:      "clocks",
+                    Version:   (*semver.Version)(nil),
+                    _node:     wit._node{},
+                },
+                Interfaces: {
+                    "monotonic-clock": &wit.Interface{
+                        Name:     &"monotonic-clock",
+                        TypeDefs: {
+                            "instant": &wit.TypeDef{
+                                Name:       &"instant",
+                                Kind:       wit.U64{},
+                                Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                                Docs:       wit.Docs{},
+                                _worldItem: wit._worldItem{},
+                                _type:      wit._type{},
+                            },
+                            "pollable": &wit.TypeDef{
+                                Name:       &"pollable",
+                                Kind:       &wit.TypeDef{(CYCLIC REFERENCE)},
+                                Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                                Docs:       wit.Docs{},
+                                _worldItem: wit._worldItem{},
+                                _type:      wit._type{},
+                            },
+                        },
+                        Functions: {
+                            "now": &wit.Function{
+                                Name:    "now",
+                                Kind:    &wit.Freestanding{},
+                                Params:  nil,
+                                Results: {
+                                    {
+                                        Name: "",
+                                        Type: &wit.TypeDef{(CYCLIC REFERENCE)},
+                                    },
+                                },
+                                Docs:       wit.Docs{},
+                                _worldItem: wit._worldItem{},
+                            },
+                            "resolution": &wit.Function{
+                                Name:    "resolution",
+                                Kind:    &wit.Freestanding{},
+                                Params:  nil,
+                                Results: {
+                                    {
+                                        Name: "",
+                                        Type: &wit.TypeDef{(CYCLIC REFERENCE)},
+                                    },
+                                },
+                                Docs:       wit.Docs{},
+                                _worldItem: wit._worldItem{},
+                            },
+                            "subscribe": &wit.Function{
+                                Name:   "subscribe",
+                                Kind:   &wit.Freestanding{},
+                                Params: {
+                                    {
+                                        Name: "when",
+                                        Type: &wit.TypeDef{(CYCLIC REFERENCE)},
+                                    },
+                                    {
+                                        Name: "absolute",
+                                        Type: wit.Bool{},
+                                    },
+                                },
+                                Results: {
+                                    {
+                                        Name: "",
+                                        Type: &wit.TypeDef{(CYCLIC REFERENCE)},
+                                    },
+                                },
+                                Docs:       wit.Docs{},
+                                _worldItem: wit._worldItem{},
+                            },
+                        },
+                        Package:    &wit.Package{(CYCLIC REFERENCE)},
+                        Docs:       wit.Docs{},
+                        _typeOwner: wit._typeOwner{},
+                        _worldItem: wit._worldItem{},
+                    },
+                    "timezone": &wit.Interface{
+                        Name:     &"timezone",
+                        TypeDefs: {
+                            "datetime": &wit.TypeDef{
+                                Name:       &"datetime",
+                                Kind:       &wit.TypeDef{(CYCLIC REFERENCE)},
+                                Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                                Docs:       wit.Docs{},
+                                _worldItem: wit._worldItem{},
+                                _type:      wit._type{},
+                            },
+                            "timezone-display": &wit.TypeDef{
+                                Name: &"timezone-display",
+                                Kind: &wit.Record{
+                                    Fields: {
+                                        {
+                                            Name: "utc-offset",
+                                            Type: wit.S32{},
+                                            Docs: wit.Docs{},
+                                        },
+                                        {
+                                            Name: "name",
+                                            Type: wit.String{},
+                                            Docs: wit.Docs{},
+                                        },
+                                        {
+                                            Name: "in-daylight-saving-time",
+                                            Type: wit.Bool{},
+                                            Docs: wit.Docs{},
+                                        },
+                                    },
+                                    _typeDefKind: wit._typeDefKind{},
+                                },
+                                Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                                Docs:       wit.Docs{},
+                                _worldItem: wit._worldItem{},
+                                _type:      wit._type{},
+                            },
+                        },
+                        Functions: {
+                            "display": &wit.Function{
+                                Name:   "display",
+                                Kind:   &wit.Freestanding{},
+                                Params: {
+                                    {
+                                        Name: "when",
+                                        Type: &wit.TypeDef{(CYCLIC REFERENCE)},
+                                    },
+                                },
+                                Results: {
+                                    {
+                                        Name: "",
+                                        Type: &wit.TypeDef{(CYCLIC REFERENCE)},
+                                    },
+                                },
+                                Docs:       wit.Docs{},
+                                _worldItem: wit._worldItem{},
+                            },
+                            "utc-offset": &wit.Function{
+                                Name:   "utc-offset",
+                                Kind:   &wit.Freestanding{},
+                                Params: {
+                                    {
+                                        Name: "when",
+                                        Type: &wit.TypeDef{(CYCLIC REFERENCE)},
+                                    },
+                                },
+                                Results: {
+                                    {
+                                        Name: "",
+                                        Type: wit.S32{},
+                                    },
+                                },
+                                Docs:       wit.Docs{},
+                                _worldItem: wit._worldItem{},
+                            },
+                        },
+                        Package:    &wit.Package{(CYCLIC REFERENCE)},
+                        Docs:       wit.Docs{},
+                        _typeOwner: wit._typeOwner{},
+                        _worldItem: wit._worldItem{},
+                    },
+                    "wall-clock": &wit.Interface{
+                        Name:     &"wall-clock",
+                        TypeDefs: {
+                            "datetime": &wit.TypeDef{
+                                Name: &"datetime",
+                                Kind: &wit.Record{
+                                    Fields: {
+                                        {
+                                            Name: "seconds",
+                                            Type: wit.U64{},
+                                            Docs: wit.Docs{},
+                                        },
+                                        {
+                                            Name: "nanoseconds",
+                                            Type: wit.U32{},
+                                            Docs: wit.Docs{},
+                                        },
+                                    },
+                                    _typeDefKind: wit._typeDefKind{},
+                                },
+                                Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                                Docs:       wit.Docs{},
+                                _worldItem: wit._worldItem{},
+                                _type:      wit._type{},
+                            },
+                        },
+                        Functions: {
+                            "now": &wit.Function{
+                                Name:    "now",
+                                Kind:    &wit.Freestanding{},
+                                Params:  nil,
+                                Results: {
+                                    {
+                                        Name: "",
+                                        Type: &wit.TypeDef{(CYCLIC REFERENCE)},
+                                    },
+                                },
+                                Docs:       wit.Docs{},
+                                _worldItem: wit._worldItem{},
+                            },
+                            "resolution": &wit.Function{
+                                Name:    "resolution",
+                                Kind:    &wit.Freestanding{},
+                                Params:  nil,
+                                Results: {
+                                    {
+                                        Name: "",
+                                        Type: &wit.TypeDef{(CYCLIC REFERENCE)},
+                                    },
+                                },
+                                Docs:       wit.Docs{},
+                                _worldItem: wit._worldItem{},
+                            },
+                        },
+                        Package:    &wit.Package{(CYCLIC REFERENCE)},
+                        Docs:       wit.Docs{},
+                        _typeOwner: wit._typeOwner{},
+                        _worldItem: wit._worldItem{},
+                    },
+                },
+                Worlds: {
+                    "imports": &wit.World{(CYCLIC REFERENCE)},
+                },
+                Docs: wit.Docs{},
+            },
+            Docs:       wit.Docs{},
+            _typeOwner: wit._typeOwner{},
+        },
+    },
+    Interfaces: {
+        &wit.Interface{
+            Name:     &"poll",
+            TypeDefs: {
+                "pollable": &wit.TypeDef{
+                    Name:       &"pollable",
+                    Kind:       wit.U32{},
+                    Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                    _type:      wit._type{},
+                },
+            },
+            Functions: {
+                "drop-pollable": &wit.Function{
+                    Name:   "drop-pollable",
+                    Kind:   &wit.Freestanding{},
+                    Params: {
+                        {
+                            Name: "this",
+                            Type: &wit.TypeDef{(CYCLIC REFERENCE)},
+                        },
+                    },
+                    Results:    nil,
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                },
+                "poll-oneoff": &wit.Function{
+                    Name:   "poll-oneoff",
+                    Kind:   &wit.Freestanding{},
+                    Params: {
+                        {
+                            Name: "in",
+                            Type: &wit.TypeDef{
+                                Name: (*string)(nil),
+                                Kind: &wit.List{
+                                    Type:         &wit.TypeDef{(CYCLIC REFERENCE)},
+                                    _typeDefKind: wit._typeDefKind{},
+                                },
+                                Owner:      nil,
+                                Docs:       wit.Docs{},
+                                _worldItem: wit._worldItem{},
+                                _type:      wit._type{},
+                            },
+                        },
+                    },
+                    Results: {
+                        {
+                            Name: "",
+                            Type: &wit.TypeDef{
+                                Name: (*string)(nil),
+                                Kind: &wit.List{
+                                    Type:         wit.Bool{},
+                                    _typeDefKind: wit._typeDefKind{},
+                                },
+                                Owner:      nil,
+                                Docs:       wit.Docs{},
+                                _worldItem: wit._worldItem{},
+                                _type:      wit._type{},
+                            },
+                        },
+                    },
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                },
+            },
+            Package: &wit.Package{
+                Name: wit.PackageName{
+                    Namespace: "wasi",
+                    Name:      "poll",
+                    Version:   (*semver.Version)(nil),
+                    _node:     wit._node{},
+                },
+                Interfaces: {
+                    "poll": &wit.Interface{(CYCLIC REFERENCE)},
+                },
+                Worlds: {
+                    "example-world": &wit.World{(CYCLIC REFERENCE)},
+                },
+                Docs: wit.Docs{},
+            },
+            Docs:       wit.Docs{},
+            _typeOwner: wit._typeOwner{},
+            _worldItem: wit._worldItem{},
+        },
+        &wit.Interface{
+            Name:     &"monotonic-clock",
+            TypeDefs: {
+                "instant": &wit.TypeDef{
+                    Name:       &"instant",
+                    Kind:       wit.U64{},
+                    Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                    _type:      wit._type{},
+                },
+                "pollable": &wit.TypeDef{
+                    Name:       &"pollable",
+                    Kind:       &wit.TypeDef{(CYCLIC REFERENCE)},
+                    Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                    _type:      wit._type{},
+                },
+            },
+            Functions: {
+                "now": &wit.Function{
+                    Name:    "now",
+                    Kind:    &wit.Freestanding{},
+                    Params:  nil,
+                    Results: {
+                        {
+                            Name: "",
+                            Type: &wit.TypeDef{(CYCLIC REFERENCE)},
+                        },
+                    },
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                },
+                "resolution": &wit.Function{
+                    Name:    "resolution",
+                    Kind:    &wit.Freestanding{},
+                    Params:  nil,
+                    Results: {
+                        {
+                            Name: "",
+                            Type: &wit.TypeDef{(CYCLIC REFERENCE)},
+                        },
+                    },
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                },
+                "subscribe": &wit.Function{
+                    Name:   "subscribe",
+                    Kind:   &wit.Freestanding{},
+                    Params: {
+                        {
+                            Name: "when",
+                            Type: &wit.TypeDef{(CYCLIC REFERENCE)},
+                        },
+                        {
+                            Name: "absolute",
+                            Type: wit.Bool{},
+                        },
+                    },
+                    Results: {
+                        {
+                            Name: "",
+                            Type: &wit.TypeDef{(CYCLIC REFERENCE)},
+                        },
+                    },
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                },
+            },
+            Package: &wit.Package{
+                Name: wit.PackageName{
+                    Namespace: "wasi",
+                    Name:      "clocks",
+                    Version:   (*semver.Version)(nil),
+                    _node:     wit._node{},
+                },
+                Interfaces: {
+                    "monotonic-clock": &wit.Interface{(CYCLIC REFERENCE)},
+                    "timezone":        &wit.Interface{
+                        Name:     &"timezone",
+                        TypeDefs: {
+                            "datetime": &wit.TypeDef{
+                                Name:       &"datetime",
+                                Kind:       &wit.TypeDef{(CYCLIC REFERENCE)},
+                                Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                                Docs:       wit.Docs{},
+                                _worldItem: wit._worldItem{},
+                                _type:      wit._type{},
+                            },
+                            "timezone-display": &wit.TypeDef{
+                                Name: &"timezone-display",
+                                Kind: &wit.Record{
+                                    Fields: {
+                                        {
+                                            Name: "utc-offset",
+                                            Type: wit.S32{},
+                                            Docs: wit.Docs{},
+                                        },
+                                        {
+                                            Name: "name",
+                                            Type: wit.String{},
+                                            Docs: wit.Docs{},
+                                        },
+                                        {
+                                            Name: "in-daylight-saving-time",
+                                            Type: wit.Bool{},
+                                            Docs: wit.Docs{},
+                                        },
+                                    },
+                                    _typeDefKind: wit._typeDefKind{},
+                                },
+                                Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                                Docs:       wit.Docs{},
+                                _worldItem: wit._worldItem{},
+                                _type:      wit._type{},
+                            },
+                        },
+                        Functions: {
+                            "display": &wit.Function{
+                                Name:   "display",
+                                Kind:   &wit.Freestanding{(CYCLIC REFERENCE)},
+                                Params: {
+                                    {
+                                        Name: "when",
+                                        Type: &wit.TypeDef{(CYCLIC REFERENCE)},
+                                    },
+                                },
+                                Results: {
+                                    {
+                                        Name: "",
+                                        Type: &wit.TypeDef{(CYCLIC REFERENCE)},
+                                    },
+                                },
+                                Docs:       wit.Docs{},
+                                _worldItem: wit._worldItem{},
+                            },
+                            "utc-offset": &wit.Function{
+                                Name:   "utc-offset",
+                                Kind:   &wit.Freestanding{(CYCLIC REFERENCE)},
+                                Params: {
+                                    {
+                                        Name: "when",
+                                        Type: &wit.TypeDef{(CYCLIC REFERENCE)},
+                                    },
+                                },
+                                Results: {
+                                    {
+                                        Name: "",
+                                        Type: wit.S32{},
+                                    },
+                                },
+                                Docs:       wit.Docs{},
+                                _worldItem: wit._worldItem{},
+                            },
+                        },
+                        Package:    &wit.Package{(CYCLIC REFERENCE)},
+                        Docs:       wit.Docs{},
+                        _typeOwner: wit._typeOwner{},
+                        _worldItem: wit._worldItem{},
+                    },
+                    "wall-clock": &wit.Interface{
+                        Name:     &"wall-clock",
+                        TypeDefs: {
+                            "datetime": &wit.TypeDef{
+                                Name: &"datetime",
+                                Kind: &wit.Record{
+                                    Fields: {
+                                        {
+                                            Name: "seconds",
+                                            Type: wit.U64{},
+                                            Docs: wit.Docs{},
+                                        },
+                                        {
+                                            Name: "nanoseconds",
+                                            Type: wit.U32{},
+                                            Docs: wit.Docs{},
+                                        },
+                                    },
+                                    _typeDefKind: wit._typeDefKind{},
+                                },
+                                Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                                Docs:       wit.Docs{},
+                                _worldItem: wit._worldItem{},
+                                _type:      wit._type{},
+                            },
+                        },
+                        Functions: {
+                            "now": &wit.Function{
+                                Name:    "now",
+                                Kind:    &wit.Freestanding{(CYCLIC REFERENCE)},
+                                Params:  nil,
+                                Results: {
+                                    {
+                                        Name: "",
+                                        Type: &wit.TypeDef{(CYCLIC REFERENCE)},
+                                    },
+                                },
+                                Docs:       wit.Docs{},
+                                _worldItem: wit._worldItem{},
+                            },
+                            "resolution": &wit.Function{
+                                Name:    "resolution",
+                                Kind:    &wit.Freestanding{(CYCLIC REFERENCE)},
+                                Params:  nil,
+                                Results: {
+                                    {
+                                        Name: "",
+                                        Type: &wit.TypeDef{(CYCLIC REFERENCE)},
+                                    },
+                                },
+                                Docs:       wit.Docs{},
+                                _worldItem: wit._worldItem{},
+                            },
+                        },
+                        Package:    &wit.Package{(CYCLIC REFERENCE)},
+                        Docs:       wit.Docs{},
+                        _typeOwner: wit._typeOwner{},
+                        _worldItem: wit._worldItem{},
+                    },
+                },
+                Worlds: {
+                    "imports": &wit.World{(CYCLIC REFERENCE)},
+                },
+                Docs: wit.Docs{},
+            },
+            Docs:       wit.Docs{},
+            _typeOwner: wit._typeOwner{},
+            _worldItem: wit._worldItem{},
+        },
+        &wit.Interface{
+            Name:     &"wall-clock",
+            TypeDefs: {
+                "datetime": &wit.TypeDef{
+                    Name: &"datetime",
+                    Kind: &wit.Record{
+                        Fields: {
+                            {
+                                Name: "seconds",
+                                Type: wit.U64{},
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "nanoseconds",
+                                Type: wit.U32{},
+                                Docs: wit.Docs{},
+                            },
+                        },
+                        _typeDefKind: wit._typeDefKind{},
+                    },
+                    Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                    _type:      wit._type{},
+                },
+            },
+            Functions: {
+                "now": &wit.Function{
+                    Name:    "now",
+                    Kind:    &wit.Freestanding{},
+                    Params:  nil,
+                    Results: {
+                        {
+                            Name: "",
+                            Type: &wit.TypeDef{(CYCLIC REFERENCE)},
+                        },
+                    },
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                },
+                "resolution": &wit.Function{
+                    Name:    "resolution",
+                    Kind:    &wit.Freestanding{},
+                    Params:  nil,
+                    Results: {
+                        {
+                            Name: "",
+                            Type: &wit.TypeDef{(CYCLIC REFERENCE)},
+                        },
+                    },
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                },
+            },
+            Package: &wit.Package{
+                Name: wit.PackageName{
+                    Namespace: "wasi",
+                    Name:      "clocks",
+                    Version:   (*semver.Version)(nil),
+                    _node:     wit._node{},
+                },
+                Interfaces: {
+                    "monotonic-clock": &wit.Interface{(CYCLIC REFERENCE)},
+                    "timezone":        &wit.Interface{
+                        Name:     &"timezone",
+                        TypeDefs: {
+                            "datetime": &wit.TypeDef{
+                                Name:       &"datetime",
+                                Kind:       &wit.TypeDef{(CYCLIC REFERENCE)},
+                                Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                                Docs:       wit.Docs{},
+                                _worldItem: wit._worldItem{},
+                                _type:      wit._type{},
+                            },
+                            "timezone-display": &wit.TypeDef{
+                                Name: &"timezone-display",
+                                Kind: &wit.Record{
+                                    Fields: {
+                                        {
+                                            Name: "utc-offset",
+                                            Type: wit.S32{},
+                                            Docs: wit.Docs{},
+                                        },
+                                        {
+                                            Name: "name",
+                                            Type: wit.String{},
+                                            Docs: wit.Docs{},
+                                        },
+                                        {
+                                            Name: "in-daylight-saving-time",
+                                            Type: wit.Bool{},
+                                            Docs: wit.Docs{},
+                                        },
+                                    },
+                                    _typeDefKind: wit._typeDefKind{},
+                                },
+                                Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                                Docs:       wit.Docs{},
+                                _worldItem: wit._worldItem{},
+                                _type:      wit._type{},
+                            },
+                        },
+                        Functions: {
+                            "display": &wit.Function{
+                                Name:   "display",
+                                Kind:   &wit.Freestanding{(CYCLIC REFERENCE)},
+                                Params: {
+                                    {
+                                        Name: "when",
+                                        Type: &wit.TypeDef{(CYCLIC REFERENCE)},
+                                    },
+                                },
+                                Results: {
+                                    {
+                                        Name: "",
+                                        Type: &wit.TypeDef{(CYCLIC REFERENCE)},
+                                    },
+                                },
+                                Docs:       wit.Docs{},
+                                _worldItem: wit._worldItem{},
+                            },
+                            "utc-offset": &wit.Function{
+                                Name:   "utc-offset",
+                                Kind:   &wit.Freestanding{(CYCLIC REFERENCE)},
+                                Params: {
+                                    {
+                                        Name: "when",
+                                        Type: &wit.TypeDef{(CYCLIC REFERENCE)},
+                                    },
+                                },
+                                Results: {
+                                    {
+                                        Name: "",
+                                        Type: wit.S32{},
+                                    },
+                                },
+                                Docs:       wit.Docs{},
+                                _worldItem: wit._worldItem{},
+                            },
+                        },
+                        Package:    &wit.Package{(CYCLIC REFERENCE)},
+                        Docs:       wit.Docs{},
+                        _typeOwner: wit._typeOwner{},
+                        _worldItem: wit._worldItem{},
+                    },
+                    "wall-clock": &wit.Interface{(CYCLIC REFERENCE)},
+                },
+                Worlds: {
+                    "imports": &wit.World{(CYCLIC REFERENCE)},
+                },
+                Docs: wit.Docs{},
+            },
+            Docs:       wit.Docs{},
+            _typeOwner: wit._typeOwner{},
+            _worldItem: wit._worldItem{},
+        },
+        &wit.Interface{
+            Name:     &"timezone",
+            TypeDefs: {
+                "datetime": &wit.TypeDef{
+                    Name:       &"datetime",
+                    Kind:       &wit.TypeDef{(CYCLIC REFERENCE)},
+                    Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                    _type:      wit._type{},
+                },
+                "timezone-display": &wit.TypeDef{
                     Name: &"timezone-display",
                     Kind: &wit.Record{
-                      Fields: []wit.Field{
-                        wit.Field{
-                          Name: "utc-offset",
-                          Type: wit.S32{},
-                          Docs: wit.Docs{
-                            Contents: "",
-                          },
+                        Fields: {
+                            {
+                                Name: "utc-offset",
+                                Type: wit.S32{},
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "name",
+                                Type: wit.String{},
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "in-daylight-saving-time",
+                                Type: wit.Bool{},
+                                Docs: wit.Docs{},
+                            },
                         },
-                        wit.Field{
-                          Name: "name",
-                          Type: wit.String{},
-                          Docs: wit.Docs{
-                            Contents: "",
-                          },
-                        },
-                        wit.Field{
-                          Name: "in-daylight-saving-time",
-                          Type: wit.Bool{},
-                          Docs: wit.Docs{
-                            Contents: "",
-                          },
-                        },
-                      },
+                        _typeDefKind: wit._typeDefKind{},
                     },
-                    Owner: &wit.Interface{...},
-                    Docs:  wit.Docs{
-                      Contents: "",
-                    },
-                  },
+                    Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                    _type:      wit._type{},
                 },
-                Functions: map[string]*wit.Function{
-                  "display": &wit.Function{
+            },
+            Functions: {
+                "display": &wit.Function{
                     Name:   "display",
-                    Kind:   &wit.Freestanding{...},
-                    Params: []wit.Param{
-                      wit.Param{
-                        Name: "when",
-                        Type: &wit.TypeDef{...},
-                      },
+                    Kind:   &wit.Freestanding{},
+                    Params: {
+                        {
+                            Name: "when",
+                            Type: &wit.TypeDef{(CYCLIC REFERENCE)},
+                        },
                     },
-                    Results: []wit.Param{
-                      wit.Param{
-                        Name: "",
-                        Type: &wit.TypeDef{...},
-                      },
+                    Results: {
+                        {
+                            Name: "",
+                            Type: &wit.TypeDef{(CYCLIC REFERENCE)},
+                        },
                     },
-                    Docs: wit.Docs{
-                      Contents: "",
-                    },
-                  },
-                  "utc-offset": &wit.Function{
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                },
+                "utc-offset": &wit.Function{
                     Name:   "utc-offset",
-                    Kind:   &wit.Freestanding{...},
-                    Params: []wit.Param{
-                      wit.Param{
-                        Name: "when",
-                        Type: &wit.TypeDef{...},
-                      },
+                    Kind:   &wit.Freestanding{},
+                    Params: {
+                        {
+                            Name: "when",
+                            Type: &wit.TypeDef{(CYCLIC REFERENCE)},
+                        },
                     },
-                    Results: []wit.Param{
-                      wit.Param{
-                        Name: "",
-                        Type: wit.S32{},
-                      },
+                    Results: {
+                        {
+                            Name: "",
+                            Type: wit.S32{},
+                        },
                     },
-                    Docs: wit.Docs{
-                      Contents: "",
-                    },
-                  },
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
                 },
-                Package: &wit.Package{...},
-                Docs:    wit.Docs{
-                  Contents: "",
+            },
+            Package: &wit.Package{
+                Name: wit.PackageName{
+                    Namespace: "wasi",
+                    Name:      "clocks",
+                    Version:   (*semver.Version)(nil),
+                    _node:     wit._node{},
                 },
-              },
-              "wall-clock": &wit.Interface{...},
+                Interfaces: {
+                    "monotonic-clock": &wit.Interface{(CYCLIC REFERENCE)},
+                    "timezone":        &wit.Interface{(CYCLIC REFERENCE)},
+                    "wall-clock":      &wit.Interface{(CYCLIC REFERENCE)},
+                },
+                Worlds: {
+                    "imports": &wit.World{(CYCLIC REFERENCE)},
+                },
+                Docs: wit.Docs{},
             },
-            Worlds: map[string]*wit.World{
-              "imports": &wit.World{...},
-            },
-            Docs: wit.Docs{
-              Contents: "",
-            },
-          },
-          Docs: wit.Docs{
-            Contents: "",
-          },
+            Docs:       wit.Docs{},
+            _typeOwner: wit._typeOwner{},
+            _worldItem: wit._worldItem{},
         },
-        "interface-2": &wit.Interface{...},
-        "interface-3": &wit.Interface{...},
-      },
-      Exports: map[string]wit.WorldItem{},
-      Package: &wit.Package{...},
-      Docs:    wit.Docs{
-        Contents: "",
-      },
     },
-  },
-  Interfaces: []*wit.Interface{
-    &wit.Interface{...},
-    &wit.Interface{...},
-    &wit.Interface{...},
-    &wit.Interface{...},
-  },
-  TypeDefs: []*wit.TypeDef{
-    &wit.TypeDef{...},
-    &wit.TypeDef{...},
-    &wit.TypeDef{...},
-    &wit.TypeDef{...},
-    &wit.TypeDef{...},
-    &wit.TypeDef{...},
-    &wit.TypeDef{...},
-    &wit.TypeDef{...},
-  },
-  Packages: []*wit.Package{
-    &wit.Package{...},
-    &wit.Package{...},
-  },
+    TypeDefs: {
+        &wit.TypeDef{
+            Name:       &"pollable",
+            Kind:       wit.U32{},
+            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name: (*string)(nil),
+            Kind: &wit.List{
+                Type:         &wit.TypeDef{(CYCLIC REFERENCE)},
+                _typeDefKind: wit._typeDefKind{},
+            },
+            Owner:      nil,
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name: (*string)(nil),
+            Kind: &wit.List{
+                Type:         wit.Bool{},
+                _typeDefKind: wit._typeDefKind{},
+            },
+            Owner:      nil,
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name:       &"pollable",
+            Kind:       &wit.TypeDef{(CYCLIC REFERENCE)},
+            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name:       &"instant",
+            Kind:       wit.U64{},
+            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name: &"datetime",
+            Kind: &wit.Record{
+                Fields: {
+                    {
+                        Name: "seconds",
+                        Type: wit.U64{},
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "nanoseconds",
+                        Type: wit.U32{},
+                        Docs: wit.Docs{},
+                    },
+                },
+                _typeDefKind: wit._typeDefKind{},
+            },
+            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name:       &"datetime",
+            Kind:       &wit.TypeDef{(CYCLIC REFERENCE)},
+            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name: &"timezone-display",
+            Kind: &wit.Record{
+                Fields: {
+                    {
+                        Name: "utc-offset",
+                        Type: wit.S32{},
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "name",
+                        Type: wit.String{},
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "in-daylight-saving-time",
+                        Type: wit.Bool{},
+                        Docs: wit.Docs{},
+                    },
+                },
+                _typeDefKind: wit._typeDefKind{},
+            },
+            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+    },
+    Packages: {
+        &wit.Package{
+            Name: wit.PackageName{
+                Namespace: "wasi",
+                Name:      "poll",
+                Version:   (*semver.Version)(nil),
+                _node:     wit._node{},
+            },
+            Interfaces: {
+                "poll": &wit.Interface{(CYCLIC REFERENCE)},
+            },
+            Worlds: {
+                "example-world": &wit.World{(CYCLIC REFERENCE)},
+            },
+            Docs: wit.Docs{},
+        },
+        &wit.Package{
+            Name: wit.PackageName{
+                Namespace: "wasi",
+                Name:      "clocks",
+                Version:   (*semver.Version)(nil),
+                _node:     wit._node{},
+            },
+            Interfaces: {
+                "monotonic-clock": &wit.Interface{(CYCLIC REFERENCE)},
+                "timezone":        &wit.Interface{(CYCLIC REFERENCE)},
+                "wall-clock":      &wit.Interface{(CYCLIC REFERENCE)},
+            },
+            Worlds: {
+                "imports": &wit.World{(CYCLIC REFERENCE)},
+            },
+            Docs: wit.Docs{},
+        },
+    },
 }

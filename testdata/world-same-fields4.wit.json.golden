@@ -1,87 +1,256 @@
 &wit.Resolve{
-  Worlds: []*wit.World{
-    &wit.World{
-      Name:    "foo",
-      Imports: map[string]wit.WorldItem{
-        "interface-0": &wit.Interface{
-          Name:     &"shared-items",
-          TypeDefs: map[string]*wit.TypeDef{
-            "a": &wit.TypeDef{
-              Name:  &"a",
-              Kind:  wit.U32{},
-              Owner: &wit.Interface{...},
-              Docs:  wit.Docs{
-                Contents: "",
-              },
+    Worlds: {
+        &wit.World{
+            Name:    "foo",
+            Imports: {
+                "interface-0": &wit.Interface{
+                    Name:     &"shared-items",
+                    TypeDefs: {
+                        "a": &wit.TypeDef{
+                            Name:       &"a",
+                            Kind:       wit.U32{},
+                            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                            Docs:       wit.Docs{},
+                            _worldItem: wit._worldItem{},
+                            _type:      wit._type{},
+                        },
+                    },
+                    Functions: {},
+                    Package:   &wit.Package{
+                        Name: wit.PackageName{
+                            Namespace: "foo",
+                            Name:      "foo",
+                            Version:   (*semver.Version)(nil),
+                            _node:     wit._node{},
+                        },
+                        Interfaces: {
+                            "shared-items": &wit.Interface{(CYCLIC REFERENCE)},
+                        },
+                        Worlds: {
+                            "foo": &wit.World{(CYCLIC REFERENCE)},
+                        },
+                        Docs: wit.Docs{},
+                    },
+                    Docs:       wit.Docs{},
+                    _typeOwner: wit._typeOwner{},
+                    _worldItem: wit._worldItem{},
+                },
+                "shared-items": &wit.Interface{
+                    Name:      (*string)(nil),
+                    TypeDefs:  {},
+                    Functions: {},
+                    Package:   &wit.Package{
+                        Name: wit.PackageName{
+                            Namespace: "foo",
+                            Name:      "foo",
+                            Version:   (*semver.Version)(nil),
+                            _node:     wit._node{},
+                        },
+                        Interfaces: {
+                            "shared-items": &wit.Interface{(CYCLIC REFERENCE)},
+                        },
+                        Worlds: {
+                            "foo": &wit.World{(CYCLIC REFERENCE)},
+                        },
+                        Docs: wit.Docs{},
+                    },
+                    Docs:       wit.Docs{},
+                    _typeOwner: wit._typeOwner{},
+                    _worldItem: wit._worldItem{},
+                },
             },
-          },
-          Functions: map[string]*wit.Function{},
-          Package:   &wit.Package{
-            Name: wit.PackageName{
-              Namespace: "foo",
-              Name:      "foo",
-              Version:   (*semver.Version)(nil),
+            Exports: {
+                "a-name": &wit.Interface{
+                    Name:     (*string)(nil),
+                    TypeDefs: {
+                        "a": &wit.TypeDef{
+                            Name:       &"a",
+                            Kind:       &wit.TypeDef{(CYCLIC REFERENCE)},
+                            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                            Docs:       wit.Docs{},
+                            _worldItem: wit._worldItem{},
+                            _type:      wit._type{},
+                        },
+                    },
+                    Functions: {},
+                    Package:   &wit.Package{
+                        Name: wit.PackageName{
+                            Namespace: "foo",
+                            Name:      "foo",
+                            Version:   (*semver.Version)(nil),
+                            _node:     wit._node{},
+                        },
+                        Interfaces: {
+                            "shared-items": &wit.Interface{(CYCLIC REFERENCE)},
+                        },
+                        Worlds: {
+                            "foo": &wit.World{(CYCLIC REFERENCE)},
+                        },
+                        Docs: wit.Docs{},
+                    },
+                    Docs:       wit.Docs{},
+                    _typeOwner: wit._typeOwner{},
+                    _worldItem: wit._worldItem{},
+                },
             },
-            Interfaces: map[string]*wit.Interface{
-              "shared-items": &wit.Interface{...},
+            Package: &wit.Package{
+                Name: wit.PackageName{
+                    Namespace: "foo",
+                    Name:      "foo",
+                    Version:   (*semver.Version)(nil),
+                    _node:     wit._node{},
+                },
+                Interfaces: {
+                    "shared-items": &wit.Interface{
+                        Name:     &"shared-items",
+                        TypeDefs: {
+                            "a": &wit.TypeDef{
+                                Name:       &"a",
+                                Kind:       wit.U32{},
+                                Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                                Docs:       wit.Docs{},
+                                _worldItem: wit._worldItem{},
+                                _type:      wit._type{},
+                            },
+                        },
+                        Functions:  {},
+                        Package:    &wit.Package{(CYCLIC REFERENCE)},
+                        Docs:       wit.Docs{},
+                        _typeOwner: wit._typeOwner{},
+                        _worldItem: wit._worldItem{},
+                    },
+                },
+                Worlds: {
+                    "foo": &wit.World{(CYCLIC REFERENCE)},
+                },
+                Docs: wit.Docs{},
             },
-            Worlds: map[string]*wit.World{
-              "foo": &wit.World{...},
-            },
-            Docs: wit.Docs{
-              Contents: "",
-            },
-          },
-          Docs: wit.Docs{
-            Contents: "",
-          },
+            Docs:       wit.Docs{},
+            _typeOwner: wit._typeOwner{},
         },
-        "shared-items": &wit.Interface{
-          Name:      (*string)(nil),
-          TypeDefs:  map[string]*wit.TypeDef{},
-          Functions: map[string]*wit.Function{},
-          Package:   &wit.Package{...},
-          Docs:      wit.Docs{
-            Contents: "",
-          },
-        },
-      },
-      Exports: map[string]wit.WorldItem{
-        "a-name": &wit.Interface{
-          Name:     (*string)(nil),
-          TypeDefs: map[string]*wit.TypeDef{
-            "a": &wit.TypeDef{
-              Name:  &"a",
-              Kind:  &wit.TypeDef{...},
-              Owner: &wit.Interface{...},
-              Docs:  wit.Docs{
-                Contents: "",
-              },
-            },
-          },
-          Functions: map[string]*wit.Function{},
-          Package:   &wit.Package{...},
-          Docs:      wit.Docs{
-            Contents: "",
-          },
-        },
-      },
-      Package: &wit.Package{...},
-      Docs:    wit.Docs{
-        Contents: "",
-      },
     },
-  },
-  Interfaces: []*wit.Interface{
-    &wit.Interface{...},
-    &wit.Interface{...},
-    &wit.Interface{...},
-  },
-  TypeDefs: []*wit.TypeDef{
-    &wit.TypeDef{...},
-    &wit.TypeDef{...},
-  },
-  Packages: []*wit.Package{
-    &wit.Package{...},
-  },
+    Interfaces: {
+        &wit.Interface{
+            Name:     &"shared-items",
+            TypeDefs: {
+                "a": &wit.TypeDef{
+                    Name:       &"a",
+                    Kind:       wit.U32{},
+                    Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                    _type:      wit._type{},
+                },
+            },
+            Functions: {},
+            Package:   &wit.Package{
+                Name: wit.PackageName{
+                    Namespace: "foo",
+                    Name:      "foo",
+                    Version:   (*semver.Version)(nil),
+                    _node:     wit._node{},
+                },
+                Interfaces: {
+                    "shared-items": &wit.Interface{(CYCLIC REFERENCE)},
+                },
+                Worlds: {
+                    "foo": &wit.World{(CYCLIC REFERENCE)},
+                },
+                Docs: wit.Docs{},
+            },
+            Docs:       wit.Docs{},
+            _typeOwner: wit._typeOwner{},
+            _worldItem: wit._worldItem{},
+        },
+        &wit.Interface{
+            Name:      (*string)(nil),
+            TypeDefs:  {},
+            Functions: {},
+            Package:   &wit.Package{
+                Name: wit.PackageName{
+                    Namespace: "foo",
+                    Name:      "foo",
+                    Version:   (*semver.Version)(nil),
+                    _node:     wit._node{},
+                },
+                Interfaces: {
+                    "shared-items": &wit.Interface{(CYCLIC REFERENCE)},
+                },
+                Worlds: {
+                    "foo": &wit.World{(CYCLIC REFERENCE)},
+                },
+                Docs: wit.Docs{},
+            },
+            Docs:       wit.Docs{},
+            _typeOwner: wit._typeOwner{},
+            _worldItem: wit._worldItem{},
+        },
+        &wit.Interface{
+            Name:     (*string)(nil),
+            TypeDefs: {
+                "a": &wit.TypeDef{
+                    Name:       &"a",
+                    Kind:       &wit.TypeDef{(CYCLIC REFERENCE)},
+                    Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                    _type:      wit._type{},
+                },
+            },
+            Functions: {},
+            Package:   &wit.Package{
+                Name: wit.PackageName{
+                    Namespace: "foo",
+                    Name:      "foo",
+                    Version:   (*semver.Version)(nil),
+                    _node:     wit._node{},
+                },
+                Interfaces: {
+                    "shared-items": &wit.Interface{(CYCLIC REFERENCE)},
+                },
+                Worlds: {
+                    "foo": &wit.World{(CYCLIC REFERENCE)},
+                },
+                Docs: wit.Docs{},
+            },
+            Docs:       wit.Docs{},
+            _typeOwner: wit._typeOwner{},
+            _worldItem: wit._worldItem{},
+        },
+    },
+    TypeDefs: {
+        &wit.TypeDef{
+            Name:       &"a",
+            Kind:       wit.U32{},
+            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name:       &"a",
+            Kind:       &wit.TypeDef{(CYCLIC REFERENCE)},
+            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+    },
+    Packages: {
+        &wit.Package{
+            Name: wit.PackageName{
+                Namespace: "foo",
+                Name:      "foo",
+                Version:   (*semver.Version)(nil),
+                _node:     wit._node{},
+            },
+            Interfaces: {
+                "shared-items": &wit.Interface{(CYCLIC REFERENCE)},
+            },
+            Worlds: {
+                "foo": &wit.World{(CYCLIC REFERENCE)},
+            },
+            Docs: wit.Docs{},
+        },
+    },
 }

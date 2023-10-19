@@ -1,540 +1,740 @@
 &wit.Resolve{
-  Worlds:     []*wit.World(nil),
-  Interfaces: []*wit.Interface{
-    &wit.Interface{
-      Name:     &"wasi",
-      TypeDefs: map[string]*wit.TypeDef{
-        "clockid": &wit.TypeDef{
-          Name: &"clockid",
-          Kind: &wit.Enum{
-            Cases: []wit.EnumCase{
-              wit.EnumCase{
-                Name: "realtime",
-                Docs: wit.Docs{
-                  Contents: "",
+    Worlds:     nil,
+    Interfaces: {
+        &wit.Interface{
+            Name:     &"wasi",
+            TypeDefs: {
+                "clockid": &wit.TypeDef{
+                    Name: &"clockid",
+                    Kind: &wit.Enum{
+                        Cases: {
+                            {
+                                Name: "realtime",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "monotonic",
+                                Docs: wit.Docs{},
+                            },
+                        },
+                        _typeDefKind: wit._typeDefKind{},
+                    },
+                    Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                    _type:      wit._type{},
                 },
-              },
-              wit.EnumCase{
-                Name: "monotonic",
-                Docs: wit.Docs{
-                  Contents: "",
+                "errno": &wit.TypeDef{
+                    Name: &"errno",
+                    Kind: &wit.Enum{
+                        Cases: {
+                            {
+                                Name: "success",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "toobig",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "access",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "addrinuse",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "addrnotavail",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "afnosupport",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "again",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "already",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "badf",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "badmsg",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "busy",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "canceled",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "child",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "connaborted",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "connrefused",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "connreset",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "deadlk",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "destaddrreq",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "dom",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "dquot",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "exist",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "fault",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "fbig",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "hostunreach",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "idrm",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "ilseq",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "inprogress",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "intr",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "inval",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "io",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "isconn",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "isdir",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "loop",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "mfile",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "mlink",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "msgsize",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "multihop",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "nametoolong",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "netdown",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "netreset",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "netunreach",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "nfile",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "nobufs",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "nodev",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "noent",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "noexec",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "nolck",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "nolink",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "nomem",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "nomsg",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "noprotoopt",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "nospc",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "nosys",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "notconn",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "notdir",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "notempty",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "notrecoverable",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "notsock",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "notsup",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "notty",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "nxio",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "overflow",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "ownerdead",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "perm",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "pipe",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "proto",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "protonosupport",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "prototype",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "range",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "rofs",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "spipe",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "srch",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "stale",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "timedout",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "txtbsy",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "xdev",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "notcapable",
+                                Docs: wit.Docs{},
+                            },
+                        },
+                        _typeDefKind: wit._typeDefKind{},
+                    },
+                    Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                    _type:      wit._type{},
                 },
-              },
+                "timestamp": &wit.TypeDef{
+                    Name:       &"timestamp",
+                    Kind:       wit.U64{},
+                    Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                    _type:      wit._type{},
+                },
             },
-          },
-          Owner: &wit.Interface{...},
-          Docs:  wit.Docs{
-            Contents: "",
-          },
-        },
-        "errno": &wit.TypeDef{
-          Name: &"errno",
-          Kind: &wit.Enum{
-            Cases: []wit.EnumCase{
-              wit.EnumCase{
-                Name: "success",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "toobig",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "access",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "addrinuse",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "addrnotavail",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "afnosupport",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "again",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "already",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "badf",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "badmsg",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "busy",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "canceled",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "child",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "connaborted",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "connrefused",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "connreset",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "deadlk",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "destaddrreq",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "dom",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "dquot",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "exist",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "fault",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "fbig",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "hostunreach",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "idrm",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "ilseq",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "inprogress",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "intr",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "inval",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "io",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "isconn",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "isdir",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "loop",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "mfile",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "mlink",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "msgsize",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "multihop",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "nametoolong",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "netdown",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "netreset",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "netunreach",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "nfile",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "nobufs",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "nodev",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "noent",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "noexec",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "nolck",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "nolink",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "nomem",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "nomsg",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "noprotoopt",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "nospc",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "nosys",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "notconn",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "notdir",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "notempty",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "notrecoverable",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "notsock",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "notsup",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "notty",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "nxio",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "overflow",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "ownerdead",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "perm",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "pipe",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "proto",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "protonosupport",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "prototype",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "range",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "rofs",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "spipe",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "srch",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "stale",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "timedout",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "txtbsy",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "xdev",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
-              wit.EnumCase{
-                Name: "notcapable",
-                Docs: wit.Docs{
-                  Contents: "",
-                },
-              },
+            Functions: {},
+            Package:   &wit.Package{
+                Name: wit.PackageName{
+                    Namespace: "wasi",
+                    Name:      "filesystem",
+                    Version:   (*semver.Version)(nil),
+                    _node:     wit._node{},
+                },
+                Interfaces: {
+                    "wasi": &wit.Interface{(CYCLIC REFERENCE)},
+                },
+                Worlds: {},
+                Docs:   wit.Docs{},
             },
-          },
-          Owner: &wit.Interface{...},
-          Docs:  wit.Docs{
-            Contents: "",
-          },
+            Docs:       wit.Docs{},
+            _typeOwner: wit._typeOwner{},
+            _worldItem: wit._worldItem{},
         },
-        "timestamp": &wit.TypeDef{
-          Name:  &"timestamp",
-          Kind:  wit.U64{},
-          Owner: &wit.Interface{...},
-          Docs:  wit.Docs{
-            Contents: "",
-          },
-        },
-      },
-      Functions: map[string]*wit.Function{},
-      Package:   &wit.Package{
-        Name: wit.PackageName{
-          Namespace: "wasi",
-          Name:      "filesystem",
-          Version:   (*semver.Version)(nil),
-        },
-        Interfaces: map[string]*wit.Interface{
-          "wasi": &wit.Interface{...},
-        },
-        Worlds: map[string]*wit.World{},
-        Docs:   wit.Docs{
-          Contents: "",
-        },
-      },
-      Docs: wit.Docs{
-        Contents: "",
-      },
     },
-  },
-  TypeDefs: []*wit.TypeDef{
-    &wit.TypeDef{...},
-    &wit.TypeDef{...},
-    &wit.TypeDef{...},
-  },
-  Packages: []*wit.Package{
-    &wit.Package{...},
-  },
+    TypeDefs: {
+        &wit.TypeDef{
+            Name: &"clockid",
+            Kind: &wit.Enum{
+                Cases: {
+                    {
+                        Name: "realtime",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "monotonic",
+                        Docs: wit.Docs{},
+                    },
+                },
+                _typeDefKind: wit._typeDefKind{},
+            },
+            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name:       &"timestamp",
+            Kind:       wit.U64{},
+            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name: &"errno",
+            Kind: &wit.Enum{
+                Cases: {
+                    {
+                        Name: "success",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "toobig",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "access",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "addrinuse",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "addrnotavail",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "afnosupport",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "again",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "already",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "badf",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "badmsg",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "busy",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "canceled",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "child",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "connaborted",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "connrefused",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "connreset",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "deadlk",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "destaddrreq",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "dom",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "dquot",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "exist",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "fault",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "fbig",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "hostunreach",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "idrm",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "ilseq",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "inprogress",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "intr",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "inval",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "io",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "isconn",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "isdir",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "loop",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "mfile",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "mlink",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "msgsize",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "multihop",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "nametoolong",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "netdown",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "netreset",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "netunreach",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "nfile",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "nobufs",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "nodev",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "noent",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "noexec",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "nolck",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "nolink",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "nomem",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "nomsg",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "noprotoopt",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "nospc",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "nosys",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "notconn",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "notdir",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "notempty",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "notrecoverable",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "notsock",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "notsup",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "notty",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "nxio",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "overflow",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "ownerdead",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "perm",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "pipe",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "proto",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "protonosupport",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "prototype",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "range",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "rofs",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "spipe",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "srch",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "stale",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "timedout",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "txtbsy",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "xdev",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "notcapable",
+                        Docs: wit.Docs{},
+                    },
+                },
+                _typeDefKind: wit._typeDefKind{},
+            },
+            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+    },
+    Packages: {
+        &wit.Package{
+            Name: wit.PackageName{
+                Namespace: "wasi",
+                Name:      "filesystem",
+                Version:   (*semver.Version)(nil),
+                _node:     wit._node{},
+            },
+            Interfaces: {
+                "wasi": &wit.Interface{(CYCLIC REFERENCE)},
+            },
+            Worlds: {},
+            Docs:   wit.Docs{},
+        },
+    },
 }

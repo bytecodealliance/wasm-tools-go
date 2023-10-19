@@ -1,215 +1,266 @@
 &wit.Resolve{
-  Worlds:     []*wit.World(nil),
-  Interfaces: []*wit.Interface{
-    &wit.Interface{
-      Name:      &"functions",
-      TypeDefs:  map[string]*wit.TypeDef{},
-      Functions: map[string]*wit.Function{
-        "f1": &wit.Function{
-          Name:    "f1",
-          Kind:    &wit.Freestanding{},
-          Params:  []wit.Param(nil),
-          Results: []wit.Param(nil),
-          Docs:    wit.Docs{
-            Contents: "",
-          },
-        },
-        "f10": &wit.Function{
-          Name:    "f10",
-          Kind:    &wit.Freestanding{...},
-          Params:  []wit.Param(nil),
-          Results: []wit.Param{
-            wit.Param{
-              Name: "u",
-              Type: wit.U32{},
-            },
-          },
-          Docs: wit.Docs{
-            Contents: "",
-          },
-        },
-        "f11": &wit.Function{
-          Name:    "f11",
-          Kind:    &wit.Freestanding{...},
-          Params:  []wit.Param(nil),
-          Results: []wit.Param(nil),
-          Docs:    wit.Docs{
-            Contents: "",
-          },
-        },
-        "f2": &wit.Function{
-          Name:   "f2",
-          Kind:   &wit.Freestanding{...},
-          Params: []wit.Param{
-            wit.Param{
-              Name: "a",
-              Type: wit.U32{},
-            },
-          },
-          Results: []wit.Param(nil),
-          Docs:    wit.Docs{
-            Contents: "",
-          },
-        },
-        "f3": &wit.Function{
-          Name:   "f3",
-          Kind:   &wit.Freestanding{...},
-          Params: []wit.Param{
-            wit.Param{
-              Name: "a",
-              Type: wit.U32{},
-            },
-          },
-          Results: []wit.Param(nil),
-          Docs:    wit.Docs{
-            Contents: "",
-          },
-        },
-        "f4": &wit.Function{
-          Name:    "f4",
-          Kind:    &wit.Freestanding{...},
-          Params:  []wit.Param(nil),
-          Results: []wit.Param{
-            wit.Param{
-              Name: "",
-              Type: wit.U32{},
-            },
-          },
-          Docs: wit.Docs{
-            Contents: "",
-          },
-        },
-        "f6": &wit.Function{
-          Name:    "f6",
-          Kind:    &wit.Freestanding{...},
-          Params:  []wit.Param(nil),
-          Results: []wit.Param{
-            wit.Param{
-              Name: "",
-              Type: &wit.TypeDef{
-                Name: (*string)(nil),
-                Kind: &wit.Tuple{
-                  Types: []wit.Type{
-                    wit.U32{},
-                    wit.U32{},
-                  },
+    Worlds:     nil,
+    Interfaces: {
+        &wit.Interface{
+            Name:      &"functions",
+            TypeDefs:  {},
+            Functions: {
+                "f1": &wit.Function{
+                    Name:       "f1",
+                    Kind:       &wit.Freestanding{},
+                    Params:     nil,
+                    Results:    nil,
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
                 },
-                Owner: nil,
-                Docs:  wit.Docs{
-                  Contents: "",
+                "f10": &wit.Function{
+                    Name:    "f10",
+                    Kind:    &wit.Freestanding{},
+                    Params:  nil,
+                    Results: {
+                        {
+                            Name: "u",
+                            Type: wit.U32{},
+                        },
+                    },
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
                 },
-              },
-            },
-          },
-          Docs: wit.Docs{
-            Contents: "",
-          },
-        },
-        "f7": &wit.Function{
-          Name:   "f7",
-          Kind:   &wit.Freestanding{...},
-          Params: []wit.Param{
-            wit.Param{
-              Name: "a",
-              Type: wit.Float32{},
-            },
-            wit.Param{
-              Name: "b",
-              Type: wit.Float32{},
-            },
-          },
-          Results: []wit.Param{
-            wit.Param{
-              Name: "",
-              Type: &wit.TypeDef{...},
-            },
-          },
-          Docs: wit.Docs{
-            Contents: "",
-          },
-        },
-        "f8": &wit.Function{
-          Name:   "f8",
-          Kind:   &wit.Freestanding{...},
-          Params: []wit.Param{
-            wit.Param{
-              Name: "a",
-              Type: &wit.TypeDef{
-                Name: (*string)(nil),
-                Kind: &wit.Option{
-                  Type: wit.U32{},
+                "f11": &wit.Function{
+                    Name:       "f11",
+                    Kind:       &wit.Freestanding{},
+                    Params:     nil,
+                    Results:    nil,
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
                 },
-                Owner: nil,
-                Docs:  wit.Docs{
-                  Contents: "",
+                "f2": &wit.Function{
+                    Name:   "f2",
+                    Kind:   &wit.Freestanding{},
+                    Params: {
+                        {
+                            Name: "a",
+                            Type: wit.U32{},
+                        },
+                    },
+                    Results:    nil,
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
                 },
-              },
-            },
-          },
-          Results: []wit.Param{
-            wit.Param{
-              Name: "",
-              Type: &wit.TypeDef{
-                Name: (*string)(nil),
-                Kind: &wit.Result{
-                  OK:  wit.U32{},
-                  Err: wit.Float32{},
+                "f3": &wit.Function{
+                    Name:   "f3",
+                    Kind:   &wit.Freestanding{},
+                    Params: {
+                        {
+                            Name: "a",
+                            Type: wit.U32{},
+                        },
+                    },
+                    Results:    nil,
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
                 },
-                Owner: nil,
-                Docs:  wit.Docs{
-                  Contents: "",
+                "f4": &wit.Function{
+                    Name:    "f4",
+                    Kind:    &wit.Freestanding{},
+                    Params:  nil,
+                    Results: {
+                        {
+                            Name: "",
+                            Type: wit.U32{},
+                        },
+                    },
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
                 },
-              },
+                "f6": &wit.Function{
+                    Name:    "f6",
+                    Kind:    &wit.Freestanding{},
+                    Params:  nil,
+                    Results: {
+                        {
+                            Name: "",
+                            Type: &wit.TypeDef{
+                                Name: (*string)(nil),
+                                Kind: &wit.Tuple{
+                                    Types: {
+                                        wit.U32{},
+                                        wit.U32{},
+                                    },
+                                    _typeDefKind: wit._typeDefKind{},
+                                },
+                                Owner:      nil,
+                                Docs:       wit.Docs{},
+                                _worldItem: wit._worldItem{},
+                                _type:      wit._type{},
+                            },
+                        },
+                    },
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                },
+                "f7": &wit.Function{
+                    Name:   "f7",
+                    Kind:   &wit.Freestanding{},
+                    Params: {
+                        {
+                            Name: "a",
+                            Type: wit.Float32{},
+                        },
+                        {
+                            Name: "b",
+                            Type: wit.Float32{},
+                        },
+                    },
+                    Results: {
+                        {
+                            Name: "",
+                            Type: &wit.TypeDef{
+                                Name: (*string)(nil),
+                                Kind: &wit.Tuple{
+                                    Types: {
+                                        wit.U32{},
+                                        wit.U32{},
+                                    },
+                                    _typeDefKind: wit._typeDefKind{},
+                                },
+                                Owner:      nil,
+                                Docs:       wit.Docs{},
+                                _worldItem: wit._worldItem{},
+                                _type:      wit._type{},
+                            },
+                        },
+                    },
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                },
+                "f8": &wit.Function{
+                    Name:   "f8",
+                    Kind:   &wit.Freestanding{},
+                    Params: {
+                        {
+                            Name: "a",
+                            Type: &wit.TypeDef{
+                                Name: (*string)(nil),
+                                Kind: &wit.Option{
+                                    Type:         wit.U32{},
+                                    _typeDefKind: wit._typeDefKind{},
+                                },
+                                Owner:      nil,
+                                Docs:       wit.Docs{},
+                                _worldItem: wit._worldItem{},
+                                _type:      wit._type{},
+                            },
+                        },
+                    },
+                    Results: {
+                        {
+                            Name: "",
+                            Type: &wit.TypeDef{
+                                Name: (*string)(nil),
+                                Kind: &wit.Result{
+                                    OK:           wit.U32{},
+                                    Err:          wit.Float32{},
+                                    _typeDefKind: wit._typeDefKind{},
+                                },
+                                Owner:      nil,
+                                Docs:       wit.Docs{},
+                                _worldItem: wit._worldItem{},
+                                _type:      wit._type{},
+                            },
+                        },
+                    },
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                },
+                "f9": &wit.Function{
+                    Name:    "f9",
+                    Kind:    &wit.Freestanding{},
+                    Params:  nil,
+                    Results: {
+                        {
+                            Name: "u",
+                            Type: wit.U32{},
+                        },
+                        {
+                            Name: "f",
+                            Type: wit.Float32{},
+                        },
+                    },
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                },
             },
-          },
-          Docs: wit.Docs{
-            Contents: "",
-          },
-        },
-        "f9": &wit.Function{
-          Name:    "f9",
-          Kind:    &wit.Freestanding{...},
-          Params:  []wit.Param(nil),
-          Results: []wit.Param{
-            wit.Param{
-              Name: "u",
-              Type: wit.U32{},
+            Package: &wit.Package{
+                Name: wit.PackageName{
+                    Namespace: "foo",
+                    Name:      "functions",
+                    Version:   (*semver.Version)(nil),
+                    _node:     wit._node{},
+                },
+                Interfaces: {
+                    "functions": &wit.Interface{(CYCLIC REFERENCE)},
+                },
+                Worlds: {},
+                Docs:   wit.Docs{},
             },
-            wit.Param{
-              Name: "f",
-              Type: wit.Float32{},
-            },
-          },
-          Docs: wit.Docs{
-            Contents: "",
-          },
+            Docs:       wit.Docs{},
+            _typeOwner: wit._typeOwner{},
+            _worldItem: wit._worldItem{},
         },
-      },
-      Package: &wit.Package{
-        Name: wit.PackageName{
-          Namespace: "foo",
-          Name:      "functions",
-          Version:   (*semver.Version)(nil),
-        },
-        Interfaces: map[string]*wit.Interface{
-          "functions": &wit.Interface{...},
-        },
-        Worlds: map[string]*wit.World{},
-        Docs:   wit.Docs{
-          Contents: "",
-        },
-      },
-      Docs: wit.Docs{
-        Contents: "",
-      },
     },
-  },
-  TypeDefs: []*wit.TypeDef{
-    &wit.TypeDef{...},
-    &wit.TypeDef{...},
-    &wit.TypeDef{...},
-  },
-  Packages: []*wit.Package{
-    &wit.Package{...},
-  },
+    TypeDefs: {
+        &wit.TypeDef{
+            Name: (*string)(nil),
+            Kind: &wit.Tuple{
+                Types: {
+                    wit.U32{},
+                    wit.U32{},
+                },
+                _typeDefKind: wit._typeDefKind{},
+            },
+            Owner:      nil,
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name: (*string)(nil),
+            Kind: &wit.Option{
+                Type:         wit.U32{},
+                _typeDefKind: wit._typeDefKind{},
+            },
+            Owner:      nil,
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name: (*string)(nil),
+            Kind: &wit.Result{
+                OK:           wit.U32{},
+                Err:          wit.Float32{},
+                _typeDefKind: wit._typeDefKind{},
+            },
+            Owner:      nil,
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+    },
+    Packages: {
+        &wit.Package{
+            Name: wit.PackageName{
+                Namespace: "foo",
+                Name:      "functions",
+                Version:   (*semver.Version)(nil),
+                _node:     wit._node{},
+            },
+            Interfaces: {
+                "functions": &wit.Interface{(CYCLIC REFERENCE)},
+            },
+            Worlds: {},
+            Docs:   wit.Docs{},
+        },
+    },
 }
