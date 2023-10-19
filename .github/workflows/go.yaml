@@ -28,6 +28,9 @@ jobs:
         with:
           tinygo-version: '0.30.0'
 
+      - name: Set up Wasmtime
+        uses: bytecodealliance/actions/wasmtime/setup@v1
+
       - name: Vet Go code
         run: go vet ./...
 
@@ -41,6 +44,9 @@ jobs:
 
       - name: Test with TinyGo
         run: tinygo test -v ./...
+
+      - name: Test with TinyGo + WASI
+        run: tinygo test -v -target=wasi -stack-size=128KB ./...
 
       - name: Verify repo is unchanged
         run: git diff --exit-code HEAD
