@@ -327,7 +327,7 @@ type Variant struct {
 //
 // [ABI byte size]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#size
 func (v *Variant) Size() uintptr {
-	s := Discriminant(len(v.Cases)).Size()
+	s := Discriminant(uint32(len(v.Cases))).Size()
 	s = Align(s, v.maxCaseAlign())
 	s += v.maxCaseSize()
 	return Align(s, v.Align())
@@ -337,7 +337,7 @@ func (v *Variant) Size() uintptr {
 //
 // [ABI byte alignment]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#alignment
 func (v *Variant) Align() uintptr {
-	return max(Discriminant(len(v.Cases)).Align(), v.maxCaseAlign())
+	return max(Discriminant(uint32(len(v.Cases))).Align(), v.maxCaseAlign())
 }
 
 func (v *Variant) maxCaseSize() uintptr {
