@@ -9,9 +9,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/k0kubun/pp/v3"
-	"github.com/sergi/go-diff/diffmatchpatch"
 	"github.com/ydnar/wasm-tools-go/internal/callerfs"
+
+	"github.com/kr/pretty"
+	"github.com/sergi/go-diff/diffmatchpatch"
 )
 
 var update = flag.Bool("update", false, "update golden files")
@@ -61,13 +62,9 @@ func loadTestdata(f func(path string, res *Resolve) error) error {
 }
 
 func TestGoldenFiles(t *testing.T) {
-	p := pp.New()
-	p.SetExportedOnly(true)
-	p.SetColoringEnabled(false)
-
 	err := loadTestdata(func(path string, res *Resolve) error {
 		t.Run(strings.TrimPrefix(path, testdataDir), func(t *testing.T) {
-			data := p.Sprint(res)
+			data := pretty.Sprint(res)
 			compareOrWrite(t, path, path+".golden", data)
 		})
 		return nil
@@ -79,10 +76,6 @@ func TestGoldenFiles(t *testing.T) {
 }
 
 func TestWITGoldenFiles(t *testing.T) {
-	p := pp.New()
-	p.SetExportedOnly(true)
-	p.SetColoringEnabled(false)
-
 	err := loadTestdata(func(path string, res *Resolve) error {
 		t.Run(strings.TrimPrefix(path, testdataDir), func(t *testing.T) {
 			data := res.WIT(nil, "")
