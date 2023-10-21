@@ -1,9 +1,9 @@
 ### Usage
 
-This package contains a single exported WebAssembly function `cabi_realloc` ([Canonical ABI] realloc). To use, import this package with `_`:
+The `cabi` package contains a single exported WebAssembly function `cabi_realloc` ([Canonical ABI] realloc). To use, import this package with `_`:
 
 ```
-import _ "github.com/ydnar/wasm-tools-go/abi"
+import _ "github.com/ydnar/wasm-tools-go/cabi"
 ```
 
 `cabi_realloc` is a WebAssembly [core function](https://www.w3.org/TR/wasm-core-2/syntax/modules.html#functions) that is validated to have the following core function type:

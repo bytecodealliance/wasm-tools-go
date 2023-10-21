@@ -1,4 +1,4 @@
-package abi
+package cabi
 
 import (
 	"slices"
