@@ -26,10 +26,12 @@ jobs:
       - name: Set up TinyGo
         uses: acifani/setup-tinygo@v1.2.0
         with:
-          tinygo-version: '0.30.0'
+          tinygo-version: "0.30.0"
 
       - name: Set up Wasmtime
         uses: bytecodealliance/actions/wasmtime/setup@v0.0.1
+        with:
+          version: "v13.0.0"
 
       - name: Vet Go code
         run: go vet ./...
