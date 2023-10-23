@@ -69,7 +69,9 @@ func (w *World) WIT(ctx Node, name string) string {
 	}
 	var b strings.Builder
 	// TODO: docs
-	fmt.Fprintf(&b, "world %s {", name) // TODO: compare to w.Name?
+	b.WriteString("world ")
+	b.WriteString(name) // TODO: compare to w.Name?
+	b.WriteString(" {")
 	n := 0
 	for _, name := range codec.SortedKeys(w.Imports) {
 		if n == 0 {
