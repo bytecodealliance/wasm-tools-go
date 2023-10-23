@@ -6,13 +6,6 @@ interface foo {
     resource c {} // TODO: constructor, methods, and static functions;
     resource d {} // TODO: constructor, methods, and static functions;
     resource e {} // TODO: constructor, methods, and static functions;
-    [constructor]b: func() -> own<b>;
-    [constructor]c: func(x: u32) -> own<c>;
-    [constructor]d: func(x: u32) -> own<d>;
-    [constructor]e: func(other: own<e>, other2: borrow<e>) -> own<e>;
-    [method]d.a: func(self: borrow<d>);
-    [method]e.method: func(self: borrow<e>, thing: own<e>, thing2: borrow<e>);
-    [static]d.b: func();
 }
 
 interface i {

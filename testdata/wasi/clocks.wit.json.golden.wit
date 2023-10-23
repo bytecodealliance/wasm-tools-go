@@ -15,22 +15,6 @@ interface streams {
         last-operation-failed,
         closed
     };
-    [method]input-stream.blocking-read: func(self: borrow<input-stream>, len: u64) -> result<tuple<list<u8>, stream-status>, _>;
-    [method]input-stream.blocking-skip: func(self: borrow<input-stream>, len: u64) -> result<tuple<u64, stream-status>, _>;
-    [method]input-stream.read: func(self: borrow<input-stream>, len: u64) -> result<tuple<list<u8>, stream-status>, _>;
-    [method]input-stream.skip: func(self: borrow<input-stream>, len: u64) -> result<tuple<u64, stream-status>, _>;
-    [method]input-stream.subscribe: func(self: borrow<input-stream>) -> own<pollable>;
-    [method]output-stream.blocking-flush: func(self: borrow<output-stream>) -> result<_, write-error>;
-    [method]output-stream.blocking-splice: func(self: borrow<output-stream>, src: own<input-stream>, len: u64) -> result<tuple<u64, stream-status>, _>;
-    [method]output-stream.blocking-write-and-flush: func(self: borrow<output-stream>, contents: list<u8>) -> result<_, write-error>;
-    [method]output-stream.blocking-write-zeroes-and-flush: func(self: borrow<output-stream>, len: u64) -> result<_, write-error>;
-    [method]output-stream.check-write: func(self: borrow<output-stream>) -> result<u64, write-error>;
-    [method]output-stream.flush: func(self: borrow<output-stream>) -> result<_, write-error>;
-    [method]output-stream.forward: func(self: borrow<output-stream>, src: own<input-stream>) -> result<tuple<u64, stream-status>, _>;
-    [method]output-stream.splice: func(self: borrow<output-stream>, src: own<input-stream>, len: u64) -> result<tuple<u64, stream-status>, _>;
-    [method]output-stream.subscribe: func(self: borrow<output-stream>) -> own<pollable>;
-    [method]output-stream.write: func(self: borrow<output-stream>, contents: list<u8>) -> result<_, write-error>;
-    [method]output-stream.write-zeroes: func(self: borrow<output-stream>, len: u64) -> result<_, write-error>;
 }
 
 world imports {

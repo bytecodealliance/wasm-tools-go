@@ -134,10 +134,14 @@ func (i *Interface) WIT(ctx Node, name string) string {
 		n++
 	}
 	for _, name := range codec.SortedKeys(i.Functions) {
+		f := i.Functions[name]
+		if _, ok := f.Kind.(*Freestanding); !ok {
+			continue
+		}
 		if n == 0 {
 			b.WriteRune('\n')
 		}
-		b.WriteString(indent(i.Functions[name].WIT(i, name)))
+		b.WriteString(indent(f.WIT(i, name)))
 		b.WriteString(";\n")
 		n++
 	}
