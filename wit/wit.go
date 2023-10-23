@@ -124,25 +124,22 @@ func (i *Interface) WIT(ctx Node, name string) string {
 	}
 
 	b.WriteRune('{')
-	if len(i.TypeDefs) > 0 || len(i.Functions) > 0 {
-		b.WriteRune('\n')
-		n := 0
-		for _, name := range codec.SortedKeys(i.TypeDefs) {
-			// if n > 0 {
-			// 	b.WriteRune('\n')
-			// }
-			b.WriteString(indent(i.TypeDefs[name].WIT(i, name)))
-			b.WriteString(";\n")
-			n++
+	n := 0
+	for _, name := range codec.SortedKeys(i.TypeDefs) {
+		if n == 0 {
+			b.WriteRune('\n')
 		}
-		for _, name := range codec.SortedKeys(i.Functions) {
-			// if n > 0 {
-			// 	b.WriteRune('\n')
-			// }
-			b.WriteString(indent(i.Functions[name].WIT(i, name)))
-			b.WriteString(";\n")
-			n++
+		b.WriteString(indent(i.TypeDefs[name].WIT(i, name)))
+		b.WriteString(";\n")
+		n++
+	}
+	for _, name := range codec.SortedKeys(i.Functions) {
+		if n == 0 {
+			b.WriteRune('\n')
 		}
+		b.WriteString(indent(i.Functions[name].WIT(i, name)))
+		b.WriteString(";\n")
+		n++
 	}
 	b.WriteRune('}')
 	return b.String()
