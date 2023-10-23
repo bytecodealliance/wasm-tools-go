@@ -8,5 +8,5 @@ interface types {
 }
 
 world imports {
-    import types
+    import types;
 }
