@@ -1,10 +1,13 @@
 {
   "worlds": [
     {
-      "name": "example-world",
+      "name": "imports",
       "imports": {
         "interface-0": {
           "interface": 0
+        },
+        "interface-1": {
+          "interface": 1
         }
       },
       "exports": {},
@@ -16,14 +19,14 @@
         "interface-0": {
           "interface": 0
         },
-        "interface-1": {
-          "interface": 1
-        },
         "interface-2": {
           "interface": 2
         },
         "interface-3": {
           "interface": 3
+        },
+        "interface-4": {
+          "interface": 4
         }
       },
       "exports": {},
@@ -37,22 +40,26 @@
         "pollable": 0
       },
       "functions": {
-        "drop-pollable": {
-          "name": "drop-pollable",
+        "poll-list": {
+          "name": "poll-list",
           "kind": "freestanding",
           "params": [
             {
-              "name": "this",
-              "type": 0
+              "name": "in",
+              "type": 2
             }
           ],
-          "results": [],
+          "results": [
+            {
+              "type": 3
+            }
+          ],
           "docs": {
-            "contents": "Dispose of the specified `pollable`, after which it may no longer\nbe used."
+            "contents": "Poll for completion on a set of pollables.\n\nThis function takes a list of pollables, which identify I/O sources of\ninterest, and waits until one or more of the events is ready for I/O.\n\nThe result `list<u32>` contains one or more indices of handles in the\nargument list that is ready for I/O.\n\nIf the list contains more elements than can be indexed with a `u32`\nvalue, this function traps.\n\nA timeout can be implemented by adding a pollable from the\nwasi-clocks API to the list.\n\nThis function does not return a `result`; polling in itself does not\ndo any I/O so it doesn't fail. If any of the I/O sources identified by\nthe pollables has an error, it is indicated by marking the source as\nbeing reaedy for I/O."
           }
         },
-        "poll-oneoff": {
-          "name": "poll-oneoff",
+        "poll-one": {
+          "name": "poll-one",
           "kind": "freestanding",
           "params": [
             {
@@ -60,13 +67,9 @@
               "type": 1
             }
           ],
-          "results": [
-            {
-              "type": 2
-            }
-          ],
+          "results": [],
           "docs": {
-            "contents": "Poll for completion on a set of pollables.\n\nThis function takes a list of pollables, which identify I/O sources of\ninterest, and waits until one or more of the events is ready for I/O.\n\nThe result `list<bool>` is the same length as the argument\n`list<pollable>`, and indicates the readiness of each corresponding\nelement in that list, with true indicating ready. A single call can\nreturn multiple true elements.\n\nA timeout can be implemented by adding a pollable from the\nwasi-clocks API to the list.\n\nThis function does not return a `result`; polling in itself does not\ndo any I/O so it doesn't fail. If any of the I/O sources identified by\nthe pollables has an error, it is indicated by marking the source as\nready in the `list<bool>`.\n\nThe \"oneoff\" in the name refers to the fact that this function must do a\nlinear scan through the entire list of subscriptions, which may be\ninefficient if the number is large and the same subscriptions are used\nmany times. In the future, this is expected to be obsoleted by the\ncomponent model async proposal, which will include a scalable waiting\nfacility."
+            "contents": "Poll for completion on a single pollable.\n\nThis function is similar to `poll-list`, but operates on only a single\npollable. When it returns, the handle is ready for I/O."
           }
         }
       },
@@ -76,10 +79,398 @@
       "package": 0
     },
     {
+      "name": "streams",
+      "types": {
+        "pollable": 4,
+        "stream-status": 5,
+        "input-stream": 6,
+        "write-error": 7,
+        "output-stream": 8
+      },
+      "functions": {
+        "[method]input-stream.read": {
+          "name": "[method]input-stream.read",
+          "kind": {
+            "method": 6
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 9
+            },
+            {
+              "name": "len",
+              "type": "u64"
+            }
+          ],
+          "results": [
+            {
+              "type": 12
+            }
+          ],
+          "docs": {
+            "contents": "Perform a non-blocking read from the stream.\n\nThis function returns a list of bytes containing the data that was\nread, along with a `stream-status` which, indicates whether further\nreads are expected to produce data. The returned list will contain up to\n`len` bytes; it may return fewer than requested, but not more. An\nempty list and `stream-status:open` indicates no more data is\navailable at this time, and that the pollable given by `subscribe`\nwill be ready when more data is available.\n\nOnce a stream has reached the end, subsequent calls to `read` or\n`skip` will always report `stream-status:ended` rather than producing more\ndata.\n\nWhen the caller gives a `len` of 0, it represents a request to read 0\nbytes. This read should  always succeed and return an empty list and\nthe current `stream-status`.\n\nThe `len` parameter is a `u64`, which could represent a list of u8 which\nis not possible to allocate in wasm32, or not desirable to allocate as\nas a return value by the callee. The callee may return a list of bytes\nless than `len` in size while more bytes are available for reading."
+          }
+        },
+        "[method]input-stream.blocking-read": {
+          "name": "[method]input-stream.blocking-read",
+          "kind": {
+            "method": 6
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 9
+            },
+            {
+              "name": "len",
+              "type": "u64"
+            }
+          ],
+          "results": [
+            {
+              "type": 12
+            }
+          ],
+          "docs": {
+            "contents": "Read bytes from a stream, after blocking until at least one byte can\nbe read. Except for blocking, identical to `read`."
+          }
+        },
+        "[method]input-stream.skip": {
+          "name": "[method]input-stream.skip",
+          "kind": {
+            "method": 6
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 9
+            },
+            {
+              "name": "len",
+              "type": "u64"
+            }
+          ],
+          "results": [
+            {
+              "type": 14
+            }
+          ],
+          "docs": {
+            "contents": "Skip bytes from a stream.\n\nThis is similar to the `read` function, but avoids copying the\nbytes into the instance.\n\nOnce a stream has reached the end, subsequent calls to read or\n`skip` will always report end-of-stream rather than producing more\ndata.\n\nThis function returns the number of bytes skipped, along with a\n`stream-status` indicating whether the end of the stream was\nreached. The returned value will be at most `len`; it may be less."
+          }
+        },
+        "[method]input-stream.blocking-skip": {
+          "name": "[method]input-stream.blocking-skip",
+          "kind": {
+            "method": 6
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 9
+            },
+            {
+              "name": "len",
+              "type": "u64"
+            }
+          ],
+          "results": [
+            {
+              "type": 14
+            }
+          ],
+          "docs": {
+            "contents": "Skip bytes from a stream, after blocking until at least one byte\ncan be skipped. Except for blocking behavior, identical to `skip`."
+          }
+        },
+        "[method]input-stream.subscribe": {
+          "name": "[method]input-stream.subscribe",
+          "kind": {
+            "method": 6
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 9
+            }
+          ],
+          "results": [
+            {
+              "type": 18
+            }
+          ],
+          "docs": {
+            "contents": "Create a `pollable` which will resolve once either the specified stream\nhas bytes available to read or the other end of the stream has been\nclosed.\nThe created `pollable` is a child resource of the `input-stream`.\nImplementations may trap if the `input-stream` is dropped before\nall derived `pollable`s created with this function are dropped."
+          }
+        },
+        "[method]output-stream.check-write": {
+          "name": "[method]output-stream.check-write",
+          "kind": {
+            "method": 8
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 15
+            }
+          ],
+          "results": [
+            {
+              "type": 16
+            }
+          ],
+          "docs": {
+            "contents": "Check readiness for writing. This function never blocks.\n\nReturns the number of bytes permitted for the next call to `write`,\nor an error. Calling `write` with more bytes than this function has\npermitted will trap.\n\nWhen this function returns 0 bytes, the `subscribe` pollable will\nbecome ready when this function will report at least 1 byte, or an\nerror."
+          }
+        },
+        "[method]output-stream.write": {
+          "name": "[method]output-stream.write",
+          "kind": {
+            "method": 8
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 15
+            },
+            {
+              "name": "contents",
+              "type": 10
+            }
+          ],
+          "results": [
+            {
+              "type": 17
+            }
+          ],
+          "docs": {
+            "contents": "Perform a write. This function never blocks.\n\nPrecondition: check-write gave permit of Ok(n) and contents has a\nlength of less than or equal to n. Otherwise, this function will trap.\n\nreturns Err(closed) without writing if the stream has closed since\nthe last call to check-write provided a permit."
+          }
+        },
+        "[method]output-stream.blocking-write-and-flush": {
+          "name": "[method]output-stream.blocking-write-and-flush",
+          "kind": {
+            "method": 8
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 15
+            },
+            {
+              "name": "contents",
+              "type": 10
+            }
+          ],
+          "results": [
+            {
+              "type": 17
+            }
+          ],
+          "docs": {
+            "contents": "Perform a write of up to 4096 bytes, and then flush the stream. Block\nuntil all of these operations are complete, or an error occurs.\n\nThis is a convenience wrapper around the use of `check-write`,\n`subscribe`, `write`, and `flush`, and is implemented with the\nfollowing pseudo-code:\n\n```text\nlet pollable = this.subscribe();\nwhile !contents.is_empty() {\n// Wait for the stream to become writable\npoll-one(pollable);\nlet Ok(n) = this.check-write(); // eliding error handling\nlet len = min(n, contents.len());\nlet (chunk, rest) = contents.split_at(len);\nthis.write(chunk  );            // eliding error handling\ncontents = rest;\n}\nthis.flush();\n// Wait for completion of `flush`\npoll-one(pollable);\n// Check for any errors that arose during `flush`\nlet _ = this.check-write();         // eliding error handling\n```"
+          }
+        },
+        "[method]output-stream.flush": {
+          "name": "[method]output-stream.flush",
+          "kind": {
+            "method": 8
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 15
+            }
+          ],
+          "results": [
+            {
+              "type": 17
+            }
+          ],
+          "docs": {
+            "contents": "Request to flush buffered output. This function never blocks.\n\nThis tells the output-stream that the caller intends any buffered\noutput to be flushed. the output which is expected to be flushed\nis all that has been passed to `write` prior to this call.\n\nUpon calling this function, the `output-stream` will not accept any\nwrites (`check-write` will return `ok(0)`) until the flush has\ncompleted. The `subscribe` pollable will become ready when the\nflush has completed and the stream can accept more writes."
+          }
+        },
+        "[method]output-stream.blocking-flush": {
+          "name": "[method]output-stream.blocking-flush",
+          "kind": {
+            "method": 8
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 15
+            }
+          ],
+          "results": [
+            {
+              "type": 17
+            }
+          ],
+          "docs": {
+            "contents": "Request to flush buffered output, and block until flush completes\nand stream is ready for writing again."
+          }
+        },
+        "[method]output-stream.subscribe": {
+          "name": "[method]output-stream.subscribe",
+          "kind": {
+            "method": 8
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 15
+            }
+          ],
+          "results": [
+            {
+              "type": 18
+            }
+          ],
+          "docs": {
+            "contents": "Create a `pollable` which will resolve once the output-stream\nis ready for more writing, or an error has occured. When this\npollable is ready, `check-write` will return `ok(n)` with n>0, or an\nerror.\n\nIf the stream is closed, this pollable is always ready immediately.\n\nThe created `pollable` is a child resource of the `output-stream`.\nImplementations may trap if the `output-stream` is dropped before\nall derived `pollable`s created with this function are dropped."
+          }
+        },
+        "[method]output-stream.write-zeroes": {
+          "name": "[method]output-stream.write-zeroes",
+          "kind": {
+            "method": 8
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 15
+            },
+            {
+              "name": "len",
+              "type": "u64"
+            }
+          ],
+          "results": [
+            {
+              "type": 17
+            }
+          ],
+          "docs": {
+            "contents": "Write zeroes to a stream.\n\nthis should be used precisely like `write` with the exact same\npreconditions (must use check-write first), but instead of\npassing a list of bytes, you simply pass the number of zero-bytes\nthat should be written."
+          }
+        },
+        "[method]output-stream.blocking-write-zeroes-and-flush": {
+          "name": "[method]output-stream.blocking-write-zeroes-and-flush",
+          "kind": {
+            "method": 8
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 15
+            },
+            {
+              "name": "len",
+              "type": "u64"
+            }
+          ],
+          "results": [
+            {
+              "type": 17
+            }
+          ],
+          "docs": {
+            "contents": "Perform a write of up to 4096 zeroes, and then flush the stream.\nBlock until all of these operations are complete, or an error\noccurs.\n\nThis is a convenience wrapper around the use of `check-write`,\n`subscribe`, `write-zeroes`, and `flush`, and is implemented with\nthe following pseudo-code:\n\n```text\nlet pollable = this.subscribe();\nwhile num_zeroes != 0 {\n// Wait for the stream to become writable\npoll-one(pollable);\nlet Ok(n) = this.check-write(); // eliding error handling\nlet len = min(n, num_zeroes);\nthis.write-zeroes(len);         // eliding error handling\nnum_zeroes -= len;\n}\nthis.flush();\n// Wait for completion of `flush`\npoll-one(pollable);\n// Check for any errors that arose during `flush`\nlet _ = this.check-write();         // eliding error handling\n```"
+          }
+        },
+        "[method]output-stream.splice": {
+          "name": "[method]output-stream.splice",
+          "kind": {
+            "method": 8
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 15
+            },
+            {
+              "name": "src",
+              "type": 19
+            },
+            {
+              "name": "len",
+              "type": "u64"
+            }
+          ],
+          "results": [
+            {
+              "type": 14
+            }
+          ],
+          "docs": {
+            "contents": "Read from one stream and write to another.\n\nThis function returns the number of bytes transferred; it may be less\nthan `len`.\n\nUnlike other I/O functions, this function blocks until all the data\nread from the input stream has been written to the output stream."
+          }
+        },
+        "[method]output-stream.blocking-splice": {
+          "name": "[method]output-stream.blocking-splice",
+          "kind": {
+            "method": 8
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 15
+            },
+            {
+              "name": "src",
+              "type": 19
+            },
+            {
+              "name": "len",
+              "type": "u64"
+            }
+          ],
+          "results": [
+            {
+              "type": 14
+            }
+          ],
+          "docs": {
+            "contents": "Read from one stream and write to another, with blocking.\n\nThis is similar to `splice`, except that it blocks until at least\none byte can be read."
+          }
+        },
+        "[method]output-stream.forward": {
+          "name": "[method]output-stream.forward",
+          "kind": {
+            "method": 8
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 15
+            },
+            {
+              "name": "src",
+              "type": 19
+            }
+          ],
+          "results": [
+            {
+              "type": 14
+            }
+          ],
+          "docs": {
+            "contents": "Forward the entire contents of an input stream to an output stream.\n\nThis function repeatedly reads from the input stream and writes\nthe data to the output stream, until the end of the input stream\nis reached, or an error is encountered.\n\nUnlike other I/O functions, this function blocks until the end\nof the input stream is seen and all the data has been written to\nthe output stream.\n\nThis function returns the number of bytes transferred, and the status of\nthe output stream."
+          }
+        }
+      },
+      "docs": {
+        "contents": "WASI I/O is an I/O abstraction API which is currently focused on providing\nstream types.\n\nIn the future, the component model is expected to add built-in stream types;\nwhen it does, they are expected to subsume this API."
+      },
+      "package": 0
+    },
+    {
       "name": "monotonic-clock",
       "types": {
-        "pollable": 3,
-        "instant": 4
+        "pollable": 20,
+        "instant": 21
       },
       "functions": {
         "now": {
@@ -88,7 +479,7 @@
           "params": [],
           "results": [
             {
-              "type": 4
+              "type": 21
             }
           ],
           "docs": {
@@ -101,7 +492,7 @@
           "params": [],
           "results": [
             {
-              "type": 4
+              "type": 21
             }
           ],
           "docs": {
@@ -114,7 +505,7 @@
           "params": [
             {
               "name": "when",
-              "type": 4
+              "type": 21
             },
             {
               "name": "absolute",
@@ -123,7 +514,7 @@
           ],
           "results": [
             {
-              "type": 3
+              "type": 25
             }
           ],
           "docs": {
@@ -139,7 +530,7 @@
     {
       "name": "wall-clock",
       "types": {
-        "datetime": 5
+        "datetime": 22
       },
       "functions": {
         "now": {
@@ -148,7 +539,7 @@
           "params": [],
           "results": [
             {
-              "type": 5
+              "type": 22
             }
           ],
           "docs": {
@@ -161,7 +552,7 @@
           "params": [],
           "results": [
             {
-              "type": 5
+              "type": 22
             }
           ],
           "docs": {
@@ -177,8 +568,8 @@
     {
       "name": "timezone",
       "types": {
-        "datetime": 6,
-        "timezone-display": 7
+        "datetime": 23,
+        "timezone-display": 24
       },
       "functions": {
         "display": {
@@ -187,12 +578,12 @@
           "params": [
             {
               "name": "when",
-              "type": 6
+              "type": 23
             }
           ],
           "results": [
             {
-              "type": 7
+              "type": 24
             }
           ],
           "docs": {
@@ -205,7 +596,7 @@
           "params": [
             {
               "name": "when",
-              "type": 6
+              "type": 23
             }
           ],
           "results": [
@@ -224,27 +615,34 @@
   "types": [
     {
       "name": "pollable",
-      "kind": {
-        "type": "u32"
-      },
+      "kind": "resource",
       "owner": {
         "interface": 0
       },
       "docs": {
-        "contents": "A \"pollable\" handle.\n\nThis is conceptually represents a `stream<_, _>`, or in other words,\na stream that one can wait on, repeatedly, but which does not itself\nproduce any data. It's temporary scaffolding until component-model's\nasync features are ready.\n\nAnd at present, it is a `u32` instead of being an actual handle, until\nthe wit-bindgen implementation of handles and resources is ready.\n\n`pollable` lifetimes are not automatically managed. Users must ensure\nthat they do not outlive the resource they reference.\n\nThis [represents a resource](https://github.com/WebAssembly/WASI/blob/main/docs/WitInWasi.md#Resources)."
+        "contents": "A \"pollable\" handle."
       }
     },
     {
       "name": null,
       "kind": {
-        "list": 0
+        "handle": {
+          "borrow": 0
+        }
       },
       "owner": null
     },
     {
       "name": null,
       "kind": {
-        "list": "bool"
+        "list": 1
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "list": "u32"
       },
       "owner": null
     },
@@ -258,12 +656,202 @@
       }
     },
     {
+      "name": "stream-status",
+      "kind": {
+        "enum": {
+          "cases": [
+            {
+              "name": "open",
+              "docs": {
+                "contents": "The stream is open and may produce further data."
+              }
+            },
+            {
+              "name": "ended",
+              "docs": {
+                "contents": "When reading, this indicates that the stream will not produce\nfurther data.\nWhen writing, this indicates that the stream will no longer be read.\nFurther writes are still permitted."
+              }
+            }
+          ]
+        }
+      },
+      "owner": {
+        "interface": 1
+      },
+      "docs": {
+        "contents": "Streams provide a sequence of data and then end; once they end, they\nno longer provide any further data.\n\nFor example, a stream reading from a file ends when the stream reaches\nthe end of the file. For another example, a stream reading from a\nsocket ends when the socket is closed."
+      }
+    },
+    {
+      "name": "input-stream",
+      "kind": "resource",
+      "owner": {
+        "interface": 1
+      },
+      "docs": {
+        "contents": "An input bytestream.\n\n`input-stream`s are *non-blocking* to the extent practical on underlying\nplatforms. I/O operations always return promptly; if fewer bytes are\npromptly available than requested, they return the number of bytes promptly\navailable, which could even be zero. To wait for data to be available,\nuse the `subscribe` function to obtain a `pollable` which can be polled\nfor using `wasi:io/poll`."
+      }
+    },
+    {
+      "name": "write-error",
+      "kind": {
+        "enum": {
+          "cases": [
+            {
+              "name": "last-operation-failed",
+              "docs": {
+                "contents": "The last operation (a write or flush) failed before completion."
+              }
+            },
+            {
+              "name": "closed",
+              "docs": {
+                "contents": "The stream is closed: no more input will be accepted by the\nstream. A closed output-stream will return this error on all\nfuture operations."
+              }
+            }
+          ]
+        }
+      },
+      "owner": {
+        "interface": 1
+      },
+      "docs": {
+        "contents": "An error for output-stream operations.\n\nContrary to input-streams, a closed output-stream is reported using\nan error."
+      }
+    },
+    {
+      "name": "output-stream",
+      "kind": "resource",
+      "owner": {
+        "interface": 1
+      },
+      "docs": {
+        "contents": "An output bytestream.\n\n`output-stream`s are *non-blocking* to the extent practical on\nunderlying platforms. Except where specified otherwise, I/O operations also\nalways return promptly, after the number of bytes that can be written\npromptly, which could even be zero. To wait for the stream to be ready to\naccept data, the `subscribe` function to obtain a `pollable` which can be\npolled for using `wasi:io/poll`."
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "borrow": 6
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "list": "u8"
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "tuple": {
+          "types": [
+            10,
+            5
+          ]
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "result": {
+          "ok": 11,
+          "err": null
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "tuple": {
+          "types": [
+            "u64",
+            5
+          ]
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "result": {
+          "ok": 13,
+          "err": null
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "borrow": 8
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "result": {
+          "ok": "u64",
+          "err": 7
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "result": {
+          "ok": null,
+          "err": 7
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "own": 4
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "own": 6
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": "pollable",
+      "kind": {
+        "type": 0
+      },
+      "owner": {
+        "interface": 2
+      }
+    },
+    {
       "name": "instant",
       "kind": {
         "type": "u64"
       },
       "owner": {
-        "interface": 1
+        "interface": 2
       },
       "docs": {
         "contents": "A timestamp in nanoseconds."
@@ -286,7 +874,7 @@
         }
       },
       "owner": {
-        "interface": 2
+        "interface": 3
       },
       "docs": {
         "contents": "A time and date in seconds plus nanoseconds."
@@ -295,10 +883,10 @@
     {
       "name": "datetime",
       "kind": {
-        "type": 5
+        "type": 22
       },
       "owner": {
-        "interface": 3
+        "interface": 4
       }
     },
     {
@@ -331,29 +919,39 @@
         }
       },
       "owner": {
-        "interface": 3
+        "interface": 4
       },
       "docs": {
         "contents": "Information useful for displaying the timezone of a specific `datetime`.\n\nThis information may vary within a single `timezone` to reflect daylight\nsaving time adjustments."
       }
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "own": 20
+        }
+      },
+      "owner": null
     }
   ],
   "packages": [
     {
-      "name": "wasi:poll",
+      "name": "wasi:io",
       "interfaces": {
-        "poll": 0
+        "poll": 0,
+        "streams": 1
       },
       "worlds": {
-        "example-world": 0
+        "imports": 0
       }
     },
     {
       "name": "wasi:clocks",
       "interfaces": {
-        "monotonic-clock": 1,
-        "wall-clock": 2,
-        "timezone": 3
+        "monotonic-clock": 2,
+        "wall-clock": 3,
+        "timezone": 4
       },
       "worlds": {
         "imports": 1
