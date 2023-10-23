@@ -70,16 +70,22 @@ func (w *World) WIT(ctx Node, name string) string {
 	var b strings.Builder
 	// TODO: docs
 	fmt.Fprintf(&b, "world %s {", name) // TODO: compare to w.Name?
-	if len(w.Imports) > 0 || len(w.Exports) > 0 {
-		b.WriteRune('\n')
-		for _, name := range codec.SortedKeys(w.Imports) {
-			b.WriteString(indent(w.itemWIT("import", name, w.Imports[name])))
-			b.WriteString(";\n")
+	n := 0
+	for _, name := range codec.SortedKeys(w.Imports) {
+		if n == 0 {
+			b.WriteRune('\n')
 		}
-		for _, name := range codec.SortedKeys(w.Exports) {
-			b.WriteString(indent(w.itemWIT("export", name, w.Exports[name])))
-			b.WriteString(";\n")
+		b.WriteString(indent(w.itemWIT("import", name, w.Imports[name])))
+		b.WriteString(";\n")
+		n++
+	}
+	for _, name := range codec.SortedKeys(w.Exports) {
+		if n == 0 {
+			b.WriteRune('\n')
 		}
+		b.WriteString(indent(w.itemWIT("export", name, w.Exports[name])))
+		b.WriteString(";\n")
+		n++
 	}
 	b.WriteRune('}')
 	return b.String()
