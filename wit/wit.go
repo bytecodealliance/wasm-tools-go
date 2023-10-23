@@ -169,11 +169,7 @@ func (t *TypeDef) WIT(ctx Node, name string) string {
 		return fmt.Sprintf("use %s.{%s}", ownerName, name)
 
 	case *World, *Interface:
-		switch t.Kind.(type) {
-		case *TypeDef:
-			return t.Kind.WIT(t, name)
-		}
-		return t.Kind.WIT(ctx, name)
+		return t.Kind.WIT(t, name)
 	}
 	if name != "" {
 		return name
