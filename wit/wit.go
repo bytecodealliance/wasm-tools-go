@@ -450,14 +450,12 @@ func (r *Result) WIT(_ Node, name string) string {
 	b.WriteString("result<")
 	if r.OK != nil {
 		b.WriteString(r.OK.WIT(r, ""))
-		b.WriteString(", ")
-	} else {
-		b.WriteString("_, ")
-	}
-	if r.Err != nil {
-		b.WriteString(r.Err.WIT(r, ""))
 	} else {
 		b.WriteRune('_')
+	}
+	if r.Err != nil {
+		b.WriteString(", ")
+		b.WriteString(r.Err.WIT(r, ""))
 	}
 	b.WriteRune('>')
 	return b.String()
