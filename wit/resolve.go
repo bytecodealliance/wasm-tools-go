@@ -43,6 +43,28 @@ type World struct {
 	_typeOwner
 }
 
+// AllFunctions [iterates] through all functions exported from or imported into a [World],
+// calling yield for each. Iteration will stop if yield returns false.
+//
+// [iterates]: https://github.com/golang/go/issues/61897
+func (w *World) AllFunctions(yield func(*Function) bool) bool {
+	for _, i := range w.Imports {
+		if f, ok := i.(*Function); ok {
+			if !yield(f) {
+				return false
+			}
+		}
+	}
+	for _, i := range w.Exports {
+		if f, ok := i.(*Function); ok {
+			if !yield(f) {
+				return false
+			}
+		}
+	}
+	return true
+}
+
 // A WorldItem is any item that can be exported from or imported into a [World],
 // currently either an [Interface], [TypeDef], or [Function].
 // Any WorldItem is also a [Node].
@@ -73,6 +95,19 @@ type Interface struct {
 
 	_typeOwner
 	_worldItem
+}
+
+// AllFunctions [iterates] through all functions in [Interface] i, calling yield for each.
+// Iteration will stop if yield returns false.
+//
+// [iterates]: https://github.com/golang/go/issues/61897
+func (i *Interface) AllFunctions(yield func(*Function) bool) bool {
+	for _, f := range i.Functions {
+		if !yield(f) {
+			return false
+		}
+	}
+	return true
 }
 
 // TypeDef represents a WIT type definition. A TypeDef may be named or anonymous,
@@ -572,12 +607,14 @@ func (*Stream) Align() uintptr { return 0 }
 // currently [World] and [Interface].
 type TypeOwner interface {
 	Node
+	AllFunctions(yield func(*Function) bool) bool
 	isTypeOwner()
 }
 
 type _typeOwner struct{ _node }
 
-func (_typeOwner) isTypeOwner() {}
+func (_typeOwner) AllFunctions(yield func(*Function) bool) bool { return false }
+func (_typeOwner) isTypeOwner()                                 {}
 
 // Type is the interface implemented by any type definition. This can be a
 // [primitive type] or a user-defined type in a [TypeDef].
