@@ -1,0 +1,9 @@
+package examples:resources-in-world;
+
+interface types {
+    resource foo {} // TODO: constructor, methods, and static functions;
+}
+
+world imports {
+    import types;
+}
