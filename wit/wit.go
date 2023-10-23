@@ -96,7 +96,7 @@ func (w *World) WIT(ctx Node, name string) string {
 func (w *World) itemWIT(motion, name string, v WorldItem) string {
 	switch v := v.(type) {
 	case *Interface, *Function:
-		return motion + " " + v.WIT(w, name)
+		return motion + " " + v.WIT(w, name) // TODO: handle resource methods?
 	case *TypeDef:
 		return v.WIT(w, name) // no motion, in Imports only
 	}
