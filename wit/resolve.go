@@ -571,6 +571,7 @@ func (*Stream) Align() uintptr { return 0 }
 // TypeOwner is the interface implemented by any type that can own a TypeDef,
 // currently [World] and [Interface].
 type TypeOwner interface {
+	Node
 	isTypeOwner()
 }
 
