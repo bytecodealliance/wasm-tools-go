@@ -144,6 +144,46 @@ func (t *TypeDef) Align() uintptr {
 	return t.Kind.Align()
 }
 
+// Constructor returns the constructor for [TypeDef] t, or nil if none.
+// Currently t must be a [Resource] to have a constructor.
+func (t *TypeDef) Constructor() *Function {
+	var constructor *Function
+	t.Owner.AllFunctions(func(f *Function) bool {
+		if _, ok := f.Kind.(*Constructor); ok {
+			constructor = f
+			return false
+		}
+		return true
+	})
+	return constructor
+}
+
+// Methods returns all methods for [TypeDef] t.
+// Currently t must be a [Resource] to have methods.
+func (t *TypeDef) Methods() []*Function {
+	var methods []*Function
+	t.Owner.AllFunctions(func(f *Function) bool {
+		if m, ok := f.Kind.(*Method); ok && m.Type == t {
+			methods = append(methods, f)
+		}
+		return true
+	})
+	return methods
+}
+
+// StaticMethods returns all static methods for [TypeDef] t.
+// Currently t must be a [Resource] to have static methods.
+func (t *TypeDef) StaticMethods() []*Function {
+	var statics []*Function
+	t.Owner.AllFunctions(func(f *Function) bool {
+		if m, ok := f.Kind.(*Static); ok && m.Type == t {
+			statics = append(statics, f)
+		}
+		return true
+	})
+	return statics
+}
+
 // TypeDefKind represents the underlying type in a [TypeDef], which can be one of
 // [Record], [Resource], [Handle], [Flags], [Tuple], [Variant], [Enum],
 // [Option], [Result], [List], [Future], [Stream], or [Type].
