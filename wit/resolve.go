@@ -171,9 +171,9 @@ func (t *TypeDef) Methods() []*Function {
 	return methods
 }
 
-// StaticMethods returns all static methods for [TypeDef] t.
-// Currently t must be a [Resource] to have static methods.
-func (t *TypeDef) StaticMethods() []*Function {
+// StaticFunctions returns all static functions for [TypeDef] t.
+// Currently t must be a [Resource] to have static functions.
+func (t *TypeDef) StaticFunctions() []*Function {
 	var statics []*Function
 	t.Owner.AllFunctions(func(f *Function) bool {
 		if m, ok := f.Kind.(*Static); ok && m.Type == t {
