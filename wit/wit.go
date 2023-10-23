@@ -511,6 +511,12 @@ func (p _primitive[T]) WIT(_ Node, name string) string {
 //
 // [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
 func (f *Function) WIT(_ Node, name string) string {
+	if name == "" {
+		name = f.Name
+		if _, after, found := strings.Cut(name, "."); found {
+			name = after
+		}
+	}
 	// TODO: docs
 	var b strings.Builder
 	b.WriteString(name)
