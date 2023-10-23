@@ -2,7 +2,7 @@ package foo:resources1;
 
 interface resources1 {
     resource r1 {
-        constructor: func(self: borrow<r1>) -> borrow<r1>;
+        f1: func(self: borrow<r1>) -> borrow<r1>;
     };
     t1: func(a: borrow<r1>);
 }

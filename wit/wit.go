@@ -187,12 +187,12 @@ func (t *TypeDef) WIT(ctx Node, name string) string {
 		if constructor != nil || len(methods) > 0 || len(statics) > 0 {
 			b.WriteString(" {\n")
 			if constructor != nil {
-				b.WriteString(indent(constructor.WIT(t, "")))
+				b.WriteString(indent(constructor.WIT(t, "constructor")))
 				b.WriteString(";\n")
 			}
 			slices.SortFunc(methods, functionCompare)
 			for _, f := range methods {
-				b.WriteString(indent(f.WIT(t, "constructor")))
+				b.WriteString(indent(f.WIT(t, "")))
 				b.WriteString(";\n")
 			}
 			slices.SortFunc(statics, functionCompare)

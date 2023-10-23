@@ -9,12 +9,12 @@ interface handler {
 
 interface types {
     resource request {
-        constructor: func(self: borrow<request>, arg: list<u32>);
-        constructor: func(self: borrow<request>);
+        bar: func(self: borrow<request>, arg: list<u32>);
+        foo: func(self: borrow<request>);
     };
     resource response {
-        constructor: func(self: borrow<response>, arg: list<u32>);
-        constructor: func(self: borrow<response>);
+        bar: func(self: borrow<response>, arg: list<u32>);
+        foo: func(self: borrow<response>);
     };
 }
 
