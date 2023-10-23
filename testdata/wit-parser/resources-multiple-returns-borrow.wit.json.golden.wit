@@ -1,6 +1,8 @@
 package foo:resources1;
 
 interface resources1 {
-    resource r1 {} // TODO: constructor, methods, and static functions;
+    resource r1 {
+        constructor: func(self: borrow<r1>) -> a: s32, handle: borrow<r1>;
+    };
     t1: func(a: borrow<r1>);
 }

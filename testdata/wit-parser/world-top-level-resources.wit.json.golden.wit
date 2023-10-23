@@ -8,8 +8,14 @@ interface handler {
 }
 
 interface types {
-    resource request {} // TODO: constructor, methods, and static functions;
-    resource response {} // TODO: constructor, methods, and static functions;
+    resource request {
+        constructor: func(self: borrow<request>, arg: list<u32>);
+        constructor: func(self: borrow<request>);
+    };
+    resource response {
+        constructor: func(self: borrow<response>, arg: list<u32>);
+        constructor: func(self: borrow<response>);
+    };
 }
 
 world proxy {

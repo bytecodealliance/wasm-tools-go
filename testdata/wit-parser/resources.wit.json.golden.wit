@@ -1,15 +1,26 @@
 package foo:bar;
 
 interface foo {
-    resource a {} // TODO: constructor, methods, and static functions;
-    resource b {} // TODO: constructor, methods, and static functions;
-    resource c {} // TODO: constructor, methods, and static functions;
-    resource d {} // TODO: constructor, methods, and static functions;
-    resource e {} // TODO: constructor, methods, and static functions;
+    resource a;
+    resource b {
+        [constructor]b: func() -> own<b>;
+    };
+    resource c {
+        [constructor]c: func(x: u32) -> own<c>;
+    };
+    resource d {
+        [constructor]d: func(x: u32) -> own<d>;
+        constructor: func(self: borrow<d>);
+        b: func();
+    };
+    resource e {
+        [constructor]e: func(other: own<e>, other2: borrow<e>) -> own<e>;
+        constructor: func(self: borrow<e>, thing: own<e>, thing2: borrow<e>);
+    };
 }
 
 interface i {
-    resource a {} // TODO: constructor, methods, and static functions;
+    resource a;
     type t1 = a;
     type t2 = borrow<a>;
     type t3 = borrow<t1>;
@@ -17,7 +28,9 @@ interface i {
 
 world w {
     import [constructor]c: func() -> own<c>;
-    resource a {} // TODO: constructor, methods, and static functions;
-    resource b {} // TODO: constructor, methods, and static functions;
-    resource c {} // TODO: constructor, methods, and static functions;
+    resource a;
+    resource b;
+    resource c {
+        [constructor]c: func() -> own<c>;
+    };
 }

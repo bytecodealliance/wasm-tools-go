@@ -1,14 +1,32 @@
 package wasi:io;
 
 interface poll {
-    resource pollable {} // TODO: constructor, methods, and static functions;
+    resource pollable;
     poll-list: func(in: list<borrow<pollable>>) -> list<u32>;
     poll-one: func(in: borrow<pollable>);
 }
 
 interface streams {
-    resource input-stream {} // TODO: constructor, methods, and static functions;
-    resource output-stream {} // TODO: constructor, methods, and static functions;
+    resource input-stream {
+        constructor: func(self: borrow<input-stream>, len: u64) -> result<tuple<list<u8>, stream-status>, _>;
+        constructor: func(self: borrow<input-stream>, len: u64) -> result<tuple<u64, stream-status>, _>;
+        constructor: func(self: borrow<input-stream>, len: u64) -> result<tuple<list<u8>, stream-status>, _>;
+        constructor: func(self: borrow<input-stream>, len: u64) -> result<tuple<u64, stream-status>, _>;
+        constructor: func(self: borrow<input-stream>) -> own<pollable>;
+    };
+    resource output-stream {
+        constructor: func(self: borrow<output-stream>) -> result<_, write-error>;
+        constructor: func(self: borrow<output-stream>, src: own<input-stream>, len: u64) -> result<tuple<u64, stream-status>, _>;
+        constructor: func(self: borrow<output-stream>, contents: list<u8>) -> result<_, write-error>;
+        constructor: func(self: borrow<output-stream>, len: u64) -> result<_, write-error>;
+        constructor: func(self: borrow<output-stream>) -> result<u64, write-error>;
+        constructor: func(self: borrow<output-stream>) -> result<_, write-error>;
+        constructor: func(self: borrow<output-stream>, src: own<input-stream>) -> result<tuple<u64, stream-status>, _>;
+        constructor: func(self: borrow<output-stream>, src: own<input-stream>, len: u64) -> result<tuple<u64, stream-status>, _>;
+        constructor: func(self: borrow<output-stream>) -> own<pollable>;
+        constructor: func(self: borrow<output-stream>, contents: list<u8>) -> result<_, write-error>;
+        constructor: func(self: borrow<output-stream>, len: u64) -> result<_, write-error>;
+    };
     use poll.{pollable};
     enum stream-status { open, ended };
     enum write-error {
