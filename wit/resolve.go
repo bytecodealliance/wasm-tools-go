@@ -149,7 +149,7 @@ func (t *TypeDef) Align() uintptr {
 func (t *TypeDef) Constructor() *Function {
 	var constructor *Function
 	t.Owner.AllFunctions(func(f *Function) bool {
-		if _, ok := f.Kind.(*Constructor); ok {
+		if c, ok := f.Kind.(*Constructor); ok && c.Type == t {
 			constructor = f
 			return false
 		}
@@ -176,7 +176,7 @@ func (t *TypeDef) Methods() []*Function {
 func (t *TypeDef) StaticFunctions() []*Function {
 	var statics []*Function
 	t.Owner.AllFunctions(func(f *Function) bool {
-		if m, ok := f.Kind.(*Static); ok && m.Type == t {
+		if s, ok := f.Kind.(*Static); ok && s.Type == t {
 			statics = append(statics, f)
 		}
 		return true
