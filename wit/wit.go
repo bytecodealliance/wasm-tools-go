@@ -2,6 +2,7 @@ package wit
 
 import (
 	"fmt"
+	"slices"
 	"strings"
 
 	"github.com/ydnar/wasm-tools-go/internal/codec"
@@ -178,12 +179,39 @@ func (t *TypeDef) WIT(ctx Node, name string) string {
 		return fmt.Sprintf("use %s.{%s}", ownerName, name)
 
 	case *World, *Interface:
-		return t.Kind.WIT(t, name)
+		var b strings.Builder
+		b.WriteString(t.Kind.WIT(t, name))
+		constructor := t.Constructor()
+		methods := t.Methods()
+		statics := t.StaticFunctions()
+		if constructor != nil || len(methods) > 0 || len(statics) > 0 {
+			b.WriteString(" {\n")
+			if constructor != nil {
+				b.WriteString(indent(constructor.WIT(t, "")))
+				b.WriteString(";\n")
+			}
+			slices.SortFunc(methods, functionCompare)
+			for _, f := range methods {
+				b.WriteString(indent(f.WIT(t, "constructor")))
+				b.WriteString(";\n")
+			}
+			slices.SortFunc(statics, functionCompare)
+			for _, f := range statics {
+				b.WriteString(indent(f.WIT(t, "")))
+				b.WriteString(";\n")
+			}
+			b.WriteRune('}')
+		}
+		return b.String()
 	}
 	if name != "" {
 		return name
 	}
 	return t.Kind.WIT(ctx, name)
+}
+
+func functionCompare(a, b *Function) int {
+	return strings.Compare(a.Name, b.Name)
 }
 
 func relativeName(o TypeOwner, p *Package) string {
@@ -247,7 +275,6 @@ func (r *Resource) WIT(ctx Node, name string) string {
 	var b strings.Builder
 	b.WriteString("resource ")
 	b.WriteString(name)
-	b.WriteString(" {} // TODO: constructor, methods, and static functions")
 	return b.String()
 }
 
