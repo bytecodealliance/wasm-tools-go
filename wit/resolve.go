@@ -259,6 +259,11 @@ func (r *Resource) Align() uintptr { return 4 }
 
 // Handle represents a WIT [handle type].
 // It conforms to the [Node], [Sized], and [TypeDefKind] interfaces.
+// Handles represent the passing of unique ownership of a resource between
+// two components. When the owner of an owned handle drops that handle,
+// the resource is destroyed. In contrast, a borrowed handle represents
+// a temporary loan of a handle from the caller to the callee for the
+// duration of the call.
 //
 // [handle type]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md#handles
 type Handle interface {
