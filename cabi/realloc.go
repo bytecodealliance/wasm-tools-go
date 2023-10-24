@@ -5,7 +5,7 @@ import "unsafe"
 // realloc allocates or reallocates memory for Component Model calls across
 // the host-guest boundary.
 //
-// Note: the use of uintptr assumes 32-bit pointers, e.g. GOOS=wasm32 when compiled for WebAssembly.
+// Note: the use of uintptr assumes 32-bit pointers when compiled for WebAssembly.
 //
 //go:export cabi_realloc
 //go:wasmexport cabi_realloc
