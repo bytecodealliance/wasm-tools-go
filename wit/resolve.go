@@ -123,6 +123,19 @@ type TypeDef struct {
 	_type
 }
 
+// Root returns the Root [TypeDef] of t if it is an alias.
+// If t is not an alias, Root returns t.
+func (t *TypeDef) Root() *TypeDef {
+	for {
+		switch kind := t.Kind.(type) {
+		case *TypeDef:
+			t = kind
+		default:
+			return t
+		}
+	}
+}
+
 // Package returns the [Package] that t is associated with, if any.
 func (t *TypeDef) Package() *Package {
 	switch owner := t.Owner.(type) {
