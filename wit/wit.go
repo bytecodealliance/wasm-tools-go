@@ -11,7 +11,7 @@ import (
 // Node is the interface implemented by the WIT ([WebAssembly Interface Type])
 // types in this package.
 //
-// [WebAssembly Interface Type]: https://component-model.bytecodealliance.org/wit-overview.html
+// [WebAssembly Interface Type]: https://component-model.bytecodealliance.org/design/wit.html
 type Node interface {
 	WIT(ctx Node, name string) string
 }

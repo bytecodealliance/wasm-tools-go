@@ -29,7 +29,7 @@
 //
 //	// Do something with res
 //
-// [WebAssembly Interface Type]: https://component-model.bytecodealliance.org/wit-overview.html
+// [WebAssembly Interface Type]: https://component-model.bytecodealliance.org/design/wit.html
 // [WebAssembly Component Model]: https://component-model.bytecodealliance.org/introduction.html
 // [wit-parser]: https://docs.rs/wit-parser/latest/wit_parser/
 // [source]: https://github.com/bytecodealliance/wasm-tools/tree/main/crates/wit-parser
