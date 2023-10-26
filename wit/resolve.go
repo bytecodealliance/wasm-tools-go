@@ -123,7 +123,7 @@ type TypeDef struct {
 	_type
 }
 
-// Root returns the Root [TypeDef] of [type alias] t.
+// Root returns the root [TypeDef] of [type alias] t.
 // If t is not a type alias, Root returns t.
 //
 // [type alias]: https://component-model.bytecodealliance.org/design/wit.html#type-aliases
