@@ -8,7 +8,7 @@ func Align(ptr, align uintptr) uintptr {
 // Discriminant returns the smallest WIT integer type that can represent 0...n.
 // Used by the [Canonical ABI] for [Variant] types.
 //
-// Canonical ABI: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#alignment
+// [Canonical ABI]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#alignment
 func Discriminant(n uint32) Type {
 	switch {
 	case n <= 1<<8:
