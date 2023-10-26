@@ -275,3 +275,38 @@ func TestNoExportedTypeDefs(t *testing.T) {
 		t.Error(err)
 	}
 }
+
+// TestHandlesAreResources verifies that all [Handle] types have an underlying [Resource] type.
+func TestHandlesAreResources(t *testing.T) {
+	err := loadTestdata(func(path string, res *Resolve) error {
+		t.Run(strings.TrimPrefix(path, testdataDir), func(t *testing.T) {
+			for i, td := range res.TypeDefs {
+				var handleType *TypeDef
+				switch kind := td.Kind.(type) {
+				case *OwnedHandle:
+					handleType = kind.Type
+				case *BorrowedHandle:
+					handleType = kind.Type
+				default:
+					continue
+				}
+				name := fmt.Sprintf("TypeDefs[%d]", i)
+				if td.Name != nil {
+					name += "#" + *td.Name
+				}
+				t.Run(name, func(t *testing.T) {
+					switch kind := handleType.Root().Kind.(type) {
+					case *Resource:
+						// ok
+					default:
+						t.Errorf("non-resource type in handle: %s", kind.WIT(nil, ""))
+					}
+				})
+			}
+		})
+		return nil
+	})
+	if err != nil {
+		t.Error(err)
+	}
+}

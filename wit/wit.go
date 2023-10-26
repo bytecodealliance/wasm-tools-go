@@ -2,6 +2,7 @@ package wit
 
 import (
 	"fmt"
+	"slices"
 	"strings"
 
 	"github.com/ydnar/wasm-tools-go/internal/codec"
@@ -10,7 +11,7 @@ import (
 // Node is the interface implemented by the WIT ([WebAssembly Interface Type])
 // types in this package.
 //
-// [WebAssembly Interface Type]: https://component-model.bytecodealliance.org/wit-overview.html
+// [WebAssembly Interface Type]: https://component-model.bytecodealliance.org/design/wit.html
 type Node interface {
 	WIT(ctx Node, name string) string
 }
@@ -69,17 +70,25 @@ func (w *World) WIT(ctx Node, name string) string {
 	}
 	var b strings.Builder
 	// TODO: docs
-	fmt.Fprintf(&b, "world %s {", name) // TODO: compare to w.Name?
-	if len(w.Imports) > 0 || len(w.Exports) > 0 {
-		b.WriteRune('\n')
-		for _, name := range codec.SortedKeys(w.Imports) {
-			b.WriteString(indent(w.itemWIT("import", name, w.Imports[name])))
-			b.WriteString(";\n")
+	b.WriteString("world ")
+	b.WriteString(name) // TODO: compare to w.Name?
+	b.WriteString(" {")
+	n := 0
+	for _, name := range codec.SortedKeys(w.Imports) {
+		if n == 0 {
+			b.WriteRune('\n')
 		}
-		for _, name := range codec.SortedKeys(w.Exports) {
-			b.WriteString(indent(w.itemWIT("export", name, w.Exports[name])))
-			b.WriteString(";\n")
+		b.WriteString(indent(w.itemWIT("import", name, w.Imports[name])))
+		b.WriteString(";\n")
+		n++
+	}
+	for _, name := range codec.SortedKeys(w.Exports) {
+		if n == 0 {
+			b.WriteRune('\n')
 		}
+		b.WriteString(indent(w.itemWIT("export", name, w.Exports[name])))
+		b.WriteString(";\n")
+		n++
 	}
 	b.WriteRune('}')
 	return b.String()
@@ -88,7 +97,7 @@ func (w *World) WIT(ctx Node, name string) string {
 func (w *World) itemWIT(motion, name string, v WorldItem) string {
 	switch v := v.(type) {
 	case *Interface, *Function:
-		return motion + " " + v.WIT(w, name)
+		return motion + " " + v.WIT(w, name) // TODO: handle resource methods?
 	case *TypeDef:
 		return v.WIT(w, name) // no motion, in Imports only
 	}
@@ -124,25 +133,26 @@ func (i *Interface) WIT(ctx Node, name string) string {
 	}
 
 	b.WriteRune('{')
-	if len(i.TypeDefs) > 0 || len(i.Functions) > 0 {
-		b.WriteRune('\n')
-		n := 0
-		for _, name := range codec.SortedKeys(i.TypeDefs) {
-			// if n > 0 {
-			// 	b.WriteRune('\n')
-			// }
-			b.WriteString(indent(i.TypeDefs[name].WIT(i, name)))
-			b.WriteString(";\n")
-			n++
+	n := 0
+	for _, name := range codec.SortedKeys(i.TypeDefs) {
+		if n == 0 {
+			b.WriteRune('\n')
 		}
-		for _, name := range codec.SortedKeys(i.Functions) {
-			// if n > 0 {
-			// 	b.WriteRune('\n')
-			// }
-			b.WriteString(indent(i.Functions[name].WIT(i, name)))
-			b.WriteString(";\n")
-			n++
+		b.WriteString(indent(i.TypeDefs[name].WIT(i, name)))
+		b.WriteString(";\n")
+		n++
+	}
+	for _, name := range codec.SortedKeys(i.Functions) {
+		f := i.Functions[name]
+		if _, ok := f.Kind.(*Freestanding); !ok {
+			continue
 		}
+		if n == 0 {
+			b.WriteRune('\n')
+		}
+		b.WriteString(indent(f.WIT(i, name)))
+		b.WriteString(";\n")
+		n++
 	}
 	b.WriteRune('}')
 	return b.String()
@@ -169,16 +179,39 @@ func (t *TypeDef) WIT(ctx Node, name string) string {
 		return fmt.Sprintf("use %s.{%s}", ownerName, name)
 
 	case *World, *Interface:
-		switch t.Kind.(type) {
-		case *TypeDef:
-			return t.Kind.WIT(t, name)
+		var b strings.Builder
+		b.WriteString(t.Kind.WIT(t, name))
+		constructor := t.Constructor()
+		methods := t.Methods()
+		statics := t.StaticFunctions()
+		if constructor != nil || len(methods) > 0 || len(statics) > 0 {
+			b.WriteString(" {\n")
+			if constructor != nil {
+				b.WriteString(indent(constructor.WIT(t, "constructor")))
+				b.WriteString(";\n")
+			}
+			slices.SortFunc(methods, functionCompare)
+			for _, f := range methods {
+				b.WriteString(indent(f.WIT(t, "")))
+				b.WriteString(";\n")
+			}
+			slices.SortFunc(statics, functionCompare)
+			for _, f := range statics {
+				b.WriteString(indent(f.WIT(t, "")))
+				b.WriteString(";\n")
+			}
+			b.WriteRune('}')
 		}
-		return t.Kind.WIT(ctx, name)
+		return b.String()
 	}
 	if name != "" {
 		return name
 	}
 	return t.Kind.WIT(ctx, name)
+}
+
+func functionCompare(a, b *Function) int {
+	return strings.Compare(a.Name, b.Name)
 }
 
 func relativeName(o TypeOwner, p *Package) string {
@@ -242,7 +275,6 @@ func (r *Resource) WIT(ctx Node, name string) string {
 	var b strings.Builder
 	b.WriteString("resource ")
 	b.WriteString(name)
-	b.WriteString(" {} // TODO: constructor, methods, and static functions")
 	return b.String()
 }
 
@@ -418,14 +450,12 @@ func (r *Result) WIT(_ Node, name string) string {
 	b.WriteString("result<")
 	if r.OK != nil {
 		b.WriteString(r.OK.WIT(r, ""))
-		b.WriteString(", ")
-	} else {
-		b.WriteString("_, ")
-	}
-	if r.Err != nil {
-		b.WriteString(r.Err.WIT(r, ""))
 	} else {
 		b.WriteRune('_')
+	}
+	if r.Err != nil {
+		b.WriteString(", ")
+		b.WriteString(r.Err.WIT(r, ""))
 	}
 	b.WriteRune('>')
 	return b.String()
@@ -506,6 +536,12 @@ func (p _primitive[T]) WIT(_ Node, name string) string {
 //
 // [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
 func (f *Function) WIT(_ Node, name string) string {
+	if name == "" {
+		name = f.Name
+		if _, after, found := strings.Cut(name, "."); found {
+			name = after
+		}
+	}
 	// TODO: docs
 	var b strings.Builder
 	b.WriteString(name)
