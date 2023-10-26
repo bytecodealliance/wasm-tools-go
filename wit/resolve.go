@@ -123,8 +123,10 @@ type TypeDef struct {
 	_type
 }
 
-// Root returns the Root [TypeDef] of t if it is an alias.
-// If t is not an alias, Root returns t.
+// Root returns the Root [TypeDef] of [type alias] t.
+// If t is not a type alias, Root returns t.
+//
+// [type alias]: https://component-model.bytecodealliance.org/design/wit.html#type-aliases
 func (t *TypeDef) Root() *TypeDef {
 	for {
 		switch kind := t.Kind.(type) {
