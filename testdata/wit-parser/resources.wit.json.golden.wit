@@ -27,7 +27,6 @@ interface i {
 }
 
 world w {
-    import [constructor]c: func() -> own<c>;
     resource a;
     resource b;
     resource c {
