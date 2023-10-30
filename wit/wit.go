@@ -75,6 +75,11 @@ func (w *World) WIT(ctx Node, name string) string {
 	b.WriteString(" {")
 	n := 0
 	for _, name := range codec.SortedKeys(w.Imports) {
+		if f, ok := w.Imports[name].(*Function); ok {
+			if _, ok := f.Kind.(*Freestanding); !ok {
+				continue
+			}
+		}
 		if n == 0 {
 			b.WriteRune('\n')
 		}
