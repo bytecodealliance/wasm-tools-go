@@ -28,11 +28,11 @@ interface streams {
         write-zeroes: func(self: borrow<output-stream>, len: u64) -> result<_, write-error>;
     }
     use poll.{pollable};
-    enum stream-status { open, ended };
+    enum stream-status { open, ended }
     enum write-error {
         last-operation-failed,
         closed
-    };
+    }
 }
 
 world imports {
@@ -57,7 +57,7 @@ interface timezone {
         utc-offset: s32,
         name: string,
         in-daylight-saving-time: bool
-    };
+    }
     display: func(when: datetime) -> timezone-display;
     utc-offset: func(when: datetime) -> s32;
 }
@@ -66,7 +66,7 @@ interface wall-clock {
     record datetime {
         seconds: u64,
         nanoseconds: u32
-    };
+    }
     now: func() -> datetime;
     resolution: func() -> datetime;
 }

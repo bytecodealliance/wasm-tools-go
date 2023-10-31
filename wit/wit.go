@@ -179,9 +179,9 @@ func (t *TypeDef) WIT(ctx Node, name string) string {
 		}
 		ownerName := relativeName(t.Owner, ctx.Package())
 		if t.Name != nil && *t.Name != name {
-			return fmt.Sprintf("use %s.{%s as %s}", ownerName, *t.Name, name)
+			return fmt.Sprintf("use %s.{%s as %s};", ownerName, *t.Name, name)
 		}
-		return fmt.Sprintf("use %s.{%s}", ownerName, name)
+		return fmt.Sprintf("use %s.{%s};", ownerName, name)
 
 	case *World, *Interface:
 		var b strings.Builder
@@ -206,7 +206,9 @@ func (t *TypeDef) WIT(ctx Node, name string) string {
 				b.WriteRune('\n')
 			}
 			b.WriteRune('}')
-		} else {
+		}
+		s := b.String()
+		if s[len(s)-1] != '}' && s[len(s)-1] != ';' {
 			b.WriteRune(';')
 		}
 		return b.String()

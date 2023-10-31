@@ -35,7 +35,7 @@ interface foo {
 }
 
 interface irrelevant-name {
-    record a-name {};
+    record a-name {}
 }
 
 interface later-interface {}
