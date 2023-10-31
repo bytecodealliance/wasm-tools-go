@@ -84,7 +84,7 @@ func (w *World) WIT(ctx Node, name string) string {
 			b.WriteRune('\n')
 		}
 		b.WriteString(indent(w.itemWIT("import", name, w.Imports[name])))
-		b.WriteString(";\n")
+		b.WriteRune('\n')
 		n++
 	}
 	for _, name := range codec.SortedKeys(w.Exports) {
@@ -92,7 +92,7 @@ func (w *World) WIT(ctx Node, name string) string {
 			b.WriteRune('\n')
 		}
 		b.WriteString(indent(w.itemWIT("export", name, w.Exports[name])))
-		b.WriteString(";\n")
+		b.WriteRune('\n')
 		n++
 	}
 	b.WriteRune('}')
@@ -129,7 +129,7 @@ func (i *Interface) WIT(ctx Node, name string) string {
 	case *World:
 		rname := relativeName(i, ctx.Package)
 		if rname != "" {
-			return rname
+			return rname + ";"
 		}
 
 		// Otherwise, this is an inline interface decl.
@@ -144,7 +144,7 @@ func (i *Interface) WIT(ctx Node, name string) string {
 			b.WriteRune('\n')
 		}
 		b.WriteString(indent(i.TypeDefs[name].WIT(i, name)))
-		b.WriteString(";\n")
+		b.WriteRune('\n')
 		n++
 	}
 	for _, name := range codec.SortedKeys(i.Functions) {
@@ -156,7 +156,7 @@ func (i *Interface) WIT(ctx Node, name string) string {
 			b.WriteRune('\n')
 		}
 		b.WriteString(indent(f.WIT(i, name)))
-		b.WriteString(";\n")
+		b.WriteRune('\n')
 		n++
 	}
 	b.WriteRune('}')
@@ -193,19 +193,21 @@ func (t *TypeDef) WIT(ctx Node, name string) string {
 			b.WriteString(" {\n")
 			if constructor != nil {
 				b.WriteString(indent(constructor.WIT(t, "constructor")))
-				b.WriteString(";\n")
+				b.WriteRune('\n')
 			}
 			slices.SortFunc(methods, functionCompare)
 			for _, f := range methods {
 				b.WriteString(indent(f.WIT(t, "")))
-				b.WriteString(";\n")
+				b.WriteRune('\n')
 			}
 			slices.SortFunc(statics, functionCompare)
 			for _, f := range statics {
 				b.WriteString(indent(f.WIT(t, "")))
-				b.WriteString(";\n")
+				b.WriteRune('\n')
 			}
 			b.WriteRune('}')
+		} else {
+			b.WriteRune(';')
 		}
 		return b.String()
 	}
@@ -557,6 +559,7 @@ func (f *Function) WIT(_ Node, name string) string {
 		b.WriteString(" -> ")
 		b.WriteString(paramsWIT(f.Results))
 	}
+	b.WriteRune(';')
 	return b.String()
 }
 

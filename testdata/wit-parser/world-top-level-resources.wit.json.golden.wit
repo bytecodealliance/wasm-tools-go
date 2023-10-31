@@ -11,11 +11,11 @@ interface types {
     resource request {
         bar: func(self: borrow<request>, arg: list<u32>);
         foo: func(self: borrow<request>);
-    };
+    }
     resource response {
         bar: func(self: borrow<response>, arg: list<u32>);
         foo: func(self: borrow<response>);
-    };
+    }
 }
 
 world proxy {

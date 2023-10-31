@@ -13,7 +13,7 @@ interface streams {
         read: func(self: borrow<input-stream>, len: u64) -> result<tuple<list<u8>, stream-status>>;
         skip: func(self: borrow<input-stream>, len: u64) -> result<tuple<u64, stream-status>>;
         subscribe: func(self: borrow<input-stream>) -> own<pollable>;
-    };
+    }
     resource output-stream {
         blocking-flush: func(self: borrow<output-stream>) -> result<_, write-error>;
         blocking-splice: func(self: borrow<output-stream>, src: own<input-stream>, len: u64) -> result<tuple<u64, stream-status>>;
@@ -26,7 +26,7 @@ interface streams {
         subscribe: func(self: borrow<output-stream>) -> own<pollable>;
         write: func(self: borrow<output-stream>, contents: list<u8>) -> result<_, write-error>;
         write-zeroes: func(self: borrow<output-stream>, len: u64) -> result<_, write-error>;
-    };
+    }
     use poll.{pollable};
     enum stream-status { open, ended };
     enum write-error {

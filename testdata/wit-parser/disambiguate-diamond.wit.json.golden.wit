@@ -11,10 +11,10 @@ interface shared2 {
 world foo {
     import bar: interface {
         use shared2.{the-type};
-    };
+    }
     import foo: interface {
         use shared1.{the-type};
-    };
+    }
     import shared1;
     import shared2;
 }

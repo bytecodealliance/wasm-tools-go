@@ -12,7 +12,7 @@ interface resources-multiple {
         f7: func(self: borrow<r1>, a: float32, b: float32) -> tuple<u32, u32>;
         f8: func(self: borrow<r1>, a: option<u32>) -> result<u32, float32>;
         f9: func(self: borrow<r1>) -> u: u32, f: float32;
-    };
+    }
     t1: func(a: borrow<r1>);
     t2: func(a: own<r1>);
 }

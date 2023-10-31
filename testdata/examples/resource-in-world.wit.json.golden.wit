@@ -4,7 +4,7 @@ interface types {
     resource foo {
         bar: func(self: borrow<foo>, arg: u32);
         foo: func(self: borrow<foo>);
-    };
+    }
 }
 
 world imports {
