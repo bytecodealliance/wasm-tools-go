@@ -2,8 +2,8 @@ package examples:resources-in-world;
 
 interface types {
     resource foo {
-        bar: func(self: borrow<foo>, arg: u32);
-        foo: func(self: borrow<foo>);
+        bar: func(arg: u32);
+        foo: func();
     }
 }
 

@@ -590,24 +590,46 @@ func (f *Function) WIT(_ Node, name string) string {
 	// TODO: docs
 	var b strings.Builder
 	b.WriteString(escape(name))
-	b.WriteString(": func(")
-	b.WriteString(paramsWIT(f.Params))
+	var isConstructor, isMethod bool
+	switch f.Kind.(type) {
+	case *Constructor:
+		b.WriteRune('(')
+		isConstructor = true
+	case *Freestanding, *Method:
+		b.WriteString(": func(")
+		isMethod = true
+	case *Static:
+		b.WriteString(": static func(")
+	}
+	b.WriteString(paramsWIT(f.Params, isMethod))
 	b.WriteRune(')')
-	if len(f.Results) > 0 {
+	if !isConstructor && len(f.Results) > 0 {
+		parens := len(f.Results) > 1 || f.Results[0].Name != ""
 		b.WriteString(" -> ")
-		b.WriteString(paramsWIT(f.Results))
+		if parens {
+			b.WriteRune('(')
+		}
+		b.WriteString(paramsWIT(f.Results, false))
+		if parens {
+			b.WriteRune(')')
+		}
 	}
 	b.WriteRune(';')
 	return b.String()
 }
 
-func paramsWIT(params []Param) string {
+func paramsWIT(params []Param, isMethod bool) string {
 	var b strings.Builder
-	for i, param := range params {
+	var i int
+	for _, param := range params {
+		if param.Name == "self" && isMethod {
+			continue
+		}
 		if i > 0 {
 			b.WriteString(", ")
 		}
 		b.WriteString(param.WIT(nil, ""))
+		i++
 	}
 	return b.String()
 }
