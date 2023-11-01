@@ -33,6 +33,9 @@ jobs:
         with:
           version: "v14.0.4"
 
+      - name: Set up wasm-tools
+        uses: bytecodealliance/actions/wasm-tools/setup@v1.0.0
+
       - name: Vet Go code
         run: go vet ./...
 
