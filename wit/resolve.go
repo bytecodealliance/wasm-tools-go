@@ -86,25 +86,26 @@ func (w *World) AllExports(yield func(name string, i WorldItem) bool) bool {
 // calling yield for each item.
 func iterateWorldItems(m map[string]WorldItem, yield func(name string, i WorldItem) bool) bool {
 	type named struct {
-		name string
-		item WorldItem
+		name     string
+		sortName string
+		item     WorldItem
 	}
 	items := make([]named, 0, len(m))
 	for name, v := range m {
+		item := named{name, name, v}
 		// TODO: add WorldItem.ItemName() method or something
 		switch v := v.(type) {
 		case *Interface:
 			if v.Name != nil {
-				name = *v.Name
+				item.sortName = *v.Name
 			}
 		case *TypeDef:
 			if v.Name != nil {
-				name = *v.Name
+				item.sortName = *v.Name
 			}
 		case *Function:
-			name = v.Name
+			item.sortName = v.Name
 		}
-		item := named{name, v}
 		items = append(items, item)
 	}
 
@@ -117,7 +118,7 @@ func iterateWorldItems(m map[string]WorldItem, yield func(name string, i WorldIt
 		} else if as > bs {
 			return false
 		}
-		return a.name < b.name
+		return a.sortName < b.sortName
 	})
 
 	// Iterate
