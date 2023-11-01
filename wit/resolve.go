@@ -113,12 +113,17 @@ func iterateWorldItems(m map[string]WorldItem, yield func(name string, i WorldIt
 	sort.Slice(items, func(i, j int) bool {
 		a, b := items[i], items[j]
 		as, bs := worldItemTypeSort(a.item), worldItemTypeSort(b.item)
-		if as < bs {
+		switch {
+		case as < bs:
 			return true
-		} else if as > bs {
+		case as > bs:
+			return false
+		case a.sortName < b.sortName:
+			return true
+		case a.sortName > b.sortName:
 			return false
 		}
-		return a.sortName < b.sortName
+		return a.name < b.name
 	})
 
 	// Iterate
