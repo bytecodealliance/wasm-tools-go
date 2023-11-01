@@ -3,7 +3,7 @@ package foo:types;
 interface types {
     type bar = u32;
     type foo = bar;
-    record record {}
+    record %record {}
     type t1 = u8;
     type t10 = float64;
     type t11 = char;
