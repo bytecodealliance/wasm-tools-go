@@ -49,14 +49,14 @@ type World struct {
 //
 // [iterates]: https://github.com/golang/go/issues/61897
 func (w *World) AllFunctions(yield func(*Function) bool) bool {
-	return w.AllImports(func(i WorldItem) bool {
+	return w.AllImports(func(name string, i WorldItem) bool {
 		if f, ok := i.(*Function); ok {
 			if !yield(f) {
 				return false
 			}
 		}
 		return true
-	}) && w.AllExports(func(i WorldItem) bool {
+	}) && w.AllExports(func(name string, i WorldItem) bool {
 		if f, ok := i.(*Function); ok {
 			if !yield(f) {
 				return false
@@ -70,7 +70,7 @@ func (w *World) AllFunctions(yield func(*Function) bool) bool {
 // calling yield for each. Iteration will stop if yield returns false.
 //
 // [iterates]: https://github.com/golang/go/issues/61897
-func (w *World) AllImports(yield func(WorldItem) bool) bool {
+func (w *World) AllImports(yield func(name string, i WorldItem) bool) bool {
 	return iterateWorldItems(w.Imports, yield)
 }
 
@@ -78,13 +78,13 @@ func (w *World) AllImports(yield func(WorldItem) bool) bool {
 // calling yield for each. Iteration will stop if yield returns false.
 //
 // [iterates]: https://github.com/golang/go/issues/61897
-func (w *World) AllExports(yield func(WorldItem) bool) bool {
+func (w *World) AllExports(yield func(name string, i WorldItem) bool) bool {
 	return iterateWorldItems(w.Exports, yield)
 }
 
 // iterateWorldItems sorts a map of [WorldItem] by type, then name,
 // calling yield for each item.
-func iterateWorldItems(m map[string]WorldItem, yield func(WorldItem) bool) bool {
+func iterateWorldItems(m map[string]WorldItem, yield func(name string, i WorldItem) bool) bool {
 	type named struct {
 		name string
 		item WorldItem
@@ -122,7 +122,7 @@ func iterateWorldItems(m map[string]WorldItem, yield func(WorldItem) bool) bool 
 
 	// Iterate
 	for _, item := range items {
-		if !yield(item.item) {
+		if !yield(item.name, item.item) {
 			return false
 		}
 	}
