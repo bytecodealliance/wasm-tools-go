@@ -92,6 +92,10 @@ func TestGoldenWITFiles(t *testing.T) {
 }
 
 func TestGoldenWITRoundTrip(t *testing.T) {
+	if testing.Short() {
+		// t.Skip is not available in TinyGo, requires runtime.Goexit()
+		return
+	}
 	err := exec.Command("wasm-tools", "--version").Run()
 	if err != nil {
 		t.Log("skipping test: wasm-tools not installed")
