@@ -3,6 +3,7 @@ package wit
 import (
 	"errors"
 	"fmt"
+	"sort"
 	"strconv"
 	"strings"
 	"unsafe"
@@ -48,21 +49,96 @@ type World struct {
 //
 // [iterates]: https://github.com/golang/go/issues/61897
 func (w *World) AllFunctions(yield func(*Function) bool) bool {
-	for _, i := range w.Imports {
+	return w.AllImports(func(i WorldItem) bool {
 		if f, ok := i.(*Function); ok {
 			if !yield(f) {
 				return false
 			}
 		}
-	}
-	for _, i := range w.Exports {
+		return true
+	}) && w.AllExports(func(i WorldItem) bool {
 		if f, ok := i.(*Function); ok {
 			if !yield(f) {
 				return false
 			}
+		}
+		return true
+	})
+}
+
+// AllImports [iterates] through all imports in a [World] in a deterministic order,
+// calling yield for each. Iteration will stop if yield returns false.
+//
+// [iterates]: https://github.com/golang/go/issues/61897
+func (w *World) AllImports(yield func(WorldItem) bool) bool {
+	return iterateWorldItems(w.Imports, yield)
+}
+
+// AllExports [iterates] through all exports in a [World] in a deterministic order,
+// calling yield for each. Iteration will stop if yield returns false.
+//
+// [iterates]: https://github.com/golang/go/issues/61897
+func (w *World) AllExports(yield func(WorldItem) bool) bool {
+	return iterateWorldItems(w.Exports, yield)
+}
+
+// iterateWorldItems sorts a map of [WorldItem] by type, then name,
+// calling yield for each item.
+func iterateWorldItems(m map[string]WorldItem, yield func(WorldItem) bool) bool {
+	type named struct {
+		name string
+		item WorldItem
+	}
+	items := make([]named, 0, len(m))
+	for name, v := range m {
+		// TODO: add WorldItem.ItemName() method or something
+		switch v := v.(type) {
+		case *Interface:
+			if v.Name != nil {
+				name = *v.Name
+			}
+		case *TypeDef:
+			if v.Name != nil {
+				name = *v.Name
+			}
+		case *Function:
+			name = v.Name
+		}
+		item := named{name, v}
+		items = append(items, item)
+	}
+
+	// Sort slice
+	sort.Slice(items, func(i, j int) bool {
+		a, b := items[i], items[j]
+		as, bs := worldItemTypeSort(a.item), worldItemTypeSort(b.item)
+		if as < bs {
+			return true
+		} else if as > bs {
+			return false
+		}
+		return a.name < b.name
+	})
+
+	// Iterate
+	for _, item := range items {
+		if !yield(item.item) {
+			return false
 		}
 	}
 	return true
+}
+
+func worldItemTypeSort(i WorldItem) int {
+	switch i.(type) {
+	case *Interface:
+		return 0
+	case *TypeDef:
+		return 1
+	case *Function:
+		return 2
+	}
+	panic("BUG: unknown WorldItem type")
 }
 
 // A WorldItem is any item that can be exported from or imported into a [World],
