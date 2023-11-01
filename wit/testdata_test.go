@@ -75,7 +75,7 @@ func TestGoldenFiles(t *testing.T) {
 	}
 }
 
-func TestWITGoldenFiles(t *testing.T) {
+func TestGoldenWITFiles(t *testing.T) {
 	err := loadTestdata(func(path string, res *Resolve) error {
 		t.Run(strings.TrimPrefix(path, testdataDir), func(t *testing.T) {
 			data := res.WIT(nil, "")
