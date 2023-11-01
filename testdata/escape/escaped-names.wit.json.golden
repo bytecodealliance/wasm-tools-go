@@ -1,0 +1,1146 @@
+&wit.Resolve{
+    Worlds: {
+        &wit.World{
+            Name:    "world",
+            Imports: {
+                "interface-0": &wit.Interface{
+                    Name:     &"interface",
+                    TypeDefs: {
+                        "enum": &wit.TypeDef{
+                            Name: &"enum",
+                            Kind: &wit.Enum{
+                                Cases: {
+                                    {
+                                        Name: "enum",
+                                        Docs: wit.Docs{},
+                                    },
+                                    {
+                                        Name: "export",
+                                        Docs: wit.Docs{},
+                                    },
+                                    {
+                                        Name: "flags",
+                                        Docs: wit.Docs{},
+                                    },
+                                    {
+                                        Name: "func",
+                                        Docs: wit.Docs{},
+                                    },
+                                    {
+                                        Name: "import",
+                                        Docs: wit.Docs{},
+                                    },
+                                    {
+                                        Name: "include",
+                                        Docs: wit.Docs{},
+                                    },
+                                    {
+                                        Name: "interface",
+                                        Docs: wit.Docs{},
+                                    },
+                                    {
+                                        Name: "package",
+                                        Docs: wit.Docs{},
+                                    },
+                                    {
+                                        Name: "record",
+                                        Docs: wit.Docs{},
+                                    },
+                                    {
+                                        Name: "resource",
+                                        Docs: wit.Docs{},
+                                    },
+                                    {
+                                        Name: "static",
+                                        Docs: wit.Docs{},
+                                    },
+                                    {
+                                        Name: "type",
+                                        Docs: wit.Docs{},
+                                    },
+                                    {
+                                        Name: "variant",
+                                        Docs: wit.Docs{},
+                                    },
+                                    {
+                                        Name: "world",
+                                        Docs: wit.Docs{},
+                                    },
+                                },
+                                _typeDefKind: wit._typeDefKind{},
+                            },
+                            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                            Docs:       wit.Docs{},
+                            _worldItem: wit._worldItem{},
+                            _type:      wit._type{},
+                        },
+                        "error": &wit.TypeDef{
+                            Name: &"error",
+                            Kind: &wit.Enum{
+                                Cases: {
+                                    {
+                                        Name: "ok",
+                                        Docs: wit.Docs{},
+                                    },
+                                    {
+                                        Name: "fail",
+                                        Docs: wit.Docs{},
+                                    },
+                                },
+                                _typeDefKind: wit._typeDefKind{},
+                            },
+                            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                            Docs:       wit.Docs{},
+                            _worldItem: wit._worldItem{},
+                            _type:      wit._type{},
+                        },
+                        "export": &wit.TypeDef{
+                            Name: &"export",
+                            Kind: &wit.Record{
+                                Fields: {
+                                    {
+                                        Name: "headers",
+                                        Type: &wit.TypeDef{
+                                            Name: (*string)(nil),
+                                            Kind: &wit.List{
+                                                Type: &wit.TypeDef{
+                                                    Name: (*string)(nil),
+                                                    Kind: &wit.Tuple{
+                                                        Types: {
+                                                            !%v(DEPTH EXCEEDED),
+                                                            !%v(DEPTH EXCEEDED),
+                                                        },
+                                                        _typeDefKind: wit._typeDefKind{},
+                                                    },
+                                                    Owner:      nil,
+                                                    Docs:       wit.Docs{},
+                                                    _worldItem: wit._worldItem{},
+                                                    _type:      wit._type{},
+                                                },
+                                                _typeDefKind: wit._typeDefKind{},
+                                            },
+                                            Owner:      nil,
+                                            Docs:       wit.Docs{},
+                                            _worldItem: wit._worldItem{},
+                                            _type:      wit._type{},
+                                        },
+                                        Docs: wit.Docs{},
+                                    },
+                                    {
+                                        Name: "body",
+                                        Type: &wit.TypeDef{
+                                            Name: (*string)(nil),
+                                            Kind: &wit.List{
+                                                Type:         wit.U8{},
+                                                _typeDefKind: wit._typeDefKind{},
+                                            },
+                                            Owner:      nil,
+                                            Docs:       wit.Docs{},
+                                            _worldItem: wit._worldItem{},
+                                            _type:      wit._type{},
+                                        },
+                                        Docs: wit.Docs{},
+                                    },
+                                },
+                                _typeDefKind: wit._typeDefKind{},
+                            },
+                            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                            Docs:       wit.Docs{},
+                            _worldItem: wit._worldItem{},
+                            _type:      wit._type{},
+                        },
+                        "record": &wit.TypeDef{
+                            Name: &"record",
+                            Kind: &wit.Record{
+                                Fields: {
+                                    {
+                                        Name: "enum",
+                                        Type: &wit.TypeDef{(CYCLIC REFERENCE)},
+                                        Docs: wit.Docs{},
+                                    },
+                                    {
+                                        Name: "result",
+                                        Type: &wit.TypeDef{
+                                            Name: (*string)(nil),
+                                            Kind: &wit.Result{
+                                                OK:           wit.String{},
+                                                Err:          &wit.TypeDef{(CYCLIC REFERENCE)},
+                                                _typeDefKind: wit._typeDefKind{},
+                                            },
+                                            Owner:      nil,
+                                            Docs:       wit.Docs{},
+                                            _worldItem: wit._worldItem{},
+                                            _type:      wit._type{},
+                                        },
+                                        Docs: wit.Docs{},
+                                    },
+                                },
+                                _typeDefKind: wit._typeDefKind{},
+                            },
+                            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                            Docs:       wit.Docs{},
+                            _worldItem: wit._worldItem{},
+                            _type:      wit._type{},
+                        },
+                    },
+                    Functions: {
+                        "func": &wit.Function{
+                            Name:   "func",
+                            Kind:   &wit.Freestanding{},
+                            Params: {
+                                {
+                                    Name: "rec",
+                                    Type: &wit.TypeDef{(CYCLIC REFERENCE)},
+                                },
+                            },
+                            Results: {
+                                {
+                                    Name: "",
+                                    Type: &wit.TypeDef{
+                                        Name: (*string)(nil),
+                                        Kind: &wit.Result{
+                                            OK:           &wit.TypeDef{(CYCLIC REFERENCE)},
+                                            Err:          &wit.TypeDef{(CYCLIC REFERENCE)},
+                                            _typeDefKind: wit._typeDefKind{},
+                                        },
+                                        Owner:      nil,
+                                        Docs:       wit.Docs{},
+                                        _worldItem: wit._worldItem{},
+                                        _type:      wit._type{},
+                                    },
+                                },
+                            },
+                            Docs:       wit.Docs{},
+                            _worldItem: wit._worldItem{},
+                        },
+                    },
+                    Package: &wit.Package{
+                        Name: wit.PackageName{
+                            Namespace: "example",
+                            Name:      "escaped-names",
+                            Version:   (*semver.Version)(nil),
+                            _node:     wit._node{},
+                        },
+                        Interfaces: {
+                            "interface": &wit.Interface{(CYCLIC REFERENCE)},
+                        },
+                        Worlds: {
+                            "world": &wit.World{(CYCLIC REFERENCE)},
+                        },
+                        Docs: wit.Docs{},
+                    },
+                    Docs:       wit.Docs{},
+                    _typeOwner: wit._typeOwner{},
+                    _worldItem: wit._worldItem{},
+                },
+            },
+            Exports: {
+                "interface-0": &wit.Interface{
+                    Name:     &"interface",
+                    TypeDefs: {
+                        "enum": &wit.TypeDef{
+                            Name: &"enum",
+                            Kind: &wit.Enum{
+                                Cases: {
+                                    {
+                                        Name: "enum",
+                                        Docs: wit.Docs{},
+                                    },
+                                    {
+                                        Name: "export",
+                                        Docs: wit.Docs{},
+                                    },
+                                    {
+                                        Name: "flags",
+                                        Docs: wit.Docs{},
+                                    },
+                                    {
+                                        Name: "func",
+                                        Docs: wit.Docs{},
+                                    },
+                                    {
+                                        Name: "import",
+                                        Docs: wit.Docs{},
+                                    },
+                                    {
+                                        Name: "include",
+                                        Docs: wit.Docs{},
+                                    },
+                                    {
+                                        Name: "interface",
+                                        Docs: wit.Docs{},
+                                    },
+                                    {
+                                        Name: "package",
+                                        Docs: wit.Docs{},
+                                    },
+                                    {
+                                        Name: "record",
+                                        Docs: wit.Docs{},
+                                    },
+                                    {
+                                        Name: "resource",
+                                        Docs: wit.Docs{},
+                                    },
+                                    {
+                                        Name: "static",
+                                        Docs: wit.Docs{},
+                                    },
+                                    {
+                                        Name: "type",
+                                        Docs: wit.Docs{},
+                                    },
+                                    {
+                                        Name: "variant",
+                                        Docs: wit.Docs{},
+                                    },
+                                    {
+                                        Name: "world",
+                                        Docs: wit.Docs{},
+                                    },
+                                },
+                                _typeDefKind: wit._typeDefKind{},
+                            },
+                            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                            Docs:       wit.Docs{},
+                            _worldItem: wit._worldItem{},
+                            _type:      wit._type{},
+                        },
+                        "error": &wit.TypeDef{
+                            Name: &"error",
+                            Kind: &wit.Enum{
+                                Cases: {
+                                    {
+                                        Name: "ok",
+                                        Docs: wit.Docs{},
+                                    },
+                                    {
+                                        Name: "fail",
+                                        Docs: wit.Docs{},
+                                    },
+                                },
+                                _typeDefKind: wit._typeDefKind{},
+                            },
+                            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                            Docs:       wit.Docs{},
+                            _worldItem: wit._worldItem{},
+                            _type:      wit._type{},
+                        },
+                        "export": &wit.TypeDef{
+                            Name: &"export",
+                            Kind: &wit.Record{
+                                Fields: {
+                                    {
+                                        Name: "headers",
+                                        Type: &wit.TypeDef{
+                                            Name: (*string)(nil),
+                                            Kind: &wit.List{
+                                                Type: &wit.TypeDef{
+                                                    Name: (*string)(nil),
+                                                    Kind: &wit.Tuple{
+                                                        Types: {
+                                                            !%v(DEPTH EXCEEDED),
+                                                            !%v(DEPTH EXCEEDED),
+                                                        },
+                                                        _typeDefKind: wit._typeDefKind{},
+                                                    },
+                                                    Owner:      nil,
+                                                    Docs:       wit.Docs{},
+                                                    _worldItem: wit._worldItem{},
+                                                    _type:      wit._type{},
+                                                },
+                                                _typeDefKind: wit._typeDefKind{},
+                                            },
+                                            Owner:      nil,
+                                            Docs:       wit.Docs{},
+                                            _worldItem: wit._worldItem{},
+                                            _type:      wit._type{},
+                                        },
+                                        Docs: wit.Docs{},
+                                    },
+                                    {
+                                        Name: "body",
+                                        Type: &wit.TypeDef{
+                                            Name: (*string)(nil),
+                                            Kind: &wit.List{
+                                                Type:         wit.U8{},
+                                                _typeDefKind: wit._typeDefKind{},
+                                            },
+                                            Owner:      nil,
+                                            Docs:       wit.Docs{},
+                                            _worldItem: wit._worldItem{},
+                                            _type:      wit._type{},
+                                        },
+                                        Docs: wit.Docs{},
+                                    },
+                                },
+                                _typeDefKind: wit._typeDefKind{},
+                            },
+                            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                            Docs:       wit.Docs{},
+                            _worldItem: wit._worldItem{},
+                            _type:      wit._type{},
+                        },
+                        "record": &wit.TypeDef{
+                            Name: &"record",
+                            Kind: &wit.Record{
+                                Fields: {
+                                    {
+                                        Name: "enum",
+                                        Type: &wit.TypeDef{(CYCLIC REFERENCE)},
+                                        Docs: wit.Docs{},
+                                    },
+                                    {
+                                        Name: "result",
+                                        Type: &wit.TypeDef{
+                                            Name: (*string)(nil),
+                                            Kind: &wit.Result{
+                                                OK:           wit.String{},
+                                                Err:          &wit.TypeDef{(CYCLIC REFERENCE)},
+                                                _typeDefKind: wit._typeDefKind{},
+                                            },
+                                            Owner:      nil,
+                                            Docs:       wit.Docs{},
+                                            _worldItem: wit._worldItem{},
+                                            _type:      wit._type{},
+                                        },
+                                        Docs: wit.Docs{},
+                                    },
+                                },
+                                _typeDefKind: wit._typeDefKind{},
+                            },
+                            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                            Docs:       wit.Docs{},
+                            _worldItem: wit._worldItem{},
+                            _type:      wit._type{},
+                        },
+                    },
+                    Functions: {
+                        "func": &wit.Function{
+                            Name:   "func",
+                            Kind:   &wit.Freestanding{},
+                            Params: {
+                                {
+                                    Name: "rec",
+                                    Type: &wit.TypeDef{(CYCLIC REFERENCE)},
+                                },
+                            },
+                            Results: {
+                                {
+                                    Name: "",
+                                    Type: &wit.TypeDef{
+                                        Name: (*string)(nil),
+                                        Kind: &wit.Result{
+                                            OK:           &wit.TypeDef{(CYCLIC REFERENCE)},
+                                            Err:          &wit.TypeDef{(CYCLIC REFERENCE)},
+                                            _typeDefKind: wit._typeDefKind{},
+                                        },
+                                        Owner:      nil,
+                                        Docs:       wit.Docs{},
+                                        _worldItem: wit._worldItem{},
+                                        _type:      wit._type{},
+                                    },
+                                },
+                            },
+                            Docs:       wit.Docs{},
+                            _worldItem: wit._worldItem{},
+                        },
+                    },
+                    Package: &wit.Package{
+                        Name: wit.PackageName{
+                            Namespace: "example",
+                            Name:      "escaped-names",
+                            Version:   (*semver.Version)(nil),
+                            _node:     wit._node{},
+                        },
+                        Interfaces: {
+                            "interface": &wit.Interface{(CYCLIC REFERENCE)},
+                        },
+                        Worlds: {
+                            "world": &wit.World{(CYCLIC REFERENCE)},
+                        },
+                        Docs: wit.Docs{},
+                    },
+                    Docs:       wit.Docs{},
+                    _typeOwner: wit._typeOwner{},
+                    _worldItem: wit._worldItem{},
+                },
+            },
+            Package: &wit.Package{
+                Name: wit.PackageName{
+                    Namespace: "example",
+                    Name:      "escaped-names",
+                    Version:   (*semver.Version)(nil),
+                    _node:     wit._node{},
+                },
+                Interfaces: {
+                    "interface": &wit.Interface{
+                        Name:     &"interface",
+                        TypeDefs: {
+                            "enum": &wit.TypeDef{
+                                Name: &"enum",
+                                Kind: &wit.Enum{
+                                    Cases: {
+                                        {
+                                            Name: "enum",
+                                            Docs: wit.Docs{},
+                                        },
+                                        {
+                                            Name: "export",
+                                            Docs: wit.Docs{},
+                                        },
+                                        {
+                                            Name: "flags",
+                                            Docs: wit.Docs{},
+                                        },
+                                        {
+                                            Name: "func",
+                                            Docs: wit.Docs{},
+                                        },
+                                        {
+                                            Name: "import",
+                                            Docs: wit.Docs{},
+                                        },
+                                        {
+                                            Name: "include",
+                                            Docs: wit.Docs{},
+                                        },
+                                        {
+                                            Name: "interface",
+                                            Docs: wit.Docs{},
+                                        },
+                                        {
+                                            Name: "package",
+                                            Docs: wit.Docs{},
+                                        },
+                                        {
+                                            Name: "record",
+                                            Docs: wit.Docs{},
+                                        },
+                                        {
+                                            Name: "resource",
+                                            Docs: wit.Docs{},
+                                        },
+                                        {
+                                            Name: "static",
+                                            Docs: wit.Docs{},
+                                        },
+                                        {
+                                            Name: "type",
+                                            Docs: wit.Docs{},
+                                        },
+                                        {
+                                            Name: "variant",
+                                            Docs: wit.Docs{},
+                                        },
+                                        {
+                                            Name: "world",
+                                            Docs: wit.Docs{},
+                                        },
+                                    },
+                                    _typeDefKind: wit._typeDefKind{},
+                                },
+                                Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                                Docs:       wit.Docs{},
+                                _worldItem: wit._worldItem{},
+                                _type:      wit._type{},
+                            },
+                            "error": &wit.TypeDef{
+                                Name: &"error",
+                                Kind: &wit.Enum{
+                                    Cases: {
+                                        {
+                                            Name: "ok",
+                                            Docs: wit.Docs{},
+                                        },
+                                        {
+                                            Name: "fail",
+                                            Docs: wit.Docs{},
+                                        },
+                                    },
+                                    _typeDefKind: wit._typeDefKind{},
+                                },
+                                Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                                Docs:       wit.Docs{},
+                                _worldItem: wit._worldItem{},
+                                _type:      wit._type{},
+                            },
+                            "export": &wit.TypeDef{
+                                Name: &"export",
+                                Kind: &wit.Record{
+                                    Fields: {
+                                        {
+                                            Name: "headers",
+                                            Type: &wit.TypeDef{
+                                                Name: (*string)(nil),
+                                                Kind: &wit.List{
+                                                    Type: &wit.TypeDef{
+                                                        Name: (*string)(nil),
+                                                        Kind: &wit.Tuple{
+                                                            Types: {
+                                                                !%v(DEPTH EXCEEDED),
+                                                                !%v(DEPTH EXCEEDED),
+                                                            },
+                                                            _typeDefKind: wit._typeDefKind{},
+                                                        },
+                                                        Owner:      nil,
+                                                        Docs:       wit.Docs{},
+                                                        _worldItem: wit._worldItem{},
+                                                        _type:      wit._type{},
+                                                    },
+                                                    _typeDefKind: wit._typeDefKind{},
+                                                },
+                                                Owner:      nil,
+                                                Docs:       wit.Docs{},
+                                                _worldItem: wit._worldItem{},
+                                                _type:      wit._type{},
+                                            },
+                                            Docs: wit.Docs{},
+                                        },
+                                        {
+                                            Name: "body",
+                                            Type: &wit.TypeDef{
+                                                Name: (*string)(nil),
+                                                Kind: &wit.List{
+                                                    Type:         wit.U8{},
+                                                    _typeDefKind: wit._typeDefKind{},
+                                                },
+                                                Owner:      nil,
+                                                Docs:       wit.Docs{},
+                                                _worldItem: wit._worldItem{},
+                                                _type:      wit._type{},
+                                            },
+                                            Docs: wit.Docs{},
+                                        },
+                                    },
+                                    _typeDefKind: wit._typeDefKind{},
+                                },
+                                Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                                Docs:       wit.Docs{},
+                                _worldItem: wit._worldItem{},
+                                _type:      wit._type{},
+                            },
+                            "record": &wit.TypeDef{
+                                Name: &"record",
+                                Kind: &wit.Record{
+                                    Fields: {
+                                        {
+                                            Name: "enum",
+                                            Type: &wit.TypeDef{(CYCLIC REFERENCE)},
+                                            Docs: wit.Docs{},
+                                        },
+                                        {
+                                            Name: "result",
+                                            Type: &wit.TypeDef{
+                                                Name: (*string)(nil),
+                                                Kind: &wit.Result{
+                                                    OK:           wit.String{},
+                                                    Err:          &wit.TypeDef{(CYCLIC REFERENCE)},
+                                                    _typeDefKind: wit._typeDefKind{},
+                                                },
+                                                Owner:      nil,
+                                                Docs:       wit.Docs{},
+                                                _worldItem: wit._worldItem{},
+                                                _type:      wit._type{},
+                                            },
+                                            Docs: wit.Docs{},
+                                        },
+                                    },
+                                    _typeDefKind: wit._typeDefKind{},
+                                },
+                                Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                                Docs:       wit.Docs{},
+                                _worldItem: wit._worldItem{},
+                                _type:      wit._type{},
+                            },
+                        },
+                        Functions: {
+                            "func": &wit.Function{
+                                Name:   "func",
+                                Kind:   &wit.Freestanding{},
+                                Params: {
+                                    {
+                                        Name: "rec",
+                                        Type: &wit.TypeDef{(CYCLIC REFERENCE)},
+                                    },
+                                },
+                                Results: {
+                                    {
+                                        Name: "",
+                                        Type: &wit.TypeDef{
+                                            Name: (*string)(nil),
+                                            Kind: &wit.Result{
+                                                OK:           &wit.TypeDef{(CYCLIC REFERENCE)},
+                                                Err:          &wit.TypeDef{(CYCLIC REFERENCE)},
+                                                _typeDefKind: wit._typeDefKind{},
+                                            },
+                                            Owner:      nil,
+                                            Docs:       wit.Docs{},
+                                            _worldItem: wit._worldItem{},
+                                            _type:      wit._type{},
+                                        },
+                                    },
+                                },
+                                Docs:       wit.Docs{},
+                                _worldItem: wit._worldItem{},
+                            },
+                        },
+                        Package:    &wit.Package{(CYCLIC REFERENCE)},
+                        Docs:       wit.Docs{},
+                        _typeOwner: wit._typeOwner{},
+                        _worldItem: wit._worldItem{},
+                    },
+                },
+                Worlds: {
+                    "world": &wit.World{(CYCLIC REFERENCE)},
+                },
+                Docs: wit.Docs{},
+            },
+            Docs:       wit.Docs{},
+            _typeOwner: wit._typeOwner{},
+        },
+    },
+    Interfaces: {
+        &wit.Interface{
+            Name:     &"interface",
+            TypeDefs: {
+                "enum": &wit.TypeDef{
+                    Name: &"enum",
+                    Kind: &wit.Enum{
+                        Cases: {
+                            {
+                                Name: "enum",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "export",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "flags",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "func",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "import",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "include",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "interface",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "package",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "record",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "resource",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "static",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "type",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "variant",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "world",
+                                Docs: wit.Docs{},
+                            },
+                        },
+                        _typeDefKind: wit._typeDefKind{},
+                    },
+                    Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                    _type:      wit._type{},
+                },
+                "error": &wit.TypeDef{
+                    Name: &"error",
+                    Kind: &wit.Enum{
+                        Cases: {
+                            {
+                                Name: "ok",
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "fail",
+                                Docs: wit.Docs{},
+                            },
+                        },
+                        _typeDefKind: wit._typeDefKind{},
+                    },
+                    Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                    _type:      wit._type{},
+                },
+                "export": &wit.TypeDef{
+                    Name: &"export",
+                    Kind: &wit.Record{
+                        Fields: {
+                            {
+                                Name: "headers",
+                                Type: &wit.TypeDef{
+                                    Name: (*string)(nil),
+                                    Kind: &wit.List{
+                                        Type: &wit.TypeDef{
+                                            Name: (*string)(nil),
+                                            Kind: &wit.Tuple{
+                                                Types: {
+                                                    &wit.TypeDef{(CYCLIC REFERENCE)},
+                                                    &wit.TypeDef{(CYCLIC REFERENCE)},
+                                                },
+                                                _typeDefKind: wit._typeDefKind{},
+                                            },
+                                            Owner:      nil,
+                                            Docs:       wit.Docs{},
+                                            _worldItem: wit._worldItem{},
+                                            _type:      wit._type{},
+                                        },
+                                        _typeDefKind: wit._typeDefKind{},
+                                    },
+                                    Owner:      nil,
+                                    Docs:       wit.Docs{},
+                                    _worldItem: wit._worldItem{},
+                                    _type:      wit._type{},
+                                },
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "body",
+                                Type: &wit.TypeDef{
+                                    Name: (*string)(nil),
+                                    Kind: &wit.List{
+                                        Type:         wit.U8{},
+                                        _typeDefKind: wit._typeDefKind{},
+                                    },
+                                    Owner:      nil,
+                                    Docs:       wit.Docs{},
+                                    _worldItem: wit._worldItem{},
+                                    _type:      wit._type{},
+                                },
+                                Docs: wit.Docs{},
+                            },
+                        },
+                        _typeDefKind: wit._typeDefKind{},
+                    },
+                    Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                    _type:      wit._type{},
+                },
+                "record": &wit.TypeDef{
+                    Name: &"record",
+                    Kind: &wit.Record{
+                        Fields: {
+                            {
+                                Name: "enum",
+                                Type: &wit.TypeDef{(CYCLIC REFERENCE)},
+                                Docs: wit.Docs{},
+                            },
+                            {
+                                Name: "result",
+                                Type: &wit.TypeDef{
+                                    Name: (*string)(nil),
+                                    Kind: &wit.Result{
+                                        OK:           wit.String{},
+                                        Err:          &wit.TypeDef{(CYCLIC REFERENCE)},
+                                        _typeDefKind: wit._typeDefKind{},
+                                    },
+                                    Owner:      nil,
+                                    Docs:       wit.Docs{},
+                                    _worldItem: wit._worldItem{},
+                                    _type:      wit._type{},
+                                },
+                                Docs: wit.Docs{},
+                            },
+                        },
+                        _typeDefKind: wit._typeDefKind{},
+                    },
+                    Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                    _type:      wit._type{},
+                },
+            },
+            Functions: {
+                "func": &wit.Function{
+                    Name:   "func",
+                    Kind:   &wit.Freestanding{},
+                    Params: {
+                        {
+                            Name: "rec",
+                            Type: &wit.TypeDef{(CYCLIC REFERENCE)},
+                        },
+                    },
+                    Results: {
+                        {
+                            Name: "",
+                            Type: &wit.TypeDef{
+                                Name: (*string)(nil),
+                                Kind: &wit.Result{
+                                    OK:           &wit.TypeDef{(CYCLIC REFERENCE)},
+                                    Err:          &wit.TypeDef{(CYCLIC REFERENCE)},
+                                    _typeDefKind: wit._typeDefKind{},
+                                },
+                                Owner:      nil,
+                                Docs:       wit.Docs{},
+                                _worldItem: wit._worldItem{},
+                                _type:      wit._type{},
+                            },
+                        },
+                    },
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                },
+            },
+            Package: &wit.Package{
+                Name: wit.PackageName{
+                    Namespace: "example",
+                    Name:      "escaped-names",
+                    Version:   (*semver.Version)(nil),
+                    _node:     wit._node{},
+                },
+                Interfaces: {
+                    "interface": &wit.Interface{(CYCLIC REFERENCE)},
+                },
+                Worlds: {
+                    "world": &wit.World{(CYCLIC REFERENCE)},
+                },
+                Docs: wit.Docs{},
+            },
+            Docs:       wit.Docs{},
+            _typeOwner: wit._typeOwner{},
+            _worldItem: wit._worldItem{},
+        },
+    },
+    TypeDefs: {
+        &wit.TypeDef{
+            Name: &"error",
+            Kind: &wit.Enum{
+                Cases: {
+                    {
+                        Name: "ok",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "fail",
+                        Docs: wit.Docs{},
+                    },
+                },
+                _typeDefKind: wit._typeDefKind{},
+            },
+            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name: (*string)(nil),
+            Kind: &wit.List{
+                Type:         wit.U8{},
+                _typeDefKind: wit._typeDefKind{},
+            },
+            Owner:      nil,
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name: (*string)(nil),
+            Kind: &wit.Tuple{
+                Types: {
+                    &wit.TypeDef{(CYCLIC REFERENCE)},
+                    &wit.TypeDef{(CYCLIC REFERENCE)},
+                },
+                _typeDefKind: wit._typeDefKind{},
+            },
+            Owner:      nil,
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name: (*string)(nil),
+            Kind: &wit.List{
+                Type:         &wit.TypeDef{(CYCLIC REFERENCE)},
+                _typeDefKind: wit._typeDefKind{},
+            },
+            Owner:      nil,
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name: &"export",
+            Kind: &wit.Record{
+                Fields: {
+                    {
+                        Name: "headers",
+                        Type: &wit.TypeDef{(CYCLIC REFERENCE)},
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "body",
+                        Type: &wit.TypeDef{(CYCLIC REFERENCE)},
+                        Docs: wit.Docs{},
+                    },
+                },
+                _typeDefKind: wit._typeDefKind{},
+            },
+            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name: &"enum",
+            Kind: &wit.Enum{
+                Cases: {
+                    {
+                        Name: "enum",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "export",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "flags",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "func",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "import",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "include",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "interface",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "package",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "record",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "resource",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "static",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "type",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "variant",
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "world",
+                        Docs: wit.Docs{},
+                    },
+                },
+                _typeDefKind: wit._typeDefKind{},
+            },
+            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name: (*string)(nil),
+            Kind: &wit.Result{
+                OK:           wit.String{},
+                Err:          &wit.TypeDef{(CYCLIC REFERENCE)},
+                _typeDefKind: wit._typeDefKind{},
+            },
+            Owner:      nil,
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name: &"record",
+            Kind: &wit.Record{
+                Fields: {
+                    {
+                        Name: "enum",
+                        Type: &wit.TypeDef{(CYCLIC REFERENCE)},
+                        Docs: wit.Docs{},
+                    },
+                    {
+                        Name: "result",
+                        Type: &wit.TypeDef{(CYCLIC REFERENCE)},
+                        Docs: wit.Docs{},
+                    },
+                },
+                _typeDefKind: wit._typeDefKind{},
+            },
+            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name: (*string)(nil),
+            Kind: &wit.Result{
+                OK:           &wit.TypeDef{(CYCLIC REFERENCE)},
+                Err:          &wit.TypeDef{(CYCLIC REFERENCE)},
+                _typeDefKind: wit._typeDefKind{},
+            },
+            Owner:      nil,
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+    },
+    Packages: {
+        &wit.Package{
+            Name: wit.PackageName{
+                Namespace: "example",
+                Name:      "escaped-names",
+                Version:   (*semver.Version)(nil),
+                _node:     wit._node{},
+            },
+            Interfaces: {
+                "interface": &wit.Interface{(CYCLIC REFERENCE)},
+            },
+            Worlds: {
+                "world": &wit.World{(CYCLIC REFERENCE)},
+            },
+            Docs: wit.Docs{},
+        },
+    },
+}
