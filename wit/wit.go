@@ -74,27 +74,29 @@ func (w *World) WIT(ctx Node, name string) string {
 	b.WriteString(escape(name)) // TODO: compare to w.Name?
 	b.WriteString(" {")
 	n := 0
-	for _, name := range codec.SortedKeys(w.Imports) {
-		if f, ok := w.Imports[name].(*Function); ok {
+	w.AllImports(func(name string, i WorldItem) bool {
+		if f, ok := i.(*Function); ok {
 			if _, ok := f.Kind.(*Freestanding); !ok {
-				continue
+				return true
 			}
 		}
 		if n == 0 {
 			b.WriteRune('\n')
 		}
-		b.WriteString(indent(w.itemWIT("import", name, w.Imports[name])))
+		b.WriteString(indent(w.itemWIT("import", name, i)))
 		b.WriteRune('\n')
 		n++
-	}
-	for _, name := range codec.SortedKeys(w.Exports) {
+		return true
+	})
+	w.AllExports(func(name string, i WorldItem) bool {
 		if n == 0 {
 			b.WriteRune('\n')
 		}
-		b.WriteString(indent(w.itemWIT("export", name, w.Exports[name])))
+		b.WriteString(indent(w.itemWIT("export", name, i)))
 		b.WriteRune('\n')
 		n++
-	}
+		return true
+	})
 	b.WriteRune('}')
 	return b.String()
 }
