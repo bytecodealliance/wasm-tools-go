@@ -45,9 +45,9 @@ world c {
 
 world union-world {
     import foo:bar/a;
-    import foo:bar/b;
     import foo:baz/a;
-    import foo:baz/b;
     import ai;
+    import foo:bar/b;
+    import foo:baz/b;
     import bi;
 }

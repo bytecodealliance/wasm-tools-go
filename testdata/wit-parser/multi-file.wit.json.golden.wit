@@ -50,7 +50,7 @@ world more-depends-on-later-things {
 }
 
 world the-world {
-    import foo: func() -> x;
     import depend-on-me;
     use depend-on-me.{x};
+    import foo: func() -> x;
 }

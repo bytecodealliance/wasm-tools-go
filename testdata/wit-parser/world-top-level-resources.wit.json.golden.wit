@@ -19,7 +19,7 @@ interface types {
 }
 
 world proxy {
-    import types;
     import handler;
+    import types;
     export handler;
 }

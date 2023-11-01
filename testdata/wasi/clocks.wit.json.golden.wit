@@ -72,8 +72,8 @@ interface wall-clock {
 }
 
 world imports {
-    import wasi:io/poll;
     import monotonic-clock;
-    import wall-clock;
+    import wasi:io/poll;
     import timezone;
+    import wall-clock;
 }

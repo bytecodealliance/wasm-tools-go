@@ -5,7 +5,7 @@ interface foo {
 }
 
 world w {
-    import foo: func() -> g;
-    use foo.{g};
     import foo;
+    use foo.{g};
+    import foo: func() -> g;
 }
