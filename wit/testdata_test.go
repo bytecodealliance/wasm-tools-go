@@ -1,10 +1,12 @@
 package wit
 
 import (
+	"bytes"
 	"flag"
 	"fmt"
 	"io/fs"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -80,6 +82,50 @@ func TestGoldenWITFiles(t *testing.T) {
 		t.Run(strings.TrimPrefix(path, testdataDir), func(t *testing.T) {
 			data := res.WIT(nil, "")
 			compareOrWrite(t, path, path+".golden.wit", data)
+		})
+		return nil
+	})
+
+	if err != nil {
+		t.Error(err)
+	}
+}
+
+func TestGoldenWITRoundTrip(t *testing.T) {
+	err := loadTestdata(func(path string, res *Resolve) error {
+		data := res.WIT(nil, "")
+		if strings.Count(data, "package ") > 1 {
+			return nil
+		}
+		t.Run(strings.TrimPrefix(path, testdataDir), func(t *testing.T) {
+			// Run the generated WIT through wasm-tools to generate JSON.
+			cmd := exec.Command("wasm-tools", "component", "wit", "-j")
+			cmd.Stdin = strings.NewReader(data)
+			stdout := &bytes.Buffer{}
+			stderr := &bytes.Buffer{}
+			cmd.Stdout = stdout
+			cmd.Stderr = stderr
+			err := cmd.Run()
+			if err != nil {
+				t.Error(err, stderr.String())
+				return
+			}
+
+			// Parse the JSON into a Resolve.
+			res2, err := DecodeJSON(stdout)
+			if err != nil {
+				t.Error(err)
+				return
+			}
+
+			// Convert back to WIT.
+			data2 := res2.WIT(nil, "")
+			if string(data2) != data {
+				dmp := diffmatchpatch.New()
+				dmp.PatchMargin = 3
+				diffs := dmp.DiffMain(data, data2, false)
+				t.Errorf("round-trip WIT for %s through wasm-tools did not match:\n%v", path, dmp.DiffPrettyText(diffs))
+			}
 		})
 		return nil
 	})
