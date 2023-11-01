@@ -375,8 +375,13 @@ func (f *Flag) WIT(_ Node, _ string) string {
 // WIT returns the [WIT] text format for [Tuple] t.
 //
 // [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
-func (t *Tuple) WIT(ctx Node, _ string) string {
+func (t *Tuple) WIT(ctx Node, name string) string {
 	var b strings.Builder
+	if name != "" {
+		b.WriteString("type ")
+		b.WriteString(escape(name))
+		b.WriteString(" = ")
+	}
 	b.WriteString("tuple<")
 	for i := range t.Types {
 		if i > 0 {
