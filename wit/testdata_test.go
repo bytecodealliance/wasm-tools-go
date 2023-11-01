@@ -92,7 +92,12 @@ func TestGoldenWITFiles(t *testing.T) {
 }
 
 func TestGoldenWITRoundTrip(t *testing.T) {
-	err := loadTestdata(func(path string, res *Resolve) error {
+	err := exec.Command("wasm-tools", "--version").Run()
+	if err != nil {
+		t.Log("skipping test: wasm-tools not installed")
+		return
+	}
+	err = loadTestdata(func(path string, res *Resolve) error {
 		data := res.WIT(nil, "")
 		if strings.Count(data, "package ") > 1 {
 			return nil
