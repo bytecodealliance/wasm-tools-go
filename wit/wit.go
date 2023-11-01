@@ -486,7 +486,11 @@ func (r *Result) WIT(_ Node, name string) string {
 		b.WriteString(escape(name))
 		b.WriteString(" = ")
 	}
-	b.WriteString("result<")
+	b.WriteString("result")
+	if r.OK == nil && r.Err == nil {
+		return b.String()
+	}
+	b.WriteRune('<')
 	if r.OK != nil {
 		b.WriteString(r.OK.WIT(r, ""))
 	} else {
