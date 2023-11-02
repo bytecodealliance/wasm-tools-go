@@ -1,7 +1,7 @@
 package wasi:filesystem;
 
 interface wasi {
-    enum clockid { realtime, monotonic };
+    enum clockid { realtime, monotonic }
     enum errno {
         success,
         toobig,
@@ -80,6 +80,6 @@ interface wasi {
         txtbsy,
         xdev,
         notcapable
-    };
+    }
     type timestamp = u64;
 }

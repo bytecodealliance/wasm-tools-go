@@ -35,7 +35,7 @@ interface foo {
 }
 
 interface irrelevant-name {
-    record a-name {};
+    record a-name {}
 }
 
 interface later-interface {}
@@ -50,7 +50,7 @@ world more-depends-on-later-things {
 }
 
 world the-world {
-    import foo: func() -> x;
     import depend-on-me;
     use depend-on-me.{x};
+    import foo: func() -> x;
 }

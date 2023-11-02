@@ -1,0 +1,218 @@
+{
+  "worlds": [
+    {
+      "name": "world",
+      "imports": {
+        "interface-0": {
+          "interface": 0
+        }
+      },
+      "exports": {
+        "interface-0": {
+          "interface": 0
+        }
+      },
+      "package": 0
+    }
+  ],
+  "interfaces": [
+    {
+      "name": "interface",
+      "types": {
+        "error": 0,
+        "export": 4,
+        "enum": 5,
+        "record": 7
+      },
+      "functions": {
+        "func": {
+          "name": "func",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "rec",
+              "type": 7
+            }
+          ],
+          "results": [
+            {
+              "type": 8
+            }
+          ]
+        }
+      },
+      "package": 0
+    }
+  ],
+  "types": [
+    {
+      "name": "error",
+      "kind": {
+        "enum": {
+          "cases": [
+            {
+              "name": "ok"
+            },
+            {
+              "name": "fail"
+            }
+          ]
+        }
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "list": "u8"
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "tuple": {
+          "types": [
+            1,
+            1
+          ]
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "list": 2
+      },
+      "owner": null
+    },
+    {
+      "name": "export",
+      "kind": {
+        "record": {
+          "fields": [
+            {
+              "name": "headers",
+              "type": 3
+            },
+            {
+              "name": "body",
+              "type": 1
+            }
+          ]
+        }
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": "enum",
+      "kind": {
+        "enum": {
+          "cases": [
+            {
+              "name": "enum"
+            },
+            {
+              "name": "export"
+            },
+            {
+              "name": "flags"
+            },
+            {
+              "name": "func"
+            },
+            {
+              "name": "import"
+            },
+            {
+              "name": "include"
+            },
+            {
+              "name": "interface"
+            },
+            {
+              "name": "package"
+            },
+            {
+              "name": "record"
+            },
+            {
+              "name": "resource"
+            },
+            {
+              "name": "static"
+            },
+            {
+              "name": "type"
+            },
+            {
+              "name": "variant"
+            },
+            {
+              "name": "world"
+            }
+          ]
+        }
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "result": {
+          "ok": "string",
+          "err": 0
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": "record",
+      "kind": {
+        "record": {
+          "fields": [
+            {
+              "name": "enum",
+              "type": 5
+            },
+            {
+              "name": "result",
+              "type": 6
+            }
+          ]
+        }
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "result": {
+          "ok": 4,
+          "err": 0
+        }
+      },
+      "owner": null
+    }
+  ],
+  "packages": [
+    {
+      "name": "example:escaped-names",
+      "interfaces": {
+        "interface": 0
+      },
+      "worlds": {
+        "world": 0
+      }
+    }
+  ]
+}

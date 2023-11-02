@@ -15,8 +15,8 @@ interface shared-items {
 }
 
 world the-world {
-    import a: func();
-    import shared-items;
     import i1;
     import i2;
+    import shared-items;
+    import a: func();
 }

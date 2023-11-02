@@ -8,31 +8,31 @@ interface poll {
 
 interface streams {
     resource input-stream {
-        blocking-read: func(self: borrow<input-stream>, len: u64) -> result<tuple<list<u8>, stream-status>>;
-        blocking-skip: func(self: borrow<input-stream>, len: u64) -> result<tuple<u64, stream-status>>;
-        read: func(self: borrow<input-stream>, len: u64) -> result<tuple<list<u8>, stream-status>>;
-        skip: func(self: borrow<input-stream>, len: u64) -> result<tuple<u64, stream-status>>;
-        subscribe: func(self: borrow<input-stream>) -> own<pollable>;
-    };
+        blocking-read: func(len: u64) -> result<tuple<list<u8>, stream-status>>;
+        blocking-skip: func(len: u64) -> result<tuple<u64, stream-status>>;
+        read: func(len: u64) -> result<tuple<list<u8>, stream-status>>;
+        skip: func(len: u64) -> result<tuple<u64, stream-status>>;
+        subscribe: func() -> own<pollable>;
+    }
     resource output-stream {
-        blocking-flush: func(self: borrow<output-stream>) -> result<_, write-error>;
-        blocking-splice: func(self: borrow<output-stream>, src: own<input-stream>, len: u64) -> result<tuple<u64, stream-status>>;
-        blocking-write-and-flush: func(self: borrow<output-stream>, contents: list<u8>) -> result<_, write-error>;
-        blocking-write-zeroes-and-flush: func(self: borrow<output-stream>, len: u64) -> result<_, write-error>;
-        check-write: func(self: borrow<output-stream>) -> result<u64, write-error>;
-        flush: func(self: borrow<output-stream>) -> result<_, write-error>;
-        forward: func(self: borrow<output-stream>, src: own<input-stream>) -> result<tuple<u64, stream-status>>;
-        splice: func(self: borrow<output-stream>, src: own<input-stream>, len: u64) -> result<tuple<u64, stream-status>>;
-        subscribe: func(self: borrow<output-stream>) -> own<pollable>;
-        write: func(self: borrow<output-stream>, contents: list<u8>) -> result<_, write-error>;
-        write-zeroes: func(self: borrow<output-stream>, len: u64) -> result<_, write-error>;
-    };
+        blocking-flush: func() -> result<_, write-error>;
+        blocking-splice: func(src: own<input-stream>, len: u64) -> result<tuple<u64, stream-status>>;
+        blocking-write-and-flush: func(contents: list<u8>) -> result<_, write-error>;
+        blocking-write-zeroes-and-flush: func(len: u64) -> result<_, write-error>;
+        check-write: func() -> result<u64, write-error>;
+        flush: func() -> result<_, write-error>;
+        forward: func(src: own<input-stream>) -> result<tuple<u64, stream-status>>;
+        splice: func(src: own<input-stream>, len: u64) -> result<tuple<u64, stream-status>>;
+        subscribe: func() -> own<pollable>;
+        write: func(contents: list<u8>) -> result<_, write-error>;
+        write-zeroes: func(len: u64) -> result<_, write-error>;
+    }
     use poll.{pollable};
-    enum stream-status { open, ended };
+    enum stream-status { open, ended }
     enum write-error {
         last-operation-failed,
         closed
-    };
+    }
 }
 
 world imports {
@@ -57,7 +57,7 @@ interface timezone {
         utc-offset: s32,
         name: string,
         in-daylight-saving-time: bool
-    };
+    }
     display: func(when: datetime) -> timezone-display;
     utc-offset: func(when: datetime) -> s32;
 }
@@ -66,14 +66,14 @@ interface wall-clock {
     record datetime {
         seconds: u64,
         nanoseconds: u32
-    };
+    }
     now: func() -> datetime;
     resolution: func() -> datetime;
 }
 
 world imports {
-    import wasi:io/poll;
     import monotonic-clock;
-    import wall-clock;
+    import wasi:io/poll;
     import timezone;
+    import wall-clock;
 }

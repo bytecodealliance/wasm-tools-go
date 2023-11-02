@@ -71,30 +71,32 @@ func (w *World) WIT(ctx Node, name string) string {
 	var b strings.Builder
 	// TODO: docs
 	b.WriteString("world ")
-	b.WriteString(name) // TODO: compare to w.Name?
+	b.WriteString(escape(name)) // TODO: compare to w.Name?
 	b.WriteString(" {")
 	n := 0
-	for _, name := range codec.SortedKeys(w.Imports) {
-		if f, ok := w.Imports[name].(*Function); ok {
+	w.AllImports(func(name string, i WorldItem) bool {
+		if f, ok := i.(*Function); ok {
 			if _, ok := f.Kind.(*Freestanding); !ok {
-				continue
+				return true
 			}
 		}
 		if n == 0 {
 			b.WriteRune('\n')
 		}
-		b.WriteString(indent(w.itemWIT("import", name, w.Imports[name])))
-		b.WriteString(";\n")
+		b.WriteString(indent(w.itemWIT("import", name, i)))
+		b.WriteRune('\n')
 		n++
-	}
-	for _, name := range codec.SortedKeys(w.Exports) {
+		return true
+	})
+	w.AllExports(func(name string, i WorldItem) bool {
 		if n == 0 {
 			b.WriteRune('\n')
 		}
-		b.WriteString(indent(w.itemWIT("export", name, w.Exports[name])))
-		b.WriteString(";\n")
+		b.WriteString(indent(w.itemWIT("export", name, i)))
+		b.WriteRune('\n')
 		n++
-	}
+		return true
+	})
 	b.WriteRune('}')
 	return b.String()
 }
@@ -124,16 +126,16 @@ func (i *Interface) WIT(ctx Node, name string) string {
 	switch ctx := ctx.(type) {
 	case *Package:
 		b.WriteString("interface ")
-		b.WriteString(name)
+		b.WriteString(escape(name))
 		b.WriteRune(' ')
 	case *World:
 		rname := relativeName(i, ctx.Package)
 		if rname != "" {
-			return rname
+			return escape(rname) + ";"
 		}
 
 		// Otherwise, this is an inline interface decl.
-		b.WriteString(name)
+		b.WriteString(escape(name))
 		b.WriteString(": interface ")
 	}
 
@@ -144,7 +146,7 @@ func (i *Interface) WIT(ctx Node, name string) string {
 			b.WriteRune('\n')
 		}
 		b.WriteString(indent(i.TypeDefs[name].WIT(i, name)))
-		b.WriteString(";\n")
+		b.WriteRune('\n')
 		n++
 	}
 	for _, name := range codec.SortedKeys(i.Functions) {
@@ -156,7 +158,7 @@ func (i *Interface) WIT(ctx Node, name string) string {
 			b.WriteRune('\n')
 		}
 		b.WriteString(indent(f.WIT(i, name)))
-		b.WriteString(";\n")
+		b.WriteRune('\n')
 		n++
 	}
 	b.WriteRune('}')
@@ -175,13 +177,13 @@ func (t *TypeDef) WIT(ctx Node, name string) string {
 	case *TypeDef:
 		// Emit an type alias if same Owner.
 		if t.Owner == ctx.Owner && t.Name != nil {
-			return "type " + name + " = " + *t.Name
+			return "type " + escape(name) + " = " + escape(*t.Name)
 		}
 		ownerName := relativeName(t.Owner, ctx.Package())
 		if t.Name != nil && *t.Name != name {
-			return fmt.Sprintf("use %s.{%s as %s}", ownerName, *t.Name, name)
+			return fmt.Sprintf("use %s.{%s as %s};", ownerName, escape(*t.Name), escape(name))
 		}
-		return fmt.Sprintf("use %s.{%s}", ownerName, name)
+		return fmt.Sprintf("use %s.{%s};", ownerName, escape(name))
 
 	case *World, *Interface:
 		var b strings.Builder
@@ -193,30 +195,59 @@ func (t *TypeDef) WIT(ctx Node, name string) string {
 			b.WriteString(" {\n")
 			if constructor != nil {
 				b.WriteString(indent(constructor.WIT(t, "constructor")))
-				b.WriteString(";\n")
+				b.WriteRune('\n')
 			}
 			slices.SortFunc(methods, functionCompare)
 			for _, f := range methods {
 				b.WriteString(indent(f.WIT(t, "")))
-				b.WriteString(";\n")
+				b.WriteRune('\n')
 			}
 			slices.SortFunc(statics, functionCompare)
 			for _, f := range statics {
 				b.WriteString(indent(f.WIT(t, "")))
-				b.WriteString(";\n")
+				b.WriteRune('\n')
 			}
 			b.WriteRune('}')
+		}
+		s := b.String()
+		if s[len(s)-1] != '}' && s[len(s)-1] != ';' {
+			b.WriteRune(';')
 		}
 		return b.String()
 	}
 	if name != "" {
-		return name
+		return escape(name)
 	}
 	return t.Kind.WIT(ctx, name)
 }
 
 func functionCompare(a, b *Function) int {
 	return strings.Compare(a.Name, b.Name)
+}
+
+func escape(name string) string {
+	if keywords[name] {
+		return "%" + name
+	}
+	return name
+}
+
+var keywords = map[string]bool{
+	"enum":      true,
+	"export":    true,
+	"flags":     true,
+	"func":      true,
+	"import":    true,
+	"include":   true,
+	"interface": true,
+	"package":   true,
+	"record":    true,
+	"resource":  true,
+	"result":    true,
+	"static":    true,
+	"type":      true,
+	"variant":   true,
+	"world":     true,
 }
 
 func relativeName(o TypeOwner, p *Package) string {
@@ -249,7 +280,7 @@ func relativeName(o TypeOwner, p *Package) string {
 func (r *Record) WIT(ctx Node, name string) string {
 	var b strings.Builder
 	b.WriteString("record ")
-	b.WriteString(name)
+	b.WriteString(escape(name))
 	b.WriteString(" {")
 	if len(r.Fields) > 0 {
 		b.WriteRune('\n')
@@ -270,7 +301,7 @@ func (r *Record) WIT(ctx Node, name string) string {
 // [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
 func (f *Field) WIT(ctx Node, name string) string {
 	// TODO: docs
-	return f.Name + ": " + f.Type.WIT(f, "")
+	return escape(f.Name) + ": " + f.Type.WIT(f, "")
 }
 
 // WIT returns the [WIT] text format for [Resource] r.
@@ -279,7 +310,7 @@ func (f *Field) WIT(ctx Node, name string) string {
 func (r *Resource) WIT(ctx Node, name string) string {
 	var b strings.Builder
 	b.WriteString("resource ")
-	b.WriteString(name)
+	b.WriteString(escape(name))
 	return b.String()
 }
 
@@ -290,7 +321,7 @@ func (h *OwnedHandle) WIT(ctx Node, name string) string {
 	var b strings.Builder
 	if name != "" {
 		b.WriteString("type ")
-		b.WriteString(name)
+		b.WriteString(escape(name))
 		b.WriteString(" = ")
 	}
 	b.WriteString("own<")
@@ -306,7 +337,7 @@ func (h *BorrowedHandle) WIT(ctx Node, name string) string {
 	var b strings.Builder
 	if name != "" {
 		b.WriteString("type ")
-		b.WriteString(name)
+		b.WriteString(escape(name))
 		b.WriteString(" = ")
 	}
 	b.WriteString("borrow<")
@@ -321,7 +352,7 @@ func (h *BorrowedHandle) WIT(ctx Node, name string) string {
 func (f *Flags) WIT(ctx Node, name string) string {
 	var b strings.Builder
 	b.WriteString("flags ")
-	b.WriteString(name)
+	b.WriteString(escape(name))
 	b.WriteString(" {")
 	if len(f.Flags) > 0 {
 		for i := range f.Flags {
@@ -340,14 +371,19 @@ func (f *Flags) WIT(ctx Node, name string) string {
 // [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
 func (f *Flag) WIT(_ Node, _ string) string {
 	// TODO: docs
-	return f.Name
+	return escape(f.Name)
 }
 
 // WIT returns the [WIT] text format for [Tuple] t.
 //
 // [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
-func (t *Tuple) WIT(ctx Node, _ string) string {
+func (t *Tuple) WIT(ctx Node, name string) string {
 	var b strings.Builder
+	if name != "" {
+		b.WriteString("type ")
+		b.WriteString(escape(name))
+		b.WriteString(" = ")
+	}
 	b.WriteString("tuple<")
 	for i := range t.Types {
 		if i > 0 {
@@ -365,7 +401,7 @@ func (t *Tuple) WIT(ctx Node, _ string) string {
 func (v *Variant) WIT(_ Node, name string) string {
 	var b strings.Builder
 	b.WriteString("variant ")
-	b.WriteString(name)
+	b.WriteString(escape(name))
 	b.WriteString(" {")
 	if len(v.Cases) > 0 {
 		b.WriteRune('\n')
@@ -387,7 +423,7 @@ func (v *Variant) WIT(_ Node, name string) string {
 func (c *Case) WIT(_ Node, _ string) string {
 	// TODO: docs
 	var b strings.Builder
-	b.WriteString(c.Name)
+	b.WriteString(escape(c.Name))
 	if c.Type != nil {
 		b.WriteRune('(')
 		b.WriteString(c.Type.WIT(c, ""))
@@ -402,7 +438,7 @@ func (c *Case) WIT(_ Node, _ string) string {
 func (e *Enum) WIT(_ Node, name string) string {
 	var b strings.Builder
 	b.WriteString("enum ")
-	b.WriteString(name)
+	b.WriteString(escape(name))
 	b.WriteString(" {")
 	if len(e.Cases) > 0 {
 		b.WriteRune('\n')
@@ -423,7 +459,7 @@ func (e *Enum) WIT(_ Node, name string) string {
 // [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
 func (c *EnumCase) WIT(_ Node, _ string) string {
 	// TODO: docs
-	return c.Name
+	return escape(c.Name)
 }
 
 // WIT returns the [WIT] text format for [Option] o.
@@ -433,7 +469,7 @@ func (o *Option) WIT(_ Node, name string) string {
 	var b strings.Builder
 	if name != "" {
 		b.WriteString("type ")
-		b.WriteString(name)
+		b.WriteString(escape(name))
 		b.WriteString(" = ")
 	}
 	b.WriteString("option<")
@@ -449,10 +485,14 @@ func (r *Result) WIT(_ Node, name string) string {
 	var b strings.Builder
 	if name != "" {
 		b.WriteString("type ")
-		b.WriteString(name)
+		b.WriteString(escape(name))
 		b.WriteString(" = ")
 	}
-	b.WriteString("result<")
+	b.WriteString("result")
+	if r.OK == nil && r.Err == nil {
+		return b.String()
+	}
+	b.WriteRune('<')
 	if r.OK != nil {
 		b.WriteString(r.OK.WIT(r, ""))
 	} else {
@@ -473,7 +513,7 @@ func (l *List) WIT(_ Node, name string) string {
 	var b strings.Builder
 	if name != "" {
 		b.WriteString("type ")
-		b.WriteString(name)
+		b.WriteString(escape(name))
 		b.WriteString(" = ")
 	}
 	b.WriteString("list<")
@@ -489,7 +529,7 @@ func (f *Future) WIT(_ Node, name string) string {
 	var b strings.Builder
 	if name != "" {
 		b.WriteString("type ")
-		b.WriteString(name)
+		b.WriteString(escape(name))
 		b.WriteString(" = ")
 	}
 	b.WriteString("future")
@@ -508,20 +548,22 @@ func (s *Stream) WIT(_ Node, name string) string {
 	var b strings.Builder
 	if name != "" {
 		b.WriteString("type ")
-		b.WriteString(name)
+		b.WriteString(escape(name))
 		b.WriteString(" = ")
 	}
-	b.WriteString("stream<")
+	b.WriteString("stream")
+	if s.Element == nil && s.End == nil {
+		return b.String()
+	}
+	b.WriteRune('<')
 	if s.Element != nil {
 		b.WriteString(s.Element.WIT(s, ""))
-		b.WriteString(", ")
-	} else {
-		b.WriteString("_, ")
-	}
-	if s.End != nil {
-		b.WriteString(s.End.WIT(s, ""))
 	} else {
 		b.WriteRune('_')
+	}
+	if s.End != nil {
+		b.WriteString(", ")
+		b.WriteString(s.End.WIT(s, ""))
 	}
 	b.WriteRune('>')
 	return b.String()
@@ -549,24 +591,47 @@ func (f *Function) WIT(_ Node, name string) string {
 	}
 	// TODO: docs
 	var b strings.Builder
-	b.WriteString(name)
-	b.WriteString(": func(")
-	b.WriteString(paramsWIT(f.Params))
-	b.WriteRune(')')
-	if len(f.Results) > 0 {
-		b.WriteString(" -> ")
-		b.WriteString(paramsWIT(f.Results))
+	b.WriteString(escape(name))
+	var isConstructor, isMethod bool
+	switch f.Kind.(type) {
+	case *Constructor:
+		b.WriteRune('(')
+		isConstructor = true
+	case *Freestanding, *Method:
+		b.WriteString(": func(")
+		isMethod = true
+	case *Static:
+		b.WriteString(": static func(")
 	}
+	b.WriteString(paramsWIT(f.Params, isMethod))
+	b.WriteRune(')')
+	if !isConstructor && len(f.Results) > 0 {
+		parens := len(f.Results) > 1 || f.Results[0].Name != ""
+		b.WriteString(" -> ")
+		if parens {
+			b.WriteRune('(')
+		}
+		b.WriteString(paramsWIT(f.Results, false))
+		if parens {
+			b.WriteRune(')')
+		}
+	}
+	b.WriteRune(';')
 	return b.String()
 }
 
-func paramsWIT(params []Param) string {
+func paramsWIT(params []Param, isMethod bool) string {
 	var b strings.Builder
-	for i, param := range params {
+	var i int
+	for _, param := range params {
+		if param.Name == "self" && isMethod {
+			continue
+		}
 		if i > 0 {
 			b.WriteString(", ")
 		}
 		b.WriteString(param.WIT(nil, ""))
+		i++
 	}
 	return b.String()
 }

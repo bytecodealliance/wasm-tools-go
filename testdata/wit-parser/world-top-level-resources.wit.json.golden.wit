@@ -9,17 +9,17 @@ interface handler {
 
 interface types {
     resource request {
-        bar: func(self: borrow<request>, arg: list<u32>);
-        foo: func(self: borrow<request>);
-    };
+        bar: func(arg: list<u32>);
+        foo: func();
+    }
     resource response {
-        bar: func(self: borrow<response>, arg: list<u32>);
-        foo: func(self: borrow<response>);
-    };
+        bar: func(arg: list<u32>);
+        foo: func();
+    }
 }
 
 world proxy {
-    import types;
     import handler;
+    import types;
     export handler;
 }

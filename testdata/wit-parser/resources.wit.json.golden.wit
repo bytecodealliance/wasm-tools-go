@@ -3,20 +3,20 @@ package foo:bar;
 interface foo {
     resource a;
     resource b {
-        constructor: func() -> own<b>;
-    };
+        constructor();
+    }
     resource c {
-        constructor: func(x: u32) -> own<c>;
-    };
+        constructor(x: u32);
+    }
     resource d {
-        constructor: func(x: u32) -> own<d>;
-        a: func(self: borrow<d>);
-        b: func();
-    };
+        constructor(x: u32);
+        a: func();
+        b: static func();
+    }
     resource e {
-        constructor: func(other: own<e>, other2: borrow<e>) -> own<e>;
-        method: func(self: borrow<e>, thing: own<e>, thing2: borrow<e>);
-    };
+        constructor(other: own<e>, other2: borrow<e>);
+        method: func(thing: own<e>, thing2: borrow<e>);
+    }
 }
 
 interface i {
@@ -30,6 +30,6 @@ world w {
     resource a;
     resource b;
     resource c {
-        constructor: func() -> own<c>;
-    };
+        constructor();
+    }
 }

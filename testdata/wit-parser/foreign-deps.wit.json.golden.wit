@@ -42,7 +42,7 @@ interface clocks {
 }
 
 interface filesystem {
-    record stat { ino: u64 };
+    record stat { ino: u64 }
 }
 
 
@@ -81,6 +81,6 @@ world my-world {
 world my-world2 {
     import foo:wasi/clocks;
     import foo:wasi/filesystem;
-    export foo:corp/saas;
     export foo;
+    export foo:corp/saas;
 }

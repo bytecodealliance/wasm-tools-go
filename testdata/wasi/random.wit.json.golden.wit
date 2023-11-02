@@ -15,7 +15,7 @@ interface random {
 }
 
 world imports {
-    import insecure-seed;
     import insecure;
+    import insecure-seed;
     import random;
 }

@@ -7,7 +7,7 @@ interface foo {
 world the-world {
     import bar: interface {
         use foo.{a};
-    };
-    import foo: interface {};
+    }
+    import foo: interface {}
     import foo;
 }

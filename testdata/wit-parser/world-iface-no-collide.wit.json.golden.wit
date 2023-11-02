@@ -5,7 +5,7 @@ interface foo {
 }
 
 world bar {
-    import foo: func();
     import foo;
     use foo.{t};
+    import foo: func();
 }
