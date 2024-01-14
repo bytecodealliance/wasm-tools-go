@@ -4,6 +4,8 @@ import (
 	"runtime"
 	"testing"
 	"unsafe"
+
+	"github.com/ydnar/wasm-tools-go/internal/tinyunsafe"
 )
 
 func TestFieldAlignment(t *testing.T) {
@@ -15,7 +17,7 @@ func TestFieldAlignment(t *testing.T) {
 	if want, got := uintptr(16), unsafe.Sizeof(v1); want != got {
 		t.Errorf("expected unsafe.Sizeof(v1) == %d, got %d", want, got)
 	}
-	if want, got := uintptr(8), unsafe.Offsetof(v1.u64); want != got {
+	if want, got := uintptr(8), tinyunsafe.OffsetOf(&v1, &v1.u64); want != got {
 		t.Errorf("expected unsafe.Offsetof(v1.u64) == %d, got %d", want, got)
 	}
 
@@ -32,7 +34,7 @@ func TestFieldAlignment(t *testing.T) {
 	if want, got := uintptr(16), unsafe.Sizeof(v2); want != got {
 		t.Errorf("expected unsafe.Sizeof(v2) == %d, got %d", want, got)
 	}
-	if want, got := uintptr(8), unsafe.Offsetof(v2.u64); want != got {
+	if want, got := uintptr(8), tinyunsafe.OffsetOf(&v2, &v2.u64); want != got {
 		t.Errorf("expected unsafe.Offsetof(v2.u64) == %d, got %d", want, got)
 	}
 
@@ -44,7 +46,7 @@ func TestFieldAlignment(t *testing.T) {
 	if want, got := uintptr(1), unsafe.Sizeof(v3); want != got {
 		t.Errorf("expected unsafe.Sizeof(v3) == %d, got %d", want, got)
 	}
-	if want, got := uintptr(0), unsafe.Offsetof(v3.b); want != got {
+	if want, got := uintptr(0), tinyunsafe.OffsetOf(&v3, &v3.b); want != got {
 		t.Errorf("expected unsafe.Offsetof(v3.b) == %d, got %d", want, got)
 	}
 
@@ -56,7 +58,7 @@ func TestFieldAlignment(t *testing.T) {
 	if want, got := uintptr(4), unsafe.Sizeof(v4); want != got {
 		t.Errorf("expected unsafe.Sizeof(v4) == %d, got %d", want, got)
 	}
-	if want, got := uintptr(0), unsafe.Offsetof(v4.b); want != got {
+	if want, got := uintptr(0), tinyunsafe.OffsetOf(&v4, &v4.b); want != got {
 		t.Errorf("expected unsafe.Offsetof(v4.b) == %d, got %d", want, got)
 	}
 }

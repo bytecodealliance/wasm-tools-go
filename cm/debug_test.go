@@ -4,6 +4,8 @@ import (
 	"reflect"
 	"strings"
 	"unsafe"
+
+	"github.com/ydnar/wasm-tools-go/internal/tinyunsafe"
 )
 
 func typeName(v any) string {
@@ -32,7 +34,7 @@ func (v *SizedVariant2[Shape, T0, T1]) ValAlign() uintptr {
 }
 
 func (v *SizedVariant2[Shape, T0, T1]) ValOffset() uintptr {
-	return unsafe.Offsetof(v.val)
+	return tinyunsafe.OffsetOf(v, &v.val)
 }
 
 func (v *UnsizedVariant2[T0, T1]) Size() uintptr {
