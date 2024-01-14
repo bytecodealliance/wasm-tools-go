@@ -1,107 +1,120 @@
 package cm
 
 import (
+	"runtime"
 	"testing"
 	"unsafe"
+
+	"github.com/ydnar/wasm-tools-go/internal/tinyunsafe"
 )
 
-func TestVariantLayout(t *testing.T) {
-	// 8 on 64-bit, 4 on 32-bit
-	ptrSize := unsafe.Sizeof(uintptr(0))
-
-	var u1 UnsizedVariant2[struct{}, struct{}]
-	var u2 UnsizedVariant2[[0]byte, struct{}]
-
-	tests := []struct {
-		v      VariantDebug
-		size   uintptr
-		offset uintptr
-	}{
-		{&u1, 1, 0},
-		{&u2, 1, 0},
-		{&SizedVariant2[Shape[string], string, string]{}, sizePlusAlignOf[string](), ptrSize},
-		{&SizedVariant2[Shape[string], bool, string]{}, sizePlusAlignOf[string](), ptrSize},
-		{&SizedVariant2[Shape[string], string, struct{}]{}, sizePlusAlignOf[string](), ptrSize},
-		{&SizedVariant2[Shape[string], struct{}, string]{}, sizePlusAlignOf[string](), ptrSize},
-		{&SizedVariant2[Shape[uint64], uint64, uint64]{}, 16, alignOf[uint64]()},
-		{&SizedVariant2[Shape[uint64], uint32, uint64]{}, 16, alignOf[uint64]()},
-		{&SizedVariant2[Shape[uint64], uint64, uint32]{}, 16, alignOf[uint64]()},
-		{&SizedVariant2[Shape[uint64], uint8, uint64]{}, 16, alignOf[uint64]()},
-		{&SizedVariant2[Shape[uint64], uint64, uint8]{}, 16, alignOf[uint64]()},
-		{&SizedVariant2[Shape[uint32], uint8, uint32]{}, 8, alignOf[uint32]()},
-		{&SizedVariant2[Shape[uint32], uint32, uint8]{}, 8, alignOf[uint32]()},
-		{&SizedVariant2[Shape[[9]byte], [9]byte, uint64]{}, 24, alignOf[uint64]()},
+func TestFieldAlignment(t *testing.T) {
+	var v1 struct {
+		_   bool
+		_   [0][7]byte
+		u64 uint64
+	}
+	if want, got := uintptr(16), unsafe.Sizeof(v1); want != got {
+		t.Errorf("expected unsafe.Sizeof(v1) == %d, got %d", want, got)
+	}
+	if want, got := uintptr(8), tinyunsafe.OffsetOf(&v1, &v1.u64); want != got {
+		t.Errorf("expected unsafe.Offsetof(v1.u64) == %d, got %d", want, got)
 	}
 
-	for _, tt := range tests {
-		name := typeName(tt.v)
-		t.Run(name, func(t *testing.T) {
-			if got, want := tt.v.Size(), tt.size; got != want {
-				t.Errorf("(%s).Size() == %v, expected %v", name, got, want)
-			}
-			if got, want := tt.v.ValOffset(), tt.offset; got != want {
-				t.Errorf("(%s).ValOffset() == %v, expected %v", name, got, want)
-			}
-		})
+	var v2 struct {
+		_ bool
+		_ [0][7]byte
+		_ [0][51]float64
+		_ [0]struct {
+			uint64
+			_ []byte
+		}
+		u64 uint64
 	}
-}
-
-func TestResultLayout(t *testing.T) {
-	// 8 on 64-bit, 4 on 32-bit
-	ptrSize := unsafe.Sizeof(uintptr(0))
-
-	tests := []struct {
-		name   string
-		r      ResultDebug
-		size   uintptr
-		offset uintptr
-	}{
-		{"result", &UntypedResult{}, 1, 0},
-
-		{"result<_, _>", &UnsizedResult[struct{}, struct{}]{}, 1, 0},
-		{"result<[0]byte, _>", &UnsizedResult[[0]byte, struct{}]{}, 1, 0},
-
-		{"result<string, string>", &SizedResult[Shape[string], string, string]{}, sizePlusAlignOf[string](), ptrSize},
-		{"result<bool, string>", &SizedResult[Shape[string], bool, string]{}, sizePlusAlignOf[string](), ptrSize},
-		{"result<string, _>", &SizedResult[Shape[string], string, struct{}]{}, sizePlusAlignOf[string](), ptrSize},
-		{"result<_, string>", &SizedResult[Shape[string], struct{}, string]{}, sizePlusAlignOf[string](), ptrSize},
-		{"result<u64, u64>", &SizedResult[Shape[uint64], uint64, uint64]{}, 16, alignOf[uint64]()},
-		{"result<u32, u64>", &SizedResult[Shape[uint64], uint32, uint64]{}, 16, alignOf[uint64]()},
-		{"result<u64, u32>", &SizedResult[Shape[uint64], uint64, uint32]{}, 16, alignOf[uint64]()},
-		{"result<u8, u64>", &SizedResult[Shape[uint64], uint8, uint64]{}, 16, alignOf[uint64]()},
-		{"result<u64, u8>", &SizedResult[Shape[uint64], uint64, uint8]{}, 16, alignOf[uint64]()},
-		{"result<u8, u32>", &SizedResult[Shape[uint32], uint8, uint32]{}, 8, alignOf[uint32]()},
-		{"result<u32, u8>", &SizedResult[Shape[uint32], uint32, uint8]{}, 8, alignOf[uint32]()},
-		{"result<[9]byte, u64>", &SizedResult[Shape[[9]byte], [9]byte, uint64]{}, 24, alignOf[uint64]()},
-
-		{"result<string, _>", &OKSizedResult[string, struct{}]{}, sizePlusAlignOf[string](), ptrSize},
-		{"result<string, bool>", &OKSizedResult[string, bool]{}, sizePlusAlignOf[string](), ptrSize},
-		{"result<[9]byte, u64>", &OKSizedResult[[9]byte, uint64]{}, 24, alignOf[uint64]()},
-
-		{"result<_, string>", &ErrSizedResult[struct{}, string]{}, sizePlusAlignOf[string](), ptrSize},
-		{"result<bool, string>", &ErrSizedResult[bool, string]{}, sizePlusAlignOf[string](), ptrSize},
-		{"result<u64, [9]byte>", &ErrSizedResult[uint64, [9]byte]{}, 24, alignOf[uint64]()},
+	if want, got := uintptr(16), unsafe.Sizeof(v2); want != got {
+		t.Errorf("expected unsafe.Sizeof(v2) == %d, got %d", want, got)
+	}
+	if want, got := uintptr(8), tinyunsafe.OffsetOf(&v2, &v2.u64); want != got {
+		t.Errorf("expected unsafe.Offsetof(v2.u64) == %d, got %d", want, got)
 	}
 
-	for _, tt := range tests {
-		typ := typeName(tt.r)
-		t.Run(tt.name, func(t *testing.T) {
-			if got, want := tt.r.Size(), tt.size; got != want {
-				t.Errorf("(%s).Size() == %v, expected %v", typ, got, want)
-			}
-			if got, want := tt.r.ValOffset(), tt.offset; got != want {
-				t.Errorf("(%s).ValOffset() == %v, expected %v", typ, got, want)
-			}
-		})
+	// size 1
+	var v3 struct {
+		_ struct{}
+		b bool // offset 0
+	}
+	if want, got := uintptr(1), unsafe.Sizeof(v3); want != got {
+		t.Errorf("expected unsafe.Sizeof(v3) == %d, got %d", want, got)
+	}
+	if want, got := uintptr(0), tinyunsafe.OffsetOf(&v3, &v3.b); want != got {
+		t.Errorf("expected unsafe.Offsetof(v3.b) == %d, got %d", want, got)
+	}
+
+	// size 0
+	var v4 struct {
+		_ [0]uint32
+		b bool // offset 0!
+	}
+	if want, got := uintptr(4), unsafe.Sizeof(v4); want != got {
+		t.Errorf("expected unsafe.Sizeof(v4) == %d, got %d", want, got)
+	}
+	if want, got := uintptr(0), tinyunsafe.OffsetOf(&v4, &v4.b); want != got {
+		t.Errorf("expected unsafe.Offsetof(v4.b) == %d, got %d", want, got)
 	}
 }
 
-func sizePlusAlignOf[T any]() uintptr {
-	var v T
-	return unsafe.Sizeof(v) + unsafe.Alignof(v)
-}
+// TestBool verifies that Go bool size, alignment, and values are consistent
+// with the Component Model Canonical ABI.
+func TestBool(t *testing.T) {
+	var b bool
+	if got, want := unsafe.Sizeof(b), uintptr(1); got != want {
+		t.Errorf("unsafe.Sizeof(b) == %d, expected %d", got, want)
+	}
+	if got, want := unsafe.Alignof(b), uintptr(1); got != want {
+		t.Errorf("unsafe.Alignof(b) == %d, expected %d", got, want)
+	}
 
-func alignOf[T any]() uintptr {
-	var v T
-	return unsafe.Alignof(v)
+	// uint8(false) == 0
+	b = false
+	if got, want := *(*uint8)(unsafe.Pointer(&b)), uint8(0); got != want {
+		t.Errorf("uint8(b) == %d, expected %d", got, want)
+	}
+
+	// uint8(true) == 1
+	b = true
+	if got, want := *(*uint8)(unsafe.Pointer(&b)), uint8(1); got != want {
+		t.Errorf("uint8(b) == %d, expected %d", got, want)
+	}
+
+	// low bit 1 == true
+	*(*uint8)(unsafe.Pointer(&b)) = 1
+	if got, want := b, true; got != want {
+		t.Errorf("b == %t, expected %t", got, want)
+	}
+
+	// low bit 1 == true
+	*(*uint8)(unsafe.Pointer(&b)) = 3
+	if got, want := b, true; got != want {
+		t.Errorf("b == %t, expected %t", got, want)
+	}
+
+	// low bit 1 == true
+	*(*uint8)(unsafe.Pointer(&b)) = 255
+	if got, want := b, true; got != want {
+		t.Errorf("b == %t, expected %t", got, want)
+	}
+
+	if runtime.GOARCH != "amd64" {
+		// low bit 0 == false
+		*(*uint8)(unsafe.Pointer(&b)) = 2
+		if got, want := b, false; got != want {
+			t.Errorf("b == %t, expected %t", got, want)
+		}
+
+		// low bit 0 == false
+		*(*uint8)(unsafe.Pointer(&b)) = 254
+		if got, want := b, false; got != want {
+			t.Errorf("b == %t, expected %t", got, want)
+		}
+	}
 }
