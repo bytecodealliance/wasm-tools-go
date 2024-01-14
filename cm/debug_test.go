@@ -18,6 +18,21 @@ func typeName(v any) string {
 	return strings.ReplaceAll(name, " ", "")
 }
 
+func sizePlusAlignOf[T any]() uintptr {
+	var v T
+	return unsafe.Sizeof(v) + unsafe.Alignof(v)
+}
+
+func alignOf[T any]() uintptr {
+	var v T
+	return unsafe.Alignof(v)
+}
+
+func zeroPtr[T any]() *T {
+	var zero T
+	return &zero
+}
+
 // VariantDebug is an interface used in tests to validate layout of variant types.
 type VariantDebug interface {
 	Size() uintptr

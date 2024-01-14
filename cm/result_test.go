@@ -62,13 +62,3 @@ func TestResultLayout(t *testing.T) {
 		})
 	}
 }
-
-func sizePlusAlignOf[T any]() uintptr {
-	var v T
-	return unsafe.Sizeof(v) + unsafe.Alignof(v)
-}
-
-func alignOf[T any]() uintptr {
-	var v T
-	return unsafe.Alignof(v)
-}

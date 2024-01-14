@@ -51,8 +51,3 @@ func TestVariantLayout(t *testing.T) {
 		})
 	}
 }
-
-func zeroPtr[T any]() *T {
-	var zero T
-	return &zero
-}
