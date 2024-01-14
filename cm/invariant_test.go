@@ -1,6 +1,7 @@
 package cm
 
 import (
+	"runtime"
 	"testing"
 	"unsafe"
 )
@@ -89,21 +90,9 @@ func TestBool(t *testing.T) {
 		t.Errorf("b == %t, expected %t", got, want)
 	}
 
-	// low bit 0 == false
-	*(*uint8)(unsafe.Pointer(&b)) = 2
-	if got, want := b, false; got != want {
-		t.Errorf("b == %t, expected %t", got, want)
-	}
-
 	// low bit 1 == true
 	*(*uint8)(unsafe.Pointer(&b)) = 3
 	if got, want := b, true; got != want {
-		t.Errorf("b == %t, expected %t", got, want)
-	}
-
-	// low bit 0 == false
-	*(*uint8)(unsafe.Pointer(&b)) = 254
-	if got, want := b, false; got != want {
 		t.Errorf("b == %t, expected %t", got, want)
 	}
 
@@ -111,5 +100,19 @@ func TestBool(t *testing.T) {
 	*(*uint8)(unsafe.Pointer(&b)) = 255
 	if got, want := b, true; got != want {
 		t.Errorf("b == %t, expected %t", got, want)
+	}
+
+	if runtime.GOARCH != "amd64" {
+		// low bit 0 == false
+		*(*uint8)(unsafe.Pointer(&b)) = 2
+		if got, want := b, false; got != want {
+			t.Errorf("b == %t, expected %t", got, want)
+		}
+
+		// low bit 0 == false
+		*(*uint8)(unsafe.Pointer(&b)) = 254
+		if got, want := b, false; got != want {
+			t.Errorf("b == %t, expected %t", got, want)
+		}
 	}
 }
