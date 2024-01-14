@@ -76,11 +76,11 @@ func TestResultLayout(t *testing.T) {
 
 		{"result<string, _>", &OKSizedResult[string, struct{}]{}, sizePlusAlignOf[string](), ptrSize},
 		{"result<string, bool>", &OKSizedResult[string, bool]{}, sizePlusAlignOf[string](), ptrSize},
-		{"result<[9]byte, u64>", &OKSizedResult[[9]byte, uint64]{}, sizePlusAlignOf[string](), alignOf[uint64]()},
+		{"result<[9]byte, u64>", &OKSizedResult[[9]byte, uint64]{}, 24, alignOf[uint64]()},
 
 		{"result<_, string>", &ErrSizedResult[struct{}, string]{}, sizePlusAlignOf[string](), ptrSize},
 		{"result<bool, string>", &ErrSizedResult[bool, string]{}, sizePlusAlignOf[string](), ptrSize},
-		{"result<u64, [9]byte>", &ErrSizedResult[uint64, [9]byte]{}, sizePlusAlignOf[string](), alignOf[uint64]()},
+		{"result<u64, [9]byte>", &ErrSizedResult[uint64, [9]byte]{}, 24, alignOf[uint64]()},
 	}
 
 	for _, tt := range tests {
