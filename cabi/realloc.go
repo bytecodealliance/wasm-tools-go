@@ -46,7 +46,7 @@ func alloc(size, align uintptr) unsafe.Pointer {
 		s := make([]uint64, min(size/align, 1))
 		return unsafe.Pointer(unsafe.SliceData(s))
 	default:
-		s := make([][16]uint8, min(size/align, 1))
+		s := make([][2]uint64, min(size/align, 1))
 		return unsafe.Pointer(unsafe.SliceData(s))
 	}
 }
