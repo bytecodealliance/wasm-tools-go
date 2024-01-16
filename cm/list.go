@@ -5,8 +5,8 @@ import "unsafe"
 // List represents a Component Model list<T>.
 // The binary representation of list<T> is similar to a Go slice minus the cap field.
 type List[T any] struct {
-	ptr *T
-	len uintptr
+	data *T
+	len  uint
 }
 
 // ToList returns a List[T] equivalent to the Go slice s.
@@ -14,12 +14,18 @@ type List[T any] struct {
 // same array storage as the slice.
 func ToList[S ~[]T, T any](s S) List[T] {
 	return List[T]{
-		ptr: unsafe.SliceData([]T(s)),
-		len: uintptr(len(s)),
+		data: unsafe.SliceData([]T(s)),
+		len:  uint(len(s)),
 	}
+}
+
+// Len returns the length of the list.
+// TODO: should this return an int instead of a uint?
+func (list List[T]) Len() uint {
+	return uint(list.len)
 }
 
 // Slice returns a Go slice representing the List.
 func (list List[T]) Slice() []T {
-	return unsafe.Slice(list.ptr, list.len)
+	return unsafe.Slice(list.data, list.len)
 }
