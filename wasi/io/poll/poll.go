@@ -1,10 +1,12 @@
+//go:build wasip2
+
 // Package poll represents the imported interface "wasi:io/poll".
 //
 // A poll API intended to let users wait for I/O events on multiple handles
 // at once.
 package poll
 
-import "internal/wasm/cm"
+import "github.com/ydnar/wasm-tools-go/cm"
 
 // Pollable represents the imported type "wasi:io/poll.pollable".
 //

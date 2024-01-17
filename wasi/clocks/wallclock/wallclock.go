@@ -1,3 +1,5 @@
+//go:build wasip2
+
 // Package wallclock represents the interface "wasi:clocks/wall-clock".
 //
 // WASI Wall Clock is a clock API intended to let users query the current

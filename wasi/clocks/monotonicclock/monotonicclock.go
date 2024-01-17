@@ -1,3 +1,5 @@
+//go:build wasip2
+
 // Package monotonicclock represents the interface "wasi:clocks/monotonic-clock".
 //
 // WASI Monotonic Clock is a clock API intended to let users measure elapsed
@@ -12,7 +14,7 @@
 // It is intended for measuring elapsed time.
 package monotonicclock
 
-import "internal/wasm/wasi/io/poll"
+import "github.com/ydnar/wasm-tools-go/wasi/io/poll"
 
 // Instant represents the type "wasi:clocks/monotonic-clock.instant".
 //
