@@ -6,19 +6,22 @@ package poll
 
 import "internal/wasm/cm"
 
-// Pollable represents the imported type "wasi:io/poll.pollale".
+// Pollable represents the imported type "wasi:io/poll.pollable".
 //
 // `pollable` represents a single I/O event which may be ready, or not.
 type Pollable cm.Resource
 
-// Ready represents the imported method "wasi:io/poll.pollable#ready".
+// Ready calls the imported method "wasi:io/poll.pollable#ready".
 //
 // Return the readiness of a pollable. This function never blocks.
 //
 // Returns `true` when the pollable is ready, and `false` otherwise.
-//
+func (self Pollable) Ready() bool {
+	return self.ready()
+}
+
 //go:wasmimport wasi:io/poll@0.2.0-rc-2023-11-10 [method]pollable.ready
-func (self Pollable) Ready() bool
+func (self Pollable) ready() bool
 
 // Ready represents the imported method "wasi:io/poll.pollable#block".
 //
@@ -27,9 +30,12 @@ func (self Pollable) Ready() bool
 //
 // This function is equivalent to calling `poll.poll` on a list
 // containing only this pollable.
-//
+func (self Pollable) Block() {
+	self.block()
+}
+
 //go:wasmimport wasi:io/poll@0.2.0-rc-2023-11-10 [method]pollable.block
-func (self Pollable) Block()
+func (self Pollable) block()
 
 // Poll represents the imported function "wasi:io/poll#poll".
 //
