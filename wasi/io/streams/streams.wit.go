@@ -14,17 +14,29 @@ import (
 	ioerror "github.com/ydnar/wasm-tools-go/wasi/io/error"
 )
 
+// StreamError represents variant "wasi:io/streams.stream-error".
+//
+// An error for input-stream and output-stream operations.
 type StreamError struct {
-	cm.SizedVariant2[cm.Shape[ioerror.Error], ioerror.Error, struct{}]
+	cm.Variant[uint8, ioerror.Error, ioerror.Error]
 }
 
-func (self StreamError) LastOperationFailed() (ioerror.Error, bool) {
-	return self.SizedVariant2.V0()
+// LastOperationFailed represents variant case "last-operation-failed(error)".
+//
+// The last operation (a write or flush) failed before completion.
+//
+// More information is available in the `error` payload.
+func (self *StreamError) LastOperationFailed() (ioerror.Error, bool) {
+	return *(*ioerror.Error)(self.Data()), self.Tag() == 0
 }
 
-func (self StreamError) Closed() bool {
-	_, ret := self.SizedVariant2.V1()
-	return ret
+// Closed represents variant case "closed".
+//
+// The stream is closed: no more input will be accepted by the
+// stream. A closed output-stream will return this error on all
+// future operations.
+func (self *StreamError) Closed() bool {
+	return self.Tag() == 1
 }
 
 /*
