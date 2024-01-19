@@ -2,6 +2,43 @@ package cm
 
 import "unsafe"
 
+type Discriminant interface {
+	uint8 | uint16 | uint32
+}
+
+type Variant[Disc Discriminant, Shape, Align any] struct {
+	tag  Disc
+	_    [0]Align
+	data Shape
+}
+
+func (v *Variant[Disc, Shape, Align]) Tag() uint32 {
+	return uint32(v.tag)
+}
+
+func (v *Variant[Disc, Shape, Align]) Data() unsafe.Pointer {
+	return unsafe.Pointer(&v.data)
+}
+
+func Get[T any, Disc Discriminant, Shape, Align any](v *Variant[Disc, Shape, Align], tag Disc) (T, bool) {
+	if v.tag != tag {
+		var zero T
+		return zero, false
+	}
+	return *((*T)(unsafe.Pointer(&v.data))), true
+}
+
+func Set[T any, Disc Discriminant, Shape, Align any](v *Variant[Disc, Shape, Align], tag Disc, data T) {
+	v.tag = tag
+	*((*T)(unsafe.Pointer(&v.data))) = data
+}
+
+func init() {
+	var v Variant[uint8, uint64, uint64]
+	Set(&v, 1, uint64(99))
+	_, _ = Get[int64](&v, 1)
+}
+
 type Shape[T any] [1]T
 
 type Variant2[T0, T1 any] interface {
@@ -73,17 +110,3 @@ func (v *UnsizedVariant2[T0, T1]) Set1(val T1) {
 // UntypedVariant2 represents an untyped variant of cardinality 2.
 // The associated types are defaulted to struct{}.
 type UntypedVariant2 = UnsizedVariant2[struct{}, struct{}]
-
-// TODO: remove load?
-func load[T any, S any, Disc ~bool | ~uint8 | ~uint16 | ~uint32](disc *Disc, n Disc, ptr *S) (val T, ok bool) {
-	if *disc != n {
-		return val, false
-	}
-	return *(*T)(unsafe.Pointer(ptr)), true
-}
-
-// TODO: remove store?
-func store[T any, S any, Disc ~bool | ~uint8 | ~uint16 | ~uint32](disc *Disc, n Disc, ptr *S, val T) {
-	*(*T)(unsafe.Pointer(ptr)) = val
-	*disc = n
-}
