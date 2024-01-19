@@ -40,16 +40,16 @@ type VariantDebug interface {
 	ValOffset() uintptr
 }
 
-func (v SizedVariant2[Shape, T0, T1]) Size() uintptr {
+func (v Variant2[Shape, T0, T1]) Size() uintptr {
 	return unsafe.Sizeof(v)
 }
 
-func (v SizedVariant2[Shape, T0, T1]) ValAlign() uintptr {
-	return unsafe.Alignof(v.val)
+func (v Variant2[Shape, T0, T1]) ValAlign() uintptr {
+	return unsafe.Alignof(v.Variant.data)
 }
 
-func (v SizedVariant2[Shape, T0, T1]) ValOffset() uintptr {
-	return tinyunsafe.OffsetOf(&v, &v.val)
+func (v Variant2[Shape, T0, T1]) ValOffset() uintptr {
+	return tinyunsafe.OffsetOf(&v, &v.Variant.data)
 }
 
 func (v UnsizedVariant2[T0, T1]) Size() uintptr {

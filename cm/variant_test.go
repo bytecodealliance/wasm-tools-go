@@ -6,12 +6,19 @@ import (
 )
 
 var (
-	// TODO: nuke Variant2 interface?
-	_ Variant2[struct{}, struct{}] = zeroPtr[UnsizedVariant2[struct{}, struct{}]]()
-	_ Variant2[struct{}, struct{}] = zeroPtr[UnsizedVariant2[struct{}, struct{}]]()
-	_ Variant2[string, bool]       = &SizedVariant2[Shape[string], string, bool]{}
-	_ Variant2[bool, string]       = &SizedVariant2[Shape[string], bool, string]{}
+	_ variant2[struct{}, struct{}] = zeroPtr[UnsizedVariant2[struct{}, struct{}]]()
+	_ variant2[struct{}, struct{}] = zeroPtr[UnsizedVariant2[struct{}, struct{}]]()
+	_ variant2[string, bool]       = &Variant2[string, string, bool]{}
+	_ variant2[bool, string]       = &Variant2[string, bool, string]{}
 )
+
+type variant2[T0, T1 any] interface {
+	Tag() bool
+	Case0() (T0, bool)
+	Case1() (T1, bool)
+	Set0(T0)
+	Set1(T1)
+}
 
 func TestVariantLayout(t *testing.T) {
 	// 8 on 64-bit, 4 on 32-bit
@@ -25,18 +32,18 @@ func TestVariantLayout(t *testing.T) {
 	}{
 		{"variant { _; _ }", UnsizedVariant2[struct{}, struct{}](false), 1, 0},
 		{"variant { [0]u8; _ }", UnsizedVariant2[[0]byte, struct{}](false), 1, 0},
-		{"variant { string; string }", SizedVariant2[Shape[string], string, string]{}, sizePlusAlignOf[string](), ptrSize},
-		{"variant { bool; string }", SizedVariant2[Shape[string], bool, string]{}, sizePlusAlignOf[string](), ptrSize},
-		{"variant { string; _ }", SizedVariant2[Shape[string], string, struct{}]{}, sizePlusAlignOf[string](), ptrSize},
-		{"variant { _; _ }", SizedVariant2[Shape[string], struct{}, string]{}, sizePlusAlignOf[string](), ptrSize},
-		{"variant { u64; u64 }", SizedVariant2[Shape[uint64], uint64, uint64]{}, 16, alignOf[uint64]()},
-		{"variant { u32; u64 }", SizedVariant2[Shape[uint64], uint32, uint64]{}, 16, alignOf[uint64]()},
-		{"variant { u64; u32 }", SizedVariant2[Shape[uint64], uint64, uint32]{}, 16, alignOf[uint64]()},
-		{"variant { u8; u64 }", SizedVariant2[Shape[uint64], uint8, uint64]{}, 16, alignOf[uint64]()},
-		{"variant { u64; u8 }", SizedVariant2[Shape[uint64], uint64, uint8]{}, 16, alignOf[uint64]()},
-		{"variant { u8; u32 }", SizedVariant2[Shape[uint32], uint8, uint32]{}, 8, alignOf[uint32]()},
-		{"variant { u32; u8 }", SizedVariant2[Shape[uint32], uint32, uint8]{}, 8, alignOf[uint32]()},
-		{"variant { [9]u8, u64 }", SizedVariant2[Shape[[9]byte], [9]byte, uint64]{}, 24, alignOf[uint64]()},
+		{"variant { string; string }", Variant2[string, string, string]{}, sizePlusAlignOf[string](), ptrSize},
+		{"variant { bool; string }", Variant2[string, bool, string]{}, sizePlusAlignOf[string](), ptrSize},
+		{"variant { string; _ }", Variant2[string, string, struct{}]{}, sizePlusAlignOf[string](), ptrSize},
+		{"variant { _; _ }", Variant2[string, struct{}, string]{}, sizePlusAlignOf[string](), ptrSize},
+		{"variant { u64; u64 }", Variant2[Shape[uint64], uint64, uint64]{}, 16, alignOf[uint64]()},
+		{"variant { u32; u64 }", Variant2[Shape[uint64], uint32, uint64]{}, 16, alignOf[uint64]()},
+		{"variant { u64; u32 }", Variant2[Shape[uint64], uint64, uint32]{}, 16, alignOf[uint64]()},
+		{"variant { u8; u64 }", Variant2[Shape[uint64], uint8, uint64]{}, 16, alignOf[uint64]()},
+		{"variant { u64; u8 }", Variant2[Shape[uint64], uint64, uint8]{}, 16, alignOf[uint64]()},
+		{"variant { u8; u32 }", Variant2[Shape[uint32], uint8, uint32]{}, 8, alignOf[uint32]()},
+		{"variant { u32; u8 }", Variant2[Shape[uint32], uint32, uint8]{}, 8, alignOf[uint32]()},
+		{"variant { [9]u8, u64 }", Variant2[Shape[[9]byte], [9]byte, uint64]{}, 24, alignOf[uint64]()},
 	}
 
 	for _, tt := range tests {

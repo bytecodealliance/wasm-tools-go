@@ -8,7 +8,7 @@ import (
 var (
 	_ Result[struct{}, struct{}] = &UntypedResult{}
 	_ Result[struct{}, struct{}] = &UnsizedResult[struct{}, struct{}]{}
-	_ Result[string, bool]       = &SizedResult[Shape[string], string, bool]{}
+	_ Result[string, bool]       = &SizedResult[string, string, bool]{}
 	_ Result[string, bool]       = &OKSizedResult[string, bool]{}
 	_ Result[bool, string]       = &ErrSizedResult[bool, string]{}
 )
@@ -28,10 +28,10 @@ func TestResultLayout(t *testing.T) {
 		{"result<_, _>", UnsizedResult[struct{}, struct{}]{}, 1, 0},
 		{"result<[0]u8, _>", UnsizedResult[[0]byte, struct{}]{}, 1, 0},
 
-		{"result<string, string>", SizedResult[Shape[string], string, string]{}, sizePlusAlignOf[string](), ptrSize},
-		{"result<bool, string>", SizedResult[Shape[string], bool, string]{}, sizePlusAlignOf[string](), ptrSize},
-		{"result<string, _>", SizedResult[Shape[string], string, struct{}]{}, sizePlusAlignOf[string](), ptrSize},
-		{"result<_, string>", SizedResult[Shape[string], struct{}, string]{}, sizePlusAlignOf[string](), ptrSize},
+		{"result<string, string>", SizedResult[string, string, string]{}, sizePlusAlignOf[string](), ptrSize},
+		{"result<bool, string>", SizedResult[string, bool, string]{}, sizePlusAlignOf[string](), ptrSize},
+		{"result<string, _>", SizedResult[string, string, struct{}]{}, sizePlusAlignOf[string](), ptrSize},
+		{"result<_, string>", SizedResult[string, struct{}, string]{}, sizePlusAlignOf[string](), ptrSize},
 		{"result<u64, u64>", SizedResult[Shape[uint64], uint64, uint64]{}, 16, alignOf[uint64]()},
 		{"result<u32, u64>", SizedResult[Shape[uint64], uint32, uint64]{}, 16, alignOf[uint64]()},
 		{"result<u64, u32>", SizedResult[Shape[uint64], uint64, uint32]{}, 16, alignOf[uint64]()},
