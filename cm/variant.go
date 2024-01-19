@@ -20,6 +20,10 @@ func (v *Variant[Disc, Shape, Align]) Data() unsafe.Pointer {
 	return unsafe.Pointer(&v.data)
 }
 
+func Is[T any, Disc Discriminant, Shape, Align any](v *Variant[Disc, Shape, Align], tag Disc) bool {
+	return v.tag == tag
+}
+
 func Get[T any, Disc Discriminant, Shape, Align any](v *Variant[Disc, Shape, Align], tag Disc) (T, bool) {
 	if v.tag != tag {
 		var zero T
