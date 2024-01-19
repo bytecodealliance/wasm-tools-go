@@ -18,7 +18,7 @@ import (
 //
 // An error for input-stream and output-stream operations.
 type StreamError struct {
-	cm.Variant[uint8, ioerror.Error, ioerror.Error]
+	v cm.Variant[bool, ioerror.Error, ioerror.Error]
 }
 
 // LastOperationFailed represents variant case "last-operation-failed(error)".
@@ -27,7 +27,7 @@ type StreamError struct {
 //
 // More information is available in the `error` payload.
 func (self *StreamError) LastOperationFailed() (ioerror.Error, bool) {
-	return *(*ioerror.Error)(self.Data()), self.Tag() == 0
+	return cm.Get[ioerror.Error](&self.v, false)
 }
 
 // Closed represents variant case "closed".
@@ -36,7 +36,7 @@ func (self *StreamError) LastOperationFailed() (ioerror.Error, bool) {
 // stream. A closed output-stream will return this error on all
 // future operations.
 func (self *StreamError) Closed() bool {
-	return self.Tag() == 1
+	return self.v.Is(true)
 }
 
 /*
