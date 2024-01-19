@@ -6,25 +6,46 @@ type Discriminant interface {
 	uint8 | uint16 | uint32
 }
 
+// Variant represents a loosely-typed Component Model variant.
+// Disc must be one of uint8, uint16, or uint32. Shape and Align
+// must be non-zero sized types. To create a variant with no associated
+// types, use UntypedVariant. To create a variant with only zero-sized types
+// like struct{} or [0]int, use UnsizedVariant.
 type Variant[Disc Discriminant, Shape, Align any] struct {
 	tag  Disc
 	_    [0]Align
 	data Shape
 }
 
-func (v *Variant[Disc, Shape, Align]) Tag() uint32 {
-	return uint32(v.tag)
+// Tag returns the variant tag value.
+func (v *Variant[Disc, Shape, Align]) Tag() Disc {
+	return v.tag
 }
 
+// Data returns an unsafe.Pointer to the data field in v.
 func (v *Variant[Disc, Shape, Align]) Data() unsafe.Pointer {
 	return unsafe.Pointer(&v.data)
 }
 
-func Is[T any, Disc Discriminant, Shape, Align any](v *Variant[Disc, Shape, Align], tag Disc) bool {
+// Is returns true if the variant tag value equals tag
+func (v *Variant[Disc, Shape, Align]) Is(tag Disc) bool {
 	return v.tag == tag
 }
 
-func Get[T any, Disc Discriminant, Shape, Align any](v *Variant[Disc, Shape, Align], tag Disc) (T, bool) {
+// As coerces the value in Variant v into type T.
+func As[T any, Disc Discriminant, Shape, Align any](v *Variant[Disc, Shape, Align]) (data T) {
+	if BoundsCheck && unsafe.Sizeof(data) > unsafe.Sizeof(v.data) {
+		panic("As: size of requested type greater than size of data type")
+	}
+	return *((*T)(unsafe.Pointer(&v.data)))
+}
+
+// Get returns a value of type T and true if the Variant tag is tag,
+// or returns the zero value of T and false.
+func Get[T any, Disc Discriminant, Shape, Align any](v *Variant[Disc, Shape, Align], tag Disc) (data T, ok bool) {
+	if BoundsCheck && unsafe.Sizeof(data) > unsafe.Sizeof(v.data) {
+		panic("Get: size of requested type greater than size of data type")
+	}
 	if v.tag != tag {
 		var zero T
 		return zero, false
@@ -32,15 +53,33 @@ func Get[T any, Disc Discriminant, Shape, Align any](v *Variant[Disc, Shape, Ali
 	return *((*T)(unsafe.Pointer(&v.data))), true
 }
 
+// Set sets the tag and value of Variant v.
 func Set[T any, Disc Discriminant, Shape, Align any](v *Variant[Disc, Shape, Align], tag Disc, data T) {
+	if BoundsCheck && unsafe.Sizeof(data) > unsafe.Sizeof(v.data) {
+		panic("Set: size of requested type greater than size of data type")
+	}
 	v.tag = tag
 	*((*T)(unsafe.Pointer(&v.data))) = data
+}
+
+// NewVariant returns a new variant with tag of type Disc, storage and GC shape of type Shape,
+// setting the tag and value of type T.
+func NewVariant[Disc Discriminant, Shape, Align any, T any](tag Disc, data T) Variant[Disc, Shape, Align] {
+	var v Variant[Disc, Shape, Align]
+	if BoundsCheck && unsafe.Sizeof(data) > unsafe.Sizeof(v.data) {
+		panic("NewVariant: size of requested type greater than size of data type")
+	}
+	v.tag = tag
+	*((*T)(unsafe.Pointer(&v.data))) = data
+	return v
 }
 
 func init() {
 	var v Variant[uint8, uint64, uint64]
 	Set(&v, 1, uint64(99))
 	_, _ = Get[int64](&v, 1)
+	_ = NewVariant[uint8, string, string](0, "hello world")
+	_ = NewVariant[uint8, string, string](0, "hello world")
 }
 
 type Shape[T any] [1]T

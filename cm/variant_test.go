@@ -51,3 +51,54 @@ func TestVariantLayout(t *testing.T) {
 		})
 	}
 }
+
+func TestAsBoundsCheck(t *testing.T) {
+	if !BoundsCheck {
+		return // TinyGo does not support t.SkipNow
+	}
+	defer func() {
+		if recover() == nil {
+			t.Errorf("As did not panic")
+		}
+	}()
+	var v Variant[uint8, uint8, uint8]
+	_ = As[string](&v)
+}
+
+func TestGetBoundsCheck(t *testing.T) {
+	if !BoundsCheck {
+		return // TinyGo does not support t.SkipNow
+	}
+	defer func() {
+		if recover() == nil {
+			t.Errorf("Get did not panic")
+		}
+	}()
+	var v Variant[uint8, uint8, uint8]
+	_, _ = Get[string](&v, 0)
+}
+
+func TestSetBoundsCheck(t *testing.T) {
+	if !BoundsCheck {
+		return // TinyGo does not support t.SkipNow
+	}
+	defer func() {
+		if recover() == nil {
+			t.Errorf("Set did not panic")
+		}
+	}()
+	var v Variant[uint8, uint8, uint8]
+	Set(&v, 0, "hello world")
+}
+
+func TestNewVariantBoundsCheck(t *testing.T) {
+	if !BoundsCheck {
+		return // TinyGo does not support t.SkipNow
+	}
+	defer func() {
+		if recover() == nil {
+			t.Errorf("NewVariant did not panic")
+		}
+	}()
+	_ = NewVariant[uint8, uint8, uint8](0, "hello world")
+}
