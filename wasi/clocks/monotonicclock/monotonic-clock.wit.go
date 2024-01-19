@@ -15,8 +15,6 @@
 package monotonicclock
 
 import (
-	_ "unsafe"
-
 	"github.com/ydnar/wasm-tools-go/wasi/io/poll"
 )
 

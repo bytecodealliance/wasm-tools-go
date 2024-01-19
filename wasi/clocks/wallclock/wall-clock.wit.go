@@ -18,10 +18,6 @@
 // It is intended for reporting the current date and time for humans.
 package wallclock
 
-import (
-	_ "unsafe"
-)
-
 // DateTime represents the type "wasi:clocks/wall-clock.datetime".
 type DateTime struct {
 	Seconds     uint64
