@@ -69,15 +69,15 @@ type ResultDebug interface {
 	VariantDebug
 }
 
-func (r SizedResult[S, OK, Err]) Size() uintptr {
+func (r Result[S, OK, Err]) Size() uintptr {
 	return unsafe.Sizeof(r)
 }
 
-func (r SizedResult[S, OK, Err]) ValAlign() uintptr {
+func (r Result[S, OK, Err]) ValAlign() uintptr {
 	return r.v.ValAlign()
 }
 
-func (r SizedResult[S, OK, Err]) ValOffset() uintptr {
+func (r Result[S, OK, Err]) ValOffset() uintptr {
 	return r.v.ValOffset()
 }
 
