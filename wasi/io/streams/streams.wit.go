@@ -12,13 +12,19 @@ package streams
 import (
 	"github.com/ydnar/wasm-tools-go/cm"
 	ioerror "github.com/ydnar/wasm-tools-go/wasi/io/error"
+	"github.com/ydnar/wasm-tools-go/wasi/io/poll"
+)
+
+type (
+	Error    = ioerror.Error
+	Pollable = poll.Pollable
 )
 
 // StreamError represents variant "wasi:io/streams.stream-error".
 //
 // An error for input-stream and output-stream operations.
 type StreamError struct {
-	v cm.Variant[bool, ioerror.Error, ioerror.Error]
+	v cm.Variant[bool, Error, Error]
 }
 
 // LastOperationFailed represents variant case "last-operation-failed(error)".
@@ -26,8 +32,8 @@ type StreamError struct {
 // The last operation (a write or flush) failed before completion.
 //
 // More information is available in the `error` payload.
-func (self *StreamError) LastOperationFailed() (ioerror.Error, bool) {
-	return cm.Get[ioerror.Error](&self.v, false)
+func (self *StreamError) LastOperationFailed() (Error, bool) {
+	return cm.Get[Error](&self.v, false)
 }
 
 // Closed represents variant case "closed".
@@ -39,83 +45,110 @@ func (self *StreamError) Closed() bool {
 	return self.v.Is(true)
 }
 
+// InputStream represents the resource "wasi:io/streams.input-stream".
+//
+// An input bytestream.
+//
+// `input-stream`s are *non-blocking* to the extent practical on underlying
+// platforms. I/O operations always return promptly; if fewer bytes are
+// promptly available than requested, they return the number of bytes promptly
+// available, which could even be zero. To wait for data to be available,
+// use the `subscribe` function to obtain a `pollable` which can be polled
+// for using `wasi:io/poll`.
+type InputStream cm.Resource
+
+// Read represents the method "wasi:io/streams.input-stream#read".
+//
+// Perform a non-blocking read from the stream.
+//
+// This function returns a list of bytes containing the read data,
+// when successful. The returned list will contain up to `len` bytes;
+// it may return fewer than requested, but not more. The list is
+// empty when no bytes are available for reading at this time. The
+// pollable given by `subscribe` will be ready when more bytes are
+// available.
+//
+// This function fails with a `stream-error` when the operation
+// encounters an error, giving `last-operation-failed`, or when the
+// stream is closed, giving `closed`.
+//
+// When the caller gives a `len` of 0, it represents a request to
+// read 0 bytes. If the stream is still open, this call should
+// succeed and return an empty list, or otherwise fail with `closed`.
+//
+// The `len` parameter is a `u64`, which could represent a list of u8 which
+// is not possible to allocate in wasm32, or not desirable to allocate as
+// as a return value by the callee. The callee may return a list of bytes
+// less than `len` in size while more bytes are available for reading.
+func (self InputStream) Read(len uint64) cm.OKSizedResult[cm.List[uint8], StreamError] {
+	var ret cm.OKSizedResult[cm.List[uint8], StreamError]
+	self.read(len, &ret)
+	return ret
+}
+
+//go:wasmimport wasi:io/streams@0.2.0-rc-2023-11-10 [method]input-stream.read
+func (self InputStream) read(len uint64, ret *cm.OKSizedResult[cm.List[uint8], StreamError])
+
+// BlockingRead represents the method "wasi:io/streams.input-stream.blocking-read".
+//
+// Read bytes from a stream, after blocking until at least one byte can
+// be read. Except for blocking, behavior is identical to `read`.
+func (self InputStream) BlockingRead(len uint64) cm.OKSizedResult[cm.List[uint8], StreamError] {
+	var ret cm.OKSizedResult[cm.List[uint8], StreamError]
+	self.blocking_read(len, &ret)
+	return ret
+}
+
+//go:wasmimport wasi:io/streams@0.2.0-rc-2023-11-10 [method]input-stream.blocking-read
+func (self InputStream) blocking_read(len uint64, ret *cm.OKSizedResult[cm.List[uint8], StreamError])
+
+// Skip represents the method "wasi:io/streams.input-stream#skip".
+//
+// Skip bytes from a stream. Returns number of bytes skipped.
+//
+// Behaves identical to `read`, except instead of returning a list
+// of bytes, returns the number of bytes consumed from the stream.
+func (self InputStream) Skip(len uint64) cm.OKSizedResult[uint64, StreamError] {
+	var ret cm.OKSizedResult[uint64, StreamError]
+	self.skip(len, &ret)
+	return ret
+}
+
+//go:wasmimport wasi:io/streams@0.2.0-rc-2023-11-10 [method]input-stream.skip
+func (self InputStream) skip(len uint64, ret *cm.OKSizedResult[uint64, StreamError])
+
+// BlockingSkip represents the method "wasi:io/streams.input-stream.blocking-skip".
+//
+// Skip bytes from a stream, after blocking until at least one byte
+// can be skipped. Except for blocking behavior, identical to `skip`.
+func (self InputStream) BlockingSkip(len uint64) cm.OKSizedResult[uint64, StreamError] {
+	var ret cm.OKSizedResult[uint64, StreamError]
+	self.blocking_skip(len, &ret)
+	return ret
+}
+
+//go:wasmimport wasi:io/streams@0.2.0-rc-2023-11-10 [method]input-stream.blocking-skip
+func (self InputStream) blocking_skip(len uint64, ret *cm.OKSizedResult[uint64, StreamError])
+
+// Subscribe represents the method "wasi:io/streams.input-stream.subscribe".
+//
+// Create a `pollable` which will resolve once either the specified stream
+// has bytes available to read or the other end of the stream has been
+// closed.
+// The created `pollable` is a child resource of the `input-stream`.
+// Implementations may trap if the `input-stream` is dropped before
+// all derived `pollable`s created with this function are dropped.
+func (self InputStream) Subscribe() Pollable {
+	return self.subscribe()
+}
+
+//go:wasmimport wasi:io/streams@0.2.0-rc-2023-11-10 [method]input-stream.subscribe
+func (self InputStream) subscribe() Pollable
+
 /*
-package wasi:io@0.2.0-rc-2023-11-10;
 
 interface streams {
-    use error.{error};
-    use poll.{pollable};
-
-    // An error for input-stream and output-stream operations.
-    variant stream-error {
-        // The last operation (a write or flush) failed before completion.
-        //
-        // More information is available in the `error` payload.
-        last-operation-failed(error),
-        // The stream is closed: no more input will be accepted by the
-        // stream. A closed output-stream will return this error on all
-        // future operations.
-        closed
-    }
-
-    // An input bytestream.
-    //
-    // `input-stream`s are *non-blocking* to the extent practical on underlying
-    // platforms. I/O operations always return promptly; if fewer bytes are
-    // promptly available than requested, they return the number of bytes promptly
-    // available, which could even be zero. To wait for data to be available,
-    // use the `subscribe` function to obtain a `pollable` which can be polled
-    // for using `wasi:io/poll`.
     resource input-stream {
-        // Perform a non-blocking read from the stream.
-        //
-        // This function returns a list of bytes containing the read data,
-        // when successful. The returned list will contain up to `len` bytes;
-        // it may return fewer than requested, but not more. The list is
-        // empty when no bytes are available for reading at this time. The
-        // pollable given by `subscribe` will be ready when more bytes are
-        // available.
-        //
-        // This function fails with a `stream-error` when the operation
-        // encounters an error, giving `last-operation-failed`, or when the
-        // stream is closed, giving `closed`.
-        //
-        // When the caller gives a `len` of 0, it represents a request to
-        // read 0 bytes. If the stream is still open, this call should
-        // succeed and return an empty list, or otherwise fail with `closed`.
-        //
-        // The `len` parameter is a `u64`, which could represent a list of u8 which
-        // is not possible to allocate in wasm32, or not desirable to allocate as
-        // as a return value by the callee. The callee may return a list of bytes
-        // less than `len` in size while more bytes are available for reading.
-        read: func(
-            // The maximum number of bytes to read
-            len: u64
-        ) -> result<list<u8>, stream-error>;
-
-        // Read bytes from a stream, after blocking until at least one byte can
-        // be read. Except for blocking, behavior is identical to `read`.
-        blocking-read: func(
-            // The maximum number of bytes to read
-            len: u64
-        ) -> result<list<u8>, stream-error>;
-
-        // Skip bytes from a stream. Returns number of bytes skipped.
-        //
-        // Behaves identical to `read`, except instead of returning a list
-        // of bytes, returns the number of bytes consumed from the stream.
-        skip: func(
-            // The maximum number of bytes to skip.
-            len: u64,
-        ) -> result<u64, stream-error>;
-
-        // Skip bytes from a stream, after blocking until at least one byte
-        // can be skipped. Except for blocking behavior, identical to `skip`.
-        blocking-skip: func(
-            // The maximum number of bytes to skip.
-            len: u64,
-        ) -> result<u64, stream-error>;
-
         // Create a `pollable` which will resolve once either the specified stream
         // has bytes available to read or the other end of the stream has been
         // closed.
