@@ -93,7 +93,6 @@ type align2[T0, T1 any] struct {
 
 func (v *Variant2[S, T0, T1]) Case0() (val T0, ok bool) {
 	return Get[T0](&v.Variant, false)
-
 }
 
 func (v *Variant2[S, T0, T1]) Case1() (val T1, ok bool) {

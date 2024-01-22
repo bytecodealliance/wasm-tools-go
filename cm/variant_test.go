@@ -8,8 +8,8 @@ import (
 var (
 	_ variant2[struct{}, struct{}] = zeroPtr[UnsizedVariant2[struct{}, struct{}]]()
 	_ variant2[struct{}, struct{}] = zeroPtr[UnsizedVariant2[struct{}, struct{}]]()
-	_ variant2[string, bool]       = &Variant2[string, string, bool]{}
-	_ variant2[bool, string]       = &Variant2[string, bool, string]{}
+	_ variant2[string, bool]       = zeroPtr[Variant2[string, string, bool]]()
+	_ variant2[bool, string]       = zeroPtr[Variant2[string, bool, string]]()
 )
 
 type variant2[T0, T1 any] interface {

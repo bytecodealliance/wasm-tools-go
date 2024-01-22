@@ -6,11 +6,9 @@ import (
 )
 
 var (
-	_ result[struct{}, struct{}] = &UntypedResult{}
-	_ result[struct{}, struct{}] = &UnsizedResult[struct{}, struct{}]{}
-	_ result[string, bool]       = &Result[string, string, bool]{}
-	_ result[string, bool]       = &OKSizedResult[string, bool]{}
-	_ result[bool, string]       = &ErrSizedResult[bool, string]{}
+	_ result[string, bool] = &Result[string, string, bool]{}
+	_ result[string, bool] = &OKSizedResult[string, bool]{}
+	_ result[bool, string] = &ErrSizedResult[bool, string]{}
 )
 
 type result[OK, Err any] interface {
@@ -31,10 +29,12 @@ func TestResultLayout(t *testing.T) {
 		size   uintptr
 		offset uintptr
 	}{
-		{"result", UntypedResult{}, 1, 0},
+		{"result", UntypedResult(false), 1, 0},
+		{"ok", UntypedResult(ResultOK), 1, 0},
+		{"err", UntypedResult(ResultErr), 1, 0},
 
-		{"result<_, _>", UnsizedResult[struct{}, struct{}]{}, 1, 0},
-		{"result<[0]u8, _>", UnsizedResult[[0]byte, struct{}]{}, 1, 0},
+		{"result<_, _>", UnsizedResult[struct{}, struct{}](false), 1, 0},
+		{"result<[0]u8, _>", UnsizedResult[[0]byte, struct{}](false), 1, 0},
 
 		{"result<string, string>", Result[string, string, string]{}, sizePlusAlignOf[string](), ptrSize},
 		{"result<bool, string>", Result[string, bool, string]{}, sizePlusAlignOf[string](), ptrSize},

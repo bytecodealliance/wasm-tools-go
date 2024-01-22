@@ -86,9 +86,9 @@ func (r UnsizedResult[OK, Err]) Size() uintptr {
 }
 
 func (r UnsizedResult[OK, Err]) ValAlign() uintptr {
-	return r.v.ValAlign()
+	return 0
 }
 
 func (r UnsizedResult[OK, Err]) ValOffset() uintptr {
-	return r.v.ValOffset()
+	return 0
 }
