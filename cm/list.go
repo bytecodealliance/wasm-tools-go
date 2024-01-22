@@ -29,6 +29,11 @@ func ToList[S ~[]T, T any](s S) List[T] {
 	}
 }
 
+// Data returns the data pointer for the list.
+func (list List[T]) Data() *T {
+	return list.data
+}
+
 // Len returns the length of the list.
 // TODO: should this return an int instead of a uint?
 func (list List[T]) Len() uint {
