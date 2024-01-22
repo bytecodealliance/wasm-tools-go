@@ -9,5 +9,5 @@ func GetStderr() OutputStream {
 	return get_stderr()
 }
 
-//go:wasmimport wasi:cli/stderr@0.2.0-rc-2023-11-10 get-stderr
+//go:wasmimport wasi:cli/stderr@0.2.0-rc-2023-12-05 get-stderr
 func get_stderr() OutputStream
