@@ -1,5 +1,13 @@
 package cm
 
+const (
+	// ResultOK represents the OK case of a result.
+	ResultOK = false
+
+	// ResultErr represents the error case of a result.
+	ResultErr = true
+)
+
 // OKSizedResult represents a result sized to hold the OK type.
 // The size of the OK type must be greater than or equal to the size of the Err type.
 // For results with two zero-length types, use UnsizedResult.
