@@ -22,7 +22,7 @@ type Result[Shape any, OK any, Err any] struct {
 	v Variant2[Shape, OK, Err]
 }
 
-// IsErr returns true if r holds the error value.
+// IsErr returns true if r represents the error case.
 func (r *Result[S, OK, Err]) IsErr() bool {
 	return r.v.tag
 }
@@ -37,14 +37,14 @@ func (r *Result[S, OK, Err]) SetErr(err Err) {
 	r.v.Set1(err)
 }
 
-// OK returns the OK value for r and true if r represents the OK state.
+// OK returns the OK value for r and true if r represents the OK case.
 // If r represents an error, then the zero value of OK is returned.
 func (r *Result[S, OK, Err]) OK() (ok OK, isOK bool) {
 	return r.v.Case0()
 }
 
-// Err returns the error value for r and true if r represents the error state.
-// If r represents an OK value, then the zero value of Err is returned.
+// Err returns the error value for r and true if r represents the error case.
+// If r represents the OK case, then the zero value of Err is returned.
 func (r *Result[S, OK, Err]) Err() (err Err, isErr bool) {
 	return r.v.Case1()
 }
@@ -53,35 +53,11 @@ func (r *Result[S, OK, Err]) Err() (err Err, isErr bool) {
 // Both OK or Err must have zero size, e.g. both must be struct{} or a zero-length array.
 // For results with one or more non-zero length types, use Result.
 // For results with no associated types, use UntypedResult.
-type UnsizedResult[OK any, Err any] struct {
-	v UnsizedVariant2[OK, Err]
-}
+type UnsizedResult[OK any, Err any] UnsizedVariant2[OK, Err]
 
-// IsErr returns true if r holds the error value.
+// IsErr returns true if r represents the error case.
 func (r *UnsizedResult[OK, Err]) IsErr() bool {
-	return bool(r.v)
-}
-
-// SetErr stores the OK value in r.
-func (r *UnsizedResult[OK, Err]) SetOK(ok OK) {
-	r.v.Set0(ok)
-}
-
-// SetErr stores the error value in r.
-func (r *UnsizedResult[OK, Err]) SetErr(err Err) {
-	r.v.Set1(err)
-}
-
-// OK returns the OK value for r and true if r represents the OK state.
-// If r represents an error, then the zero value of OK is returned.
-func (r *UnsizedResult[OK, Err]) OK() (ok OK, isOK bool) {
-	return r.v.Case0()
-}
-
-// Err returns the error value for r and true if r represents the error state.
-// If r represents an OK value, then the zero value of Err is returned.
-func (r *UnsizedResult[OK, Err]) Err() (err Err, isErr bool) {
-	return r.v.Case1()
+	return bool(*r)
 }
 
 // UntypedResult represents an untyped Component Model result, e.g.
