@@ -1,4 +1,4 @@
-package stdout
+package stderr
 
 import "github.com/ydnar/wasm-tools-go/wasi/io/streams"
 
