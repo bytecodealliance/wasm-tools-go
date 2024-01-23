@@ -11,6 +11,7 @@ import "unsafe"
 //	type MyFlags struct { cm.Flags[uint8, MyFlag] }
 type Flag uint
 
+// flagsShape defines sufficient shapes to store up to 1024 flag values.
 // FIXME(ydnar): this is silly
 type flagsShape interface {
 	uint8 | uint16 | uint32 |
