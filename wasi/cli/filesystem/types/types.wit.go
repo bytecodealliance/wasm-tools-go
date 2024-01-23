@@ -26,8 +26,6 @@
 // [WASI filesystem path resolution]: https://github.com/WebAssembly/wasi-filesystem/blob/main/path-resolution.md
 package types
 
-import "github.com/ydnar/wasm-tools-go/cm"
-
 // FileSize represents the type "wasi:filesystem.types.filesize".
 //
 // File size or length of a region within a file.
@@ -56,16 +54,14 @@ const (
 // Descriptor flags.
 //
 // Note: This was called `fdflags` in earlier versions of WASI.
-type DescriptorFlags = cm.Flags8[descriptorFlag]
-
-type descriptorFlag uint
+type DescriptorFlags uint8
 
 const (
 	// Read mode: Data can be read.
-	DescriptorFlagRead descriptorFlag = iota
+	DescriptorFlagsRead DescriptorFlags = 1 << iota
 
 	// Write mode: Data can be written to.
-	DescriptorFlagWrite
+	DescriptorFlagsWrite
 
 	// Request that writes be performed according to synchronized I/O file
 	// integrity completion. The data stored in the file and the file's
@@ -74,7 +70,7 @@ const (
 	// The precise semantics of this operation have not yet been defined for
 	// WASI. At this time, it should be interpreted as a request, and not a
 	// requirement.
-	DescriptorFlagFileIntegritySync
+	DescriptorFlagsFileIntegritySync
 
 	// Request that writes be performed according to synchronized I/O data
 	// integrity completion. Only the data stored in the file is
@@ -83,7 +79,7 @@ const (
 	// The precise semantics of this operation have not yet been defined for
 	// WASI. At this time, it should be interpreted as a request, and not a
 	// requirement.
-	DescriptorFlagDataIntegritySync
+	DescriptorFlagsDataIntegritySync
 
 	// Requests that reads be performed at the same level of integrety
 	// requested for writes. This is similar to `O_RSYNC` in POSIX.
@@ -91,7 +87,7 @@ const (
 	// The precise semantics of this operation have not yet been defined for
 	// WASI. At this time, it should be interpreted as a request, and not a
 	// requirement.
-	DescriptorFlagRequestedWriteSync
+	DescriptorFlagsRequestedWriteSync
 
 	// Mutating directories mode: Directory contents may be mutated.
 	//
@@ -102,7 +98,7 @@ const (
 	// they would otherwise succeed.
 	//
 	// This may only be set on directories.
-	DescriptorFlagMutateDirectory
+	DescriptorFlagsMutateDirectory
 )
 
 /*
