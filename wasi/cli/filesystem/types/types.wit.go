@@ -26,10 +26,23 @@
 // [WASI filesystem path resolution]: https://github.com/WebAssembly/wasi-filesystem/blob/main/path-resolution.md
 package types
 
-// FileSize represents the type "wasi:filesystem.types.filesize".
+import (
+	"github.com/ydnar/wasm-tools-go/cm"
+	"github.com/ydnar/wasm-tools-go/wasi/clocks/wallclock"
+	"github.com/ydnar/wasm-tools-go/wasi/io/streams"
+)
+
+type (
+	InputStream  = streams.InputStream
+	OutputStream = streams.OutputStream
+	Error        = streams.Error
+	DateTime     = wallclock.DateTime
+)
+
+// FileSize represents the type "wasi:filesystem/types.filesize".
 //
 // File size or length of a region within a file.
-type FileSize uint64
+type FileSize = uint64
 
 // DescriptorType represents the enum "wasi:filesystem.types.descriptor-type".
 //
@@ -49,7 +62,7 @@ const (
 	DescriptorTypeSocket                                // The descriptor refers to a socket.
 )
 
-// DescriptorFlags represents the flags "wasi:filesystem.types.descriptor-flags".
+// DescriptorFlags represents the flags "wasi:filesystem/types.descriptor-flags".
 //
 // Descriptor flags.
 //
@@ -101,105 +114,125 @@ const (
 	DescriptorFlagsMutateDirectory
 )
 
+// DescriptorStat represents the record "wasi:filesystem/types.descriptor-stat".
+//
+// File attributes.
+//
+// Note: This was called `filestat` in earlier versions of WASI.
+type DescriptorStat struct {
+	// File type.
+	Type DescriptorType
+
+	// Number of hard links to the file.
+	LinkCount LinkCount
+
+	// For regular files, the file size in bytes. For symbolic links, the
+	// length in bytes of the pathname contained in the symbolic link.
+	Size FileSize
+
+	// Last data access timestamp.
+	//
+	// If the `option` is none, the platform doesn't maintain an access
+	// timestamp for this file.
+	DataAccessTimestamp cm.Option[DateTime]
+
+	// Last data modification timestamp.
+	//
+	// If the `option` is none, the platform doesn't maintain a
+	// modification timestamp for this file.
+	DataModificationTimestamp cm.Option[DateTime]
+
+	// Last file status-change timestamp.
+	//
+	// If the `option` is none, the platform doesn't maintain a
+	// status-change timestamp for this file.
+	StatusChangeTimestamp cm.Option[DateTime]
+}
+
+// PathFlags represents the flags "wasi:filesystem/types.path-flags".
+//
+// Flags determining the method of how paths are resolved.
+type PathFlags uint8
+
+const (
+	// As long as the resolved path corresponds to a symbolic link, it is
+	// expanded.
+	PathFlagsSymlinkFollow PathFlags = 1 << iota
+)
+
+// OpenFlags represents the flags "wasi:filesystem/types.open-flags".
+//
+// Open flags used by `open-at`.
+type OpenFlags uint8
+
+const (
+	// Create file if it does not exist, similar to `O_CREAT` in POSIX.
+	OpenFlagsCreate OpenFlags = 1 << iota
+
+	// Fail if not a directory, similar to `O_DIRECTORY` in POSIX.
+	OpenFlagsDirectory
+
+	// Fail if file already exists, similar to `O_EXCL` in POSIX.
+	OpenFlagsExclusive
+
+	// Truncate file to size 0, similar to `O_TRUNC` in POSIX.
+	OpenFlagsTruncate
+)
+
+// LinkCount represents the type  "wasi:filesystem/types.link-count"
+//
+// Number of hard links to an inode.
+type LinkCount = uint64
+
+type NewTimestamp struct {
+	v cm.Variant[uint8, DateTime, struct{}]
+}
+
+// NewTimestampNoChange returns a NewTimestamp with variant case "no-change".
+func NewTimestampNoChange() NewTimestamp {
+	var result NewTimestamp
+	cm.Set(&result.v, 0, struct{}{})
+	return result
+}
+
+// NoChange represents variant case "no-change".
+//
+// Leave the timestamp set to its previous value.
+func (self *NewTimestamp) NoChange() bool {
+	return self.v.Is(0)
+}
+
+// NewTimestampNow returns a NewTimestamp with variant case "now".
+func NewTimestampNow() NewTimestamp {
+	var result NewTimestamp
+	cm.Set(&result.v, 1, struct{}{})
+	return result
+}
+
+// Now represents variant case "now".
+//
+// Leave the timestamp set to its previous value.
+func (self *NewTimestamp) Now() bool {
+	return self.v.Is(1)
+}
+
+// Timestamp represents variant case "timestamp(datetime)".
+//
+// Set the timestamp to the given value.
+func (self *NewTimestamp) Timestamp() (DateTime, bool) {
+	return cm.Get[DateTime](&self.v, 2)
+}
+
+// NewTimestampTimestamp returns a NewTimestamp with variant case "timestamp(datetime)".
+func NewTimestampTimestamp(v DateTime) NewTimestamp {
+	var result NewTimestamp
+	cm.Set(&result.v, 2, v)
+	return result
+}
+
 /*
 package wasi:filesystem@0.2.0-rc-2023-11-10;
 interface types {
-    use wasi:io/streams@0.2.0-rc-2023-11-10.{input-stream, output-stream, error};
-    use wasi:clocks/wall-clock@0.2.0-rc-2023-11-10.{datetime};
-
-    // Descriptor flags.
-    //
-    // Note: This was called `fdflags` in earlier versions of WASI.
-    flags descriptor-flags {
-        // Read mode: Data can be read.
-        read,
-        // Write mode: Data can be written to.
-        write,
-        // Request that writes be performed according to synchronized I/O file
-        // integrity completion. The data stored in the file and the file's
-        // metadata are synchronized. This is similar to `O_SYNC` in POSIX.
-        //
-        // The precise semantics of this operation have not yet been defined for
-        // WASI. At this time, it should be interpreted as a request, and not a
-        // requirement.
-        file-integrity-sync,
-        // Request that writes be performed according to synchronized I/O data
-        // integrity completion. Only the data stored in the file is
-        // synchronized. This is similar to `O_DSYNC` in POSIX.
-        //
-        // The precise semantics of this operation have not yet been defined for
-        // WASI. At this time, it should be interpreted as a request, and not a
-        // requirement.
-        data-integrity-sync,
-        // Requests that reads be performed at the same level of integrety
-        // requested for writes. This is similar to `O_RSYNC` in POSIX.
-        //
-        // The precise semantics of this operation have not yet been defined for
-        // WASI. At this time, it should be interpreted as a request, and not a
-        // requirement.
-        requested-write-sync,
-        // Mutating directories mode: Directory contents may be mutated.
-        //
-        // When this flag is unset on a descriptor, operations using the
-        // descriptor which would create, rename, delete, modify the data or
-        // metadata of filesystem objects, or obtain another handle which
-        // would permit any of those, shall fail with `error-code::read-only` if
-        // they would otherwise succeed.
-        //
-        // This may only be set on directories.
-        mutate-directory,
-    }
-
-    // File attributes.
-    //
-    // Note: This was called `filestat` in earlier versions of WASI.
-    record descriptor-stat {
-        // File type.
-        %type: descriptor-type,
-        // Number of hard links to the file.
-        link-count: link-count,
-        // For regular files, the file size in bytes. For symbolic links, the
-        // length in bytes of the pathname contained in the symbolic link.
-        size: filesize,
-        // Last data access timestamp.
-        //
-        // If the `option` is none, the platform doesn't maintain an access
-        // timestamp for this file.
-        data-access-timestamp: option<datetime>,
-        // Last data modification timestamp.
-        //
-        // If the `option` is none, the platform doesn't maintain a
-        // modification timestamp for this file.
-        data-modification-timestamp: option<datetime>,
-        // Last file status-change timestamp.
-        //
-        // If the `option` is none, the platform doesn't maintain a
-        // status-change timestamp for this file.
-        status-change-timestamp: option<datetime>,
-    }
-
-    // Flags determining the method of how paths are resolved.
-    flags path-flags {
-        // As long as the resolved path corresponds to a symbolic link, it is
-        // expanded.
-        symlink-follow,
-    }
-
-    // Open flags used by `open-at`.
-    flags open-flags {
-        // Create file if it does not exist, similar to `O_CREAT` in POSIX.
-        create,
-        // Fail if not a directory, similar to `O_DIRECTORY` in POSIX.
-        directory,
-        // Fail if file already exists, similar to `O_EXCL` in POSIX.
-        exclusive,
-        // Truncate file to size 0, similar to `O_TRUNC` in POSIX.
-        truncate,
-    }
-
-    // Number of hard links to an inode.
-    type link-count = u64;
-
     // When setting a timestamp, this gives the value to set it to.
     variant new-timestamp {
         // Leave the timestamp set to its previous value.
