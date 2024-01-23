@@ -60,12 +60,6 @@ type DescriptorFlags = cm.Flags8[descriptorFlag]
 
 type descriptorFlag uint
 
-func init() {
-	var flags DescriptorFlags
-	flags.Set(DescriptorFlagRead)
-	flags.Set(DescriptorFlagWrite)
-}
-
 const (
 	// Read mode: Data can be read.
 	DescriptorFlagRead descriptorFlag = iota
