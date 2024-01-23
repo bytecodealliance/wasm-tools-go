@@ -26,6 +26,8 @@
 // [WASI filesystem path resolution]: https://github.com/WebAssembly/wasi-filesystem/blob/main/path-resolution.md
 package types
 
+import "github.com/ydnar/wasm-tools-go/cm"
+
 // FileSize represents the type "wasi:filesystem.types.filesize".
 //
 // File size or length of a region within a file.
@@ -54,14 +56,22 @@ const (
 // Descriptor flags.
 //
 // Note: This was called `fdflags` in earlier versions of WASI.
-type DescriptorFlags uint8
+type DescriptorFlags = cm.Flags8[descriptorFlag]
+
+type descriptorFlag uint
+
+func init() {
+	var flags DescriptorFlags
+	flags.Set(DescriptorFlagRead)
+	flags.Set(DescriptorFlagWrite)
+}
 
 const (
 	// Read mode: Data can be read.
-	DescriptorFlagsRead DescriptorFlags = 1 << iota
+	DescriptorFlagRead descriptorFlag = iota
 
 	// Write mode: Data can be written to.
-	DescriptorFlagsWrite
+	DescriptorFlagWrite
 
 	// Request that writes be performed according to synchronized I/O file
 	// integrity completion. The data stored in the file and the file's
@@ -70,7 +80,7 @@ const (
 	// The precise semantics of this operation have not yet been defined for
 	// WASI. At this time, it should be interpreted as a request, and not a
 	// requirement.
-	DescriptorFlagsFileIntegritySync
+	DescriptorFlagFileIntegritySync
 
 	// Request that writes be performed according to synchronized I/O data
 	// integrity completion. Only the data stored in the file is
@@ -79,7 +89,7 @@ const (
 	// The precise semantics of this operation have not yet been defined for
 	// WASI. At this time, it should be interpreted as a request, and not a
 	// requirement.
-	DescriptorFlagsDataIntegritySync
+	DescriptorFlagDataIntegritySync
 
 	// Requests that reads be performed at the same level of integrety
 	// requested for writes. This is similar to `O_RSYNC` in POSIX.
@@ -87,7 +97,7 @@ const (
 	// The precise semantics of this operation have not yet been defined for
 	// WASI. At this time, it should be interpreted as a request, and not a
 	// requirement.
-	DescriptorFlagsRequestedWriteSync
+	DescriptorFlagRequestedWriteSync
 
 	// Mutating directories mode: Directory contents may be mutated.
 	//
@@ -98,7 +108,7 @@ const (
 	// they would otherwise succeed.
 	//
 	// This may only be set on directories.
-	DescriptorFlagsMutateDirectory
+	DescriptorFlagMutateDirectory
 )
 
 /*
