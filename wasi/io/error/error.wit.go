@@ -40,11 +40,10 @@ type Error cm.Resource
 // It may change across platforms, hosts, or other implementation
 // details. Parsing this string is a major platform-compatibility
 // hazard.
-func (self Error) ToDebugString() string {
-	var ret string
-	self.to_debug_string(&ret)
-	return ret
+func (self Error) ToDebugString() (result string) {
+	self.to_debug_string(&result)
+	return
 }
 
 //go:wasmimport wasi:io/error@0.2.0-rc-2023-11-10 [method]error.to-debug-string
-func (self Error) to_debug_string(ret *string)
+func (self Error) to_debug_string(result *string)

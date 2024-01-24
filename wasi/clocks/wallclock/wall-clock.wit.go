@@ -29,14 +29,13 @@ type DateTime struct {
 // Query the resolution of the clock.
 //
 // The nanoseconds field of the output is always less than 1000000000.
-func Now() DateTime {
-	var ret DateTime
-	now(&ret)
-	return ret
+func Now() (result DateTime) {
+	now(&result)
+	return
 }
 
 //go:wasmimport wasi:clocks/wall-clock@0.2.0-rc-2023-11-10 now
-func now(ret *DateTime)
+func now(result *DateTime)
 
 // Resolution calls the imported function "wasi:clocks/wall-clock#resolution".
 //
@@ -53,11 +52,10 @@ func now(ret *DateTime)
 //
 // [POSIX's Seconds Since the Epoch]: https://pubs.opengroup.org/onlinepubs/9699919799/xrat/V4_xbd_chap04.html#tag_21_04_16
 // [Unix Time]: https://en.wikipedia.org/wiki/Unix_time
-func Resolution() DateTime {
-	var ret DateTime
-	resolution(&ret)
-	return ret
+func Resolution() (result DateTime) {
+	resolution(&result)
+	return
 }
 
 //go:wasmimport wasi:clocks/wall-clock@0.2.0-rc-2023-11-10 resolution
-func resolution(ret *DateTime)
+func resolution(result *DateTime)

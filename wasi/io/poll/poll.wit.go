@@ -63,11 +63,10 @@ func (self Pollable) block()
 // do any I/O so it doesn't fail. If any of the I/O sources identified by
 // the pollables has an error, it is indicated by marking the source as
 // being reaedy for I/O.
-func Poll(in cm.List[Pollable]) cm.List[uint32] {
-	var ret cm.List[uint32]
-	poll(in, &ret)
-	return ret
+func Poll(in cm.List[Pollable]) (result cm.List[uint32]) {
+	poll(in, &result)
+	return
 }
 
 //go:wasmimport wasi:io/poll@0.2.0-rc-2023-11-10 pollable.poll
-func poll(in cm.List[Pollable], ret *cm.List[uint32])
+func poll(in cm.List[Pollable], result *cm.List[uint32])

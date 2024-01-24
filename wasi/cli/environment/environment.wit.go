@@ -12,30 +12,33 @@ import "github.com/ydnar/wasm-tools-go/cm"
 // Morally, these are a value import, but until value imports are available
 // in the component model, this import function should return the same
 // values each time it is called.
-func GetEnvironment() cm.List[cm.Tuple[string, string]] {
-	return get_environment()
+func GetEnvironment() (result cm.List[cm.Tuple[string, string]]) {
+	get_environment(&result)
+	return
 }
 
 //go:wasmimport wasi:cli/environment@0.2.0-rc-2023-12-05 get-environment
-func get_environment() cm.List[cm.Tuple[string, string]]
+func get_environment(result *cm.List[cm.Tuple[string, string]])
 
 // GetArguments represents the imported function "wasi:cli/environment.get-arguments".
 //
 // Get the POSIX-style arguments to the program.
-func GetArguments() cm.List[string] {
-	return get_arguments()
+func GetArguments() (result cm.List[string]) {
+	get_arguments(&result)
+	return
 }
 
 //go:wasmimport wasi:cli/environment@0.2.0-rc-2023-12-05 get-arguments
-func get_arguments() cm.List[string]
+func get_arguments(result *cm.List[string])
 
 // InitialCWD represents the imported function "wasi:cli/environment.initial-cwd".
 //
 // Return a path that programs should use as their initial current working
 // directory, interpreting `.` as shorthand for this.
-func InitialCWD() cm.Option[string] {
-	return initial_cwd()
+func InitialCWD() (result cm.Option[string]) {
+	initial_cwd(&result)
+	return
 }
 
 //go:wasmimport wasi:cli/environment@0.2.0-rc-2023-12-05 initial-cwd
-func initial_cwd() cm.Option[string]
+func initial_cwd(result *cm.Option[string])
