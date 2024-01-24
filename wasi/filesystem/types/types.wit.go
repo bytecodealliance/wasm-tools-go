@@ -479,86 +479,119 @@ func (self Descriptor) Advise(offset FileSize, length FileSize, advice Advice) c
 //go:wasmimport wasi:filesystem/types@0.2.0-rc-2023-11-10 [method]descriptor.advise
 func (self Descriptor) advise(offset FileSize, length FileSize, advice Advice) cm.ErrResult[ErrorCode]
 
+// SyncData represents the resource method "sync-data".
+//
+// Synchronize the data of a file to disk.
+//
+// This function succeeds with no effect if the file descriptor is not
+// opened for writing.
+//
+// Note: This is similar to `fdatasync` in POSIX.
+func (self Descriptor) SyncData() cm.ErrResult[ErrorCode] {
+	return self.sync_data()
+}
+
+//go:wasmimport wasi:filesystem/types@0.2.0-rc-2023-11-10 [method]descriptor.sync-data
+func (self Descriptor) sync_data() cm.ErrResult[ErrorCode]
+
+// GetFlags represents the resource method "get-flags".
+//
+// Get flags associated with a descriptor.
+//
+// Note: This returns similar flags to `fcntl(fd, F_GETFL)` in POSIX.
+//
+// Note: This returns the value that was the `fs_flags` value returned
+// from `fdstat_get` in earlier versions of WASI.
+func (self Descriptor) GetFlags() cm.OKSizedResult[DescriptorFlags, ErrorCode] {
+	return self.get_flags()
+}
+
+//go:wasmimport wasi:filesystem/types@0.2.0-rc-2023-11-10 [method]descriptor.get-flags
+func (self Descriptor) get_flags() cm.OKSizedResult[DescriptorFlags, ErrorCode]
+
+// GetType represents the resource method "get-type".
+//
+// Get the dynamic type of a descriptor.
+//
+// Note: This returns the same value as the `type` field of the `fd-stat`
+// returned by `stat`, `stat-at` and similar.
+//
+// Note: This returns similar flags to the `st_mode & S_IFMT` value provided
+// by `fstat` in POSIX.
+//
+// Note: This returns the value that was the `fs_filetype` value returned
+// from `fdstat_get` in earlier versions of WASI.
+func (self Descriptor) GetType() cm.OKSizedResult[DescriptorType, ErrorCode] {
+	return self.get_type()
+}
+
+//go:wasmimport wasi:filesystem/types@0.2.0-rc-2023-11-10 [method]descriptor.get-type
+func (self Descriptor) get_type() cm.OKSizedResult[DescriptorType, ErrorCode]
+
+// SetSize represents the resource method "set-size".
+//
+// Adjust the size of an open file. If this increases the file's size, the
+// extra bytes are filled with zeros.
+//
+// Note: This was called `fd_filestat_set_size` in earlier versions of WASI.
+func (self Descriptor) SetSize(size FileSize) cm.ErrResult[ErrorCode] {
+	return self.set_size(size)
+}
+
+//go:wasmimport wasi:filesystem/types@0.2.0-rc-2023-11-10 [method]descriptor.set-size
+func (self Descriptor) set_size(size FileSize) cm.ErrResult[ErrorCode]
+
+// SetTimes represents the resource method "set-times".
+//
+// Adjust the timestamps of an open file or directory.
+//
+// Note: This is similar to `futimens` in POSIX.
+//
+// Note: This was called `fd_filestat_set_times` in earlier versions of WASI.
+func (self Descriptor) SetTimes(dataAccessTimestamp NewTimestamp, dataModificationTimestamp NewTimestamp) cm.ErrResult[ErrorCode] {
+	return self.set_times(dataAccessTimestamp, dataModificationTimestamp)
+}
+
+//go:wasmimport wasi:filesystem/types@0.2.0-rc-2023-11-10 [method]descriptor.set-times
+func (self Descriptor) set_times(dataAccessTimestamp NewTimestamp, dataModificationTimestamp NewTimestamp) cm.ErrResult[ErrorCode]
+
+// Read represents the resource method "read".
+//
+// Read from a descriptor, without using and updating the descriptor's offset.
+//
+// This function returns a list of bytes containing the data that was
+// read, along with a bool which, when true, indicates that the end of the
+// file was reached. The returned list will contain up to `length` bytes; it
+// may return fewer than requested, if the end of the file is reached or
+// if the I/O operation is interrupted.
+//
+// In the future, this may change to return a `stream<u8, error-code>`.
+//
+// Note: This is similar to `pread` in POSIX.
+func (self Descriptor) Read(length FileSize, offset FileSize) (result cm.OKSizedResult[cm.Tuple[cm.List[uint8], bool], ErrorCode]) {
+	self.read(length, offset, &result)
+	return
+}
+
+//go:wasmimport wasi:filesystem/types@0.2.0-rc-2023-11-10 [method]descriptor.read
+func (self Descriptor) read(length FileSize, offset FileSize, result *cm.OKSizedResult[cm.Tuple[cm.List[uint8], bool], ErrorCode])
+
+// -----------------------------
+
+// METHOD represents the resource method "wasi-method".
+//
+// DOCS
+func (self Descriptor) METHOD() cm.ErrResult[ErrorCode] {
+	return self.wasi_method()
+}
+
+//go:wasmimport wasi:filesystem/types@0.2.0-rc-2023-11-10 [method]descriptor.wasi-method
+func (self Descriptor) wasi_method() cm.ErrResult[ErrorCode]
+
 /*
 package wasi:filesystem@0.2.0-rc-2023-11-10;
 interface types {
     resource descriptor {
-        // Provide file advisory information on a descriptor.
-        //
-        // This is similar to `posix_fadvise` in POSIX.
-        advise: func(
-            // The offset within the file to which the advisory applies.
-            offset: filesize,
-            // The length of the region to which the advisory applies.
-            length: filesize,
-            // The advice.
-            advice: advice
-        ) -> result<_, error-code>;
-
-        // Synchronize the data of a file to disk.
-        //
-        // This function succeeds with no effect if the file descriptor is not
-        // opened for writing.
-        //
-        // Note: This is similar to `fdatasync` in POSIX.
-        sync-data: func() -> result<_, error-code>;
-
-        // Get flags associated with a descriptor.
-        //
-        // Note: This returns similar flags to `fcntl(fd, F_GETFL)` in POSIX.
-        //
-        // Note: This returns the value that was the `fs_flags` value returned
-        // from `fdstat_get` in earlier versions of WASI.
-        get-flags: func() -> result<descriptor-flags, error-code>;
-
-        // Get the dynamic type of a descriptor.
-        //
-        // Note: This returns the same value as the `type` field of the `fd-stat`
-        // returned by `stat`, `stat-at` and similar.
-        //
-        // Note: This returns similar flags to the `st_mode & S_IFMT` value provided
-        // by `fstat` in POSIX.
-        //
-        // Note: This returns the value that was the `fs_filetype` value returned
-        // from `fdstat_get` in earlier versions of WASI.
-        get-type: func() -> result<descriptor-type, error-code>;
-
-        // Adjust the size of an open file. If this increases the file's size, the
-        // extra bytes are filled with zeros.
-        //
-        // Note: This was called `fd_filestat_set_size` in earlier versions of WASI.
-        set-size: func(size: filesize) -> result<_, error-code>;
-
-        // Adjust the timestamps of an open file or directory.
-        //
-        // Note: This is similar to `futimens` in POSIX.
-        //
-        // Note: This was called `fd_filestat_set_times` in earlier versions of WASI.
-        set-times: func(
-            // The desired values of the data access timestamp.
-            data-access-timestamp: new-timestamp,
-            // The desired values of the data modification timestamp.
-            data-modification-timestamp: new-timestamp,
-        ) -> result<_, error-code>;
-
-        // Read from a descriptor, without using and updating the descriptor's offset.
-        //
-        // This function returns a list of bytes containing the data that was
-        // read, along with a bool which, when true, indicates that the end of the
-        // file was reached. The returned list will contain up to `length` bytes; it
-        // may return fewer than requested, if the end of the file is reached or
-        // if the I/O operation is interrupted.
-        //
-        // In the future, this may change to return a `stream<u8, error-code>`.
-        //
-        // Note: This is similar to `pread` in POSIX.
-        read: func(
-            // The maximum number of bytes to read.
-            length: filesize,
-            // The offset within the file at which to read.
-            offset: filesize,
-        ) -> result<tuple<list<u8>, bool>, error-code>;
-
         // Write to a descriptor, without using and updating the descriptor's offset.
         //
         // It is valid to write past the end of a file; the file is extended to the
@@ -782,24 +815,37 @@ interface types {
             path: string,
         ) -> result<metadata-hash-value, error-code>;
     }
+}
+*/
 
-    // A stream of directory entries.
-    resource directory-entry-stream {
-        // Read a single directory entry from a `directory-entry-stream`.
-        read-directory-entry: func() -> result<option<directory-entry>, error-code>;
-    }
+// DirectoryEntryStream represents the resource "wasi:filesystem/types.directory-entry-stream".
+//
+// A stream of directory entries.
+type DirectoryEntryStream cm.Resource
 
-    // Attempts to extract a filesystem-related `error-code` from the stream
-    // `error` provided.
-    //
-    // Stream operations which return `stream-error::last-operation-failed`
-    // have a payload with more information about the operation that failed.
-    // This payload can be passed through to this function to see if there's
-    // filesystem-related information about the error to return.
-    //
-    // Note that this function is fallible because not all stream-related
-    // errors are filesystem-related errors.
-    filesystem-error-code: func(err: borrow<error>) -> option<error-code>;
+func (self DirectoryEntryStream) ReadDirectoryEntry() (result cm.OKSizedResult[cm.Option[DirectoryEntry], ErrorCode]) {
+	self.read_directory_entry(&result)
+	return
 }
 
-*/
+//go:wasmimport wasi:filesystem/types@0.2.0-rc-2023-11-10 [method]directory-entry-stream.read-directory-entry
+func (self DirectoryEntryStream) read_directory_entry(result *cm.OKSizedResult[cm.Option[DirectoryEntry], ErrorCode])
+
+// FilesystemErrorCode represents the imported function "wasi:filesystem/types.filesystem-error-code"
+//
+// Attempts to extract a filesystem-related `error-code` from the stream
+// `error` provided.
+//
+// Stream operations which return `stream-error::last-operation-failed`
+// have a payload with more information about the operation that failed.
+// This payload can be passed through to this function to see if there's
+// filesystem-related information about the error to return.
+//
+// Note that this function is fallible because not all stream-related
+// errors are filesystem-related errors.
+func FilesystemErrorCode(err Error) cm.Option[ErrorCode] {
+	return filesystem_error_code(err)
+}
+
+//go:wasmimport wasi:filesystem/types@0.2.0-rc-2023-11-10 filesystem-error-code
+func filesystem_error_code(err Error) cm.Option[ErrorCode]
