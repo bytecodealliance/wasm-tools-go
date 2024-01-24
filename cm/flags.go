@@ -4,6 +4,11 @@ import (
 	"unsafe"
 )
 
+// TODO: this file represents an experiment for how to represent Component Model
+// flags types larger than a uint64, which according to the Canonical ABI are
+// represented by [N]uint32 where N >= the number of unique flags represented
+// by the type.
+
 // Flag represents an individual flag. The value of a Flag
 // is index of the bit into a Flags value.
 //
