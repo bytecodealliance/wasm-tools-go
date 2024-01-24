@@ -49,10 +49,12 @@ func TestResultLayout(t *testing.T) {
 		{"result<u32, u8>", Result[uint32, uint32, uint8]{}, 8, alignOf[uint32]()},
 		{"result<[9]u8, u64>", Result[Shape[[9]byte], [9]byte, uint64]{}, 24, alignOf[uint64]()},
 
+		{"result<string, _>", OKResult[string]{}, sizePlusAlignOf[string](), ptrSize},
 		{"result<string, _>", OKSizedResult[string, struct{}]{}, sizePlusAlignOf[string](), ptrSize},
 		{"result<string, bool>", OKSizedResult[string, bool]{}, sizePlusAlignOf[string](), ptrSize},
 		{"result<[9]u8, u64>", OKSizedResult[[9]byte, uint64]{}, 24, alignOf[uint64]()},
 
+		{"result<_, string>", ErrResult[string]{}, sizePlusAlignOf[string](), ptrSize},
 		{"result<_, string>", ErrSizedResult[struct{}, string]{}, sizePlusAlignOf[string](), ptrSize},
 		{"result<bool, string>", ErrSizedResult[bool, string]{}, sizePlusAlignOf[string](), ptrSize},
 		{"result<u64, [9]u8>", ErrSizedResult[uint64, [9]byte]{}, 24, alignOf[uint64]()},

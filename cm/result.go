@@ -8,6 +8,16 @@ const (
 	ResultErr = true
 )
 
+// OKResult represents a result with only an OK type.
+type OKResult[OK any] struct {
+	Result[OK, OK, struct{}]
+}
+
+// ErrResult represents a result with only an error type.
+type ErrResult[Err any] struct {
+	Result[Err, struct{}, Err]
+}
+
 // OKSizedResult represents a result sized to hold the OK type.
 // The size of the OK type must be greater than or equal to the size of the Err type.
 // For results with two zero-length types, use UnsizedResult.
