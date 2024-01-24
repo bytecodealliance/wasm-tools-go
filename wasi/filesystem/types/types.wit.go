@@ -568,7 +568,13 @@ func (self Descriptor) set_times(dataAccessTimestamp NewTimestamp, dataModificat
 // In the future, this may change to return a `stream<u8, error-code>`.
 //
 // Note: This is similar to `pread` in POSIX.
-func (self Descriptor) Read(length FileSize, offset FileSize) (result cm.OKSizedResult[cm.Tuple[cm.List[uint8], bool], ErrorCode]) {
+func (self Descriptor) Read(
+	// The maximum number of bytes to read.
+	length FileSize,
+
+	// The offset within the file at which to read.
+	offset FileSize,
+) (result cm.OKSizedResult[cm.Tuple[cm.List[uint8], bool], ErrorCode]) {
 	self.read(length, offset, &result)
 	return
 }
