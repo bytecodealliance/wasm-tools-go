@@ -576,247 +576,344 @@ func (self Descriptor) Read(length FileSize, offset FileSize) (result cm.OKSized
 //go:wasmimport wasi:filesystem/types@0.2.0-rc-2023-11-10 [method]descriptor.read
 func (self Descriptor) read(length FileSize, offset FileSize, result *cm.OKSizedResult[cm.Tuple[cm.List[uint8], bool], ErrorCode])
 
-// -----------------------------
-
-// METHOD represents the resource method "wasi-method".
+// Write represents the resource method "write".
 //
-// DOCS
-func (self Descriptor) METHOD() cm.ErrResult[ErrorCode] {
-	return self.wasi_method()
+// Write to a descriptor, without using and updating the descriptor's offset.
+//
+// It is valid to write past the end of a file; the file is extended to the
+// extent of the write, with bytes between the previous end and the start of
+// the write set to zero.
+//
+// In the future, this may change to take a `stream<u8, error-code>`.
+//
+// Note: This is similar to `pwrite` in POSIX.
+func (self Descriptor) Write(buffer cm.List[uint8], offset FileSize) (result cm.OKSizedResult[FileSize, ErrorCode]) {
+	self.write(buffer, offset, &result)
+	return
 }
 
-//go:wasmimport wasi:filesystem/types@0.2.0-rc-2023-11-10 [method]descriptor.wasi-method
-func (self Descriptor) wasi_method() cm.ErrResult[ErrorCode]
+//go:wasmimport wasi:filesystem/types@0.2.0-rc-2023-11-10 [method]descriptor.write
+func (self Descriptor) write(buffer cm.List[uint8], offset FileSize, result *cm.OKSizedResult[FileSize, ErrorCode]) cm.ErrResult[ErrorCode]
 
-/*
-package wasi:filesystem@0.2.0-rc-2023-11-10;
-interface types {
-    resource descriptor {
-        // Write to a descriptor, without using and updating the descriptor's offset.
-        //
-        // It is valid to write past the end of a file; the file is extended to the
-        // extent of the write, with bytes between the previous end and the start of
-        // the write set to zero.
-        //
-        // In the future, this may change to take a `stream<u8, error-code>`.
-        //
-        // Note: This is similar to `pwrite` in POSIX.
-        write: func(
-            // Data to write
-            buffer: list<u8>,
-            // The offset within the file at which to write.
-            offset: filesize,
-        ) -> result<filesize, error-code>;
-
-        // Read directory entries from a directory.
-        //
-        // On filesystems where directories contain entries referring to themselves
-        // and their parents, often named `.` and `..` respectively, these entries
-        // are omitted.
-        //
-        // This always returns a new stream which starts at the beginning of the
-        // directory. Multiple streams may be active on the same directory, and they
-        // do not interfere with each other.
-        read-directory: func() -> result<directory-entry-stream, error-code>;
-
-        // Synchronize the data and metadata of a file to disk.
-        //
-        // This function succeeds with no effect if the file descriptor is not
-        // opened for writing.
-        //
-        // Note: This is similar to `fsync` in POSIX.
-        sync: func() -> result<_, error-code>;
-
-        // Create a directory.
-        //
-        // Note: This is similar to `mkdirat` in POSIX.
-        create-directory-at: func(
-            // The relative path at which to create the directory.
-            path: string,
-        ) -> result<_, error-code>;
-
-        // Return the attributes of an open file or directory.
-        //
-        // Note: This is similar to `fstat` in POSIX, except that it does not return
-        // device and inode information. For testing whether two descriptors refer to
-        // the same underlying filesystem object, use `is-same-object`. To obtain
-        // additional data that can be used do determine whether a file has been
-        // modified, use `metadata-hash`.
-        //
-        // Note: This was called `fd_filestat_get` in earlier versions of WASI.
-        stat: func() -> result<descriptor-stat, error-code>;
-
-        // Return the attributes of a file or directory.
-        //
-        // Note: This is similar to `fstatat` in POSIX, except that it does not
-        // return device and inode information. See the `stat` description for a
-        // discussion of alternatives.
-        //
-        // Note: This was called `path_filestat_get` in earlier versions of WASI.
-        stat-at: func(
-            // Flags determining the method of how the path is resolved.
-            path-flags: path-flags,
-            // The relative path of the file or directory to inspect.
-            path: string,
-        ) -> result<descriptor-stat, error-code>;
-
-        // Adjust the timestamps of a file or directory.
-        //
-        // Note: This is similar to `utimensat` in POSIX.
-        //
-        // Note: This was called `path_filestat_set_times` in earlier versions of
-        // WASI.
-        set-times-at: func(
-            // Flags determining the method of how the path is resolved.
-            path-flags: path-flags,
-            // The relative path of the file or directory to operate on.
-            path: string,
-            // The desired values of the data access timestamp.
-            data-access-timestamp: new-timestamp,
-            // The desired values of the data modification timestamp.
-            data-modification-timestamp: new-timestamp,
-        ) -> result<_, error-code>;
-
-        // Create a hard link.
-        //
-        // Note: This is similar to `linkat` in POSIX.
-        link-at: func(
-            // Flags determining the method of how the path is resolved.
-            old-path-flags: path-flags,
-            // The relative source path from which to link.
-            old-path: string,
-            // The base directory for `new-path`.
-            new-descriptor: borrow<descriptor>,
-            // The relative destination path at which to create the hard link.
-            new-path: string,
-        ) -> result<_, error-code>;
-
-        // Open a file or directory.
-        //
-        // The returned descriptor is not guaranteed to be the lowest-numbered
-        // descriptor not currently open/ it is randomized to prevent applications
-        // from depending on making assumptions about indexes, since this is
-        // error-prone in multi-threaded contexts. The returned descriptor is
-        // guaranteed to be less than 2**31.
-        //
-        // If `flags` contains `descriptor-flags::mutate-directory`, and the base
-        // descriptor doesn't have `descriptor-flags::mutate-directory` set,
-        // `open-at` fails with `error-code::read-only`.
-        //
-        // If `flags` contains `write` or `mutate-directory`, or `open-flags`
-        // contains `truncate` or `create`, and the base descriptor doesn't have
-        // `descriptor-flags::mutate-directory` set, `open-at` fails with
-        // `error-code::read-only`.
-        //
-        // Note: This is similar to `openat` in POSIX.
-        open-at: func(
-            // Flags determining the method of how the path is resolved.
-            path-flags: path-flags,
-            // The relative path of the object to open.
-            path: string,
-            // The method by which to open the file.
-            open-flags: open-flags,
-            // Flags to use for the resulting descriptor.
-            %flags: descriptor-flags,
-        ) -> result<descriptor, error-code>;
-
-        // Read the contents of a symbolic link.
-        //
-        // If the contents contain an absolute or rooted path in the underlying
-        // filesystem, this function fails with `error-code::not-permitted`.
-        //
-        // Note: This is similar to `readlinkat` in POSIX.
-        readlink-at: func(
-            // The relative path of the symbolic link from which to read.
-            path: string,
-        ) -> result<string, error-code>;
-
-        // Remove a directory.
-        //
-        // Return `error-code::not-empty` if the directory is not empty.
-        //
-        // Note: This is similar to `unlinkat(fd, path, AT_REMOVEDIR)` in POSIX.
-        remove-directory-at: func(
-            // The relative path to a directory to remove.
-            path: string,
-        ) -> result<_, error-code>;
-
-        // Rename a filesystem object.
-        //
-        // Note: This is similar to `renameat` in POSIX.
-        rename-at: func(
-            // The relative source path of the file or directory to rename.
-            old-path: string,
-            // The base directory for `new-path`.
-            new-descriptor: borrow<descriptor>,
-            // The relative destination path to which to rename the file or directory.
-            new-path: string,
-        ) -> result<_, error-code>;
-
-        // Create a symbolic link (also known as a "symlink").
-        //
-        // If `old-path` starts with `/`, the function fails with
-        // `error-code::not-permitted`.
-        //
-        // Note: This is similar to `symlinkat` in POSIX.
-        symlink-at: func(
-            // The contents of the symbolic link.
-            old-path: string,
-            // The relative destination path at which to create the symbolic link.
-            new-path: string,
-        ) -> result<_, error-code>;
-
-        // Unlink a filesystem object that is not a directory.
-        //
-        // Return `error-code::is-directory` if the path refers to a directory.
-        // Note: This is similar to `unlinkat(fd, path, 0)` in POSIX.
-        unlink-file-at: func(
-            // The relative path to a file to unlink.
-            path: string,
-        ) -> result<_, error-code>;
-
-        // Test whether two descriptors refer to the same filesystem object.
-        //
-        // In POSIX, this corresponds to testing whether the two descriptors have the
-        // same device (`st_dev`) and inode (`st_ino` or `d_ino`) numbers.
-        // wasi-filesystem does not expose device and inode numbers, so this function
-        // may be used instead.
-        is-same-object: func(other: borrow<descriptor>) -> bool;
-
-        // Return a hash of the metadata associated with a filesystem object referred
-        // to by a descriptor.
-        //
-        // This returns a hash of the last-modification timestamp and file size, and
-        // may also include the inode number, device number, birth timestamp, and
-        // other metadata fields that may change when the file is modified or
-        // replaced. It may also include a secret value chosen by the
-        // implementation and not otherwise exposed.
-        //
-        // Implementations are encourated to provide the following properties:
-        //
-        //  - If the file is not modified or replaced, the computed hash value should
-        //    usually not change.
-        //  - If the object is modified or replaced, the computed hash value should
-        //    usually change.
-        //  - The inputs to the hash should not be easily computable from the
-        //    computed hash.
-        //
-        // However, none of these is required.
-        metadata-hash: func() -> result<metadata-hash-value, error-code>;
-
-        // Return a hash of the metadata associated with a filesystem object referred
-        // to by a directory descriptor and a relative path.
-        //
-        // This performs the same hash computation as `metadata-hash`.
-        metadata-hash-at: func(
-            // Flags determining the method of how the path is resolved.
-            path-flags: path-flags,
-            // The relative path of the file or directory to inspect.
-            path: string,
-        ) -> result<metadata-hash-value, error-code>;
-    }
+// ReadDirectory represents the resource method "read-directory".
+//
+// Read directory entries from a directory.
+//
+// On filesystems where directories contain entries referring to themselves
+// and their parents, often named `.` and `..` respectively, these entries
+// are omitted.
+//
+// This always returns a new stream which starts at the beginning of the
+// directory. Multiple streams may be active on the same directory, and they
+// do not interfere with each other.
+func (self Descriptor) ReadDirectory() (result cm.OKSizedResult[DirectoryEntryStream, ErrorCode]) {
+	self.read_directory(&result)
+	return
 }
-*/
+
+//go:wasmimport wasi:filesystem/types@0.2.0-rc-2023-11-10 [method]descriptor.read-directory
+func (self Descriptor) read_directory(result *cm.OKSizedResult[DirectoryEntryStream, ErrorCode])
+
+// Sync represents the resource method "sync".
+//
+// Synchronize the data and metadata of a file to disk.
+//
+// This function succeeds with no effect if the file descriptor is not
+// opened for writing.
+//
+// Note: This is similar to `fsync` in POSIX.
+func (self Descriptor) Sync() cm.ErrResult[ErrorCode] {
+	return self.sync()
+}
+
+//go:wasmimport wasi:filesystem/types@0.2.0-rc-2023-11-10 [method]descriptor.sync
+func (self Descriptor) sync() cm.ErrResult[ErrorCode]
+
+// CreateDirectoryAt represents the resource method "create-directory-at".
+//
+// Create a directory.
+//
+// Note: This is similar to `mkdirat` in POSIX.
+func (self Descriptor) CreateDirectoryAt(path string) cm.ErrResult[ErrorCode] {
+	return self.create_directory_at(path)
+}
+
+//go:wasmimport wasi:filesystem/types@0.2.0-rc-2023-11-10 [method]descriptor.create-directory-at
+func (self Descriptor) create_directory_at(path string) cm.ErrResult[ErrorCode]
+
+// Stat represents the resource method "stat".
+//
+// Return the attributes of an open file or directory.
+//
+// Note: This is similar to `fstat` in POSIX, except that it does not return
+// device and inode information. For testing whether two descriptors refer to
+// the same underlying filesystem object, use `is-same-object`. To obtain
+// additional data that can be used do determine whether a file has been
+// modified, use `metadata-hash`.
+//
+// Note: This was called `fd_filestat_get` in earlier versions of WASI.
+func (self Descriptor) Stat() (result cm.OKSizedResult[DescriptorStat, ErrorCode]) {
+	self.stat(&result)
+	return
+}
+
+//go:wasmimport wasi:filesystem/types@0.2.0-rc-2023-11-10 [method]descriptor.stat-at
+func (self Descriptor) stat(result *cm.OKSizedResult[DescriptorStat, ErrorCode]) cm.OKSizedResult[DescriptorStat, ErrorCode]
+
+// StatAt represents the resource method "stat".
+//
+// Return the attributes of a file or directory.
+//
+// Note: This is similar to `fstatat` in POSIX, except that it does not
+// return device and inode information. See the `stat` description for a
+// discussion of alternatives.
+//
+// Note: This was called `path_filestat_get` in earlier versions of WASI.
+func (self Descriptor) StatAt(pathFlags PathFlags, path string) (result cm.OKSizedResult[DescriptorStat, ErrorCode]) {
+	self.stat_at(pathFlags, path, &result)
+	return
+}
+
+//go:wasmimport wasi:filesystem/types@0.2.0-rc-2023-11-10 [method]descriptor.stat-at
+func (self Descriptor) stat_at(pathFlags PathFlags, path string, result *cm.OKSizedResult[DescriptorStat, ErrorCode]) cm.OKSizedResult[DescriptorStat, ErrorCode]
+
+// SetTimesAt represents the resource method "set-times-at".
+//
+// Adjust the timestamps of a file or directory.
+//
+// Note: This is similar to `utimensat` in POSIX.
+//
+// Note: This was called `path_filestat_set_times` in earlier versions of
+// WASI.
+func (self Descriptor) SetTimesAt(pathFlags PathFlags, path string, dataAccessTimestamp NewTimestamp, dataModificationTimestamp NewTimestamp) cm.ErrResult[ErrorCode] {
+	return self.set_times_at(pathFlags, path, dataAccessTimestamp, dataModificationTimestamp)
+}
+
+//go:wasmimport wasi:filesystem/types@0.2.0-rc-2023-11-10 [method]descriptor.set-times-at
+func (self Descriptor) set_times_at(pathFlags PathFlags, path string, dataAccessTimestamp NewTimestamp, dataModificationTimestamp NewTimestamp) cm.ErrResult[ErrorCode]
+
+// LinkAt represents the resource method "link-at".
+//
+// Create a hard link.
+//
+// Note: This is similar to `linkat` in POSIX.
+func (self Descriptor) LinkAt(
+	// Flags determining the method of how the path is resolved.
+	oldPathFlags PathFlags,
+
+	// The relative source path from which to link.
+	oldPath string,
+
+	// The base directory for `new-path`.
+	newDescriptor Descriptor,
+
+	// The relative destination path at which to create the hard link.
+	newPath string,
+) (result cm.ErrResult[ErrorCode]) {
+	return self.link_at(oldPathFlags, oldPath, newDescriptor, newPath)
+}
+
+//go:wasmimport wasi:filesystem/types@0.2.0-rc-2023-11-10 [method]descriptor.link-at
+func (self Descriptor) link_at(oldPathFlags PathFlags, oldPath string, newDescriptor Descriptor, newPath string) cm.ErrResult[ErrorCode]
+
+// OpenAt represents the resource method "open-at".
+//
+// Open a file or directory.
+//
+// The returned descriptor is not guaranteed to be the lowest-numbered
+// descriptor not currently open/ it is randomized to prevent applications
+// from depending on making assumptions about indexes, since this is
+// error-prone in multi-threaded contexts. The returned descriptor is
+// guaranteed to be less than 2**31.
+//
+// If `flags` contains `descriptor-flags::mutate-directory`, and the base
+// descriptor doesn't have `descriptor-flags::mutate-directory` set,
+// `open-at` fails with `error-code::read-only`.
+//
+// If `flags` contains `write` or `mutate-directory`, or `open-flags`
+// contains `truncate` or `create`, and the base descriptor doesn't have
+// `descriptor-flags::mutate-directory` set, `open-at` fails with
+// `error-code::read-only`.
+//
+// Note: This is similar to `openat` in POSIX.
+func (self Descriptor) OpenAt(
+	// Flags determining the method of how the path is resolved.
+	pathFlags PathFlags,
+
+	// The relative path of the object to open.
+	path string,
+
+	// The method by which to open the file.
+	openFlags OpenFlags,
+
+	// Flags to use for the resulting descriptor.
+	flags DescriptorFlags,
+
+) (result cm.OKSizedResult[Descriptor, ErrorCode]) {
+	self.open_at(pathFlags, path, openFlags, flags, &result)
+	return
+}
+
+//go:wasmimport wasi:filesystem/types@0.2.0-rc-2023-11-10 [method]descriptor.open-at
+func (self Descriptor) open_at(pathFlags PathFlags, path string, openFlags OpenFlags, flags DescriptorFlags, result *cm.OKSizedResult[Descriptor, ErrorCode])
+
+// ReadLinkAt represents the resource method "read-link-at".
+//
+// Read the contents of a symbolic link.
+//
+// If the contents contain an absolute or rooted path in the underlying
+// filesystem, this function fails with `error-code::not-permitted`.
+//
+// Note: This is similar to `readlinkat` in POSIX.
+func (self Descriptor) ReadLinkAt(
+	// The relative path of the symbolic link from which to read.
+	path string,
+) (result cm.OKSizedResult[string, ErrorCode]) {
+	self.read_link_at(path, &result)
+	return
+}
+
+//go:wasmimport wasi:filesystem/types@0.2.0-rc-2023-11-10 [method]descriptor.read-link-at
+func (self Descriptor) read_link_at(path string, result *cm.OKSizedResult[string, ErrorCode])
+
+// RemoveDirectoryAt represents the resource method "remove-directory-at".
+//
+// Remove a directory.
+//
+// Return `error-code::not-empty` if the directory is not empty.
+//
+// Note: This is similar to `unlinkat(fd, path, AT_REMOVEDIR)` in POSIX.
+func (self Descriptor) RemoveDirectoryAt(
+	// The relative path to a directory to remove.
+	path string,
+) (result cm.ErrResult[ErrorCode]) {
+	return self.remove_directory_at(path)
+}
+
+//go:wasmimport wasi:filesystem/types@0.2.0-rc-2023-11-10 [method]descriptor.remove-directory-at
+func (self Descriptor) remove_directory_at(path string) cm.ErrResult[ErrorCode]
+
+// RenameAt represents the resource method "rename-at".
+//
+// Rename a filesystem object.
+//
+// Note: This is similar to `renameat` in POSIX.
+func (self Descriptor) RenameAt(
+	// The relative source path of the file or directory to rename.
+	oldPath string,
+
+	// The base directory for `new-path`.
+	newDescriptor Descriptor,
+
+	// The relative destination path to which to rename the file or directory.
+	newPath string,
+) (result cm.ErrResult[ErrorCode]) {
+	return self.rename_at(oldPath, newDescriptor, newPath)
+}
+
+//go:wasmimport wasi:filesystem/types@0.2.0-rc-2023-11-10 [method]descriptor.rename-at
+func (self Descriptor) rename_at(oldPath string, newDescriptor Descriptor, newPath string) cm.ErrResult[ErrorCode]
+
+// SymlinkAt represents the resource method "symlink-at".
+//
+// Create a symbolic link (also known as a "symlink").
+//
+// If `old-path` starts with `/`, the function fails with
+// `error-code::not-permitted`.
+//
+// Note: This is similar to `symlinkat` in POSIX.
+func (self Descriptor) SymlinkAt(
+	// The contents of the symbolic link.
+	oldPath string,
+
+	// The relative destination path at which to create the symbolic link.
+	newPath string,
+) (result cm.ErrResult[ErrorCode]) {
+	return self.symlink_at(oldPath, newPath)
+}
+
+//go:wasmimport wasi:filesystem/types@0.2.0-rc-2023-11-10 [method]descriptor.symlink-at
+func (self Descriptor) symlink_at(oldPath string, newPath string) cm.ErrResult[ErrorCode]
+
+// UnlinkFileAt represents the resource method "unlink-file-at".
+//
+// Unlink a filesystem object that is not a directory.
+//
+// Return `error-code::is-directory` if the path refers to a directory.
+// Note: This is similar to `unlinkat(fd, path, 0)` in POSIX.
+func (self Descriptor) UnlinkFileAt(
+	// The relative path to a file to unlink.
+	path string,
+) (result cm.ErrResult[ErrorCode]) {
+	return self.unlink_file_at(path)
+}
+
+//go:wasmimport wasi:filesystem/types@0.2.0-rc-2023-11-10 [method]descriptor.unlink-file-at
+func (self Descriptor) unlink_file_at(path string) cm.ErrResult[ErrorCode]
+
+// IsSameObject represents the resource method "is-same-object".
+//
+// Test whether two descriptors refer to the same filesystem object.
+//
+// In POSIX, this corresponds to testing whether the two descriptors have the
+// same device (`st_dev`) and inode (`st_ino` or `d_ino`) numbers.
+// wasi-filesystem does not expose device and inode numbers, so this function
+// may be used instead.
+func (self Descriptor) IsSameObject(other Descriptor) bool {
+	return self.is_same_object(other)
+}
+
+//go:wasmimport wasi:filesystem/types@0.2.0-rc-2023-11-10 [method]descriptor.is-same-object
+func (self Descriptor) is_same_object(other Descriptor) bool
+
+// MetadataHash represents the resource method "metadata-hash".
+//
+// Return a hash of the metadata associated with a filesystem object referred
+// to by a descriptor.
+//
+// This returns a hash of the last-modification timestamp and file size, and
+// may also include the inode number, device number, birth timestamp, and
+// other metadata fields that may change when the file is modified or
+// replaced. It may also include a secret value chosen by the
+// implementation and not otherwise exposed.
+//
+// Implementations are encourated to provide the following properties:
+//
+//   - If the file is not modified or replaced, the computed hash value should
+//     usually not change.
+//   - If the object is modified or replaced, the computed hash value should
+//     usually change.
+//   - The inputs to the hash should not be easily computable from the
+//     computed hash.
+//
+// However, none of these is required.
+func (self Descriptor) MetadataHash() (result cm.OKSizedResult[MetadataHashValue, ErrorCode]) {
+	self.metadata_hash(&result)
+	return
+}
+
+//go:wasmimport wasi:filesystem/types@0.2.0-rc-2023-11-10 [method]descriptor.metadata-hash
+func (self Descriptor) metadata_hash(result *cm.OKSizedResult[MetadataHashValue, ErrorCode])
+
+// MetadataHashAt represents the resource method "metadata-hash-at".
+//
+// Return a hash of the metadata associated with a filesystem object referred
+// to by a directory descriptor and a relative path.
+//
+// This performs the same hash computation as `metadata-hash`.
+func (self Descriptor) MetadataHashAt(
+	// Flags determining the method of how the path is resolved.
+	pathFlags PathFlags,
+
+	// The relative path of the file or directory to inspect.
+	path string,
+) (result cm.OKSizedResult[MetadataHashValue, ErrorCode]) {
+	self.metadata_hash_at(pathFlags, path, &result)
+	return
+}
+
+//go:wasmimport wasi:filesystem/types@0.2.0-rc-2023-11-10 [method]descriptor.metadata-hash-at
+func (self Descriptor) metadata_hash_at(pathFlags PathFlags, path string, result *cm.OKSizedResult[MetadataHashValue, ErrorCode])
 
 // DirectoryEntryStream represents the resource "wasi:filesystem/types.directory-entry-stream".
 //
