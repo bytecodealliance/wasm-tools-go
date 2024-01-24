@@ -425,8 +425,7 @@ type Descriptor cm.Resource
 // file and they do not interfere with each other.
 //
 // Note: This allows using `read-stream`, which is similar to `read` in POSIX.
-func (self Descriptor) ReadViaStream(offset FileSize) cm.Result[InputStream, InputStream, ErrorCode] {
-	var result cm.Result[InputStream, InputStream, ErrorCode]
+func (self Descriptor) ReadViaStream(offset FileSize) (result cm.Result[InputStream, InputStream, ErrorCode]) {
 	self.read_via_stream(&result)
 	return result
 }
@@ -434,37 +433,42 @@ func (self Descriptor) ReadViaStream(offset FileSize) cm.Result[InputStream, Inp
 //go:wasmimport wasi:filesystem/types@0.2.0-rc-2023-11-10 [method]descriptor.read-via-stream
 func (self Descriptor) read_via_stream(result *cm.Result[InputStream, InputStream, ErrorCode])
 
+// WriteViaStream represents the resource method "write-via-stream".
+//
+// Return a stream for writing to a file, if available.
+//
+// May fail with an error-code describing why the file cannot be written.
+//
+// Note: This allows using `write-stream`, which is similar to `write` in
+// POSIX.
+func (self Descriptor) WriteViaStream(offset FileSize) (result cm.Result[OutputStream, OutputStream, ErrorCode]) {
+	self.write_via_stream(&result)
+	return result
+}
+
+//go:wasmimport wasi:filesystem/types@0.2.0-rc-2023-11-10 [method]descriptor.append-via-stream
+func (self Descriptor) write_via_stream(result *cm.Result[OutputStream, OutputStream, ErrorCode])
+
+// AppendViaStream represents the resource method "write-via-stream".
+//
+// Return a stream for appending to a file, if available.
+//
+// May fail with an error-code describing why the file cannot be appended.
+//
+// Note: This allows using `write-stream`, which is similar to `write` with
+// `O_APPEND` in in POSIX.
+func (self Descriptor) AppendViaStream(offset FileSize) (result cm.Result[OutputStream, OutputStream, ErrorCode]) {
+	self.append_via_stream(&result)
+	return result
+}
+
+//go:wasmimport wasi:filesystem/types@0.2.0-rc-2023-11-10 [method]descriptor.append-via-stream
+func (self Descriptor) append_via_stream(result *cm.Result[OutputStream, OutputStream, ErrorCode])
+
 /*
 package wasi:filesystem@0.2.0-rc-2023-11-10;
 interface types {
-    // A descriptor is a reference to a filesystem object, which may be a file,
-    // directory, named pipe, special file, or other object on which filesystem
-    // calls may be made.
     resource descriptor {
-        // Return a stream for reading from a file, if available.
-        //
-        // May fail with an error-code describing why the file cannot be read.
-        //
-        // Multiple read, write, and append streams may be active on the same open
-        // file and they do not interfere with each other.
-        //
-        // Note: This allows using `read-stream`, which is similar to `read` in POSIX.
-        read-via-stream: func(
-            // The offset within the file at which to start reading.
-            offset: filesize,
-        ) -> result<input-stream, error-code>;
-
-        // Return a stream for writing to a file, if available.
-        //
-        // May fail with an error-code describing why the file cannot be written.
-        //
-        // Note: This allows using `write-stream`, which is similar to `write` in
-        // POSIX.
-        write-via-stream: func(
-            // The offset within the file at which to start writing.
-            offset: filesize,
-        ) -> result<output-stream, error-code>;
-
         // Return a stream for appending to a file, if available.
         //
         // May fail with an error-code describing why the file cannot be appended.
