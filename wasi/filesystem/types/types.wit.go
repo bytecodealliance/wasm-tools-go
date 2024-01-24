@@ -408,6 +408,32 @@ type MetadataHashValue struct {
 	Upper uint64
 }
 
+// Descriptor represents the resource "wasi:filesystem/types.descriptor".
+//
+// A descriptor is a reference to a filesystem object, which may be a file,
+// directory, named pipe, special file, or other object on which filesystem
+// calls may be made.
+type Descriptor cm.Resource
+
+// ReadViaStream represents the resource method "read-via-stream".
+//
+// Return a stream for reading from a file, if available.
+//
+// May fail with an error-code describing why the file cannot be read.
+//
+// Multiple read, write, and append streams may be active on the same open
+// file and they do not interfere with each other.
+//
+// Note: This allows using `read-stream`, which is similar to `read` in POSIX.
+func (self Descriptor) ReadViaStream(offset FileSize) cm.Result[InputStream, InputStream, ErrorCode] {
+	var result cm.Result[InputStream, InputStream, ErrorCode]
+	self.read_via_stream(&result)
+	return result
+}
+
+//go:wasmimport wasi:filesystem/types@0.2.0-rc-2023-11-10 [method]descriptor.read-via-stream
+func (self Descriptor) read_via_stream(result *cm.Result[InputStream, InputStream, ErrorCode])
+
 /*
 package wasi:filesystem@0.2.0-rc-2023-11-10;
 interface types {
