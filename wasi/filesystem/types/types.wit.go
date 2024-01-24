@@ -465,18 +465,24 @@ func (self Descriptor) AppendViaStream(offset FileSize) (result cm.Result[Output
 //go:wasmimport wasi:filesystem/types@0.2.0-rc-2023-11-10 [method]descriptor.append-via-stream
 func (self Descriptor) append_via_stream(result *cm.Result[OutputStream, OutputStream, ErrorCode])
 
+// Advise represents the resource method "advise".
+//
+// Provide file advisory information on a descriptor.
+//
+// This is similar to `posix_fadvise` in POSIX.
+func (self Descriptor) Advise(offset FileSize, length FileSize, advice Advice) cm.ErrResult[ErrorCode] {
+	return self.advise(offset, length, advice)
+}
+
+// TODO(ydnar): does this return a result, or accept a *result argument?
+//
+//go:wasmimport wasi:filesystem/types@0.2.0-rc-2023-11-10 [method]descriptor.advise
+func (self Descriptor) advise(offset FileSize, length FileSize, advice Advice) cm.ErrResult[ErrorCode]
+
 /*
 package wasi:filesystem@0.2.0-rc-2023-11-10;
 interface types {
     resource descriptor {
-        // Return a stream for appending to a file, if available.
-        //
-        // May fail with an error-code describing why the file cannot be appended.
-        //
-        // Note: This allows using `write-stream`, which is similar to `write` with
-        // `O_APPEND` in in POSIX.
-        append-via-stream: func() -> result<output-stream, error-code>;
-
         // Provide file advisory information on a descriptor.
         //
         // This is similar to `posix_fadvise` in POSIX.
