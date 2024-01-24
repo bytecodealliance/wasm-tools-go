@@ -233,130 +233,184 @@ func NewTimestampTimestamp(v DateTime) NewTimestamp {
 	return result
 }
 
+// DirectoryEntry represents the record "wasi:filesystem/types.directory-entry".
+//
+// A directory entry.
+type DirectoryEntry struct {
+	// The type of the file referred to by this directory entry.
+	Type DescriptorType
+
+	// The name of the object.
+	Name string
+}
+
+// ErrorCode represents the enum "wasi:filesystem/types.error-code".
+//
+// Error codes returned by functions, similar to `errno` in POSIX.
+// Not all of these error codes are returned by the functions provided by this
+// API; some are used in higher-level library layers, and others are provided
+// merely for alignment with POSIX.
+type ErrorCode uint8
+
+const (
+	// Permission denied, similar to `EACCES` in POSIX.
+	ErrorCodeAccess ErrorCode = iota
+
+	// Resource unavailable, or operation would block, similar to `EAGAIN` and `EWOULDBLOCK` in POSIX.
+	ErrorCodeWouldBlock
+
+	// Connection already in progress, similar to `EALREADY` in POSIX.
+	ErrorCodeAlready
+
+	// Bad descriptor, similar to `EBADF` in POSIX.
+	ErrorCodeBadDescriptor
+
+	// Device or resource busy, similar to `EBUSY` in POSIX.
+	ErrorCodeBusy
+
+	// Resource deadlock would occur, similar to `EDEADLK` in POSIX.
+	ErrorCodeDeadlock
+
+	// Storage quota exceeded, similar to `EDQUOT` in POSIX.
+	ErrorCodeQuota
+
+	// File exists, similar to `EEXIST` in POSIX.
+	ErrorCodeExist
+
+	// File too large, similar to `EFBIG` in POSIX.
+	ErrorCodeFileTooLarge
+
+	// Illegal byte sequence, similar to `EILSEQ` in POSIX.
+	ErrorCodeIllegalByteSequence
+
+	// Operation in progress, similar to `EINPROGRESS` in POSIX.
+	ErrorCodeInProgress
+
+	// Interrupted function, similar to `EINTR` in POSIX.
+	ErrorCodeInterrupted
+
+	// Invalid argument, similar to `EINVAL` in POSIX.
+	ErrorCodeInvalid
+
+	// I/O error, similar to `EIO` in POSIX.
+	ErrorCodeIo
+
+	// Is a directory, similar to `EISDIR` in POSIX.
+	ErrorCodeIsDirectory
+
+	// Too many levels of symbolic links, similar to `ELOOP` in POSIX.
+	ErrorCodeLoop
+
+	// Too many links, similar to `EMLINK` in POSIX.
+	ErrorCodeTooManyLinks
+
+	// Message too large, similar to `EMSGSIZE` in POSIX.
+	ErrorCodeMessageSize
+
+	// Filename too long, similar to `ENAMETOOLONG` in POSIX.
+	ErrorCodeNameTooLong
+
+	// No such device, similar to `ENODEV` in POSIX.
+	ErrorCodeNoDevice
+
+	// No such file or directory, similar to `ENOENT` in POSIX.
+	ErrorCodeNoEntry
+
+	// No locks available, similar to `ENOLCK` in POSIX.
+	ErrorCodeNoLock
+
+	// Not enough space, similar to `ENOMEM` in POSIX.
+	ErrorCodeInsufficientMemory
+
+	// No space left on device, similar to `ENOSPC` in POSIX.
+	ErrorCodeInsufficientSpace
+
+	// Not a directory or a symbolic link to a directory, similar to `ENOTDIR` in POSIX.
+	ErrorCodeNotDirectory
+
+	// Directory not empty, similar to `ENOTEMPTY` in POSIX.
+	ErrorCodeNotEmpty
+
+	// State not recoverable, similar to `ENOTRECOVERABLE` in POSIX.
+	ErrorCodeNotRecoverable
+
+	// Not supported, similar to `ENOTSUP` and `ENOSYS` in POSIX.
+	ErrorCodeUnsupported
+
+	// Inappropriate I/O control operation, similar to `ENOTTY` in POSIX.
+	ErrorCodeNoTTY
+
+	// No such device or address, similar to `ENXIO` in POSIX.
+	ErrorCodeNoSuchDevice
+
+	// Value too large to be stored in data type, similar to `EOVERFLOW` in POSIX.
+	ErrorCodeOverflow
+
+	// Operation not permitted, similar to `EPERM` in POSIX.
+	ErrorCodeNotPermitted
+
+	// Broken pipe, similar to `EPIPE` in POSIX.
+	ErrorCodePipe
+
+	// ReadOnly file system, similar to `EROFS` in POSIX.
+	ErrorCodeReadOnly
+
+	// Invalid seek, similar to `ESPIPE` in POSIX.
+	ErrorCodeInvalidSeek
+
+	// Text file busy, similar to `ETXTBSY` in POSIX.
+	ErrorCodeTextFileBusy
+
+	// Cross-device link, similar to `EXDEV` in POSIX.
+	ErrorCodeCrossDevice
+)
+
+// Advice represents the enum "wasi:filesystem/types.advice".
+//
+// File or memory access pattern advisory information.
+type Advice uint8
+
+const (
+	// The application has no advice to give on its behavior with respect
+	// to the specified data.
+	Normal Advice = iota
+
+	// The application expects to access the specified data sequentially
+	// from lower offsets to higher offsets.
+	Sequential
+
+	// The application expects to access the specified data in a random
+	// order.
+	Random
+
+	// The application expects to access the specified data in the near
+	// future.
+	WillNeed
+
+	// The application expects that it will not access the specified data
+	// in the near future.
+	DontNeed
+
+	// The application expects to access the specified data once and then
+	// not reuse it thereafter.
+	NoReuse
+)
+
+// MetadataHashValue represents the record "wasi:filesystem/types.metadata-hash-value".
+//
+// A 128-bit hash value, split into parts because wasm doesn't have a
+// 128-bit integer type.
+type MetadataHashValue struct {
+	// 64 bits of a 128-bit hash value.
+	Lower uint64
+
+	// Another 64 bits of a 128-bit hash value.
+	Upper uint64
+}
+
 /*
 package wasi:filesystem@0.2.0-rc-2023-11-10;
 interface types {
-    // A directory entry.
-    record directory-entry {
-        // The type of the file referred to by this directory entry.
-        %type: descriptor-type,
-
-        // The name of the object.
-        name: string,
-    }
-
-    // Error codes returned by functions, similar to `errno` in POSIX.
-    // Not all of these error codes are returned by the functions provided by this
-    // API; some are used in higher-level library layers, and others are provided
-    // merely for alignment with POSIX.
-    enum error-code {
-        // Permission denied, similar to `EACCES` in POSIX.
-        access,
-        // Resource unavailable, or operation would block, similar to `EAGAIN` and `EWOULDBLOCK` in POSIX.
-        would-block,
-        // Connection already in progress, similar to `EALREADY` in POSIX.
-        already,
-        // Bad descriptor, similar to `EBADF` in POSIX.
-        bad-descriptor,
-        // Device or resource busy, similar to `EBUSY` in POSIX.
-        busy,
-        // Resource deadlock would occur, similar to `EDEADLK` in POSIX.
-        deadlock,
-        // Storage quota exceeded, similar to `EDQUOT` in POSIX.
-        quota,
-        // File exists, similar to `EEXIST` in POSIX.
-        exist,
-        // File too large, similar to `EFBIG` in POSIX.
-        file-too-large,
-        // Illegal byte sequence, similar to `EILSEQ` in POSIX.
-        illegal-byte-sequence,
-        // Operation in progress, similar to `EINPROGRESS` in POSIX.
-        in-progress,
-        // Interrupted function, similar to `EINTR` in POSIX.
-        interrupted,
-        // Invalid argument, similar to `EINVAL` in POSIX.
-        invalid,
-        // I/O error, similar to `EIO` in POSIX.
-        io,
-        // Is a directory, similar to `EISDIR` in POSIX.
-        is-directory,
-        // Too many levels of symbolic links, similar to `ELOOP` in POSIX.
-        loop,
-        // Too many links, similar to `EMLINK` in POSIX.
-        too-many-links,
-        // Message too large, similar to `EMSGSIZE` in POSIX.
-        message-size,
-        // Filename too long, similar to `ENAMETOOLONG` in POSIX.
-        name-too-long,
-        // No such device, similar to `ENODEV` in POSIX.
-        no-device,
-        // No such file or directory, similar to `ENOENT` in POSIX.
-        no-entry,
-        // No locks available, similar to `ENOLCK` in POSIX.
-        no-lock,
-        // Not enough space, similar to `ENOMEM` in POSIX.
-        insufficient-memory,
-        // No space left on device, similar to `ENOSPC` in POSIX.
-        insufficient-space,
-        // Not a directory or a symbolic link to a directory, similar to `ENOTDIR` in POSIX.
-        not-directory,
-        // Directory not empty, similar to `ENOTEMPTY` in POSIX.
-        not-empty,
-        // State not recoverable, similar to `ENOTRECOVERABLE` in POSIX.
-        not-recoverable,
-        // Not supported, similar to `ENOTSUP` and `ENOSYS` in POSIX.
-        unsupported,
-        // Inappropriate I/O control operation, similar to `ENOTTY` in POSIX.
-        no-tty,
-        // No such device or address, similar to `ENXIO` in POSIX.
-        no-such-device,
-        // Value too large to be stored in data type, similar to `EOVERFLOW` in POSIX.
-        overflow,
-        // Operation not permitted, similar to `EPERM` in POSIX.
-        not-permitted,
-        // Broken pipe, similar to `EPIPE` in POSIX.
-        pipe,
-        // Read-only file system, similar to `EROFS` in POSIX.
-        read-only,
-        // Invalid seek, similar to `ESPIPE` in POSIX.
-        invalid-seek,
-        // Text file busy, similar to `ETXTBSY` in POSIX.
-        text-file-busy,
-        // Cross-device link, similar to `EXDEV` in POSIX.
-        cross-device,
-    }
-
-    // File or memory access pattern advisory information.
-    enum advice {
-        // The application has no advice to give on its behavior with respect
-        // to the specified data.
-        normal,
-        // The application expects to access the specified data sequentially
-        // from lower offsets to higher offsets.
-        sequential,
-        // The application expects to access the specified data in a random
-        // order.
-        random,
-        // The application expects to access the specified data in the near
-        // future.
-        will-need,
-        // The application expects that it will not access the specified data
-        // in the near future.
-        dont-need,
-        // The application expects to access the specified data once and then
-        // not reuse it thereafter.
-        no-reuse,
-    }
-
-    // A 128-bit hash value, split into parts because wasm doesn't have a
-    // 128-bit integer type.
-    record metadata-hash-value {
-       // 64 bits of a 128-bit hash value.
-       lower: u64,
-       // Another 64 bits of a 128-bit hash value.
-       upper: u64,
-    }
-
     // A descriptor is a reference to a filesystem object, which may be a file,
     // directory, named pipe, special file, or other object on which filesystem
     // calls may be made.
