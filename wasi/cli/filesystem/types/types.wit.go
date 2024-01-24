@@ -179,11 +179,14 @@ const (
 	OpenFlagsTruncate
 )
 
-// LinkCount represents the type  "wasi:filesystem/types.link-count"
+// LinkCount represents the type "wasi:filesystem/types.link-count".
 //
 // Number of hard links to an inode.
 type LinkCount = uint64
 
+// NewTimestamp represents the variant "wasi:filesystem/types.new-timestamp".
+//
+// When setting a timestamp, this gives the value to set it to.
 type NewTimestamp struct {
 	v cm.Variant[uint8, DateTime, struct{}]
 }
@@ -233,17 +236,6 @@ func NewTimestampTimestamp(v DateTime) NewTimestamp {
 /*
 package wasi:filesystem@0.2.0-rc-2023-11-10;
 interface types {
-    // When setting a timestamp, this gives the value to set it to.
-    variant new-timestamp {
-        // Leave the timestamp set to its previous value.
-        no-change,
-        // Set the timestamp to the current time of the system clock associated
-        // with the filesystem.
-        now,
-        // Set the timestamp to the given value.
-        timestamp(datetime),
-    }
-
     // A directory entry.
     record directory-entry {
         // The type of the file referred to by this directory entry.
