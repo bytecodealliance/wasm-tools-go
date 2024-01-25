@@ -1,4 +1,4 @@
-// Package types represents the interface "wasi:filesystem.types".
+// Package types represents the interface "wasi:filesystem/types".
 //
 // WASI filesystem is a filesystem API primarily intended to let users run WASI
 // programs that access their files on their existing filesystems, without
@@ -44,7 +44,7 @@ type (
 // File size or length of a region within a file.
 type FileSize = uint64
 
-// DescriptorType represents the enum "wasi:filesystem.types.descriptor-type".
+// DescriptorType represents the enum "wasi:filesystem/types.descriptor-type".
 //
 // The type of a filesystem object referenced by a descriptor.
 //
