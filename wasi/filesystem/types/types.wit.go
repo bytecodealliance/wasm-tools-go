@@ -946,6 +946,17 @@ func (self Descriptor) metadata_hash_at(pathFlags PathFlags, path string, result
 // A stream of directory entries.
 type DirectoryEntryStream cm.Resource
 
+// ResourceDrop represents the resource-drop for "wasi:filesystem/types.directory-entry-stream".
+func (self DirectoryEntryStream) ResourceDrop() {
+	self.resource_drop()
+}
+
+//go:wasmimport wasi:filesystem/types@0.2.0-rc-2023-11-10 [resource-drop]directory-entry-stream
+func (self DirectoryEntryStream) resource_drop()
+
+// ReadDirectoryEntry represents the method "read-directory-entry".
+//
+// Read a single directory entry from a `directory-entry-stream`.
 func (self DirectoryEntryStream) ReadDirectoryEntry() (result cm.OKSizedResult[cm.Option[DirectoryEntry], ErrorCode]) {
 	self.read_directory_entry(&result)
 	return

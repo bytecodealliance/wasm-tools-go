@@ -17,6 +17,14 @@ import (
 // `pollable` represents a single I/O event which may be ready, or not.
 type Pollable cm.Resource
 
+// ResourceDrop represents the resource-drop for "wasi:io/poll.pollable".
+func (self Pollable) ResourceDrop() {
+	self.resource_drop()
+}
+
+//go:wasmimport wasi:io/poll@0.2.0-rc-2023-11-10 [resource-drop]pollable
+func (self Pollable) resource_drop()
+
 // Ready calls the imported method "wasi:io/poll.pollable#ready".
 //
 // Return the readiness of a pollable. This function never blocks.

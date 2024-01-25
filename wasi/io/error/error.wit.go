@@ -31,6 +31,14 @@ import (
 // concrete type is open.
 type Error cm.Resource
 
+// ResourceDrop represents the resource-drop for "wasi:io/error.error".
+func (self Error) ResourceDrop() {
+	self.resource_drop()
+}
+
+//go:wasmimport wasi:io/error@0.2.0-rc-2023-11-10 [resource-drop]error
+func (self Error) resource_drop()
+
 // ToDebugString represents the method "wasi:io/error.error#to-debug-string".
 //
 // Returns a string that is suitable to assist humans in debugging
