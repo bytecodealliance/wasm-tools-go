@@ -611,7 +611,7 @@ func (self Descriptor) Write(buffer cm.List[uint8], offset FileSize) (result cm.
 }
 
 //go:wasmimport wasi:filesystem/types@0.2.0-rc-2023-11-10 [method]descriptor.write
-func (self Descriptor) write(buffer cm.List[uint8], offset FileSize, result *cm.OKSizedResult[FileSize, ErrorCode]) cm.ErrResult[ErrorCode]
+func (self Descriptor) write(buffer cm.List[uint8], offset FileSize, result *cm.OKSizedResult[FileSize, ErrorCode])
 
 // ReadDirectory represents the resource method "read-directory".
 //
@@ -677,10 +677,10 @@ func (self Descriptor) Stat() (result cm.OKSizedResult[DescriptorStat, ErrorCode
 	return
 }
 
-//go:wasmimport wasi:filesystem/types@0.2.0-rc-2023-11-10 [method]descriptor.stat-at
-func (self Descriptor) stat(result *cm.OKSizedResult[DescriptorStat, ErrorCode]) cm.OKSizedResult[DescriptorStat, ErrorCode]
+//go:wasmimport wasi:filesystem/types@0.2.0-rc-2023-11-10 [method]descriptor.stat
+func (self Descriptor) stat(result *cm.OKSizedResult[DescriptorStat, ErrorCode])
 
-// StatAt represents the resource method "stat".
+// StatAt represents the resource method "stat-at".
 //
 // Return the attributes of a file or directory.
 //
