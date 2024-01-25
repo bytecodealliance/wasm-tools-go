@@ -40,16 +40,16 @@ type VariantDebug interface {
 	ValOffset() uintptr
 }
 
-func (v SizedVariant2[Shape, T0, T1]) Size() uintptr {
+func (v Variant2[Shape, T0, T1]) Size() uintptr {
 	return unsafe.Sizeof(v)
 }
 
-func (v SizedVariant2[Shape, T0, T1]) ValAlign() uintptr {
-	return unsafe.Alignof(v.val)
+func (v Variant2[Shape, T0, T1]) ValAlign() uintptr {
+	return unsafe.Alignof(v.Variant.data)
 }
 
-func (v SizedVariant2[Shape, T0, T1]) ValOffset() uintptr {
-	return tinyunsafe.OffsetOf(&v, &v.val)
+func (v Variant2[Shape, T0, T1]) ValOffset() uintptr {
+	return tinyunsafe.OffsetOf(&v, &v.Variant.data)
 }
 
 func (v UnsizedVariant2[T0, T1]) Size() uintptr {
@@ -69,15 +69,15 @@ type ResultDebug interface {
 	VariantDebug
 }
 
-func (r SizedResult[S, OK, Err]) Size() uintptr {
+func (r Result[S, OK, Err]) Size() uintptr {
 	return unsafe.Sizeof(r)
 }
 
-func (r SizedResult[S, OK, Err]) ValAlign() uintptr {
+func (r Result[S, OK, Err]) ValAlign() uintptr {
 	return r.v.ValAlign()
 }
 
-func (r SizedResult[S, OK, Err]) ValOffset() uintptr {
+func (r Result[S, OK, Err]) ValOffset() uintptr {
 	return r.v.ValOffset()
 }
 
@@ -86,9 +86,9 @@ func (r UnsizedResult[OK, Err]) Size() uintptr {
 }
 
 func (r UnsizedResult[OK, Err]) ValAlign() uintptr {
-	return r.v.ValAlign()
+	return 0
 }
 
 func (r UnsizedResult[OK, Err]) ValOffset() uintptr {
-	return r.v.ValOffset()
+	return 0
 }

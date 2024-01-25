@@ -1,12 +1,22 @@
 package cm
 
-import "unsafe"
+import (
+	"unsafe"
+)
 
 // List represents a Component Model list<T>.
 // The binary representation of list<T> is similar to a Go slice minus the cap field.
 type List[T any] struct {
 	data *T
 	len  uint
+}
+
+// NewList returns a List[T] from data and len.
+func NewList[T any](data *T, len uint) List[T] {
+	return List[T]{
+		data: data,
+		len:  len,
+	}
 }
 
 // ToList returns a List[T] equivalent to the Go slice s.
@@ -17,6 +27,11 @@ func ToList[S ~[]T, T any](s S) List[T] {
 		data: unsafe.SliceData([]T(s)),
 		len:  uint(len(s)),
 	}
+}
+
+// Data returns the data pointer for the list.
+func (list List[T]) Data() *T {
+	return list.data
 }
 
 // Len returns the length of the list.
