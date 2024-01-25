@@ -373,27 +373,27 @@ type Advice uint8
 const (
 	// The application has no advice to give on its behavior with respect
 	// to the specified data.
-	Normal Advice = iota
+	AdviceNormal Advice = iota
 
 	// The application expects to access the specified data sequentially
 	// from lower offsets to higher offsets.
-	Sequential
+	AdviceSequential
 
 	// The application expects to access the specified data in a random
 	// order.
-	Random
+	AdviceRandom
 
 	// The application expects to access the specified data in the near
 	// future.
-	WillNeed
+	AdviceWillNeed
 
 	// The application expects that it will not access the specified data
 	// in the near future.
-	DontNeed
+	AdviceDontNeed
 
 	// The application expects to access the specified data once and then
 	// not reuse it thereafter.
-	NoReuse
+	AdviceNoReuse
 )
 
 // MetadataHashValue represents the record "wasi:filesystem/types.metadata-hash-value".
