@@ -47,7 +47,7 @@ func TestResultLayout(t *testing.T) {
 		{"result<u64, u8>", Result[uint64, uint64, uint8]{}, 16, alignOf[uint64]()},
 		{"result<u8, u32>", Result[uint32, uint8, uint32]{}, 8, alignOf[uint32]()},
 		{"result<u32, u8>", Result[uint32, uint32, uint8]{}, 8, alignOf[uint32]()},
-		{"result<[9]u8, u64>", Result[Shape[[9]byte], [9]byte, uint64]{}, 24, alignOf[uint64]()},
+		{"result<[9]u8, u64>", Result[[9]byte, [9]byte, uint64]{}, 24, alignOf[uint64]()},
 
 		{"result<string, _>", OKResult[string]{}, sizePlusAlignOf[string](), ptrSize},
 		{"result<string, _>", OKSizedResult[string, struct{}]{}, sizePlusAlignOf[string](), ptrSize},

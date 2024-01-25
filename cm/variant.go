@@ -76,8 +76,6 @@ func NewVariant[Disc Discriminant, Shape, Align any, T any](tag Disc, data T) Va
 	return v
 }
 
-type Shape[T any] [1]T
-
 // Variant2 represents a variant with 2 cases, where at least one case has an
 // associated type with a non-zero size.
 // Use UnsizedVariant2 if both T0 or T1 are zero-sized.
