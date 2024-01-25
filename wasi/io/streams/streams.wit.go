@@ -57,6 +57,14 @@ func (self *StreamError) Closed() bool {
 // for using `wasi:io/poll`.
 type InputStream cm.Resource
 
+// ResourceDrop represents the resource-drop for "wasi:io/streams.input-stream".
+func (self InputStream) ResourceDrop() {
+	self.resource_drop()
+}
+
+//go:wasmimport wasi:io/streams@0.2.0-rc-2023-11-10 [resource-drop]input-stream
+func (self InputStream) resource_drop()
+
 // Read represents the method "wasi:io/streams.input-stream#read".
 //
 // Perform a non-blocking read from the stream.
@@ -152,6 +160,14 @@ func (self InputStream) subscribe() Pollable
 // accept data, the `subscribe` function to obtain a `pollable` which can be
 // polled for using `wasi:io/poll`.
 type OutputStream cm.Resource
+
+// ResourceDrop represents the resource-drop for "wasi:io/streams.output-stream".
+func (self OutputStream) ResourceDrop() {
+	self.resource_drop()
+}
+
+//go:wasmimport wasi:io/streams@0.2.0-rc-2023-11-10 [resource-drop]output-stream
+func (self OutputStream) resource_drop()
 
 // CheckWrite represents the method "wasi:io/streams.output-stream.check-write".
 //

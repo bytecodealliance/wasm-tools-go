@@ -415,6 +415,14 @@ type MetadataHashValue struct {
 // calls may be made.
 type Descriptor cm.Resource
 
+// ResourceDrop represents the resource-drop for "wasi:filesystem/types.descriptor".
+func (self Descriptor) ResourceDrop() {
+	self.resource_drop()
+}
+
+//go:wasmimport wasi:filesystem/types@0.2.0-rc-2023-11-10 [resource-drop]descriptor
+func (self Descriptor) resource_drop()
+
 // ReadViaStream represents the resource method "read-via-stream".
 //
 // Return a stream for reading from a file, if available.
