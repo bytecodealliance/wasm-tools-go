@@ -1,0 +1,84 @@
+{
+  "worlds": [
+    {
+      "name": "exports",
+      "imports": {},
+      "exports": {
+        "interface-0": {
+          "interface": 0
+        }
+      },
+      "package": 0
+    }
+  ],
+  "interfaces": [
+    {
+      "name": "example",
+      "types": {
+        "example-resource": 0
+      },
+      "functions": {
+        "[method]example-resource.foo": {
+          "name": "[method]example-resource.foo",
+          "kind": {
+            "method": 0
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 1
+            }
+          ],
+          "results": []
+        },
+        "[method]example-resource.bar": {
+          "name": "[method]example-resource.bar",
+          "kind": {
+            "method": 0
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 1
+            },
+            {
+              "name": "arg",
+              "type": "u32"
+            }
+          ],
+          "results": []
+        }
+      },
+      "package": 0
+    }
+  ],
+  "types": [
+    {
+      "name": "example-resource",
+      "kind": "resource",
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "borrow": 0
+        }
+      },
+      "owner": null
+    }
+  ],
+  "packages": [
+    {
+      "name": "examples:exported-resource@0.2.0",
+      "interfaces": {
+        "example": 0
+      },
+      "worlds": {
+        "exports": 0
+      }
+    }
+  ]
+}

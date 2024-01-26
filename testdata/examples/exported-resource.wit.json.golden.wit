@@ -1,0 +1,12 @@
+package examples:exported-resource@0.2.0;
+
+interface example {
+    resource example-resource {
+        bar: func(arg: u32);
+        foo: func();
+    }
+}
+
+world exports {
+    export example;
+}
