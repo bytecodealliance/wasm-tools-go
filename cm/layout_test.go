@@ -104,7 +104,7 @@ func TestBool(t *testing.T) {
 		t.Errorf("b == %t, expected %t", got, want)
 	}
 
-	if runtime.GOARCH != "amd64" {
+	if runtime.GOARCH == "arm64" {
 		// low bit 0 == false
 		*(*uint8)(unsafe.Pointer(&b)) = 2
 		if got, want := b, false; got != want {
