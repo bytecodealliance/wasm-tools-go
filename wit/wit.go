@@ -190,8 +190,13 @@ func (i *Interface) WIT(ctx Node, name string) string {
 
 	b.WriteRune('{')
 	n := 0
-	for _, name := range codec.SortedKeys(i.TypeDefs) {
+	keys := codec.SortedKeys(i.TypeDefs)
+	// Emit use statements first
+	for _, name := range keys {
 		td := i.TypeDefs[name]
+		if td.Root().Owner == td.Owner {
+			continue // Skip declarations
+		}
 		if n == 0 || td.Docs.Contents != "" {
 			b.WriteRune('\n')
 		}
@@ -199,6 +204,20 @@ func (i *Interface) WIT(ctx Node, name string) string {
 		b.WriteRune('\n')
 		n++
 	}
+	// Declarations
+	for _, name := range keys {
+		td := i.TypeDefs[name]
+		if td.Root().Owner != td.Owner {
+			continue // Skip use statements
+		}
+		if n == 0 || td.Docs.Contents != "" {
+			b.WriteRune('\n')
+		}
+		b.WriteString(indent(td.WIT(i, name)))
+		b.WriteRune('\n')
+		n++
+	}
+	// Functions
 	for _, name := range codec.SortedKeys(i.Functions) {
 		f := i.Functions[name]
 		if _, ok := f.Kind.(*Freestanding); !ok {
