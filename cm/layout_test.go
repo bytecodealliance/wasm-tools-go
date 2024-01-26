@@ -14,11 +14,11 @@ func TestFieldAlignment(t *testing.T) {
 		_   [0][7]byte
 		u64 uint64
 	}
-	if want, got := uintptr(16), unsafe.Sizeof(v1); want != got {
-		t.Errorf("expected unsafe.Sizeof(v1) == %d, got %d", want, got)
+	if got, want := unsafe.Sizeof(v1), uintptr(16); got != want {
+		t.Errorf("expected unsafe.Sizeof(v1) == %d, expected %d", got, want)
 	}
-	if want, got := uintptr(8), tinyunsafe.OffsetOf(&v1, &v1.u64); want != got {
-		t.Errorf("expected unsafe.Offsetof(v1.u64) == %d, got %d", want, got)
+	if got, want := tinyunsafe.OffsetOf(&v1, &v1.u64), uintptr(8); got != want {
+		t.Errorf("expected unsafe.Offsetof(v1.u64) == %d, expected %d", got, want)
 	}
 
 	var v2 struct {
@@ -31,11 +31,11 @@ func TestFieldAlignment(t *testing.T) {
 		}
 		u64 uint64
 	}
-	if want, got := uintptr(16), unsafe.Sizeof(v2); want != got {
-		t.Errorf("expected unsafe.Sizeof(v2) == %d, got %d", want, got)
+	if got, want := unsafe.Sizeof(v2), uintptr(16); got != want {
+		t.Errorf("expected unsafe.Sizeof(v2) == %d, expected %d", got, want)
 	}
-	if want, got := uintptr(8), tinyunsafe.OffsetOf(&v2, &v2.u64); want != got {
-		t.Errorf("expected unsafe.Offsetof(v2.u64) == %d, got %d", want, got)
+	if got, want := tinyunsafe.OffsetOf(&v2, &v2.u64), uintptr(8); got != want {
+		t.Errorf("expected unsafe.Offsetof(v2.u64) == %d, expected %d", got, want)
 	}
 
 	// size 1
@@ -43,11 +43,11 @@ func TestFieldAlignment(t *testing.T) {
 		_ struct{}
 		b bool // offset 0
 	}
-	if want, got := uintptr(1), unsafe.Sizeof(v3); want != got {
-		t.Errorf("expected unsafe.Sizeof(v3) == %d, got %d", want, got)
+	if got, want := unsafe.Sizeof(v3), uintptr(1); got != want {
+		t.Errorf("expected unsafe.Sizeof(v3) == %d, expected %d", got, want)
 	}
-	if want, got := uintptr(0), tinyunsafe.OffsetOf(&v3, &v3.b); want != got {
-		t.Errorf("expected unsafe.Offsetof(v3.b) == %d, got %d", want, got)
+	if got, want := tinyunsafe.OffsetOf(&v3, &v3.b), uintptr(0); got != want {
+		t.Errorf("expected unsafe.Offsetof(v3.b) == %d, expected %d", got, want)
 	}
 
 	// size 0
@@ -55,11 +55,11 @@ func TestFieldAlignment(t *testing.T) {
 		_ [0]uint32
 		b bool // offset 0!
 	}
-	if want, got := uintptr(4), unsafe.Sizeof(v4); want != got {
-		t.Errorf("expected unsafe.Sizeof(v4) == %d, got %d", want, got)
+	if got, want := unsafe.Sizeof(v4), uintptr(4); got != want {
+		t.Errorf("expected unsafe.Sizeof(v4) == %d, expected %d", got, want)
 	}
-	if want, got := uintptr(0), tinyunsafe.OffsetOf(&v4, &v4.b); want != got {
-		t.Errorf("expected unsafe.Offsetof(v4.b) == %d, got %d", want, got)
+	if got, want := tinyunsafe.OffsetOf(&v4, &v4.b), uintptr(0); got != want {
+		t.Errorf("expected unsafe.Offsetof(v4.b) == %d, expected %d", got, want)
 	}
 }
 
