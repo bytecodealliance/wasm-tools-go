@@ -61,7 +61,10 @@
                                     },
                                 },
                             },
-                            Docs:       wit.Docs{},
+                            Docs: wit.Docs{
+                                Contents: "Poll for completion on a set of pollables.\n\nThis function takes a list of pollables, which identify I/O sources of\ninterest, and waits until one or more of the events is ready for I/O.\n\nThe result `list<u32>` contains one or more indices of handles in the\nargument list that is ready for I/O.\n\nIf the list contains more elements than can be indexed with a `u32`\nvalue, this function traps.\n\nA timeout can be implemented by adding a pollable from the\nwasi-clocks API to the list.\n\nThis function does not return a `result`; polling in itself does not\ndo any I/O so it doesn't fail. If any of the I/O sources identified by\nthe pollables has an error, it is indicated by marking the source as\nbeing reaedy for I/O.",
+                                _node:    wit._node{},
+                            },
                             _worldItem: wit._worldItem{},
                         },
                         "poll-one": &wit.Function{
@@ -83,8 +86,11 @@
                                     },
                                 },
                             },
-                            Results:    nil,
-                            Docs:       wit.Docs{},
+                            Results: nil,
+                            Docs:    wit.Docs{
+                                Contents: "Poll for completion on a single pollable.\n\nThis function is similar to `poll-list`, but operates on only a single\npollable. When it returns, the handle is ready for I/O.",
+                                _node:    wit._node{},
+                            },
                             _worldItem: wit._worldItem{},
                         },
                     },
@@ -130,11 +136,17 @@
                                             Cases: {
                                                 {
                                                     Name: "open",
-                                                    Docs: wit.Docs{},
+                                                    Docs: wit.Docs{
+                                                        Contents: "The stream is open and may produce further data.",
+                                                        _node:    wit._node{},
+                                                    },
                                                 },
                                                 {
                                                     Name: "ended",
-                                                    Docs: wit.Docs{},
+                                                    Docs: wit.Docs{
+                                                        Contents: "When reading, this indicates that the stream will not produce\nfurther data.\nWhen writing, this indicates that the stream will no longer be read.\nFurther writes are still permitted.",
+                                                        _node:    wit._node{},
+                                                    },
                                                 },
                                             },
                                             _typeDefKind: wit._typeDefKind{},
@@ -150,11 +162,17 @@
                                             Cases: {
                                                 {
                                                     Name: "last-operation-failed",
-                                                    Docs: wit.Docs{},
+                                                    Docs: wit.Docs{
+                                                        Contents: "The last operation (a write or flush) failed before completion.",
+                                                        _node:    wit._node{},
+                                                    },
                                                 },
                                                 {
                                                     Name: "closed",
-                                                    Docs: wit.Docs{},
+                                                    Docs: wit.Docs{
+                                                        Contents: "The stream is closed: no more input will be accepted by the\nstream. A closed output-stream will return this error on all\nfuture operations.",
+                                                        _node:    wit._node{},
+                                                    },
                                                 },
                                             },
                                             _typeDefKind: wit._typeDefKind{},
@@ -216,7 +234,10 @@
                                                 },
                                             },
                                         },
-                                        Docs:       wit.Docs{},
+                                        Docs: wit.Docs{
+                                            Contents: "Read bytes from a stream, after blocking until at least one byte can\nbe read. Except for blocking, identical to `read`.",
+                                            _node:    wit._node{},
+                                        },
                                         _worldItem: wit._worldItem{},
                                     },
                                     "[method]input-stream.blocking-skip": &wit.Function{
@@ -269,7 +290,10 @@
                                                 },
                                             },
                                         },
-                                        Docs:       wit.Docs{},
+                                        Docs: wit.Docs{
+                                            Contents: "Skip bytes from a stream, after blocking until at least one byte\ncan be skipped. Except for blocking behavior, identical to `skip`.",
+                                            _node:    wit._node{},
+                                        },
                                         _worldItem: wit._worldItem{},
                                     },
                                     "[method]input-stream.read": &wit.Function{
@@ -322,7 +346,10 @@
                                                 },
                                             },
                                         },
-                                        Docs:       wit.Docs{},
+                                        Docs: wit.Docs{
+                                            Contents: "Perform a non-blocking read from the stream.\n\nThis function returns a list of bytes containing the data that was\nread, along with a `stream-status` which, indicates whether further\nreads are expected to produce data. The returned list will contain up to\n`len` bytes; it may return fewer than requested, but not more. An\nempty list and `stream-status:open` indicates no more data is\navailable at this time, and that the pollable given by `subscribe`\nwill be ready when more data is available.\n\nOnce a stream has reached the end, subsequent calls to `read` or\n`skip` will always report `stream-status:ended` rather than producing more\ndata.\n\nWhen the caller gives a `len` of 0, it represents a request to read 0\nbytes. This read should  always succeed and return an empty list and\nthe current `stream-status`.\n\nThe `len` parameter is a `u64`, which could represent a list of u8 which\nis not possible to allocate in wasm32, or not desirable to allocate as\nas a return value by the callee. The callee may return a list of bytes\nless than `len` in size while more bytes are available for reading.",
+                                            _node:    wit._node{},
+                                        },
                                         _worldItem: wit._worldItem{},
                                     },
                                     "[method]input-stream.skip": &wit.Function{
@@ -375,7 +402,10 @@
                                                 },
                                             },
                                         },
-                                        Docs:       wit.Docs{},
+                                        Docs: wit.Docs{
+                                            Contents: "Skip bytes from a stream.\n\nThis is similar to the `read` function, but avoids copying the\nbytes into the instance.\n\nOnce a stream has reached the end, subsequent calls to read or\n`skip` will always report end-of-stream rather than producing more\ndata.\n\nThis function returns the number of bytes skipped, along with a\n`stream-status` indicating whether the end of the stream was\nreached. The returned value will be at most `len`; it may be less.",
+                                            _node:    wit._node{},
+                                        },
                                         _worldItem: wit._worldItem{},
                                     },
                                     "[method]input-stream.subscribe": &wit.Function{
@@ -416,7 +446,10 @@
                                                 },
                                             },
                                         },
-                                        Docs:       wit.Docs{},
+                                        Docs: wit.Docs{
+                                            Contents: "Create a `pollable` which will resolve once either the specified stream\nhas bytes available to read or the other end of the stream has been\nclosed.\nThe created `pollable` is a child resource of the `input-stream`.\nImplementations may trap if the `input-stream` is dropped before\nall derived `pollable`s created with this function are dropped.",
+                                            _node:    wit._node{},
+                                        },
                                         _worldItem: wit._worldItem{},
                                     },
                                     "[method]output-stream.blocking-flush": &wit.Function{
@@ -458,7 +491,10 @@
                                                 },
                                             },
                                         },
-                                        Docs:       wit.Docs{},
+                                        Docs: wit.Docs{
+                                            Contents: "Request to flush buffered output, and block until flush completes\nand stream is ready for writing again.",
+                                            _node:    wit._node{},
+                                        },
                                         _worldItem: wit._worldItem{},
                                     },
                                     "[method]output-stream.blocking-splice": &wit.Function{
@@ -525,7 +561,10 @@
                                                 },
                                             },
                                         },
-                                        Docs:       wit.Docs{},
+                                        Docs: wit.Docs{
+                                            Contents: "Read from one stream and write to another, with blocking.\n\nThis is similar to `splice`, except that it blocks until at least\none byte can be read.",
+                                            _node:    wit._node{},
+                                        },
                                         _worldItem: wit._worldItem{},
                                     },
                                     "[method]output-stream.blocking-write-and-flush": &wit.Function{
@@ -581,7 +620,10 @@
                                                 },
                                             },
                                         },
-                                        Docs:       wit.Docs{},
+                                        Docs: wit.Docs{
+                                            Contents: "Perform a write of up to 4096 bytes, and then flush the stream. Block\nuntil all of these operations are complete, or an error occurs.\n\nThis is a convenience wrapper around the use of `check-write`,\n`subscribe`, `write`, and `flush`, and is implemented with the\nfollowing pseudo-code:\n\n```text\nlet pollable = this.subscribe();\nwhile !contents.is_empty() {\n// Wait for the stream to become writable\npoll-one(pollable);\nlet Ok(n) = this.check-write(); // eliding error handling\nlet len = min(n, contents.len());\nlet (chunk, rest) = contents.split_at(len);\nthis.write(chunk  );            // eliding error handling\ncontents = rest;\n}\nthis.flush();\n// Wait for completion of `flush`\npoll-one(pollable);\n// Check for any errors that arose during `flush`\nlet _ = this.check-write();         // eliding error handling\n```",
+                                            _node:    wit._node{},
+                                        },
                                         _worldItem: wit._worldItem{},
                                     },
                                     "[method]output-stream.blocking-write-zeroes-and-flush": &wit.Function{
@@ -627,7 +669,10 @@
                                                 },
                                             },
                                         },
-                                        Docs:       wit.Docs{},
+                                        Docs: wit.Docs{
+                                            Contents: "Perform a write of up to 4096 zeroes, and then flush the stream.\nBlock until all of these operations are complete, or an error\noccurs.\n\nThis is a convenience wrapper around the use of `check-write`,\n`subscribe`, `write-zeroes`, and `flush`, and is implemented with\nthe following pseudo-code:\n\n```text\nlet pollable = this.subscribe();\nwhile num_zeroes != 0 {\n// Wait for the stream to become writable\npoll-one(pollable);\nlet Ok(n) = this.check-write(); // eliding error handling\nlet len = min(n, num_zeroes);\nthis.write-zeroes(len);         // eliding error handling\nnum_zeroes -= len;\n}\nthis.flush();\n// Wait for completion of `flush`\npoll-one(pollable);\n// Check for any errors that arose during `flush`\nlet _ = this.check-write();         // eliding error handling\n```",
+                                            _node:    wit._node{},
+                                        },
                                         _worldItem: wit._worldItem{},
                                     },
                                     "[method]output-stream.check-write": &wit.Function{
@@ -669,7 +714,10 @@
                                                 },
                                             },
                                         },
-                                        Docs:       wit.Docs{},
+                                        Docs: wit.Docs{
+                                            Contents: "Check readiness for writing. This function never blocks.\n\nReturns the number of bytes permitted for the next call to `write`,\nor an error. Calling `write` with more bytes than this function has\npermitted will trap.\n\nWhen this function returns 0 bytes, the `subscribe` pollable will\nbecome ready when this function will report at least 1 byte, or an\nerror.",
+                                            _node:    wit._node{},
+                                        },
                                         _worldItem: wit._worldItem{},
                                     },
                                     "[method]output-stream.flush": &wit.Function{
@@ -711,7 +759,10 @@
                                                 },
                                             },
                                         },
-                                        Docs:       wit.Docs{},
+                                        Docs: wit.Docs{
+                                            Contents: "Request to flush buffered output. This function never blocks.\n\nThis tells the output-stream that the caller intends any buffered\noutput to be flushed. the output which is expected to be flushed\nis all that has been passed to `write` prior to this call.\n\nUpon calling this function, the `output-stream` will not accept any\nwrites (`check-write` will return `ok(0)`) until the flush has\ncompleted. The `subscribe` pollable will become ready when the\nflush has completed and the stream can accept more writes.",
+                                            _node:    wit._node{},
+                                        },
                                         _worldItem: wit._worldItem{},
                                     },
                                     "[method]output-stream.forward": &wit.Function{
@@ -774,7 +825,10 @@
                                                 },
                                             },
                                         },
-                                        Docs:       wit.Docs{},
+                                        Docs: wit.Docs{
+                                            Contents: "Forward the entire contents of an input stream to an output stream.\n\nThis function repeatedly reads from the input stream and writes\nthe data to the output stream, until the end of the input stream\nis reached, or an error is encountered.\n\nUnlike other I/O functions, this function blocks until the end\nof the input stream is seen and all the data has been written to\nthe output stream.\n\nThis function returns the number of bytes transferred, and the status of\nthe output stream.",
+                                            _node:    wit._node{},
+                                        },
                                         _worldItem: wit._worldItem{},
                                     },
                                     "[method]output-stream.splice": &wit.Function{
@@ -841,7 +895,10 @@
                                                 },
                                             },
                                         },
-                                        Docs:       wit.Docs{},
+                                        Docs: wit.Docs{
+                                            Contents: "Read from one stream and write to another.\n\nThis function returns the number of bytes transferred; it may be less\nthan `len`.\n\nUnlike other I/O functions, this function blocks until all the data\nread from the input stream has been written to the output stream.",
+                                            _node:    wit._node{},
+                                        },
                                         _worldItem: wit._worldItem{},
                                     },
                                     "[method]output-stream.subscribe": &wit.Function{
@@ -882,7 +939,10 @@
                                                 },
                                             },
                                         },
-                                        Docs:       wit.Docs{},
+                                        Docs: wit.Docs{
+                                            Contents: "Create a `pollable` which will resolve once the output-stream\nis ready for more writing, or an error has occured. When this\npollable is ready, `check-write` will return `ok(n)` with n>0, or an\nerror.\n\nIf the stream is closed, this pollable is always ready immediately.\n\nThe created `pollable` is a child resource of the `output-stream`.\nImplementations may trap if the `output-stream` is dropped before\nall derived `pollable`s created with this function are dropped.",
+                                            _node:    wit._node{},
+                                        },
                                         _worldItem: wit._worldItem{},
                                     },
                                     "[method]output-stream.write": &wit.Function{
@@ -938,7 +998,10 @@
                                                 },
                                             },
                                         },
-                                        Docs:       wit.Docs{},
+                                        Docs: wit.Docs{
+                                            Contents: "Perform a write. This function never blocks.\n\nPrecondition: check-write gave permit of Ok(n) and contents has a\nlength of less than or equal to n. Otherwise, this function will trap.\n\nreturns Err(closed) without writing if the stream has closed since\nthe last call to check-write provided a permit.",
+                                            _node:    wit._node{},
+                                        },
                                         _worldItem: wit._worldItem{},
                                     },
                                     "[method]output-stream.write-zeroes": &wit.Function{
@@ -984,12 +1047,18 @@
                                                 },
                                             },
                                         },
-                                        Docs:       wit.Docs{},
+                                        Docs: wit.Docs{
+                                            Contents: "Write zeroes to a stream.\n\nthis should be used precisely like `write` with the exact same\npreconditions (must use check-write first), but instead of\npassing a list of bytes, you simply pass the number of zero-bytes\nthat should be written.",
+                                            _node:    wit._node{},
+                                        },
                                         _worldItem: wit._worldItem{},
                                     },
                                 },
-                                Package:    &wit.Package{(CYCLIC REFERENCE)},
-                                Docs:       wit.Docs{},
+                                Package: &wit.Package{(CYCLIC REFERENCE)},
+                                Docs:    wit.Docs{
+                                    Contents: "WASI I/O is an I/O abstraction API which is currently focused on providing\nstream types.\n\nIn the future, the component model is expected to add built-in stream types;\nwhen it does, they are expected to subsume this API.",
+                                    _node:    wit._node{},
+                                },
                                 _typeOwner: wit._typeOwner{},
                                 _worldItem: wit._worldItem{},
                             },
@@ -999,7 +1068,10 @@
                         },
                         Docs: wit.Docs{},
                     },
-                    Docs:       wit.Docs{},
+                    Docs: wit.Docs{
+                        Contents: "A poll API intended to let users wait for I/O events on multiple handles\nat once.",
+                        _node:    wit._node{},
+                    },
                     _typeOwner: wit._typeOwner{},
                     _worldItem: wit._worldItem{},
                 },
@@ -1036,11 +1108,17 @@
                                 Cases: {
                                     {
                                         Name: "open",
-                                        Docs: wit.Docs{},
+                                        Docs: wit.Docs{
+                                            Contents: "The stream is open and may produce further data.",
+                                            _node:    wit._node{},
+                                        },
                                     },
                                     {
                                         Name: "ended",
-                                        Docs: wit.Docs{},
+                                        Docs: wit.Docs{
+                                            Contents: "When reading, this indicates that the stream will not produce\nfurther data.\nWhen writing, this indicates that the stream will no longer be read.\nFurther writes are still permitted.",
+                                            _node:    wit._node{},
+                                        },
                                     },
                                 },
                                 _typeDefKind: wit._typeDefKind{},
@@ -1056,11 +1134,17 @@
                                 Cases: {
                                     {
                                         Name: "last-operation-failed",
-                                        Docs: wit.Docs{},
+                                        Docs: wit.Docs{
+                                            Contents: "The last operation (a write or flush) failed before completion.",
+                                            _node:    wit._node{},
+                                        },
                                     },
                                     {
                                         Name: "closed",
-                                        Docs: wit.Docs{},
+                                        Docs: wit.Docs{
+                                            Contents: "The stream is closed: no more input will be accepted by the\nstream. A closed output-stream will return this error on all\nfuture operations.",
+                                            _node:    wit._node{},
+                                        },
                                     },
                                 },
                                 _typeDefKind: wit._typeDefKind{},
@@ -1128,7 +1212,10 @@
                                     },
                                 },
                             },
-                            Docs:       wit.Docs{},
+                            Docs: wit.Docs{
+                                Contents: "Read bytes from a stream, after blocking until at least one byte can\nbe read. Except for blocking, identical to `read`.",
+                                _node:    wit._node{},
+                            },
                             _worldItem: wit._worldItem{},
                         },
                         "[method]input-stream.blocking-skip": &wit.Function{
@@ -1187,7 +1274,10 @@
                                     },
                                 },
                             },
-                            Docs:       wit.Docs{},
+                            Docs: wit.Docs{
+                                Contents: "Skip bytes from a stream, after blocking until at least one byte\ncan be skipped. Except for blocking behavior, identical to `skip`.",
+                                _node:    wit._node{},
+                            },
                             _worldItem: wit._worldItem{},
                         },
                         "[method]input-stream.read": &wit.Function{
@@ -1246,7 +1336,10 @@
                                     },
                                 },
                             },
-                            Docs:       wit.Docs{},
+                            Docs: wit.Docs{
+                                Contents: "Perform a non-blocking read from the stream.\n\nThis function returns a list of bytes containing the data that was\nread, along with a `stream-status` which, indicates whether further\nreads are expected to produce data. The returned list will contain up to\n`len` bytes; it may return fewer than requested, but not more. An\nempty list and `stream-status:open` indicates no more data is\navailable at this time, and that the pollable given by `subscribe`\nwill be ready when more data is available.\n\nOnce a stream has reached the end, subsequent calls to `read` or\n`skip` will always report `stream-status:ended` rather than producing more\ndata.\n\nWhen the caller gives a `len` of 0, it represents a request to read 0\nbytes. This read should  always succeed and return an empty list and\nthe current `stream-status`.\n\nThe `len` parameter is a `u64`, which could represent a list of u8 which\nis not possible to allocate in wasm32, or not desirable to allocate as\nas a return value by the callee. The callee may return a list of bytes\nless than `len` in size while more bytes are available for reading.",
+                                _node:    wit._node{},
+                            },
                             _worldItem: wit._worldItem{},
                         },
                         "[method]input-stream.skip": &wit.Function{
@@ -1305,7 +1398,10 @@
                                     },
                                 },
                             },
-                            Docs:       wit.Docs{},
+                            Docs: wit.Docs{
+                                Contents: "Skip bytes from a stream.\n\nThis is similar to the `read` function, but avoids copying the\nbytes into the instance.\n\nOnce a stream has reached the end, subsequent calls to read or\n`skip` will always report end-of-stream rather than producing more\ndata.\n\nThis function returns the number of bytes skipped, along with a\n`stream-status` indicating whether the end of the stream was\nreached. The returned value will be at most `len`; it may be less.",
+                                _node:    wit._node{},
+                            },
                             _worldItem: wit._worldItem{},
                         },
                         "[method]input-stream.subscribe": &wit.Function{
@@ -1346,7 +1442,10 @@
                                     },
                                 },
                             },
-                            Docs:       wit.Docs{},
+                            Docs: wit.Docs{
+                                Contents: "Create a `pollable` which will resolve once either the specified stream\nhas bytes available to read or the other end of the stream has been\nclosed.\nThe created `pollable` is a child resource of the `input-stream`.\nImplementations may trap if the `input-stream` is dropped before\nall derived `pollable`s created with this function are dropped.",
+                                _node:    wit._node{},
+                            },
                             _worldItem: wit._worldItem{},
                         },
                         "[method]output-stream.blocking-flush": &wit.Function{
@@ -1388,7 +1487,10 @@
                                     },
                                 },
                             },
-                            Docs:       wit.Docs{},
+                            Docs: wit.Docs{
+                                Contents: "Request to flush buffered output, and block until flush completes\nand stream is ready for writing again.",
+                                _node:    wit._node{},
+                            },
                             _worldItem: wit._worldItem{},
                         },
                         "[method]output-stream.blocking-splice": &wit.Function{
@@ -1461,7 +1563,10 @@
                                     },
                                 },
                             },
-                            Docs:       wit.Docs{},
+                            Docs: wit.Docs{
+                                Contents: "Read from one stream and write to another, with blocking.\n\nThis is similar to `splice`, except that it blocks until at least\none byte can be read.",
+                                _node:    wit._node{},
+                            },
                             _worldItem: wit._worldItem{},
                         },
                         "[method]output-stream.blocking-write-and-flush": &wit.Function{
@@ -1517,7 +1622,10 @@
                                     },
                                 },
                             },
-                            Docs:       wit.Docs{},
+                            Docs: wit.Docs{
+                                Contents: "Perform a write of up to 4096 bytes, and then flush the stream. Block\nuntil all of these operations are complete, or an error occurs.\n\nThis is a convenience wrapper around the use of `check-write`,\n`subscribe`, `write`, and `flush`, and is implemented with the\nfollowing pseudo-code:\n\n```text\nlet pollable = this.subscribe();\nwhile !contents.is_empty() {\n// Wait for the stream to become writable\npoll-one(pollable);\nlet Ok(n) = this.check-write(); // eliding error handling\nlet len = min(n, contents.len());\nlet (chunk, rest) = contents.split_at(len);\nthis.write(chunk  );            // eliding error handling\ncontents = rest;\n}\nthis.flush();\n// Wait for completion of `flush`\npoll-one(pollable);\n// Check for any errors that arose during `flush`\nlet _ = this.check-write();         // eliding error handling\n```",
+                                _node:    wit._node{},
+                            },
                             _worldItem: wit._worldItem{},
                         },
                         "[method]output-stream.blocking-write-zeroes-and-flush": &wit.Function{
@@ -1563,7 +1671,10 @@
                                     },
                                 },
                             },
-                            Docs:       wit.Docs{},
+                            Docs: wit.Docs{
+                                Contents: "Perform a write of up to 4096 zeroes, and then flush the stream.\nBlock until all of these operations are complete, or an error\noccurs.\n\nThis is a convenience wrapper around the use of `check-write`,\n`subscribe`, `write-zeroes`, and `flush`, and is implemented with\nthe following pseudo-code:\n\n```text\nlet pollable = this.subscribe();\nwhile num_zeroes != 0 {\n// Wait for the stream to become writable\npoll-one(pollable);\nlet Ok(n) = this.check-write(); // eliding error handling\nlet len = min(n, num_zeroes);\nthis.write-zeroes(len);         // eliding error handling\nnum_zeroes -= len;\n}\nthis.flush();\n// Wait for completion of `flush`\npoll-one(pollable);\n// Check for any errors that arose during `flush`\nlet _ = this.check-write();         // eliding error handling\n```",
+                                _node:    wit._node{},
+                            },
                             _worldItem: wit._worldItem{},
                         },
                         "[method]output-stream.check-write": &wit.Function{
@@ -1605,7 +1716,10 @@
                                     },
                                 },
                             },
-                            Docs:       wit.Docs{},
+                            Docs: wit.Docs{
+                                Contents: "Check readiness for writing. This function never blocks.\n\nReturns the number of bytes permitted for the next call to `write`,\nor an error. Calling `write` with more bytes than this function has\npermitted will trap.\n\nWhen this function returns 0 bytes, the `subscribe` pollable will\nbecome ready when this function will report at least 1 byte, or an\nerror.",
+                                _node:    wit._node{},
+                            },
                             _worldItem: wit._worldItem{},
                         },
                         "[method]output-stream.flush": &wit.Function{
@@ -1647,7 +1761,10 @@
                                     },
                                 },
                             },
-                            Docs:       wit.Docs{},
+                            Docs: wit.Docs{
+                                Contents: "Request to flush buffered output. This function never blocks.\n\nThis tells the output-stream that the caller intends any buffered\noutput to be flushed. the output which is expected to be flushed\nis all that has been passed to `write` prior to this call.\n\nUpon calling this function, the `output-stream` will not accept any\nwrites (`check-write` will return `ok(0)`) until the flush has\ncompleted. The `subscribe` pollable will become ready when the\nflush has completed and the stream can accept more writes.",
+                                _node:    wit._node{},
+                            },
                             _worldItem: wit._worldItem{},
                         },
                         "[method]output-stream.forward": &wit.Function{
@@ -1716,7 +1833,10 @@
                                     },
                                 },
                             },
-                            Docs:       wit.Docs{},
+                            Docs: wit.Docs{
+                                Contents: "Forward the entire contents of an input stream to an output stream.\n\nThis function repeatedly reads from the input stream and writes\nthe data to the output stream, until the end of the input stream\nis reached, or an error is encountered.\n\nUnlike other I/O functions, this function blocks until the end\nof the input stream is seen and all the data has been written to\nthe output stream.\n\nThis function returns the number of bytes transferred, and the status of\nthe output stream.",
+                                _node:    wit._node{},
+                            },
                             _worldItem: wit._worldItem{},
                         },
                         "[method]output-stream.splice": &wit.Function{
@@ -1789,7 +1909,10 @@
                                     },
                                 },
                             },
-                            Docs:       wit.Docs{},
+                            Docs: wit.Docs{
+                                Contents: "Read from one stream and write to another.\n\nThis function returns the number of bytes transferred; it may be less\nthan `len`.\n\nUnlike other I/O functions, this function blocks until all the data\nread from the input stream has been written to the output stream.",
+                                _node:    wit._node{},
+                            },
                             _worldItem: wit._worldItem{},
                         },
                         "[method]output-stream.subscribe": &wit.Function{
@@ -1830,7 +1953,10 @@
                                     },
                                 },
                             },
-                            Docs:       wit.Docs{},
+                            Docs: wit.Docs{
+                                Contents: "Create a `pollable` which will resolve once the output-stream\nis ready for more writing, or an error has occured. When this\npollable is ready, `check-write` will return `ok(n)` with n>0, or an\nerror.\n\nIf the stream is closed, this pollable is always ready immediately.\n\nThe created `pollable` is a child resource of the `output-stream`.\nImplementations may trap if the `output-stream` is dropped before\nall derived `pollable`s created with this function are dropped.",
+                                _node:    wit._node{},
+                            },
                             _worldItem: wit._worldItem{},
                         },
                         "[method]output-stream.write": &wit.Function{
@@ -1886,7 +2012,10 @@
                                     },
                                 },
                             },
-                            Docs:       wit.Docs{},
+                            Docs: wit.Docs{
+                                Contents: "Perform a write. This function never blocks.\n\nPrecondition: check-write gave permit of Ok(n) and contents has a\nlength of less than or equal to n. Otherwise, this function will trap.\n\nreturns Err(closed) without writing if the stream has closed since\nthe last call to check-write provided a permit.",
+                                _node:    wit._node{},
+                            },
                             _worldItem: wit._worldItem{},
                         },
                         "[method]output-stream.write-zeroes": &wit.Function{
@@ -1932,7 +2061,10 @@
                                     },
                                 },
                             },
-                            Docs:       wit.Docs{},
+                            Docs: wit.Docs{
+                                Contents: "Write zeroes to a stream.\n\nthis should be used precisely like `write` with the exact same\npreconditions (must use check-write first), but instead of\npassing a list of bytes, you simply pass the number of zero-bytes\nthat should be written.",
+                                _node:    wit._node{},
+                            },
                             _worldItem: wit._worldItem{},
                         },
                     },
@@ -1952,7 +2084,10 @@
                         },
                         Docs: wit.Docs{},
                     },
-                    Docs:       wit.Docs{},
+                    Docs: wit.Docs{
+                        Contents: "WASI I/O is an I/O abstraction API which is currently focused on providing\nstream types.\n\nIn the future, the component model is expected to add built-in stream types;\nwhen it does, they are expected to subsume this API.",
+                        _node:    wit._node{},
+                    },
                     _typeOwner: wit._typeOwner{},
                     _worldItem: wit._worldItem{},
                 },
@@ -2014,7 +2149,10 @@
                                         },
                                     },
                                 },
-                                Docs:       wit.Docs{},
+                                Docs: wit.Docs{
+                                    Contents: "Poll for completion on a set of pollables.\n\nThis function takes a list of pollables, which identify I/O sources of\ninterest, and waits until one or more of the events is ready for I/O.\n\nThe result `list<u32>` contains one or more indices of handles in the\nargument list that is ready for I/O.\n\nIf the list contains more elements than can be indexed with a `u32`\nvalue, this function traps.\n\nA timeout can be implemented by adding a pollable from the\nwasi-clocks API to the list.\n\nThis function does not return a `result`; polling in itself does not\ndo any I/O so it doesn't fail. If any of the I/O sources identified by\nthe pollables has an error, it is indicated by marking the source as\nbeing reaedy for I/O.",
+                                    _node:    wit._node{},
+                                },
                                 _worldItem: wit._worldItem{},
                             },
                             "poll-one": &wit.Function{
@@ -2036,13 +2174,19 @@
                                         },
                                     },
                                 },
-                                Results:    nil,
-                                Docs:       wit.Docs{},
+                                Results: nil,
+                                Docs:    wit.Docs{
+                                    Contents: "Poll for completion on a single pollable.\n\nThis function is similar to `poll-list`, but operates on only a single\npollable. When it returns, the handle is ready for I/O.",
+                                    _node:    wit._node{},
+                                },
                                 _worldItem: wit._worldItem{},
                             },
                         },
-                        Package:    &wit.Package{(CYCLIC REFERENCE)},
-                        Docs:       wit.Docs{},
+                        Package: &wit.Package{(CYCLIC REFERENCE)},
+                        Docs:    wit.Docs{
+                            Contents: "A poll API intended to let users wait for I/O events on multiple handles\nat once.",
+                            _node:    wit._node{},
+                        },
                         _typeOwner: wit._typeOwner{},
                         _worldItem: wit._worldItem{},
                     },
@@ -2079,11 +2223,17 @@
                                     Cases: {
                                         {
                                             Name: "open",
-                                            Docs: wit.Docs{},
+                                            Docs: wit.Docs{
+                                                Contents: "The stream is open and may produce further data.",
+                                                _node:    wit._node{},
+                                            },
                                         },
                                         {
                                             Name: "ended",
-                                            Docs: wit.Docs{},
+                                            Docs: wit.Docs{
+                                                Contents: "When reading, this indicates that the stream will not produce\nfurther data.\nWhen writing, this indicates that the stream will no longer be read.\nFurther writes are still permitted.",
+                                                _node:    wit._node{},
+                                            },
                                         },
                                     },
                                     _typeDefKind: wit._typeDefKind{},
@@ -2099,11 +2249,17 @@
                                     Cases: {
                                         {
                                             Name: "last-operation-failed",
-                                            Docs: wit.Docs{},
+                                            Docs: wit.Docs{
+                                                Contents: "The last operation (a write or flush) failed before completion.",
+                                                _node:    wit._node{},
+                                            },
                                         },
                                         {
                                             Name: "closed",
-                                            Docs: wit.Docs{},
+                                            Docs: wit.Docs{
+                                                Contents: "The stream is closed: no more input will be accepted by the\nstream. A closed output-stream will return this error on all\nfuture operations.",
+                                                _node:    wit._node{},
+                                            },
                                         },
                                     },
                                     _typeDefKind: wit._typeDefKind{},
@@ -2171,7 +2327,10 @@
                                         },
                                     },
                                 },
-                                Docs:       wit.Docs{},
+                                Docs: wit.Docs{
+                                    Contents: "Read bytes from a stream, after blocking until at least one byte can\nbe read. Except for blocking, identical to `read`.",
+                                    _node:    wit._node{},
+                                },
                                 _worldItem: wit._worldItem{},
                             },
                             "[method]input-stream.blocking-skip": &wit.Function{
@@ -2230,7 +2389,10 @@
                                         },
                                     },
                                 },
-                                Docs:       wit.Docs{},
+                                Docs: wit.Docs{
+                                    Contents: "Skip bytes from a stream, after blocking until at least one byte\ncan be skipped. Except for blocking behavior, identical to `skip`.",
+                                    _node:    wit._node{},
+                                },
                                 _worldItem: wit._worldItem{},
                             },
                             "[method]input-stream.read": &wit.Function{
@@ -2289,7 +2451,10 @@
                                         },
                                     },
                                 },
-                                Docs:       wit.Docs{},
+                                Docs: wit.Docs{
+                                    Contents: "Perform a non-blocking read from the stream.\n\nThis function returns a list of bytes containing the data that was\nread, along with a `stream-status` which, indicates whether further\nreads are expected to produce data. The returned list will contain up to\n`len` bytes; it may return fewer than requested, but not more. An\nempty list and `stream-status:open` indicates no more data is\navailable at this time, and that the pollable given by `subscribe`\nwill be ready when more data is available.\n\nOnce a stream has reached the end, subsequent calls to `read` or\n`skip` will always report `stream-status:ended` rather than producing more\ndata.\n\nWhen the caller gives a `len` of 0, it represents a request to read 0\nbytes. This read should  always succeed and return an empty list and\nthe current `stream-status`.\n\nThe `len` parameter is a `u64`, which could represent a list of u8 which\nis not possible to allocate in wasm32, or not desirable to allocate as\nas a return value by the callee. The callee may return a list of bytes\nless than `len` in size while more bytes are available for reading.",
+                                    _node:    wit._node{},
+                                },
                                 _worldItem: wit._worldItem{},
                             },
                             "[method]input-stream.skip": &wit.Function{
@@ -2348,7 +2513,10 @@
                                         },
                                     },
                                 },
-                                Docs:       wit.Docs{},
+                                Docs: wit.Docs{
+                                    Contents: "Skip bytes from a stream.\n\nThis is similar to the `read` function, but avoids copying the\nbytes into the instance.\n\nOnce a stream has reached the end, subsequent calls to read or\n`skip` will always report end-of-stream rather than producing more\ndata.\n\nThis function returns the number of bytes skipped, along with a\n`stream-status` indicating whether the end of the stream was\nreached. The returned value will be at most `len`; it may be less.",
+                                    _node:    wit._node{},
+                                },
                                 _worldItem: wit._worldItem{},
                             },
                             "[method]input-stream.subscribe": &wit.Function{
@@ -2389,7 +2557,10 @@
                                         },
                                     },
                                 },
-                                Docs:       wit.Docs{},
+                                Docs: wit.Docs{
+                                    Contents: "Create a `pollable` which will resolve once either the specified stream\nhas bytes available to read or the other end of the stream has been\nclosed.\nThe created `pollable` is a child resource of the `input-stream`.\nImplementations may trap if the `input-stream` is dropped before\nall derived `pollable`s created with this function are dropped.",
+                                    _node:    wit._node{},
+                                },
                                 _worldItem: wit._worldItem{},
                             },
                             "[method]output-stream.blocking-flush": &wit.Function{
@@ -2431,7 +2602,10 @@
                                         },
                                     },
                                 },
-                                Docs:       wit.Docs{},
+                                Docs: wit.Docs{
+                                    Contents: "Request to flush buffered output, and block until flush completes\nand stream is ready for writing again.",
+                                    _node:    wit._node{},
+                                },
                                 _worldItem: wit._worldItem{},
                             },
                             "[method]output-stream.blocking-splice": &wit.Function{
@@ -2504,7 +2678,10 @@
                                         },
                                     },
                                 },
-                                Docs:       wit.Docs{},
+                                Docs: wit.Docs{
+                                    Contents: "Read from one stream and write to another, with blocking.\n\nThis is similar to `splice`, except that it blocks until at least\none byte can be read.",
+                                    _node:    wit._node{},
+                                },
                                 _worldItem: wit._worldItem{},
                             },
                             "[method]output-stream.blocking-write-and-flush": &wit.Function{
@@ -2560,7 +2737,10 @@
                                         },
                                     },
                                 },
-                                Docs:       wit.Docs{},
+                                Docs: wit.Docs{
+                                    Contents: "Perform a write of up to 4096 bytes, and then flush the stream. Block\nuntil all of these operations are complete, or an error occurs.\n\nThis is a convenience wrapper around the use of `check-write`,\n`subscribe`, `write`, and `flush`, and is implemented with the\nfollowing pseudo-code:\n\n```text\nlet pollable = this.subscribe();\nwhile !contents.is_empty() {\n// Wait for the stream to become writable\npoll-one(pollable);\nlet Ok(n) = this.check-write(); // eliding error handling\nlet len = min(n, contents.len());\nlet (chunk, rest) = contents.split_at(len);\nthis.write(chunk  );            // eliding error handling\ncontents = rest;\n}\nthis.flush();\n// Wait for completion of `flush`\npoll-one(pollable);\n// Check for any errors that arose during `flush`\nlet _ = this.check-write();         // eliding error handling\n```",
+                                    _node:    wit._node{},
+                                },
                                 _worldItem: wit._worldItem{},
                             },
                             "[method]output-stream.blocking-write-zeroes-and-flush": &wit.Function{
@@ -2606,7 +2786,10 @@
                                         },
                                     },
                                 },
-                                Docs:       wit.Docs{},
+                                Docs: wit.Docs{
+                                    Contents: "Perform a write of up to 4096 zeroes, and then flush the stream.\nBlock until all of these operations are complete, or an error\noccurs.\n\nThis is a convenience wrapper around the use of `check-write`,\n`subscribe`, `write-zeroes`, and `flush`, and is implemented with\nthe following pseudo-code:\n\n```text\nlet pollable = this.subscribe();\nwhile num_zeroes != 0 {\n// Wait for the stream to become writable\npoll-one(pollable);\nlet Ok(n) = this.check-write(); // eliding error handling\nlet len = min(n, num_zeroes);\nthis.write-zeroes(len);         // eliding error handling\nnum_zeroes -= len;\n}\nthis.flush();\n// Wait for completion of `flush`\npoll-one(pollable);\n// Check for any errors that arose during `flush`\nlet _ = this.check-write();         // eliding error handling\n```",
+                                    _node:    wit._node{},
+                                },
                                 _worldItem: wit._worldItem{},
                             },
                             "[method]output-stream.check-write": &wit.Function{
@@ -2648,7 +2831,10 @@
                                         },
                                     },
                                 },
-                                Docs:       wit.Docs{},
+                                Docs: wit.Docs{
+                                    Contents: "Check readiness for writing. This function never blocks.\n\nReturns the number of bytes permitted for the next call to `write`,\nor an error. Calling `write` with more bytes than this function has\npermitted will trap.\n\nWhen this function returns 0 bytes, the `subscribe` pollable will\nbecome ready when this function will report at least 1 byte, or an\nerror.",
+                                    _node:    wit._node{},
+                                },
                                 _worldItem: wit._worldItem{},
                             },
                             "[method]output-stream.flush": &wit.Function{
@@ -2690,7 +2876,10 @@
                                         },
                                     },
                                 },
-                                Docs:       wit.Docs{},
+                                Docs: wit.Docs{
+                                    Contents: "Request to flush buffered output. This function never blocks.\n\nThis tells the output-stream that the caller intends any buffered\noutput to be flushed. the output which is expected to be flushed\nis all that has been passed to `write` prior to this call.\n\nUpon calling this function, the `output-stream` will not accept any\nwrites (`check-write` will return `ok(0)`) until the flush has\ncompleted. The `subscribe` pollable will become ready when the\nflush has completed and the stream can accept more writes.",
+                                    _node:    wit._node{},
+                                },
                                 _worldItem: wit._worldItem{},
                             },
                             "[method]output-stream.forward": &wit.Function{
@@ -2759,7 +2948,10 @@
                                         },
                                     },
                                 },
-                                Docs:       wit.Docs{},
+                                Docs: wit.Docs{
+                                    Contents: "Forward the entire contents of an input stream to an output stream.\n\nThis function repeatedly reads from the input stream and writes\nthe data to the output stream, until the end of the input stream\nis reached, or an error is encountered.\n\nUnlike other I/O functions, this function blocks until the end\nof the input stream is seen and all the data has been written to\nthe output stream.\n\nThis function returns the number of bytes transferred, and the status of\nthe output stream.",
+                                    _node:    wit._node{},
+                                },
                                 _worldItem: wit._worldItem{},
                             },
                             "[method]output-stream.splice": &wit.Function{
@@ -2832,7 +3024,10 @@
                                         },
                                     },
                                 },
-                                Docs:       wit.Docs{},
+                                Docs: wit.Docs{
+                                    Contents: "Read from one stream and write to another.\n\nThis function returns the number of bytes transferred; it may be less\nthan `len`.\n\nUnlike other I/O functions, this function blocks until all the data\nread from the input stream has been written to the output stream.",
+                                    _node:    wit._node{},
+                                },
                                 _worldItem: wit._worldItem{},
                             },
                             "[method]output-stream.subscribe": &wit.Function{
@@ -2873,7 +3068,10 @@
                                         },
                                     },
                                 },
-                                Docs:       wit.Docs{},
+                                Docs: wit.Docs{
+                                    Contents: "Create a `pollable` which will resolve once the output-stream\nis ready for more writing, or an error has occured. When this\npollable is ready, `check-write` will return `ok(n)` with n>0, or an\nerror.\n\nIf the stream is closed, this pollable is always ready immediately.\n\nThe created `pollable` is a child resource of the `output-stream`.\nImplementations may trap if the `output-stream` is dropped before\nall derived `pollable`s created with this function are dropped.",
+                                    _node:    wit._node{},
+                                },
                                 _worldItem: wit._worldItem{},
                             },
                             "[method]output-stream.write": &wit.Function{
@@ -2929,7 +3127,10 @@
                                         },
                                     },
                                 },
-                                Docs:       wit.Docs{},
+                                Docs: wit.Docs{
+                                    Contents: "Perform a write. This function never blocks.\n\nPrecondition: check-write gave permit of Ok(n) and contents has a\nlength of less than or equal to n. Otherwise, this function will trap.\n\nreturns Err(closed) without writing if the stream has closed since\nthe last call to check-write provided a permit.",
+                                    _node:    wit._node{},
+                                },
                                 _worldItem: wit._worldItem{},
                             },
                             "[method]output-stream.write-zeroes": &wit.Function{
@@ -2975,12 +3176,18 @@
                                         },
                                     },
                                 },
-                                Docs:       wit.Docs{},
+                                Docs: wit.Docs{
+                                    Contents: "Write zeroes to a stream.\n\nthis should be used precisely like `write` with the exact same\npreconditions (must use check-write first), but instead of\npassing a list of bytes, you simply pass the number of zero-bytes\nthat should be written.",
+                                    _node:    wit._node{},
+                                },
                                 _worldItem: wit._worldItem{},
                             },
                         },
-                        Package:    &wit.Package{(CYCLIC REFERENCE)},
-                        Docs:       wit.Docs{},
+                        Package: &wit.Package{(CYCLIC REFERENCE)},
+                        Docs:    wit.Docs{
+                            Contents: "WASI I/O is an I/O abstraction API which is currently focused on providing\nstream types.\n\nIn the future, the component model is expected to add built-in stream types;\nwhen it does, they are expected to subsume this API.",
+                            _node:    wit._node{},
+                        },
                         _typeOwner: wit._typeOwner{},
                         _worldItem: wit._worldItem{},
                     },
@@ -3044,7 +3251,10 @@
                                     },
                                 },
                             },
-                            Docs:       wit.Docs{},
+                            Docs: wit.Docs{
+                                Contents: "Poll for completion on a set of pollables.\n\nThis function takes a list of pollables, which identify I/O sources of\ninterest, and waits until one or more of the events is ready for I/O.\n\nThe result `list<u32>` contains one or more indices of handles in the\nargument list that is ready for I/O.\n\nIf the list contains more elements than can be indexed with a `u32`\nvalue, this function traps.\n\nA timeout can be implemented by adding a pollable from the\nwasi-clocks API to the list.\n\nThis function does not return a `result`; polling in itself does not\ndo any I/O so it doesn't fail. If any of the I/O sources identified by\nthe pollables has an error, it is indicated by marking the source as\nbeing reaedy for I/O.",
+                                _node:    wit._node{},
+                            },
                             _worldItem: wit._worldItem{},
                         },
                         "poll-one": &wit.Function{
@@ -3066,13 +3276,19 @@
                                     },
                                 },
                             },
-                            Results:    nil,
-                            Docs:       wit.Docs{},
+                            Results: nil,
+                            Docs:    wit.Docs{
+                                Contents: "Poll for completion on a single pollable.\n\nThis function is similar to `poll-list`, but operates on only a single\npollable. When it returns, the handle is ready for I/O.",
+                                _node:    wit._node{},
+                            },
                             _worldItem: wit._worldItem{},
                         },
                     },
-                    Package:    &wit.Package{(CYCLIC REFERENCE)},
-                    Docs:       wit.Docs{},
+                    Package: &wit.Package{(CYCLIC REFERENCE)},
+                    Docs:    wit.Docs{
+                        Contents: "A poll API intended to let users wait for I/O events on multiple handles\nat once.",
+                        _node:    wit._node{},
+                    },
                     _typeOwner: wit._typeOwner{},
                     _worldItem: wit._worldItem{},
                 },
@@ -3107,7 +3323,10 @@
                                     Type: &wit.TypeDef{(CYCLIC REFERENCE)},
                                 },
                             },
-                            Docs:       wit.Docs{},
+                            Docs: wit.Docs{
+                                Contents: "Read the current value of the clock.\n\nThe clock is monotonic, therefore calling this function repeatedly will\nproduce a sequence of non-decreasing values.",
+                                _node:    wit._node{},
+                            },
                             _worldItem: wit._worldItem{},
                         },
                         "resolution": &wit.Function{
@@ -3120,7 +3339,10 @@
                                     Type: &wit.TypeDef{(CYCLIC REFERENCE)},
                                 },
                             },
-                            Docs:       wit.Docs{},
+                            Docs: wit.Docs{
+                                Contents: "Query the resolution of the clock.",
+                                _node:    wit._node{},
+                            },
                             _worldItem: wit._worldItem{},
                         },
                         "subscribe": &wit.Function{
@@ -3152,7 +3374,10 @@
                                     },
                                 },
                             },
-                            Docs:       wit.Docs{},
+                            Docs: wit.Docs{
+                                Contents: "Create a `pollable` which will resolve once the specified time has been\nreached.",
+                                _node:    wit._node{},
+                            },
                             _worldItem: wit._worldItem{},
                         },
                     },
@@ -3203,7 +3428,10 @@
                                                                 Type: &!%v(DEPTH EXCEEDED),
                                                             },
                                                         },
-                                                        Docs:       wit.Docs{},
+                                                        Docs: wit.Docs{
+                                                            Contents: "Read the current value of the clock.\n\nThis clock is not monotonic, therefore calling this function repeatedly\nwill not necessarily produce a sequence of non-decreasing values.\n\nThe returned timestamps represent the number of seconds since\n1970-01-01T00:00:00Z, also known as [POSIX's Seconds Since the Epoch],\nalso known as [Unix Time].\n\nThe nanoseconds field of the output is always less than 1000000000.\n\n[POSIX's Seconds Since the Epoch]: https://pubs.opengroup.org/onlinepubs/9699919799/xrat/V4_xbd_chap04.html#tag_21_04_16\n[Unix Time]: https://en.wikipedia.org/wiki/Unix_time",
+                                                            _node:    wit._node{},
+                                                        },
                                                         _worldItem: wit._worldItem{},
                                                     },
                                                     "resolution": &wit.Function{
@@ -3216,12 +3444,18 @@
                                                                 Type: &!%v(DEPTH EXCEEDED),
                                                             },
                                                         },
-                                                        Docs:       wit.Docs{},
+                                                        Docs: wit.Docs{
+                                                            Contents: "Query the resolution of the clock.\n\nThe nanoseconds field of the output is always less than 1000000000.",
+                                                            _node:    wit._node{},
+                                                        },
                                                         _worldItem: wit._worldItem{},
                                                     },
                                                 },
-                                                Package:    &wit.Package{(CYCLIC REFERENCE)},
-                                                Docs:       wit.Docs{},
+                                                Package: &wit.Package{(CYCLIC REFERENCE)},
+                                                Docs:    wit.Docs{
+                                                    Contents: "WASI Wall Clock is a clock API intended to let users query the current\ntime. The name \"wall\" makes an analogy to a \"clock on the wall\", which\nis not necessarily monotonic as it may be reset.\n\nIt is intended to be portable at least between Unix-family platforms and\nWindows.\n\nA wall clock is a clock which measures the date and time according to\nsome external reference.\n\nExternal references may be reset, so this clock is not necessarily\nmonotonic, making it unsuitable for measuring elapsed time.\n\nIt is intended for reporting the current date and time for humans.",
+                                                    _node:    wit._node{},
+                                                },
                                                 _typeOwner: wit._typeOwner{},
                                                 _worldItem: wit._worldItem{},
                                             },
@@ -3241,17 +3475,26 @@
                                                 {
                                                     Name: "utc-offset",
                                                     Type: wit.S32{},
-                                                    Docs: wit.Docs{},
+                                                    Docs: wit.Docs{
+                                                        Contents: "The number of seconds difference between UTC time and the local\ntime of the timezone.\n\nThe returned value will always be less than 86400 which is the\nnumber of seconds in a day (24*60*60).\n\nIn implementations that do not expose an actual time zone, this\nshould return 0.",
+                                                        _node:    wit._node{},
+                                                    },
                                                 },
                                                 {
                                                     Name: "name",
                                                     Type: wit.String{},
-                                                    Docs: wit.Docs{},
+                                                    Docs: wit.Docs{
+                                                        Contents: "The abbreviated name of the timezone to display to a user. The name\n`UTC` indicates Coordinated Universal Time. Otherwise, this should\nreference local standards for the name of the time zone.\n\nIn implementations that do not expose an actual time zone, this\nshould be the string `UTC`.\n\nIn time zones that do not have an applicable name, a formatted\nrepresentation of the UTC offset may be returned, such as `-04:00`.",
+                                                        _node:    wit._node{},
+                                                    },
                                                 },
                                                 {
                                                     Name: "in-daylight-saving-time",
                                                     Type: wit.Bool{},
-                                                    Docs: wit.Docs{},
+                                                    Docs: wit.Docs{
+                                                        Contents: "Whether daylight saving time is active.\n\nIn implementations that do not expose an actual time zone, this\nshould return false.",
+                                                        _node:    wit._node{},
+                                                    },
                                                 },
                                             },
                                             _typeDefKind: wit._typeDefKind{},
@@ -3278,7 +3521,10 @@
                                                 Type: &wit.TypeDef{(CYCLIC REFERENCE)},
                                             },
                                         },
-                                        Docs:       wit.Docs{},
+                                        Docs: wit.Docs{
+                                            Contents: "Return information needed to display the given `datetime`. This includes\nthe UTC offset, the time zone name, and a flag indicating whether\ndaylight saving time is active.\n\nIf the timezone cannot be determined for the given `datetime`, return a\n`timezone-display` for `UTC` with a `utc-offset` of 0 and no daylight\nsaving time.",
+                                            _node:    wit._node{},
+                                        },
                                         _worldItem: wit._worldItem{},
                                     },
                                     "utc-offset": &wit.Function{
@@ -3296,7 +3542,10 @@
                                                 Type: wit.S32{},
                                             },
                                         },
-                                        Docs:       wit.Docs{},
+                                        Docs: wit.Docs{
+                                            Contents: "The same as `display`, but only return the UTC offset.",
+                                            _node:    wit._node{},
+                                        },
                                         _worldItem: wit._worldItem{},
                                     },
                                 },
@@ -3342,7 +3591,10 @@
                                                 Type: &wit.TypeDef{(CYCLIC REFERENCE)},
                                             },
                                         },
-                                        Docs:       wit.Docs{},
+                                        Docs: wit.Docs{
+                                            Contents: "Read the current value of the clock.\n\nThis clock is not monotonic, therefore calling this function repeatedly\nwill not necessarily produce a sequence of non-decreasing values.\n\nThe returned timestamps represent the number of seconds since\n1970-01-01T00:00:00Z, also known as [POSIX's Seconds Since the Epoch],\nalso known as [Unix Time].\n\nThe nanoseconds field of the output is always less than 1000000000.\n\n[POSIX's Seconds Since the Epoch]: https://pubs.opengroup.org/onlinepubs/9699919799/xrat/V4_xbd_chap04.html#tag_21_04_16\n[Unix Time]: https://en.wikipedia.org/wiki/Unix_time",
+                                            _node:    wit._node{},
+                                        },
                                         _worldItem: wit._worldItem{},
                                     },
                                     "resolution": &wit.Function{
@@ -3355,12 +3607,18 @@
                                                 Type: &wit.TypeDef{(CYCLIC REFERENCE)},
                                             },
                                         },
-                                        Docs:       wit.Docs{},
+                                        Docs: wit.Docs{
+                                            Contents: "Query the resolution of the clock.\n\nThe nanoseconds field of the output is always less than 1000000000.",
+                                            _node:    wit._node{},
+                                        },
                                         _worldItem: wit._worldItem{},
                                     },
                                 },
-                                Package:    &wit.Package{(CYCLIC REFERENCE)},
-                                Docs:       wit.Docs{},
+                                Package: &wit.Package{(CYCLIC REFERENCE)},
+                                Docs:    wit.Docs{
+                                    Contents: "WASI Wall Clock is a clock API intended to let users query the current\ntime. The name \"wall\" makes an analogy to a \"clock on the wall\", which\nis not necessarily monotonic as it may be reset.\n\nIt is intended to be portable at least between Unix-family platforms and\nWindows.\n\nA wall clock is a clock which measures the date and time according to\nsome external reference.\n\nExternal references may be reset, so this clock is not necessarily\nmonotonic, making it unsuitable for measuring elapsed time.\n\nIt is intended for reporting the current date and time for humans.",
+                                    _node:    wit._node{},
+                                },
                                 _typeOwner: wit._typeOwner{},
                                 _worldItem: wit._worldItem{},
                             },
@@ -3370,7 +3628,10 @@
                         },
                         Docs: wit.Docs{},
                     },
-                    Docs:       wit.Docs{},
+                    Docs: wit.Docs{
+                        Contents: "WASI Monotonic Clock is a clock API intended to let users measure elapsed\ntime.\n\nIt is intended to be portable at least between Unix-family platforms and\nWindows.\n\nA monotonic clock is a clock which has an unspecified initial value, and\nsuccessive reads of the clock will produce non-decreasing values.\n\nIt is intended for measuring elapsed time.",
+                        _node:    wit._node{},
+                    },
                     _typeOwner: wit._typeOwner{},
                     _worldItem: wit._worldItem{},
                 },
@@ -3411,7 +3672,10 @@
                                     Type: &wit.TypeDef{(CYCLIC REFERENCE)},
                                 },
                             },
-                            Docs:       wit.Docs{},
+                            Docs: wit.Docs{
+                                Contents: "Read the current value of the clock.\n\nThis clock is not monotonic, therefore calling this function repeatedly\nwill not necessarily produce a sequence of non-decreasing values.\n\nThe returned timestamps represent the number of seconds since\n1970-01-01T00:00:00Z, also known as [POSIX's Seconds Since the Epoch],\nalso known as [Unix Time].\n\nThe nanoseconds field of the output is always less than 1000000000.\n\n[POSIX's Seconds Since the Epoch]: https://pubs.opengroup.org/onlinepubs/9699919799/xrat/V4_xbd_chap04.html#tag_21_04_16\n[Unix Time]: https://en.wikipedia.org/wiki/Unix_time",
+                                _node:    wit._node{},
+                            },
                             _worldItem: wit._worldItem{},
                         },
                         "resolution": &wit.Function{
@@ -3424,7 +3688,10 @@
                                     Type: &wit.TypeDef{(CYCLIC REFERENCE)},
                                 },
                             },
-                            Docs:       wit.Docs{},
+                            Docs: wit.Docs{
+                                Contents: "Query the resolution of the clock.\n\nThe nanoseconds field of the output is always less than 1000000000.",
+                                _node:    wit._node{},
+                            },
                             _worldItem: wit._worldItem{},
                         },
                     },
@@ -3455,17 +3722,26 @@
                                                 {
                                                     Name: "utc-offset",
                                                     Type: wit.S32{},
-                                                    Docs: wit.Docs{},
+                                                    Docs: wit.Docs{
+                                                        Contents: "The number of seconds difference between UTC time and the local\ntime of the timezone.\n\nThe returned value will always be less than 86400 which is the\nnumber of seconds in a day (24*60*60).\n\nIn implementations that do not expose an actual time zone, this\nshould return 0.",
+                                                        _node:    wit._node{},
+                                                    },
                                                 },
                                                 {
                                                     Name: "name",
                                                     Type: wit.String{},
-                                                    Docs: wit.Docs{},
+                                                    Docs: wit.Docs{
+                                                        Contents: "The abbreviated name of the timezone to display to a user. The name\n`UTC` indicates Coordinated Universal Time. Otherwise, this should\nreference local standards for the name of the time zone.\n\nIn implementations that do not expose an actual time zone, this\nshould be the string `UTC`.\n\nIn time zones that do not have an applicable name, a formatted\nrepresentation of the UTC offset may be returned, such as `-04:00`.",
+                                                        _node:    wit._node{},
+                                                    },
                                                 },
                                                 {
                                                     Name: "in-daylight-saving-time",
                                                     Type: wit.Bool{},
-                                                    Docs: wit.Docs{},
+                                                    Docs: wit.Docs{
+                                                        Contents: "Whether daylight saving time is active.\n\nIn implementations that do not expose an actual time zone, this\nshould return false.",
+                                                        _node:    wit._node{},
+                                                    },
                                                 },
                                             },
                                             _typeDefKind: wit._typeDefKind{},
@@ -3492,7 +3768,10 @@
                                                 Type: &wit.TypeDef{(CYCLIC REFERENCE)},
                                             },
                                         },
-                                        Docs:       wit.Docs{},
+                                        Docs: wit.Docs{
+                                            Contents: "Return information needed to display the given `datetime`. This includes\nthe UTC offset, the time zone name, and a flag indicating whether\ndaylight saving time is active.\n\nIf the timezone cannot be determined for the given `datetime`, return a\n`timezone-display` for `UTC` with a `utc-offset` of 0 and no daylight\nsaving time.",
+                                            _node:    wit._node{},
+                                        },
                                         _worldItem: wit._worldItem{},
                                     },
                                     "utc-offset": &wit.Function{
@@ -3510,7 +3789,10 @@
                                                 Type: wit.S32{},
                                             },
                                         },
-                                        Docs:       wit.Docs{},
+                                        Docs: wit.Docs{
+                                            Contents: "The same as `display`, but only return the UTC offset.",
+                                            _node:    wit._node{},
+                                        },
                                         _worldItem: wit._worldItem{},
                                     },
                                 },
@@ -3526,7 +3808,10 @@
                         },
                         Docs: wit.Docs{},
                     },
-                    Docs:       wit.Docs{},
+                    Docs: wit.Docs{
+                        Contents: "WASI Wall Clock is a clock API intended to let users query the current\ntime. The name \"wall\" makes an analogy to a \"clock on the wall\", which\nis not necessarily monotonic as it may be reset.\n\nIt is intended to be portable at least between Unix-family platforms and\nWindows.\n\nA wall clock is a clock which measures the date and time according to\nsome external reference.\n\nExternal references may be reset, so this clock is not necessarily\nmonotonic, making it unsuitable for measuring elapsed time.\n\nIt is intended for reporting the current date and time for humans.",
+                        _node:    wit._node{},
+                    },
                     _typeOwner: wit._typeOwner{},
                     _worldItem: wit._worldItem{},
                 },
@@ -3548,17 +3833,26 @@
                                     {
                                         Name: "utc-offset",
                                         Type: wit.S32{},
-                                        Docs: wit.Docs{},
+                                        Docs: wit.Docs{
+                                            Contents: "The number of seconds difference between UTC time and the local\ntime of the timezone.\n\nThe returned value will always be less than 86400 which is the\nnumber of seconds in a day (24*60*60).\n\nIn implementations that do not expose an actual time zone, this\nshould return 0.",
+                                            _node:    wit._node{},
+                                        },
                                     },
                                     {
                                         Name: "name",
                                         Type: wit.String{},
-                                        Docs: wit.Docs{},
+                                        Docs: wit.Docs{
+                                            Contents: "The abbreviated name of the timezone to display to a user. The name\n`UTC` indicates Coordinated Universal Time. Otherwise, this should\nreference local standards for the name of the time zone.\n\nIn implementations that do not expose an actual time zone, this\nshould be the string `UTC`.\n\nIn time zones that do not have an applicable name, a formatted\nrepresentation of the UTC offset may be returned, such as `-04:00`.",
+                                            _node:    wit._node{},
+                                        },
                                     },
                                     {
                                         Name: "in-daylight-saving-time",
                                         Type: wit.Bool{},
-                                        Docs: wit.Docs{},
+                                        Docs: wit.Docs{
+                                            Contents: "Whether daylight saving time is active.\n\nIn implementations that do not expose an actual time zone, this\nshould return false.",
+                                            _node:    wit._node{},
+                                        },
                                     },
                                 },
                                 _typeDefKind: wit._typeDefKind{},
@@ -3585,7 +3879,10 @@
                                     Type: &wit.TypeDef{(CYCLIC REFERENCE)},
                                 },
                             },
-                            Docs:       wit.Docs{},
+                            Docs: wit.Docs{
+                                Contents: "Return information needed to display the given `datetime`. This includes\nthe UTC offset, the time zone name, and a flag indicating whether\ndaylight saving time is active.\n\nIf the timezone cannot be determined for the given `datetime`, return a\n`timezone-display` for `UTC` with a `utc-offset` of 0 and no daylight\nsaving time.",
+                                _node:    wit._node{},
+                            },
                             _worldItem: wit._worldItem{},
                         },
                         "utc-offset": &wit.Function{
@@ -3603,7 +3900,10 @@
                                     Type: wit.S32{},
                                 },
                             },
-                            Docs:       wit.Docs{},
+                            Docs: wit.Docs{
+                                Contents: "The same as `display`, but only return the UTC offset.",
+                                _node:    wit._node{},
+                            },
                             _worldItem: wit._worldItem{},
                         },
                     },
@@ -3669,7 +3969,10 @@
                                         Type: &wit.TypeDef{(CYCLIC REFERENCE)},
                                     },
                                 },
-                                Docs:       wit.Docs{},
+                                Docs: wit.Docs{
+                                    Contents: "Read the current value of the clock.\n\nThe clock is monotonic, therefore calling this function repeatedly will\nproduce a sequence of non-decreasing values.",
+                                    _node:    wit._node{},
+                                },
                                 _worldItem: wit._worldItem{},
                             },
                             "resolution": &wit.Function{
@@ -3682,7 +3985,10 @@
                                         Type: &wit.TypeDef{(CYCLIC REFERENCE)},
                                     },
                                 },
-                                Docs:       wit.Docs{},
+                                Docs: wit.Docs{
+                                    Contents: "Query the resolution of the clock.",
+                                    _node:    wit._node{},
+                                },
                                 _worldItem: wit._worldItem{},
                             },
                             "subscribe": &wit.Function{
@@ -3714,12 +4020,18 @@
                                         },
                                     },
                                 },
-                                Docs:       wit.Docs{},
+                                Docs: wit.Docs{
+                                    Contents: "Create a `pollable` which will resolve once the specified time has been\nreached.",
+                                    _node:    wit._node{},
+                                },
                                 _worldItem: wit._worldItem{},
                             },
                         },
-                        Package:    &wit.Package{(CYCLIC REFERENCE)},
-                        Docs:       wit.Docs{},
+                        Package: &wit.Package{(CYCLIC REFERENCE)},
+                        Docs:    wit.Docs{
+                            Contents: "WASI Monotonic Clock is a clock API intended to let users measure elapsed\ntime.\n\nIt is intended to be portable at least between Unix-family platforms and\nWindows.\n\nA monotonic clock is a clock which has an unspecified initial value, and\nsuccessive reads of the clock will produce non-decreasing values.\n\nIt is intended for measuring elapsed time.",
+                            _node:    wit._node{},
+                        },
                         _typeOwner: wit._typeOwner{},
                         _worldItem: wit._worldItem{},
                     },
@@ -3741,17 +4053,26 @@
                                         {
                                             Name: "utc-offset",
                                             Type: wit.S32{},
-                                            Docs: wit.Docs{},
+                                            Docs: wit.Docs{
+                                                Contents: "The number of seconds difference between UTC time and the local\ntime of the timezone.\n\nThe returned value will always be less than 86400 which is the\nnumber of seconds in a day (24*60*60).\n\nIn implementations that do not expose an actual time zone, this\nshould return 0.",
+                                                _node:    wit._node{},
+                                            },
                                         },
                                         {
                                             Name: "name",
                                             Type: wit.String{},
-                                            Docs: wit.Docs{},
+                                            Docs: wit.Docs{
+                                                Contents: "The abbreviated name of the timezone to display to a user. The name\n`UTC` indicates Coordinated Universal Time. Otherwise, this should\nreference local standards for the name of the time zone.\n\nIn implementations that do not expose an actual time zone, this\nshould be the string `UTC`.\n\nIn time zones that do not have an applicable name, a formatted\nrepresentation of the UTC offset may be returned, such as `-04:00`.",
+                                                _node:    wit._node{},
+                                            },
                                         },
                                         {
                                             Name: "in-daylight-saving-time",
                                             Type: wit.Bool{},
-                                            Docs: wit.Docs{},
+                                            Docs: wit.Docs{
+                                                Contents: "Whether daylight saving time is active.\n\nIn implementations that do not expose an actual time zone, this\nshould return false.",
+                                                _node:    wit._node{},
+                                            },
                                         },
                                     },
                                     _typeDefKind: wit._typeDefKind{},
@@ -3778,7 +4099,10 @@
                                         Type: &wit.TypeDef{(CYCLIC REFERENCE)},
                                     },
                                 },
-                                Docs:       wit.Docs{},
+                                Docs: wit.Docs{
+                                    Contents: "Return information needed to display the given `datetime`. This includes\nthe UTC offset, the time zone name, and a flag indicating whether\ndaylight saving time is active.\n\nIf the timezone cannot be determined for the given `datetime`, return a\n`timezone-display` for `UTC` with a `utc-offset` of 0 and no daylight\nsaving time.",
+                                    _node:    wit._node{},
+                                },
                                 _worldItem: wit._worldItem{},
                             },
                             "utc-offset": &wit.Function{
@@ -3796,7 +4120,10 @@
                                         Type: wit.S32{},
                                     },
                                 },
-                                Docs:       wit.Docs{},
+                                Docs: wit.Docs{
+                                    Contents: "The same as `display`, but only return the UTC offset.",
+                                    _node:    wit._node{},
+                                },
                                 _worldItem: wit._worldItem{},
                             },
                         },
@@ -3842,7 +4169,10 @@
                                         Type: &wit.TypeDef{(CYCLIC REFERENCE)},
                                     },
                                 },
-                                Docs:       wit.Docs{},
+                                Docs: wit.Docs{
+                                    Contents: "Read the current value of the clock.\n\nThis clock is not monotonic, therefore calling this function repeatedly\nwill not necessarily produce a sequence of non-decreasing values.\n\nThe returned timestamps represent the number of seconds since\n1970-01-01T00:00:00Z, also known as [POSIX's Seconds Since the Epoch],\nalso known as [Unix Time].\n\nThe nanoseconds field of the output is always less than 1000000000.\n\n[POSIX's Seconds Since the Epoch]: https://pubs.opengroup.org/onlinepubs/9699919799/xrat/V4_xbd_chap04.html#tag_21_04_16\n[Unix Time]: https://en.wikipedia.org/wiki/Unix_time",
+                                    _node:    wit._node{},
+                                },
                                 _worldItem: wit._worldItem{},
                             },
                             "resolution": &wit.Function{
@@ -3855,12 +4185,18 @@
                                         Type: &wit.TypeDef{(CYCLIC REFERENCE)},
                                     },
                                 },
-                                Docs:       wit.Docs{},
+                                Docs: wit.Docs{
+                                    Contents: "Query the resolution of the clock.\n\nThe nanoseconds field of the output is always less than 1000000000.",
+                                    _node:    wit._node{},
+                                },
                                 _worldItem: wit._worldItem{},
                             },
                         },
-                        Package:    &wit.Package{(CYCLIC REFERENCE)},
-                        Docs:       wit.Docs{},
+                        Package: &wit.Package{(CYCLIC REFERENCE)},
+                        Docs:    wit.Docs{
+                            Contents: "WASI Wall Clock is a clock API intended to let users query the current\ntime. The name \"wall\" makes an analogy to a \"clock on the wall\", which\nis not necessarily monotonic as it may be reset.\n\nIt is intended to be portable at least between Unix-family platforms and\nWindows.\n\nA wall clock is a clock which measures the date and time according to\nsome external reference.\n\nExternal references may be reset, so this clock is not necessarily\nmonotonic, making it unsuitable for measuring elapsed time.\n\nIt is intended for reporting the current date and time for humans.",
+                            _node:    wit._node{},
+                        },
                         _typeOwner: wit._typeOwner{},
                         _worldItem: wit._worldItem{},
                     },
@@ -3933,7 +4269,10 @@
                             },
                         },
                     },
-                    Docs:       wit.Docs{},
+                    Docs: wit.Docs{
+                        Contents: "Poll for completion on a set of pollables.\n\nThis function takes a list of pollables, which identify I/O sources of\ninterest, and waits until one or more of the events is ready for I/O.\n\nThe result `list<u32>` contains one or more indices of handles in the\nargument list that is ready for I/O.\n\nIf the list contains more elements than can be indexed with a `u32`\nvalue, this function traps.\n\nA timeout can be implemented by adding a pollable from the\nwasi-clocks API to the list.\n\nThis function does not return a `result`; polling in itself does not\ndo any I/O so it doesn't fail. If any of the I/O sources identified by\nthe pollables has an error, it is indicated by marking the source as\nbeing reaedy for I/O.",
+                        _node:    wit._node{},
+                    },
                     _worldItem: wit._worldItem{},
                 },
                 "poll-one": &wit.Function{
@@ -3955,8 +4294,11 @@
                             },
                         },
                     },
-                    Results:    nil,
-                    Docs:       wit.Docs{},
+                    Results: nil,
+                    Docs:    wit.Docs{
+                        Contents: "Poll for completion on a single pollable.\n\nThis function is similar to `poll-list`, but operates on only a single\npollable. When it returns, the handle is ready for I/O.",
+                        _node:    wit._node{},
+                    },
                     _worldItem: wit._worldItem{},
                 },
             },
@@ -4002,11 +4344,17 @@
                                     Cases: {
                                         {
                                             Name: "open",
-                                            Docs: wit.Docs{},
+                                            Docs: wit.Docs{
+                                                Contents: "The stream is open and may produce further data.",
+                                                _node:    wit._node{},
+                                            },
                                         },
                                         {
                                             Name: "ended",
-                                            Docs: wit.Docs{},
+                                            Docs: wit.Docs{
+                                                Contents: "When reading, this indicates that the stream will not produce\nfurther data.\nWhen writing, this indicates that the stream will no longer be read.\nFurther writes are still permitted.",
+                                                _node:    wit._node{},
+                                            },
                                         },
                                     },
                                     _typeDefKind: wit._typeDefKind{},
@@ -4022,11 +4370,17 @@
                                     Cases: {
                                         {
                                             Name: "last-operation-failed",
-                                            Docs: wit.Docs{},
+                                            Docs: wit.Docs{
+                                                Contents: "The last operation (a write or flush) failed before completion.",
+                                                _node:    wit._node{},
+                                            },
                                         },
                                         {
                                             Name: "closed",
-                                            Docs: wit.Docs{},
+                                            Docs: wit.Docs{
+                                                Contents: "The stream is closed: no more input will be accepted by the\nstream. A closed output-stream will return this error on all\nfuture operations.",
+                                                _node:    wit._node{},
+                                            },
                                         },
                                     },
                                     _typeDefKind: wit._typeDefKind{},
@@ -4094,7 +4448,10 @@
                                         },
                                     },
                                 },
-                                Docs:       wit.Docs{},
+                                Docs: wit.Docs{
+                                    Contents: "Read bytes from a stream, after blocking until at least one byte can\nbe read. Except for blocking, identical to `read`.",
+                                    _node:    wit._node{},
+                                },
                                 _worldItem: wit._worldItem{},
                             },
                             "[method]input-stream.blocking-skip": &wit.Function{
@@ -4153,7 +4510,10 @@
                                         },
                                     },
                                 },
-                                Docs:       wit.Docs{},
+                                Docs: wit.Docs{
+                                    Contents: "Skip bytes from a stream, after blocking until at least one byte\ncan be skipped. Except for blocking behavior, identical to `skip`.",
+                                    _node:    wit._node{},
+                                },
                                 _worldItem: wit._worldItem{},
                             },
                             "[method]input-stream.read": &wit.Function{
@@ -4212,7 +4572,10 @@
                                         },
                                     },
                                 },
-                                Docs:       wit.Docs{},
+                                Docs: wit.Docs{
+                                    Contents: "Perform a non-blocking read from the stream.\n\nThis function returns a list of bytes containing the data that was\nread, along with a `stream-status` which, indicates whether further\nreads are expected to produce data. The returned list will contain up to\n`len` bytes; it may return fewer than requested, but not more. An\nempty list and `stream-status:open` indicates no more data is\navailable at this time, and that the pollable given by `subscribe`\nwill be ready when more data is available.\n\nOnce a stream has reached the end, subsequent calls to `read` or\n`skip` will always report `stream-status:ended` rather than producing more\ndata.\n\nWhen the caller gives a `len` of 0, it represents a request to read 0\nbytes. This read should  always succeed and return an empty list and\nthe current `stream-status`.\n\nThe `len` parameter is a `u64`, which could represent a list of u8 which\nis not possible to allocate in wasm32, or not desirable to allocate as\nas a return value by the callee. The callee may return a list of bytes\nless than `len` in size while more bytes are available for reading.",
+                                    _node:    wit._node{},
+                                },
                                 _worldItem: wit._worldItem{},
                             },
                             "[method]input-stream.skip": &wit.Function{
@@ -4271,7 +4634,10 @@
                                         },
                                     },
                                 },
-                                Docs:       wit.Docs{},
+                                Docs: wit.Docs{
+                                    Contents: "Skip bytes from a stream.\n\nThis is similar to the `read` function, but avoids copying the\nbytes into the instance.\n\nOnce a stream has reached the end, subsequent calls to read or\n`skip` will always report end-of-stream rather than producing more\ndata.\n\nThis function returns the number of bytes skipped, along with a\n`stream-status` indicating whether the end of the stream was\nreached. The returned value will be at most `len`; it may be less.",
+                                    _node:    wit._node{},
+                                },
                                 _worldItem: wit._worldItem{},
                             },
                             "[method]input-stream.subscribe": &wit.Function{
@@ -4312,7 +4678,10 @@
                                         },
                                     },
                                 },
-                                Docs:       wit.Docs{},
+                                Docs: wit.Docs{
+                                    Contents: "Create a `pollable` which will resolve once either the specified stream\nhas bytes available to read or the other end of the stream has been\nclosed.\nThe created `pollable` is a child resource of the `input-stream`.\nImplementations may trap if the `input-stream` is dropped before\nall derived `pollable`s created with this function are dropped.",
+                                    _node:    wit._node{},
+                                },
                                 _worldItem: wit._worldItem{},
                             },
                             "[method]output-stream.blocking-flush": &wit.Function{
@@ -4354,7 +4723,10 @@
                                         },
                                     },
                                 },
-                                Docs:       wit.Docs{},
+                                Docs: wit.Docs{
+                                    Contents: "Request to flush buffered output, and block until flush completes\nand stream is ready for writing again.",
+                                    _node:    wit._node{},
+                                },
                                 _worldItem: wit._worldItem{},
                             },
                             "[method]output-stream.blocking-splice": &wit.Function{
@@ -4427,7 +4799,10 @@
                                         },
                                     },
                                 },
-                                Docs:       wit.Docs{},
+                                Docs: wit.Docs{
+                                    Contents: "Read from one stream and write to another, with blocking.\n\nThis is similar to `splice`, except that it blocks until at least\none byte can be read.",
+                                    _node:    wit._node{},
+                                },
                                 _worldItem: wit._worldItem{},
                             },
                             "[method]output-stream.blocking-write-and-flush": &wit.Function{
@@ -4483,7 +4858,10 @@
                                         },
                                     },
                                 },
-                                Docs:       wit.Docs{},
+                                Docs: wit.Docs{
+                                    Contents: "Perform a write of up to 4096 bytes, and then flush the stream. Block\nuntil all of these operations are complete, or an error occurs.\n\nThis is a convenience wrapper around the use of `check-write`,\n`subscribe`, `write`, and `flush`, and is implemented with the\nfollowing pseudo-code:\n\n```text\nlet pollable = this.subscribe();\nwhile !contents.is_empty() {\n// Wait for the stream to become writable\npoll-one(pollable);\nlet Ok(n) = this.check-write(); // eliding error handling\nlet len = min(n, contents.len());\nlet (chunk, rest) = contents.split_at(len);\nthis.write(chunk  );            // eliding error handling\ncontents = rest;\n}\nthis.flush();\n// Wait for completion of `flush`\npoll-one(pollable);\n// Check for any errors that arose during `flush`\nlet _ = this.check-write();         // eliding error handling\n```",
+                                    _node:    wit._node{},
+                                },
                                 _worldItem: wit._worldItem{},
                             },
                             "[method]output-stream.blocking-write-zeroes-and-flush": &wit.Function{
@@ -4529,7 +4907,10 @@
                                         },
                                     },
                                 },
-                                Docs:       wit.Docs{},
+                                Docs: wit.Docs{
+                                    Contents: "Perform a write of up to 4096 zeroes, and then flush the stream.\nBlock until all of these operations are complete, or an error\noccurs.\n\nThis is a convenience wrapper around the use of `check-write`,\n`subscribe`, `write-zeroes`, and `flush`, and is implemented with\nthe following pseudo-code:\n\n```text\nlet pollable = this.subscribe();\nwhile num_zeroes != 0 {\n// Wait for the stream to become writable\npoll-one(pollable);\nlet Ok(n) = this.check-write(); // eliding error handling\nlet len = min(n, num_zeroes);\nthis.write-zeroes(len);         // eliding error handling\nnum_zeroes -= len;\n}\nthis.flush();\n// Wait for completion of `flush`\npoll-one(pollable);\n// Check for any errors that arose during `flush`\nlet _ = this.check-write();         // eliding error handling\n```",
+                                    _node:    wit._node{},
+                                },
                                 _worldItem: wit._worldItem{},
                             },
                             "[method]output-stream.check-write": &wit.Function{
@@ -4571,7 +4952,10 @@
                                         },
                                     },
                                 },
-                                Docs:       wit.Docs{},
+                                Docs: wit.Docs{
+                                    Contents: "Check readiness for writing. This function never blocks.\n\nReturns the number of bytes permitted for the next call to `write`,\nor an error. Calling `write` with more bytes than this function has\npermitted will trap.\n\nWhen this function returns 0 bytes, the `subscribe` pollable will\nbecome ready when this function will report at least 1 byte, or an\nerror.",
+                                    _node:    wit._node{},
+                                },
                                 _worldItem: wit._worldItem{},
                             },
                             "[method]output-stream.flush": &wit.Function{
@@ -4613,7 +4997,10 @@
                                         },
                                     },
                                 },
-                                Docs:       wit.Docs{},
+                                Docs: wit.Docs{
+                                    Contents: "Request to flush buffered output. This function never blocks.\n\nThis tells the output-stream that the caller intends any buffered\noutput to be flushed. the output which is expected to be flushed\nis all that has been passed to `write` prior to this call.\n\nUpon calling this function, the `output-stream` will not accept any\nwrites (`check-write` will return `ok(0)`) until the flush has\ncompleted. The `subscribe` pollable will become ready when the\nflush has completed and the stream can accept more writes.",
+                                    _node:    wit._node{},
+                                },
                                 _worldItem: wit._worldItem{},
                             },
                             "[method]output-stream.forward": &wit.Function{
@@ -4682,7 +5069,10 @@
                                         },
                                     },
                                 },
-                                Docs:       wit.Docs{},
+                                Docs: wit.Docs{
+                                    Contents: "Forward the entire contents of an input stream to an output stream.\n\nThis function repeatedly reads from the input stream and writes\nthe data to the output stream, until the end of the input stream\nis reached, or an error is encountered.\n\nUnlike other I/O functions, this function blocks until the end\nof the input stream is seen and all the data has been written to\nthe output stream.\n\nThis function returns the number of bytes transferred, and the status of\nthe output stream.",
+                                    _node:    wit._node{},
+                                },
                                 _worldItem: wit._worldItem{},
                             },
                             "[method]output-stream.splice": &wit.Function{
@@ -4755,7 +5145,10 @@
                                         },
                                     },
                                 },
-                                Docs:       wit.Docs{},
+                                Docs: wit.Docs{
+                                    Contents: "Read from one stream and write to another.\n\nThis function returns the number of bytes transferred; it may be less\nthan `len`.\n\nUnlike other I/O functions, this function blocks until all the data\nread from the input stream has been written to the output stream.",
+                                    _node:    wit._node{},
+                                },
                                 _worldItem: wit._worldItem{},
                             },
                             "[method]output-stream.subscribe": &wit.Function{
@@ -4796,7 +5189,10 @@
                                         },
                                     },
                                 },
-                                Docs:       wit.Docs{},
+                                Docs: wit.Docs{
+                                    Contents: "Create a `pollable` which will resolve once the output-stream\nis ready for more writing, or an error has occured. When this\npollable is ready, `check-write` will return `ok(n)` with n>0, or an\nerror.\n\nIf the stream is closed, this pollable is always ready immediately.\n\nThe created `pollable` is a child resource of the `output-stream`.\nImplementations may trap if the `output-stream` is dropped before\nall derived `pollable`s created with this function are dropped.",
+                                    _node:    wit._node{},
+                                },
                                 _worldItem: wit._worldItem{},
                             },
                             "[method]output-stream.write": &wit.Function{
@@ -4852,7 +5248,10 @@
                                         },
                                     },
                                 },
-                                Docs:       wit.Docs{},
+                                Docs: wit.Docs{
+                                    Contents: "Perform a write. This function never blocks.\n\nPrecondition: check-write gave permit of Ok(n) and contents has a\nlength of less than or equal to n. Otherwise, this function will trap.\n\nreturns Err(closed) without writing if the stream has closed since\nthe last call to check-write provided a permit.",
+                                    _node:    wit._node{},
+                                },
                                 _worldItem: wit._worldItem{},
                             },
                             "[method]output-stream.write-zeroes": &wit.Function{
@@ -4898,12 +5297,18 @@
                                         },
                                     },
                                 },
-                                Docs:       wit.Docs{},
+                                Docs: wit.Docs{
+                                    Contents: "Write zeroes to a stream.\n\nthis should be used precisely like `write` with the exact same\npreconditions (must use check-write first), but instead of\npassing a list of bytes, you simply pass the number of zero-bytes\nthat should be written.",
+                                    _node:    wit._node{},
+                                },
                                 _worldItem: wit._worldItem{},
                             },
                         },
-                        Package:    &wit.Package{(CYCLIC REFERENCE)},
-                        Docs:       wit.Docs{},
+                        Package: &wit.Package{(CYCLIC REFERENCE)},
+                        Docs:    wit.Docs{
+                            Contents: "WASI I/O is an I/O abstraction API which is currently focused on providing\nstream types.\n\nIn the future, the component model is expected to add built-in stream types;\nwhen it does, they are expected to subsume this API.",
+                            _node:    wit._node{},
+                        },
                         _typeOwner: wit._typeOwner{},
                         _worldItem: wit._worldItem{},
                     },
@@ -4913,7 +5318,10 @@
                 },
                 Docs: wit.Docs{},
             },
-            Docs:       wit.Docs{},
+            Docs: wit.Docs{
+                Contents: "A poll API intended to let users wait for I/O events on multiple handles\nat once.",
+                _node:    wit._node{},
+            },
             _typeOwner: wit._typeOwner{},
             _worldItem: wit._worldItem{},
         },
@@ -4950,11 +5358,17 @@
                         Cases: {
                             {
                                 Name: "open",
-                                Docs: wit.Docs{},
+                                Docs: wit.Docs{
+                                    Contents: "The stream is open and may produce further data.",
+                                    _node:    wit._node{},
+                                },
                             },
                             {
                                 Name: "ended",
-                                Docs: wit.Docs{},
+                                Docs: wit.Docs{
+                                    Contents: "When reading, this indicates that the stream will not produce\nfurther data.\nWhen writing, this indicates that the stream will no longer be read.\nFurther writes are still permitted.",
+                                    _node:    wit._node{},
+                                },
                             },
                         },
                         _typeDefKind: wit._typeDefKind{},
@@ -4970,11 +5384,17 @@
                         Cases: {
                             {
                                 Name: "last-operation-failed",
-                                Docs: wit.Docs{},
+                                Docs: wit.Docs{
+                                    Contents: "The last operation (a write or flush) failed before completion.",
+                                    _node:    wit._node{},
+                                },
                             },
                             {
                                 Name: "closed",
-                                Docs: wit.Docs{},
+                                Docs: wit.Docs{
+                                    Contents: "The stream is closed: no more input will be accepted by the\nstream. A closed output-stream will return this error on all\nfuture operations.",
+                                    _node:    wit._node{},
+                                },
                             },
                         },
                         _typeDefKind: wit._typeDefKind{},
@@ -5042,7 +5462,10 @@
                             },
                         },
                     },
-                    Docs:       wit.Docs{},
+                    Docs: wit.Docs{
+                        Contents: "Read bytes from a stream, after blocking until at least one byte can\nbe read. Except for blocking, identical to `read`.",
+                        _node:    wit._node{},
+                    },
                     _worldItem: wit._worldItem{},
                 },
                 "[method]input-stream.blocking-skip": &wit.Function{
@@ -5101,7 +5524,10 @@
                             },
                         },
                     },
-                    Docs:       wit.Docs{},
+                    Docs: wit.Docs{
+                        Contents: "Skip bytes from a stream, after blocking until at least one byte\ncan be skipped. Except for blocking behavior, identical to `skip`.",
+                        _node:    wit._node{},
+                    },
                     _worldItem: wit._worldItem{},
                 },
                 "[method]input-stream.read": &wit.Function{
@@ -5160,7 +5586,10 @@
                             },
                         },
                     },
-                    Docs:       wit.Docs{},
+                    Docs: wit.Docs{
+                        Contents: "Perform a non-blocking read from the stream.\n\nThis function returns a list of bytes containing the data that was\nread, along with a `stream-status` which, indicates whether further\nreads are expected to produce data. The returned list will contain up to\n`len` bytes; it may return fewer than requested, but not more. An\nempty list and `stream-status:open` indicates no more data is\navailable at this time, and that the pollable given by `subscribe`\nwill be ready when more data is available.\n\nOnce a stream has reached the end, subsequent calls to `read` or\n`skip` will always report `stream-status:ended` rather than producing more\ndata.\n\nWhen the caller gives a `len` of 0, it represents a request to read 0\nbytes. This read should  always succeed and return an empty list and\nthe current `stream-status`.\n\nThe `len` parameter is a `u64`, which could represent a list of u8 which\nis not possible to allocate in wasm32, or not desirable to allocate as\nas a return value by the callee. The callee may return a list of bytes\nless than `len` in size while more bytes are available for reading.",
+                        _node:    wit._node{},
+                    },
                     _worldItem: wit._worldItem{},
                 },
                 "[method]input-stream.skip": &wit.Function{
@@ -5219,7 +5648,10 @@
                             },
                         },
                     },
-                    Docs:       wit.Docs{},
+                    Docs: wit.Docs{
+                        Contents: "Skip bytes from a stream.\n\nThis is similar to the `read` function, but avoids copying the\nbytes into the instance.\n\nOnce a stream has reached the end, subsequent calls to read or\n`skip` will always report end-of-stream rather than producing more\ndata.\n\nThis function returns the number of bytes skipped, along with a\n`stream-status` indicating whether the end of the stream was\nreached. The returned value will be at most `len`; it may be less.",
+                        _node:    wit._node{},
+                    },
                     _worldItem: wit._worldItem{},
                 },
                 "[method]input-stream.subscribe": &wit.Function{
@@ -5260,7 +5692,10 @@
                             },
                         },
                     },
-                    Docs:       wit.Docs{},
+                    Docs: wit.Docs{
+                        Contents: "Create a `pollable` which will resolve once either the specified stream\nhas bytes available to read or the other end of the stream has been\nclosed.\nThe created `pollable` is a child resource of the `input-stream`.\nImplementations may trap if the `input-stream` is dropped before\nall derived `pollable`s created with this function are dropped.",
+                        _node:    wit._node{},
+                    },
                     _worldItem: wit._worldItem{},
                 },
                 "[method]output-stream.blocking-flush": &wit.Function{
@@ -5302,7 +5737,10 @@
                             },
                         },
                     },
-                    Docs:       wit.Docs{},
+                    Docs: wit.Docs{
+                        Contents: "Request to flush buffered output, and block until flush completes\nand stream is ready for writing again.",
+                        _node:    wit._node{},
+                    },
                     _worldItem: wit._worldItem{},
                 },
                 "[method]output-stream.blocking-splice": &wit.Function{
@@ -5375,7 +5813,10 @@
                             },
                         },
                     },
-                    Docs:       wit.Docs{},
+                    Docs: wit.Docs{
+                        Contents: "Read from one stream and write to another, with blocking.\n\nThis is similar to `splice`, except that it blocks until at least\none byte can be read.",
+                        _node:    wit._node{},
+                    },
                     _worldItem: wit._worldItem{},
                 },
                 "[method]output-stream.blocking-write-and-flush": &wit.Function{
@@ -5431,7 +5872,10 @@
                             },
                         },
                     },
-                    Docs:       wit.Docs{},
+                    Docs: wit.Docs{
+                        Contents: "Perform a write of up to 4096 bytes, and then flush the stream. Block\nuntil all of these operations are complete, or an error occurs.\n\nThis is a convenience wrapper around the use of `check-write`,\n`subscribe`, `write`, and `flush`, and is implemented with the\nfollowing pseudo-code:\n\n```text\nlet pollable = this.subscribe();\nwhile !contents.is_empty() {\n// Wait for the stream to become writable\npoll-one(pollable);\nlet Ok(n) = this.check-write(); // eliding error handling\nlet len = min(n, contents.len());\nlet (chunk, rest) = contents.split_at(len);\nthis.write(chunk  );            // eliding error handling\ncontents = rest;\n}\nthis.flush();\n// Wait for completion of `flush`\npoll-one(pollable);\n// Check for any errors that arose during `flush`\nlet _ = this.check-write();         // eliding error handling\n```",
+                        _node:    wit._node{},
+                    },
                     _worldItem: wit._worldItem{},
                 },
                 "[method]output-stream.blocking-write-zeroes-and-flush": &wit.Function{
@@ -5477,7 +5921,10 @@
                             },
                         },
                     },
-                    Docs:       wit.Docs{},
+                    Docs: wit.Docs{
+                        Contents: "Perform a write of up to 4096 zeroes, and then flush the stream.\nBlock until all of these operations are complete, or an error\noccurs.\n\nThis is a convenience wrapper around the use of `check-write`,\n`subscribe`, `write-zeroes`, and `flush`, and is implemented with\nthe following pseudo-code:\n\n```text\nlet pollable = this.subscribe();\nwhile num_zeroes != 0 {\n// Wait for the stream to become writable\npoll-one(pollable);\nlet Ok(n) = this.check-write(); // eliding error handling\nlet len = min(n, num_zeroes);\nthis.write-zeroes(len);         // eliding error handling\nnum_zeroes -= len;\n}\nthis.flush();\n// Wait for completion of `flush`\npoll-one(pollable);\n// Check for any errors that arose during `flush`\nlet _ = this.check-write();         // eliding error handling\n```",
+                        _node:    wit._node{},
+                    },
                     _worldItem: wit._worldItem{},
                 },
                 "[method]output-stream.check-write": &wit.Function{
@@ -5519,7 +5966,10 @@
                             },
                         },
                     },
-                    Docs:       wit.Docs{},
+                    Docs: wit.Docs{
+                        Contents: "Check readiness for writing. This function never blocks.\n\nReturns the number of bytes permitted for the next call to `write`,\nor an error. Calling `write` with more bytes than this function has\npermitted will trap.\n\nWhen this function returns 0 bytes, the `subscribe` pollable will\nbecome ready when this function will report at least 1 byte, or an\nerror.",
+                        _node:    wit._node{},
+                    },
                     _worldItem: wit._worldItem{},
                 },
                 "[method]output-stream.flush": &wit.Function{
@@ -5561,7 +6011,10 @@
                             },
                         },
                     },
-                    Docs:       wit.Docs{},
+                    Docs: wit.Docs{
+                        Contents: "Request to flush buffered output. This function never blocks.\n\nThis tells the output-stream that the caller intends any buffered\noutput to be flushed. the output which is expected to be flushed\nis all that has been passed to `write` prior to this call.\n\nUpon calling this function, the `output-stream` will not accept any\nwrites (`check-write` will return `ok(0)`) until the flush has\ncompleted. The `subscribe` pollable will become ready when the\nflush has completed and the stream can accept more writes.",
+                        _node:    wit._node{},
+                    },
                     _worldItem: wit._worldItem{},
                 },
                 "[method]output-stream.forward": &wit.Function{
@@ -5630,7 +6083,10 @@
                             },
                         },
                     },
-                    Docs:       wit.Docs{},
+                    Docs: wit.Docs{
+                        Contents: "Forward the entire contents of an input stream to an output stream.\n\nThis function repeatedly reads from the input stream and writes\nthe data to the output stream, until the end of the input stream\nis reached, or an error is encountered.\n\nUnlike other I/O functions, this function blocks until the end\nof the input stream is seen and all the data has been written to\nthe output stream.\n\nThis function returns the number of bytes transferred, and the status of\nthe output stream.",
+                        _node:    wit._node{},
+                    },
                     _worldItem: wit._worldItem{},
                 },
                 "[method]output-stream.splice": &wit.Function{
@@ -5703,7 +6159,10 @@
                             },
                         },
                     },
-                    Docs:       wit.Docs{},
+                    Docs: wit.Docs{
+                        Contents: "Read from one stream and write to another.\n\nThis function returns the number of bytes transferred; it may be less\nthan `len`.\n\nUnlike other I/O functions, this function blocks until all the data\nread from the input stream has been written to the output stream.",
+                        _node:    wit._node{},
+                    },
                     _worldItem: wit._worldItem{},
                 },
                 "[method]output-stream.subscribe": &wit.Function{
@@ -5744,7 +6203,10 @@
                             },
                         },
                     },
-                    Docs:       wit.Docs{},
+                    Docs: wit.Docs{
+                        Contents: "Create a `pollable` which will resolve once the output-stream\nis ready for more writing, or an error has occured. When this\npollable is ready, `check-write` will return `ok(n)` with n>0, or an\nerror.\n\nIf the stream is closed, this pollable is always ready immediately.\n\nThe created `pollable` is a child resource of the `output-stream`.\nImplementations may trap if the `output-stream` is dropped before\nall derived `pollable`s created with this function are dropped.",
+                        _node:    wit._node{},
+                    },
                     _worldItem: wit._worldItem{},
                 },
                 "[method]output-stream.write": &wit.Function{
@@ -5800,7 +6262,10 @@
                             },
                         },
                     },
-                    Docs:       wit.Docs{},
+                    Docs: wit.Docs{
+                        Contents: "Perform a write. This function never blocks.\n\nPrecondition: check-write gave permit of Ok(n) and contents has a\nlength of less than or equal to n. Otherwise, this function will trap.\n\nreturns Err(closed) without writing if the stream has closed since\nthe last call to check-write provided a permit.",
+                        _node:    wit._node{},
+                    },
                     _worldItem: wit._worldItem{},
                 },
                 "[method]output-stream.write-zeroes": &wit.Function{
@@ -5846,7 +6311,10 @@
                             },
                         },
                     },
-                    Docs:       wit.Docs{},
+                    Docs: wit.Docs{
+                        Contents: "Write zeroes to a stream.\n\nthis should be used precisely like `write` with the exact same\npreconditions (must use check-write first), but instead of\npassing a list of bytes, you simply pass the number of zero-bytes\nthat should be written.",
+                        _node:    wit._node{},
+                    },
                     _worldItem: wit._worldItem{},
                 },
             },
@@ -5866,7 +6334,10 @@
                 },
                 Docs: wit.Docs{},
             },
-            Docs:       wit.Docs{},
+            Docs: wit.Docs{
+                Contents: "WASI I/O is an I/O abstraction API which is currently focused on providing\nstream types.\n\nIn the future, the component model is expected to add built-in stream types;\nwhen it does, they are expected to subsume this API.",
+                _node:    wit._node{},
+            },
             _typeOwner: wit._typeOwner{},
             _worldItem: wit._worldItem{},
         },
@@ -5901,7 +6372,10 @@
                             Type: &wit.TypeDef{(CYCLIC REFERENCE)},
                         },
                     },
-                    Docs:       wit.Docs{},
+                    Docs: wit.Docs{
+                        Contents: "Read the current value of the clock.\n\nThe clock is monotonic, therefore calling this function repeatedly will\nproduce a sequence of non-decreasing values.",
+                        _node:    wit._node{},
+                    },
                     _worldItem: wit._worldItem{},
                 },
                 "resolution": &wit.Function{
@@ -5914,7 +6388,10 @@
                             Type: &wit.TypeDef{(CYCLIC REFERENCE)},
                         },
                     },
-                    Docs:       wit.Docs{},
+                    Docs: wit.Docs{
+                        Contents: "Query the resolution of the clock.",
+                        _node:    wit._node{},
+                    },
                     _worldItem: wit._worldItem{},
                 },
                 "subscribe": &wit.Function{
@@ -5946,7 +6423,10 @@
                             },
                         },
                     },
-                    Docs:       wit.Docs{},
+                    Docs: wit.Docs{
+                        Contents: "Create a `pollable` which will resolve once the specified time has been\nreached.",
+                        _node:    wit._node{},
+                    },
                     _worldItem: wit._worldItem{},
                 },
             },
@@ -5977,17 +6457,26 @@
                                         {
                                             Name: "utc-offset",
                                             Type: wit.S32{},
-                                            Docs: wit.Docs{},
+                                            Docs: wit.Docs{
+                                                Contents: "The number of seconds difference between UTC time and the local\ntime of the timezone.\n\nThe returned value will always be less than 86400 which is the\nnumber of seconds in a day (24*60*60).\n\nIn implementations that do not expose an actual time zone, this\nshould return 0.",
+                                                _node:    wit._node{},
+                                            },
                                         },
                                         {
                                             Name: "name",
                                             Type: wit.String{},
-                                            Docs: wit.Docs{},
+                                            Docs: wit.Docs{
+                                                Contents: "The abbreviated name of the timezone to display to a user. The name\n`UTC` indicates Coordinated Universal Time. Otherwise, this should\nreference local standards for the name of the time zone.\n\nIn implementations that do not expose an actual time zone, this\nshould be the string `UTC`.\n\nIn time zones that do not have an applicable name, a formatted\nrepresentation of the UTC offset may be returned, such as `-04:00`.",
+                                                _node:    wit._node{},
+                                            },
                                         },
                                         {
                                             Name: "in-daylight-saving-time",
                                             Type: wit.Bool{},
-                                            Docs: wit.Docs{},
+                                            Docs: wit.Docs{
+                                                Contents: "Whether daylight saving time is active.\n\nIn implementations that do not expose an actual time zone, this\nshould return false.",
+                                                _node:    wit._node{},
+                                            },
                                         },
                                     },
                                     _typeDefKind: wit._typeDefKind{},
@@ -6014,7 +6503,10 @@
                                         Type: &wit.TypeDef{(CYCLIC REFERENCE)},
                                     },
                                 },
-                                Docs:       wit.Docs{},
+                                Docs: wit.Docs{
+                                    Contents: "Return information needed to display the given `datetime`. This includes\nthe UTC offset, the time zone name, and a flag indicating whether\ndaylight saving time is active.\n\nIf the timezone cannot be determined for the given `datetime`, return a\n`timezone-display` for `UTC` with a `utc-offset` of 0 and no daylight\nsaving time.",
+                                    _node:    wit._node{},
+                                },
                                 _worldItem: wit._worldItem{},
                             },
                             "utc-offset": &wit.Function{
@@ -6032,7 +6524,10 @@
                                         Type: wit.S32{},
                                     },
                                 },
-                                Docs:       wit.Docs{},
+                                Docs: wit.Docs{
+                                    Contents: "The same as `display`, but only return the UTC offset.",
+                                    _node:    wit._node{},
+                                },
                                 _worldItem: wit._worldItem{},
                             },
                         },
@@ -6078,7 +6573,10 @@
                                         Type: &wit.TypeDef{(CYCLIC REFERENCE)},
                                     },
                                 },
-                                Docs:       wit.Docs{},
+                                Docs: wit.Docs{
+                                    Contents: "Read the current value of the clock.\n\nThis clock is not monotonic, therefore calling this function repeatedly\nwill not necessarily produce a sequence of non-decreasing values.\n\nThe returned timestamps represent the number of seconds since\n1970-01-01T00:00:00Z, also known as [POSIX's Seconds Since the Epoch],\nalso known as [Unix Time].\n\nThe nanoseconds field of the output is always less than 1000000000.\n\n[POSIX's Seconds Since the Epoch]: https://pubs.opengroup.org/onlinepubs/9699919799/xrat/V4_xbd_chap04.html#tag_21_04_16\n[Unix Time]: https://en.wikipedia.org/wiki/Unix_time",
+                                    _node:    wit._node{},
+                                },
                                 _worldItem: wit._worldItem{},
                             },
                             "resolution": &wit.Function{
@@ -6091,12 +6589,18 @@
                                         Type: &wit.TypeDef{(CYCLIC REFERENCE)},
                                     },
                                 },
-                                Docs:       wit.Docs{},
+                                Docs: wit.Docs{
+                                    Contents: "Query the resolution of the clock.\n\nThe nanoseconds field of the output is always less than 1000000000.",
+                                    _node:    wit._node{},
+                                },
                                 _worldItem: wit._worldItem{},
                             },
                         },
-                        Package:    &wit.Package{(CYCLIC REFERENCE)},
-                        Docs:       wit.Docs{},
+                        Package: &wit.Package{(CYCLIC REFERENCE)},
+                        Docs:    wit.Docs{
+                            Contents: "WASI Wall Clock is a clock API intended to let users query the current\ntime. The name \"wall\" makes an analogy to a \"clock on the wall\", which\nis not necessarily monotonic as it may be reset.\n\nIt is intended to be portable at least between Unix-family platforms and\nWindows.\n\nA wall clock is a clock which measures the date and time according to\nsome external reference.\n\nExternal references may be reset, so this clock is not necessarily\nmonotonic, making it unsuitable for measuring elapsed time.\n\nIt is intended for reporting the current date and time for humans.",
+                            _node:    wit._node{},
+                        },
                         _typeOwner: wit._typeOwner{},
                         _worldItem: wit._worldItem{},
                     },
@@ -6106,7 +6610,10 @@
                 },
                 Docs: wit.Docs{},
             },
-            Docs:       wit.Docs{},
+            Docs: wit.Docs{
+                Contents: "WASI Monotonic Clock is a clock API intended to let users measure elapsed\ntime.\n\nIt is intended to be portable at least between Unix-family platforms and\nWindows.\n\nA monotonic clock is a clock which has an unspecified initial value, and\nsuccessive reads of the clock will produce non-decreasing values.\n\nIt is intended for measuring elapsed time.",
+                _node:    wit._node{},
+            },
             _typeOwner: wit._typeOwner{},
             _worldItem: wit._worldItem{},
         },
@@ -6147,7 +6654,10 @@
                             Type: &wit.TypeDef{(CYCLIC REFERENCE)},
                         },
                     },
-                    Docs:       wit.Docs{},
+                    Docs: wit.Docs{
+                        Contents: "Read the current value of the clock.\n\nThis clock is not monotonic, therefore calling this function repeatedly\nwill not necessarily produce a sequence of non-decreasing values.\n\nThe returned timestamps represent the number of seconds since\n1970-01-01T00:00:00Z, also known as [POSIX's Seconds Since the Epoch],\nalso known as [Unix Time].\n\nThe nanoseconds field of the output is always less than 1000000000.\n\n[POSIX's Seconds Since the Epoch]: https://pubs.opengroup.org/onlinepubs/9699919799/xrat/V4_xbd_chap04.html#tag_21_04_16\n[Unix Time]: https://en.wikipedia.org/wiki/Unix_time",
+                        _node:    wit._node{},
+                    },
                     _worldItem: wit._worldItem{},
                 },
                 "resolution": &wit.Function{
@@ -6160,7 +6670,10 @@
                             Type: &wit.TypeDef{(CYCLIC REFERENCE)},
                         },
                     },
-                    Docs:       wit.Docs{},
+                    Docs: wit.Docs{
+                        Contents: "Query the resolution of the clock.\n\nThe nanoseconds field of the output is always less than 1000000000.",
+                        _node:    wit._node{},
+                    },
                     _worldItem: wit._worldItem{},
                 },
             },
@@ -6191,17 +6704,26 @@
                                         {
                                             Name: "utc-offset",
                                             Type: wit.S32{},
-                                            Docs: wit.Docs{},
+                                            Docs: wit.Docs{
+                                                Contents: "The number of seconds difference between UTC time and the local\ntime of the timezone.\n\nThe returned value will always be less than 86400 which is the\nnumber of seconds in a day (24*60*60).\n\nIn implementations that do not expose an actual time zone, this\nshould return 0.",
+                                                _node:    wit._node{},
+                                            },
                                         },
                                         {
                                             Name: "name",
                                             Type: wit.String{},
-                                            Docs: wit.Docs{},
+                                            Docs: wit.Docs{
+                                                Contents: "The abbreviated name of the timezone to display to a user. The name\n`UTC` indicates Coordinated Universal Time. Otherwise, this should\nreference local standards for the name of the time zone.\n\nIn implementations that do not expose an actual time zone, this\nshould be the string `UTC`.\n\nIn time zones that do not have an applicable name, a formatted\nrepresentation of the UTC offset may be returned, such as `-04:00`.",
+                                                _node:    wit._node{},
+                                            },
                                         },
                                         {
                                             Name: "in-daylight-saving-time",
                                             Type: wit.Bool{},
-                                            Docs: wit.Docs{},
+                                            Docs: wit.Docs{
+                                                Contents: "Whether daylight saving time is active.\n\nIn implementations that do not expose an actual time zone, this\nshould return false.",
+                                                _node:    wit._node{},
+                                            },
                                         },
                                     },
                                     _typeDefKind: wit._typeDefKind{},
@@ -6228,7 +6750,10 @@
                                         Type: &wit.TypeDef{(CYCLIC REFERENCE)},
                                     },
                                 },
-                                Docs:       wit.Docs{},
+                                Docs: wit.Docs{
+                                    Contents: "Return information needed to display the given `datetime`. This includes\nthe UTC offset, the time zone name, and a flag indicating whether\ndaylight saving time is active.\n\nIf the timezone cannot be determined for the given `datetime`, return a\n`timezone-display` for `UTC` with a `utc-offset` of 0 and no daylight\nsaving time.",
+                                    _node:    wit._node{},
+                                },
                                 _worldItem: wit._worldItem{},
                             },
                             "utc-offset": &wit.Function{
@@ -6246,7 +6771,10 @@
                                         Type: wit.S32{},
                                     },
                                 },
-                                Docs:       wit.Docs{},
+                                Docs: wit.Docs{
+                                    Contents: "The same as `display`, but only return the UTC offset.",
+                                    _node:    wit._node{},
+                                },
                                 _worldItem: wit._worldItem{},
                             },
                         },
@@ -6262,7 +6790,10 @@
                 },
                 Docs: wit.Docs{},
             },
-            Docs:       wit.Docs{},
+            Docs: wit.Docs{
+                Contents: "WASI Wall Clock is a clock API intended to let users query the current\ntime. The name \"wall\" makes an analogy to a \"clock on the wall\", which\nis not necessarily monotonic as it may be reset.\n\nIt is intended to be portable at least between Unix-family platforms and\nWindows.\n\nA wall clock is a clock which measures the date and time according to\nsome external reference.\n\nExternal references may be reset, so this clock is not necessarily\nmonotonic, making it unsuitable for measuring elapsed time.\n\nIt is intended for reporting the current date and time for humans.",
+                _node:    wit._node{},
+            },
             _typeOwner: wit._typeOwner{},
             _worldItem: wit._worldItem{},
         },
@@ -6284,17 +6815,26 @@
                             {
                                 Name: "utc-offset",
                                 Type: wit.S32{},
-                                Docs: wit.Docs{},
+                                Docs: wit.Docs{
+                                    Contents: "The number of seconds difference between UTC time and the local\ntime of the timezone.\n\nThe returned value will always be less than 86400 which is the\nnumber of seconds in a day (24*60*60).\n\nIn implementations that do not expose an actual time zone, this\nshould return 0.",
+                                    _node:    wit._node{},
+                                },
                             },
                             {
                                 Name: "name",
                                 Type: wit.String{},
-                                Docs: wit.Docs{},
+                                Docs: wit.Docs{
+                                    Contents: "The abbreviated name of the timezone to display to a user. The name\n`UTC` indicates Coordinated Universal Time. Otherwise, this should\nreference local standards for the name of the time zone.\n\nIn implementations that do not expose an actual time zone, this\nshould be the string `UTC`.\n\nIn time zones that do not have an applicable name, a formatted\nrepresentation of the UTC offset may be returned, such as `-04:00`.",
+                                    _node:    wit._node{},
+                                },
                             },
                             {
                                 Name: "in-daylight-saving-time",
                                 Type: wit.Bool{},
-                                Docs: wit.Docs{},
+                                Docs: wit.Docs{
+                                    Contents: "Whether daylight saving time is active.\n\nIn implementations that do not expose an actual time zone, this\nshould return false.",
+                                    _node:    wit._node{},
+                                },
                             },
                         },
                         _typeDefKind: wit._typeDefKind{},
@@ -6321,7 +6861,10 @@
                             Type: &wit.TypeDef{(CYCLIC REFERENCE)},
                         },
                     },
-                    Docs:       wit.Docs{},
+                    Docs: wit.Docs{
+                        Contents: "Return information needed to display the given `datetime`. This includes\nthe UTC offset, the time zone name, and a flag indicating whether\ndaylight saving time is active.\n\nIf the timezone cannot be determined for the given `datetime`, return a\n`timezone-display` for `UTC` with a `utc-offset` of 0 and no daylight\nsaving time.",
+                        _node:    wit._node{},
+                    },
                     _worldItem: wit._worldItem{},
                 },
                 "utc-offset": &wit.Function{
@@ -6339,7 +6882,10 @@
                             Type: wit.S32{},
                         },
                     },
-                    Docs:       wit.Docs{},
+                    Docs: wit.Docs{
+                        Contents: "The same as `display`, but only return the UTC offset.",
+                        _node:    wit._node{},
+                    },
                     _worldItem: wit._worldItem{},
                 },
             },
@@ -6421,11 +6967,17 @@
                 Cases: {
                     {
                         Name: "open",
-                        Docs: wit.Docs{},
+                        Docs: wit.Docs{
+                            Contents: "The stream is open and may produce further data.",
+                            _node:    wit._node{},
+                        },
                     },
                     {
                         Name: "ended",
-                        Docs: wit.Docs{},
+                        Docs: wit.Docs{
+                            Contents: "When reading, this indicates that the stream will not produce\nfurther data.\nWhen writing, this indicates that the stream will no longer be read.\nFurther writes are still permitted.",
+                            _node:    wit._node{},
+                        },
                     },
                 },
                 _typeDefKind: wit._typeDefKind{},
@@ -6449,11 +7001,17 @@
                 Cases: {
                     {
                         Name: "last-operation-failed",
-                        Docs: wit.Docs{},
+                        Docs: wit.Docs{
+                            Contents: "The last operation (a write or flush) failed before completion.",
+                            _node:    wit._node{},
+                        },
                     },
                     {
                         Name: "closed",
-                        Docs: wit.Docs{},
+                        Docs: wit.Docs{
+                            Contents: "The stream is closed: no more input will be accepted by the\nstream. A closed output-stream will return this error on all\nfuture operations.",
+                            _node:    wit._node{},
+                        },
                     },
                 },
                 _typeDefKind: wit._typeDefKind{},
@@ -6655,17 +7213,26 @@
                     {
                         Name: "utc-offset",
                         Type: wit.S32{},
-                        Docs: wit.Docs{},
+                        Docs: wit.Docs{
+                            Contents: "The number of seconds difference between UTC time and the local\ntime of the timezone.\n\nThe returned value will always be less than 86400 which is the\nnumber of seconds in a day (24*60*60).\n\nIn implementations that do not expose an actual time zone, this\nshould return 0.",
+                            _node:    wit._node{},
+                        },
                     },
                     {
                         Name: "name",
                         Type: wit.String{},
-                        Docs: wit.Docs{},
+                        Docs: wit.Docs{
+                            Contents: "The abbreviated name of the timezone to display to a user. The name\n`UTC` indicates Coordinated Universal Time. Otherwise, this should\nreference local standards for the name of the time zone.\n\nIn implementations that do not expose an actual time zone, this\nshould be the string `UTC`.\n\nIn time zones that do not have an applicable name, a formatted\nrepresentation of the UTC offset may be returned, such as `-04:00`.",
+                            _node:    wit._node{},
+                        },
                     },
                     {
                         Name: "in-daylight-saving-time",
                         Type: wit.Bool{},
-                        Docs: wit.Docs{},
+                        Docs: wit.Docs{
+                            Contents: "Whether daylight saving time is active.\n\nIn implementations that do not expose an actual time zone, this\nshould return false.",
+                            _node:    wit._node{},
+                        },
                     },
                 },
                 _typeDefKind: wit._typeDefKind{},
