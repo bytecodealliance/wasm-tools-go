@@ -351,7 +351,9 @@ func relativeName(o TypeOwner, p *Package) string {
 	if op == nil {
 		return ""
 	}
-	return op.Name.String() + "/" + name
+	qualifiedName := op.Name
+	qualifiedName.Name += "/" + name
+	return qualifiedName.String()
 }
 
 // WIT returns the [WIT] text format for [Record] r.
