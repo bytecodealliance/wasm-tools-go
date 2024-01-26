@@ -160,6 +160,8 @@ func (c *typeDefCodec) DecodeField(dec codec.Decoder, name string) error {
 		return dec.Decode(&t.Name)
 	case "owner":
 		return dec.Decode(&t.Owner)
+	case "docs":
+		return dec.Decode(&t.Docs)
 	}
 	return nil
 }
