@@ -183,6 +183,7 @@ func (i *Interface) WIT(ctx Node, name string) string {
 		}
 
 		// Otherwise, this is an inline interface decl.
+		b.WriteString(i.Docs.WIT(ctx, ""))
 		b.WriteString(escape(name))
 		b.WriteString(": interface ")
 	}
@@ -235,6 +236,7 @@ func (t *TypeDef) WIT(ctx Node, name string) string {
 
 	case *World, *Interface:
 		var b strings.Builder
+		b.WriteString(t.Docs.WIT(ctx, ""))
 		b.WriteString(t.Kind.WIT(t, name))
 		constructor := t.Constructor()
 		methods := t.Methods()
