@@ -191,10 +191,11 @@ func (i *Interface) WIT(ctx Node, name string) string {
 	b.WriteRune('{')
 	n := 0
 	for _, name := range codec.SortedKeys(i.TypeDefs) {
-		if n == 0 {
+		td := i.TypeDefs[name]
+		if n == 0 || td.Docs.Contents != "" {
 			b.WriteRune('\n')
 		}
-		b.WriteString(indent(i.TypeDefs[name].WIT(i, name)))
+		b.WriteString(indent(td.WIT(i, name)))
 		b.WriteRune('\n')
 		n++
 	}
@@ -203,7 +204,7 @@ func (i *Interface) WIT(ctx Node, name string) string {
 		if _, ok := f.Kind.(*Freestanding); !ok {
 			continue
 		}
-		if n == 0 {
+		if n == 0 || f.Docs.Contents != "" {
 			b.WriteRune('\n')
 		}
 		b.WriteString(indent(f.WIT(i, name)))
@@ -243,19 +244,29 @@ func (t *TypeDef) WIT(ctx Node, name string) string {
 		statics := t.StaticFunctions()
 		if constructor != nil || len(methods) > 0 || len(statics) > 0 {
 			b.WriteString(" {\n")
+			n := 0
 			if constructor != nil {
 				b.WriteString(indent(constructor.WIT(t, "constructor")))
 				b.WriteRune('\n')
+				n++
 			}
 			slices.SortFunc(methods, functionCompare)
 			for _, f := range methods {
+				if f.Docs.Contents != "" {
+					b.WriteRune('\n')
+				}
 				b.WriteString(indent(f.WIT(t, "")))
 				b.WriteRune('\n')
+				n++
 			}
 			slices.SortFunc(statics, functionCompare)
 			for _, f := range statics {
+				if f.Docs.Contents != "" {
+					b.WriteRune('\n')
+				}
 				b.WriteString(indent(f.WIT(t, "")))
 				b.WriteRune('\n')
+				n++
 			}
 			b.WriteRune('}')
 		}
