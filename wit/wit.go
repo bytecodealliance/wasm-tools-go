@@ -32,7 +32,7 @@ func indent(s string) string {
 func unwrap(s string) string {
 	const chars = 50
 	const lines = 5
-	if len(s) > chars || strings.Count(s, "\n") > lines {
+	if len(s) > chars || strings.Count(s, "\n") > lines || strings.Contains(s, "//") {
 		return s
 	}
 	var b strings.Builder
