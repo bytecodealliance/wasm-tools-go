@@ -306,13 +306,13 @@ func functionCompare(a, b *Function) int {
 }
 
 func escape(name string) string {
-	if keywords[name] {
+	if witKeywords[name] {
 		return "%" + name
 	}
 	return name
 }
 
-var keywords = map[string]bool{
+var witKeywords = map[string]bool{
 	"enum":      true,
 	"export":    true,
 	"flags":     true,
