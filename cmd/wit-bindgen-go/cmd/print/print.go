@@ -1,6 +1,7 @@
 package print
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/ydnar/wasm-tools-go/internal/witcli"
@@ -16,8 +17,8 @@ var Command = &cli.Command{
 	Action: action,
 }
 
-func action(ctx *cli.Context) error {
-	res, err := witcli.LoadOne(ctx.Args().Slice()...)
+func action(ctx context.Context, cmd *cli.Command) error {
+	res, err := witcli.LoadOne(cmd.Args().Slice()...)
 	if err != nil {
 		return err
 	}
