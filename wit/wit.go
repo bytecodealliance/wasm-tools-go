@@ -22,7 +22,7 @@ func (_node) WIT(ctx Node, name string) string { return "/* TODO(" + name + ") *
 
 func indent(s string) string {
 	const ws = "    "
-	return strings.TrimSuffix(ws+strings.ReplaceAll(s, "\n", "\n"+ws), ws)
+	return strings.ReplaceAll(strings.TrimSuffix(ws+strings.ReplaceAll(s, "\n", "\n"+ws), ws), ws+"\n", "\n")
 }
 
 // unwrap unwraps a multiline string into a single line, if:
