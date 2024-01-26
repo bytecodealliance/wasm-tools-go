@@ -198,6 +198,16 @@ func (pn *PackageName) DecodeString(s string) error {
 	return err
 }
 
+// DecodeField implements the [codec.FieldDecoder] interface
+// to decode a struct or JSON object.
+func (d *Docs) DecodeField(dec codec.Decoder, name string) error {
+	switch name {
+	case "contents":
+		return dec.Decode(&d.Contents)
+	}
+	return nil
+}
+
 // worldItemCodec translates typed WorldItem references into a WorldItem,
 // currently either an Interface or a TypeDef.
 type worldItemCodec struct {
