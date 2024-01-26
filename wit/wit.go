@@ -125,7 +125,7 @@ func (w *World) WIT(ctx Node, name string) string {
 	n := 0
 	w.AllImports(func(name string, i WorldItem) bool {
 		if f, ok := i.(*Function); ok {
-			if _, ok := f.Kind.(*Freestanding); !ok {
+			if !f.IsFreestanding() {
 				return true
 			}
 		}
@@ -220,7 +220,7 @@ func (i *Interface) WIT(ctx Node, name string) string {
 	// Functions
 	for _, name := range codec.SortedKeys(i.Functions) {
 		f := i.Functions[name]
-		if _, ok := f.Kind.(*Freestanding); !ok {
+		if !f.IsFreestanding() {
 			continue
 		}
 		if n == 0 || f.Docs.Contents != "" {
