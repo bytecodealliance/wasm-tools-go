@@ -160,6 +160,8 @@ func (c *typeDefCodec) DecodeField(dec codec.Decoder, name string) error {
 		return dec.Decode(&t.Name)
 	case "owner":
 		return dec.Decode(&t.Owner)
+	case "docs":
+		return dec.Decode(&t.Docs)
 	}
 	return nil
 }
@@ -196,6 +198,16 @@ func (pn *PackageName) DecodeString(s string) error {
 	var err error
 	*pn, err = ParsePackageName(s)
 	return err
+}
+
+// DecodeField implements the [codec.FieldDecoder] interface
+// to decode a struct or JSON object.
+func (d *Docs) DecodeField(dec codec.Decoder, name string) error {
+	switch name {
+	case "contents":
+		return dec.Decode(&d.Contents)
+	}
+	return nil
 }
 
 // worldItemCodec translates typed WorldItem references into a WorldItem,

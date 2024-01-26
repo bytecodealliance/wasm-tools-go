@@ -1,0 +1,319 @@
+&wit.Resolve{
+    Worlds: {
+        &wit.World{
+            Name:    "exports",
+            Imports: {},
+            Exports: {
+                "interface-0": &wit.Interface{
+                    Name:     &"example",
+                    TypeDefs: {
+                        "example-resource": &wit.TypeDef{
+                            Name:       &"example-resource",
+                            Kind:       &wit.Resource{},
+                            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                            Docs:       wit.Docs{},
+                            _worldItem: wit._worldItem{},
+                            _type:      wit._type{},
+                        },
+                    },
+                    Functions: {
+                        "[method]example-resource.bar": &wit.Function{
+                            Name: "[method]example-resource.bar",
+                            Kind: &wit.Method{
+                                Type:          &wit.TypeDef{(CYCLIC REFERENCE)},
+                                _functionKind: wit._functionKind{},
+                            },
+                            Params: {
+                                {
+                                    Name: "self",
+                                    Type: &wit.TypeDef{
+                                        Name: (*string)(nil),
+                                        Kind: &wit.BorrowedHandle{
+                                            Type:    &wit.TypeDef{(CYCLIC REFERENCE)},
+                                            _handle: wit._handle{},
+                                        },
+                                        Owner:      nil,
+                                        Docs:       wit.Docs{},
+                                        _worldItem: wit._worldItem{},
+                                        _type:      wit._type{},
+                                    },
+                                },
+                                {
+                                    Name: "arg",
+                                    Type: wit.U32{},
+                                },
+                            },
+                            Results:    nil,
+                            Docs:       wit.Docs{},
+                            _worldItem: wit._worldItem{},
+                        },
+                        "[method]example-resource.foo": &wit.Function{
+                            Name: "[method]example-resource.foo",
+                            Kind: &wit.Method{
+                                Type:          &wit.TypeDef{(CYCLIC REFERENCE)},
+                                _functionKind: wit._functionKind{},
+                            },
+                            Params: {
+                                {
+                                    Name: "self",
+                                    Type: &wit.TypeDef{
+                                        Name: (*string)(nil),
+                                        Kind: &wit.BorrowedHandle{
+                                            Type:    &wit.TypeDef{(CYCLIC REFERENCE)},
+                                            _handle: wit._handle{},
+                                        },
+                                        Owner:      nil,
+                                        Docs:       wit.Docs{},
+                                        _worldItem: wit._worldItem{},
+                                        _type:      wit._type{},
+                                    },
+                                },
+                            },
+                            Results:    nil,
+                            Docs:       wit.Docs{},
+                            _worldItem: wit._worldItem{},
+                        },
+                    },
+                    Package: &wit.Package{
+                        Name: wit.PackageName{
+                            Namespace: "examples",
+                            Name:      "exported-resource",
+                            Version:   &semver.Version{Major:0, Minor:2, Patch:0, PreRelease:"", Metadata:""},
+                            _node:     wit._node{},
+                        },
+                        Interfaces: {
+                            "example": &wit.Interface{(CYCLIC REFERENCE)},
+                        },
+                        Worlds: {
+                            "exports": &wit.World{(CYCLIC REFERENCE)},
+                        },
+                        Docs: wit.Docs{},
+                    },
+                    Docs:       wit.Docs{},
+                    _typeOwner: wit._typeOwner{},
+                    _worldItem: wit._worldItem{},
+                },
+            },
+            Package: &wit.Package{
+                Name: wit.PackageName{
+                    Namespace: "examples",
+                    Name:      "exported-resource",
+                    Version:   &semver.Version{Major:0, Minor:2, Patch:0, PreRelease:"", Metadata:""},
+                    _node:     wit._node{},
+                },
+                Interfaces: {
+                    "example": &wit.Interface{
+                        Name:     &"example",
+                        TypeDefs: {
+                            "example-resource": &wit.TypeDef{
+                                Name:       &"example-resource",
+                                Kind:       &wit.Resource{},
+                                Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                                Docs:       wit.Docs{},
+                                _worldItem: wit._worldItem{},
+                                _type:      wit._type{},
+                            },
+                        },
+                        Functions: {
+                            "[method]example-resource.bar": &wit.Function{
+                                Name: "[method]example-resource.bar",
+                                Kind: &wit.Method{
+                                    Type:          &wit.TypeDef{(CYCLIC REFERENCE)},
+                                    _functionKind: wit._functionKind{},
+                                },
+                                Params: {
+                                    {
+                                        Name: "self",
+                                        Type: &wit.TypeDef{
+                                            Name: (*string)(nil),
+                                            Kind: &wit.BorrowedHandle{
+                                                Type:    &wit.TypeDef{(CYCLIC REFERENCE)},
+                                                _handle: wit._handle{},
+                                            },
+                                            Owner:      nil,
+                                            Docs:       wit.Docs{},
+                                            _worldItem: wit._worldItem{},
+                                            _type:      wit._type{},
+                                        },
+                                    },
+                                    {
+                                        Name: "arg",
+                                        Type: wit.U32{},
+                                    },
+                                },
+                                Results:    nil,
+                                Docs:       wit.Docs{},
+                                _worldItem: wit._worldItem{},
+                            },
+                            "[method]example-resource.foo": &wit.Function{
+                                Name: "[method]example-resource.foo",
+                                Kind: &wit.Method{
+                                    Type:          &wit.TypeDef{(CYCLIC REFERENCE)},
+                                    _functionKind: wit._functionKind{},
+                                },
+                                Params: {
+                                    {
+                                        Name: "self",
+                                        Type: &wit.TypeDef{
+                                            Name: (*string)(nil),
+                                            Kind: &wit.BorrowedHandle{
+                                                Type:    &wit.TypeDef{(CYCLIC REFERENCE)},
+                                                _handle: wit._handle{},
+                                            },
+                                            Owner:      nil,
+                                            Docs:       wit.Docs{},
+                                            _worldItem: wit._worldItem{},
+                                            _type:      wit._type{},
+                                        },
+                                    },
+                                },
+                                Results:    nil,
+                                Docs:       wit.Docs{},
+                                _worldItem: wit._worldItem{},
+                            },
+                        },
+                        Package:    &wit.Package{(CYCLIC REFERENCE)},
+                        Docs:       wit.Docs{},
+                        _typeOwner: wit._typeOwner{},
+                        _worldItem: wit._worldItem{},
+                    },
+                },
+                Worlds: {
+                    "exports": &wit.World{(CYCLIC REFERENCE)},
+                },
+                Docs: wit.Docs{},
+            },
+            Docs:       wit.Docs{},
+            _typeOwner: wit._typeOwner{},
+        },
+    },
+    Interfaces: {
+        &wit.Interface{
+            Name:     &"example",
+            TypeDefs: {
+                "example-resource": &wit.TypeDef{
+                    Name:       &"example-resource",
+                    Kind:       &wit.Resource{},
+                    Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                    _type:      wit._type{},
+                },
+            },
+            Functions: {
+                "[method]example-resource.bar": &wit.Function{
+                    Name: "[method]example-resource.bar",
+                    Kind: &wit.Method{
+                        Type:          &wit.TypeDef{(CYCLIC REFERENCE)},
+                        _functionKind: wit._functionKind{},
+                    },
+                    Params: {
+                        {
+                            Name: "self",
+                            Type: &wit.TypeDef{
+                                Name: (*string)(nil),
+                                Kind: &wit.BorrowedHandle{
+                                    Type:    &wit.TypeDef{(CYCLIC REFERENCE)},
+                                    _handle: wit._handle{},
+                                },
+                                Owner:      nil,
+                                Docs:       wit.Docs{},
+                                _worldItem: wit._worldItem{},
+                                _type:      wit._type{},
+                            },
+                        },
+                        {
+                            Name: "arg",
+                            Type: wit.U32{},
+                        },
+                    },
+                    Results:    nil,
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                },
+                "[method]example-resource.foo": &wit.Function{
+                    Name: "[method]example-resource.foo",
+                    Kind: &wit.Method{
+                        Type:          &wit.TypeDef{(CYCLIC REFERENCE)},
+                        _functionKind: wit._functionKind{},
+                    },
+                    Params: {
+                        {
+                            Name: "self",
+                            Type: &wit.TypeDef{
+                                Name: (*string)(nil),
+                                Kind: &wit.BorrowedHandle{
+                                    Type:    &wit.TypeDef{(CYCLIC REFERENCE)},
+                                    _handle: wit._handle{},
+                                },
+                                Owner:      nil,
+                                Docs:       wit.Docs{},
+                                _worldItem: wit._worldItem{},
+                                _type:      wit._type{},
+                            },
+                        },
+                    },
+                    Results:    nil,
+                    Docs:       wit.Docs{},
+                    _worldItem: wit._worldItem{},
+                },
+            },
+            Package: &wit.Package{
+                Name: wit.PackageName{
+                    Namespace: "examples",
+                    Name:      "exported-resource",
+                    Version:   &semver.Version{Major:0, Minor:2, Patch:0, PreRelease:"", Metadata:""},
+                    _node:     wit._node{},
+                },
+                Interfaces: {
+                    "example": &wit.Interface{(CYCLIC REFERENCE)},
+                },
+                Worlds: {
+                    "exports": &wit.World{(CYCLIC REFERENCE)},
+                },
+                Docs: wit.Docs{},
+            },
+            Docs:       wit.Docs{},
+            _typeOwner: wit._typeOwner{},
+            _worldItem: wit._worldItem{},
+        },
+    },
+    TypeDefs: {
+        &wit.TypeDef{
+            Name:       &"example-resource",
+            Kind:       &wit.Resource{},
+            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+        &wit.TypeDef{
+            Name: (*string)(nil),
+            Kind: &wit.BorrowedHandle{
+                Type:    &wit.TypeDef{(CYCLIC REFERENCE)},
+                _handle: wit._handle{},
+            },
+            Owner:      nil,
+            Docs:       wit.Docs{},
+            _worldItem: wit._worldItem{},
+            _type:      wit._type{},
+        },
+    },
+    Packages: {
+        &wit.Package{
+            Name: wit.PackageName{
+                Namespace: "examples",
+                Name:      "exported-resource",
+                Version:   &semver.Version{Major:0, Minor:2, Patch:0, PreRelease:"", Metadata:""},
+                _node:     wit._node{},
+            },
+            Interfaces: {
+                "example": &wit.Interface{(CYCLIC REFERENCE)},
+            },
+            Worlds: {
+                "exports": &wit.World{(CYCLIC REFERENCE)},
+            },
+            Docs: wit.Docs{},
+        },
+    },
+}

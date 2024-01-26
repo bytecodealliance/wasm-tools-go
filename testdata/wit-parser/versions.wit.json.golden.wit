@@ -15,6 +15,6 @@ interface foo {
 package foo:versions;
 
 interface foo {
-    use a:a@1.0.0/foo.{t};
-    use a:a@2.0.0/foo.{t as t2};
+    use a:a/foo@1.0.0.{t};
+    use a:a/foo@2.0.0.{t as t2};
 }

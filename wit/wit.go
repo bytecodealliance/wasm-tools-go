@@ -22,7 +22,7 @@ func (_node) WIT(ctx Node, name string) string { return "/* TODO(" + name + ") *
 
 func indent(s string) string {
 	const ws = "    "
-	return strings.TrimSuffix(ws+strings.ReplaceAll(s, "\n", "\n"+ws), ws)
+	return strings.ReplaceAll(strings.TrimSuffix(ws+strings.ReplaceAll(s, "\n", "\n"+ws), ws), ws+"\n", "\n")
 }
 
 // unwrap unwraps a multiline string into a single line, if:
@@ -32,7 +32,7 @@ func indent(s string) string {
 func unwrap(s string) string {
 	const chars = 50
 	const lines = 5
-	if len(s) > chars || strings.Count(s, "\n") > lines {
+	if len(s) > chars || strings.Count(s, "\n") > lines || strings.Contains(s, "//") {
 		return s
 	}
 	var b strings.Builder
@@ -61,6 +61,55 @@ func (r *Resolve) WIT(_ Node, _ string) string {
 	return b.String()
 }
 
+// WIT returns the [WIT] text format for [Docs] d.
+//
+// [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
+func (d *Docs) WIT(_ Node, _ string) string {
+	if d.Contents == "" {
+		return ""
+	}
+	var b strings.Builder
+	var lineLength = 0
+	for _, c := range d.Contents {
+		if lineLength == 0 {
+			b.WriteString(DocPrefix)
+			lineLength = len(DocPrefix)
+		}
+		switch c {
+		case '\n':
+			b.WriteRune('\n')
+			lineLength = 0
+			continue
+		case ' ':
+			switch {
+			case lineLength == len(DocPrefix):
+				// Ignore leading spaces
+				continue
+			case lineLength > LineLength:
+				b.WriteRune('\n')
+				lineLength = 0
+				continue
+			}
+		default:
+			if lineLength == len(DocPrefix) {
+				b.WriteRune(' ')
+				lineLength++
+			}
+		}
+		b.WriteRune(c)
+		lineLength++
+	}
+	if lineLength != 0 {
+		b.WriteRune('\n')
+	}
+	return b.String()
+}
+
+const (
+	DocPrefix  = "///"
+	LineLength = 80
+)
+
 // WIT returns the [WIT] text format for [World] w.
 //
 // [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
@@ -69,14 +118,14 @@ func (w *World) WIT(ctx Node, name string) string {
 		name = w.Name
 	}
 	var b strings.Builder
-	// TODO: docs
+	b.WriteString(w.Docs.WIT(ctx, ""))
 	b.WriteString("world ")
 	b.WriteString(escape(name)) // TODO: compare to w.Name?
 	b.WriteString(" {")
 	n := 0
 	w.AllImports(func(name string, i WorldItem) bool {
 		if f, ok := i.(*Function); ok {
-			if _, ok := f.Kind.(*Freestanding); !ok {
+			if !f.IsFreestanding() {
 				return true
 			}
 		}
@@ -121,10 +170,9 @@ func (i *Interface) WIT(ctx Node, name string) string {
 
 	var b strings.Builder
 
-	// TODO: docs
-
 	switch ctx := ctx.(type) {
 	case *Package:
+		b.WriteString(i.Docs.WIT(ctx, ""))
 		b.WriteString("interface ")
 		b.WriteString(escape(name))
 		b.WriteRune(' ')
@@ -135,26 +183,47 @@ func (i *Interface) WIT(ctx Node, name string) string {
 		}
 
 		// Otherwise, this is an inline interface decl.
+		b.WriteString(i.Docs.WIT(ctx, ""))
 		b.WriteString(escape(name))
 		b.WriteString(": interface ")
 	}
 
 	b.WriteRune('{')
 	n := 0
-	for _, name := range codec.SortedKeys(i.TypeDefs) {
-		if n == 0 {
+	keys := codec.SortedKeys(i.TypeDefs)
+	// Emit use statements first
+	for _, name := range keys {
+		td := i.TypeDefs[name]
+		if td.Root().Owner == td.Owner {
+			continue // Skip declarations
+		}
+		if n == 0 || td.Docs.Contents != "" {
 			b.WriteRune('\n')
 		}
-		b.WriteString(indent(i.TypeDefs[name].WIT(i, name)))
+		b.WriteString(indent(td.WIT(i, name)))
 		b.WriteRune('\n')
 		n++
 	}
+	// Declarations
+	for _, name := range keys {
+		td := i.TypeDefs[name]
+		if td.Root().Owner != td.Owner {
+			continue // Skip use statements
+		}
+		if n == 0 || td.Docs.Contents != "" {
+			b.WriteRune('\n')
+		}
+		b.WriteString(indent(td.WIT(i, name)))
+		b.WriteRune('\n')
+		n++
+	}
+	// Functions
 	for _, name := range codec.SortedKeys(i.Functions) {
 		f := i.Functions[name]
-		if _, ok := f.Kind.(*Freestanding); !ok {
+		if !f.IsFreestanding() {
 			continue
 		}
-		if n == 0 {
+		if n == 0 || f.Docs.Contents != "" {
 			b.WriteRune('\n')
 		}
 		b.WriteString(indent(f.WIT(i, name)))
@@ -187,25 +256,36 @@ func (t *TypeDef) WIT(ctx Node, name string) string {
 
 	case *World, *Interface:
 		var b strings.Builder
+		b.WriteString(t.Docs.WIT(ctx, ""))
 		b.WriteString(t.Kind.WIT(t, name))
 		constructor := t.Constructor()
 		methods := t.Methods()
 		statics := t.StaticFunctions()
 		if constructor != nil || len(methods) > 0 || len(statics) > 0 {
 			b.WriteString(" {\n")
+			n := 0
 			if constructor != nil {
 				b.WriteString(indent(constructor.WIT(t, "constructor")))
 				b.WriteRune('\n')
+				n++
 			}
 			slices.SortFunc(methods, functionCompare)
 			for _, f := range methods {
+				if f.Docs.Contents != "" {
+					b.WriteRune('\n')
+				}
 				b.WriteString(indent(f.WIT(t, "")))
 				b.WriteRune('\n')
+				n++
 			}
 			slices.SortFunc(statics, functionCompare)
 			for _, f := range statics {
+				if f.Docs.Contents != "" {
+					b.WriteRune('\n')
+				}
 				b.WriteString(indent(f.WIT(t, "")))
 				b.WriteRune('\n')
+				n++
 			}
 			b.WriteRune('}')
 		}
@@ -226,13 +306,13 @@ func functionCompare(a, b *Function) int {
 }
 
 func escape(name string) string {
-	if keywords[name] {
+	if witKeywords[name] {
 		return "%" + name
 	}
 	return name
 }
 
-var keywords = map[string]bool{
+var witKeywords = map[string]bool{
 	"enum":      true,
 	"export":    true,
 	"flags":     true,
@@ -271,7 +351,9 @@ func relativeName(o TypeOwner, p *Package) string {
 	if op == nil {
 		return ""
 	}
-	return op.Name.String() + "/" + name
+	qualifiedName := op.Name
+	qualifiedName.Name += "/" + name
+	return qualifiedName.String()
 }
 
 // WIT returns the [WIT] text format for [Record] r.
@@ -300,8 +382,7 @@ func (r *Record) WIT(ctx Node, name string) string {
 //
 // [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
 func (f *Field) WIT(ctx Node, name string) string {
-	// TODO: docs
-	return escape(f.Name) + ": " + f.Type.WIT(f, "")
+	return f.Docs.WIT(ctx, "") + escape(f.Name) + ": " + f.Type.WIT(f, "")
 }
 
 // WIT returns the [WIT] text format for [Resource] r.
@@ -369,9 +450,8 @@ func (f *Flags) WIT(ctx Node, name string) string {
 // WIT returns the [WIT] text format for [Flag] f.
 //
 // [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
-func (f *Flag) WIT(_ Node, _ string) string {
-	// TODO: docs
-	return escape(f.Name)
+func (f *Flag) WIT(ctx Node, _ string) string {
+	return f.Docs.WIT(ctx, "") + escape(f.Name)
 }
 
 // WIT returns the [WIT] text format for [Tuple] t.
@@ -420,9 +500,9 @@ func (v *Variant) WIT(_ Node, name string) string {
 // WIT returns the [WIT] text format for [Case] c.
 //
 // [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
-func (c *Case) WIT(_ Node, _ string) string {
-	// TODO: docs
+func (c *Case) WIT(ctx Node, _ string) string {
 	var b strings.Builder
+	b.WriteString(c.Docs.WIT(ctx, ""))
 	b.WriteString(escape(c.Name))
 	if c.Type != nil {
 		b.WriteRune('(')
@@ -457,9 +537,8 @@ func (e *Enum) WIT(_ Node, name string) string {
 // WIT returns the [WIT] text format for [EnumCase] c.
 //
 // [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
-func (c *EnumCase) WIT(_ Node, _ string) string {
-	// TODO: docs
-	return escape(c.Name)
+func (c *EnumCase) WIT(ctx Node, _ string) string {
+	return c.Docs.WIT(ctx, "") + escape(c.Name)
 }
 
 // WIT returns the [WIT] text format for [Option] o.
@@ -582,15 +661,15 @@ func (p _primitive[T]) WIT(_ Node, name string) string {
 // WIT returns the [WIT] text format for [Function] f.
 //
 // [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
-func (f *Function) WIT(_ Node, name string) string {
+func (f *Function) WIT(ctx Node, name string) string {
 	if name == "" {
 		name = f.Name
 		if _, after, found := strings.Cut(name, "."); found {
 			name = after
 		}
 	}
-	// TODO: docs
 	var b strings.Builder
+	b.WriteString(f.Docs.WIT(ctx, ""))
 	b.WriteString(escape(name))
 	var isConstructor, isMethod bool
 	switch f.Kind.(type) {
@@ -650,8 +729,8 @@ func (p *Param) WIT(_ Node, _ string) string {
 //
 // [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
 func (p *Package) WIT(ctx Node, _ string) string {
-	// TODO: docs
 	var b strings.Builder
+	b.WriteString(p.Docs.WIT(ctx, ""))
 	b.WriteString("package ")
 	b.WriteString(p.Name.String())
 	b.WriteString(";\n")

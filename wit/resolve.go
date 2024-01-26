@@ -1013,6 +1013,31 @@ type Function struct {
 	_worldItem
 }
 
+// IsFreestanding returns true if [Function] f is a freestanding function,
+// and not a constructor, method, or static function.
+func (f *Function) IsFreestanding() bool {
+	_, is := f.Kind.(*Freestanding)
+	return is
+}
+
+// IsConstructor returns true if [Function] f is a constructor.
+func (f *Function) IsConstructor() bool {
+	_, is := f.Kind.(*Constructor)
+	return is
+}
+
+// IsMethod returns true if [Function] f is a method.
+func (f *Function) IsMethod() bool {
+	_, is := f.Kind.(*Method)
+	return is
+}
+
+// IsStatic returns true if [Function] f is a static function.
+func (f *Function) IsStatic() bool {
+	_, is := f.Kind.(*Static)
+	return is
+}
+
 // FunctionKind represents the kind of a WIT [function], which can be one of
 // [Freestanding], [Method], [Static], or [Constructor].
 //
