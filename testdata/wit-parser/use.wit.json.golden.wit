@@ -16,8 +16,8 @@ interface foo {
 }
 
 interface trailing-comma {
-    record the-foo { a: the-type }
     use foo.{the-type};
+    record the-foo { a: the-type }
 }
 
 interface use-from-empty {}
