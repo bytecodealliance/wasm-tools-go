@@ -61,6 +61,55 @@ func (r *Resolve) WIT(_ Node, _ string) string {
 	return b.String()
 }
 
+// WIT returns the [WIT] text format for [Docs] d.
+//
+// [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
+func (d *Docs) WIT(_ Node, _ string) string {
+	if d.Contents == "" {
+		return ""
+	}
+	var b strings.Builder
+	var lineLength = 0
+	for _, c := range d.Contents {
+		if lineLength == 0 {
+			b.WriteString(DocPrefix)
+			lineLength = len(DocPrefix)
+		}
+		switch c {
+		case '\n':
+			b.WriteRune('\n')
+			lineLength = 0
+			continue
+		case ' ':
+			switch {
+			case lineLength == len(DocPrefix):
+				// Ignore leading spaces
+				continue
+			case lineLength > LineLength:
+				b.WriteRune('\n')
+				lineLength = 0
+				continue
+			}
+		default:
+			if lineLength == len(DocPrefix) {
+				b.WriteRune(' ')
+				lineLength++
+			}
+		}
+		b.WriteRune(c)
+		lineLength++
+	}
+	if lineLength != 0 {
+		b.WriteRune('\n')
+	}
+	return b.String()
+}
+
+const (
+	DocPrefix  = "///"
+	LineLength = 80
+)
+
 // WIT returns the [WIT] text format for [World] w.
 //
 // [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
@@ -69,7 +118,7 @@ func (w *World) WIT(ctx Node, name string) string {
 		name = w.Name
 	}
 	var b strings.Builder
-	// TODO: docs
+	b.WriteString(w.Docs.WIT(ctx, ""))
 	b.WriteString("world ")
 	b.WriteString(escape(name)) // TODO: compare to w.Name?
 	b.WriteString(" {")
@@ -121,10 +170,9 @@ func (i *Interface) WIT(ctx Node, name string) string {
 
 	var b strings.Builder
 
-	// TODO: docs
-
 	switch ctx := ctx.(type) {
 	case *Package:
+		b.WriteString(i.Docs.WIT(ctx, ""))
 		b.WriteString("interface ")
 		b.WriteString(escape(name))
 		b.WriteRune(' ')
@@ -300,8 +348,7 @@ func (r *Record) WIT(ctx Node, name string) string {
 //
 // [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
 func (f *Field) WIT(ctx Node, name string) string {
-	// TODO: docs
-	return escape(f.Name) + ": " + f.Type.WIT(f, "")
+	return f.Docs.WIT(ctx, "") + escape(f.Name) + ": " + f.Type.WIT(f, "")
 }
 
 // WIT returns the [WIT] text format for [Resource] r.
@@ -369,9 +416,8 @@ func (f *Flags) WIT(ctx Node, name string) string {
 // WIT returns the [WIT] text format for [Flag] f.
 //
 // [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
-func (f *Flag) WIT(_ Node, _ string) string {
-	// TODO: docs
-	return escape(f.Name)
+func (f *Flag) WIT(ctx Node, _ string) string {
+	return f.Docs.WIT(ctx, "") + escape(f.Name)
 }
 
 // WIT returns the [WIT] text format for [Tuple] t.
@@ -420,9 +466,9 @@ func (v *Variant) WIT(_ Node, name string) string {
 // WIT returns the [WIT] text format for [Case] c.
 //
 // [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
-func (c *Case) WIT(_ Node, _ string) string {
-	// TODO: docs
+func (c *Case) WIT(ctx Node, _ string) string {
 	var b strings.Builder
+	b.WriteString(c.Docs.WIT(ctx, ""))
 	b.WriteString(escape(c.Name))
 	if c.Type != nil {
 		b.WriteRune('(')
@@ -457,9 +503,8 @@ func (e *Enum) WIT(_ Node, name string) string {
 // WIT returns the [WIT] text format for [EnumCase] c.
 //
 // [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
-func (c *EnumCase) WIT(_ Node, _ string) string {
-	// TODO: docs
-	return escape(c.Name)
+func (c *EnumCase) WIT(ctx Node, _ string) string {
+	return c.Docs.WIT(ctx, "") + escape(c.Name)
 }
 
 // WIT returns the [WIT] text format for [Option] o.
@@ -582,15 +627,15 @@ func (p _primitive[T]) WIT(_ Node, name string) string {
 // WIT returns the [WIT] text format for [Function] f.
 //
 // [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
-func (f *Function) WIT(_ Node, name string) string {
+func (f *Function) WIT(ctx Node, name string) string {
 	if name == "" {
 		name = f.Name
 		if _, after, found := strings.Cut(name, "."); found {
 			name = after
 		}
 	}
-	// TODO: docs
 	var b strings.Builder
+	b.WriteString(f.Docs.WIT(ctx, ""))
 	b.WriteString(escape(name))
 	var isConstructor, isMethod bool
 	switch f.Kind.(type) {
@@ -650,8 +695,8 @@ func (p *Param) WIT(_ Node, _ string) string {
 //
 // [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
 func (p *Package) WIT(ctx Node, _ string) string {
-	// TODO: docs
 	var b strings.Builder
+	b.WriteString(p.Docs.WIT(ctx, ""))
 	b.WriteString("package ")
 	b.WriteString(p.Name.String())
 	b.WriteString(";\n")
