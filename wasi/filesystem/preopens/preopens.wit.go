@@ -15,5 +15,5 @@ func GetDirectories() (result cm.List[cm.Tuple[Descriptor, string]]) {
 	return
 }
 
-//go:wasmimport wasi:filesystem/preopens@0.2.0-rc-2023-11-10 get-directories
+//go:wasmimport wasi:filesystem/preopens@0.2.0 get-directories
 func get_directories(result *cm.List[cm.Tuple[Descriptor, string]])

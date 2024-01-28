@@ -22,7 +22,7 @@ func (self Pollable) ResourceDrop() {
 	self.resource_drop()
 }
 
-//go:wasmimport wasi:io/poll@0.2.0-rc-2023-11-10 [resource-drop]pollable
+//go:wasmimport wasi:io/poll@0.2.0 [resource-drop]pollable
 func (self Pollable) resource_drop()
 
 // Ready calls the imported method "wasi:io/poll.pollable#ready".
@@ -34,7 +34,7 @@ func (self Pollable) Ready() bool {
 	return self.ready()
 }
 
-//go:wasmimport wasi:io/poll@0.2.0-rc-2023-11-10 [method]pollable.ready
+//go:wasmimport wasi:io/poll@0.2.0 [method]pollable.ready
 func (self Pollable) ready() bool
 
 // Ready represents the imported method "wasi:io/poll.pollable#block".
@@ -48,7 +48,7 @@ func (self Pollable) Block() {
 	self.block()
 }
 
-//go:wasmimport wasi:io/poll@0.2.0-rc-2023-11-10 [method]pollable.block
+//go:wasmimport wasi:io/poll@0.2.0 [method]pollable.block
 func (self Pollable) block()
 
 // Poll represents the imported function "wasi:io/poll#poll".
@@ -76,5 +76,5 @@ func Poll(in cm.List[Pollable]) (result cm.List[uint32]) {
 	return
 }
 
-//go:wasmimport wasi:io/poll@0.2.0-rc-2023-11-10 pollable.poll
+//go:wasmimport wasi:io/poll@0.2.0 pollable.poll
 func poll(in cm.List[Pollable], result *cm.List[uint32])

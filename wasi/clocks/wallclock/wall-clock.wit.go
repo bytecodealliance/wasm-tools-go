@@ -34,7 +34,7 @@ func Now() (result DateTime) {
 	return
 }
 
-//go:wasmimport wasi:clocks/wall-clock@0.2.0-rc-2023-11-10 now
+//go:wasmimport wasi:clocks/wall-clock@0.2.0 now
 func now(result *DateTime)
 
 // Resolution calls the imported function "wasi:clocks/wall-clock#resolution".
@@ -57,5 +57,5 @@ func Resolution() (result DateTime) {
 	return
 }
 
-//go:wasmimport wasi:clocks/wall-clock@0.2.0-rc-2023-11-10 resolution
+//go:wasmimport wasi:clocks/wall-clock@0.2.0 resolution
 func resolution(result *DateTime)

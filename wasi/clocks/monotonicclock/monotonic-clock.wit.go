@@ -40,7 +40,7 @@ func Now() Instant {
 	return now()
 }
 
-//go:wasmimport wasi:clocks/monotonic-clock@0.2.0-rc-2023-11-10 now
+//go:wasmimport wasi:clocks/monotonic-clock@0.2.0 now
 func now() Instant
 
 // Resolution calls the imported function "wasi:clocks/monotonic-clock#resolution".
@@ -51,7 +51,7 @@ func Resolution() Instant {
 	return resolution()
 }
 
-//go:wasmimport wasi:clocks/monotonic-clock@0.2.0-rc-2023-11-10 now
+//go:wasmimport wasi:clocks/monotonic-clock@0.2.0 now
 func resolution() Instant
 
 // SubscribeInstant calls the imported function "wasi:clocks/monotonic-clock#subscribe-instant".
@@ -59,7 +59,7 @@ func SubscribeInstant(when Instant) poll.Pollable {
 	return subscribe_instant(when)
 }
 
-//go:wasmimport wasi:clocks/monotonic-clock@0.2.0-rc-2023-11-10 subscribe-instant
+//go:wasmimport wasi:clocks/monotonic-clock@0.2.0 subscribe-instant
 func subscribe_instant(when Instant) poll.Pollable
 
 // SubscribeDuration represents the imported function "wasi:clocks/monotonic-clock#subscribe-duration".
@@ -71,5 +71,5 @@ func SubscribeDuration(when Duration) poll.Pollable {
 	return subscribe_duration(when)
 }
 
-//go:wasmimport wasi:clocks/monotonic-clock@0.2.0-rc-2023-11-10 subscribe-duration
+//go:wasmimport wasi:clocks/monotonic-clock@0.2.0 subscribe-duration
 func subscribe_duration(when Duration) poll.Pollable

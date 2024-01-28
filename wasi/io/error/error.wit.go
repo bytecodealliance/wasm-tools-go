@@ -36,7 +36,7 @@ func (self Error) ResourceDrop() {
 	self.resource_drop()
 }
 
-//go:wasmimport wasi:io/error@0.2.0-rc-2023-11-10 [resource-drop]error
+//go:wasmimport wasi:io/error@0.2.0 [resource-drop]error
 func (self Error) resource_drop()
 
 // ToDebugString represents the method "wasi:io/error.error#to-debug-string".
@@ -53,5 +53,5 @@ func (self Error) ToDebugString() (result string) {
 	return
 }
 
-//go:wasmimport wasi:io/error@0.2.0-rc-2023-11-10 [method]error.to-debug-string
+//go:wasmimport wasi:io/error@0.2.0 [method]error.to-debug-string
 func (self Error) to_debug_string(result *string)

@@ -9,5 +9,5 @@ func GetStdout() OutputStream {
 	return get_stdout()
 }
 
-//go:wasmimport wasi:cli/stdout@0.2.0-rc-2023-12-05 get-stdout
+//go:wasmimport wasi:cli/stdout@0.2.0 get-stdout
 func get_stdout() OutputStream
