@@ -62,7 +62,7 @@ func (self InputStream) ResourceDrop() {
 	self.resource_drop()
 }
 
-//go:wasmimport wasi:io/streams@0.2.0-rc-2023-11-10 [resource-drop]input-stream
+//go:wasmimport wasi:io/streams@0.2.0 [resource-drop]input-stream
 func (self InputStream) resource_drop()
 
 // Read represents the method "wasi:io/streams.input-stream#read".
@@ -93,7 +93,7 @@ func (self InputStream) Read(len uint64) (result cm.OKSizedResult[cm.List[uint8]
 	return
 }
 
-//go:wasmimport wasi:io/streams@0.2.0-rc-2023-11-10 [method]input-stream.read
+//go:wasmimport wasi:io/streams@0.2.0 [method]input-stream.read
 func (self InputStream) read(len uint64, result *cm.OKSizedResult[cm.List[uint8], StreamError])
 
 // BlockingRead represents the method "wasi:io/streams.input-stream.blocking-read".
@@ -105,7 +105,7 @@ func (self InputStream) BlockingRead(len uint64) (result cm.OKSizedResult[cm.Lis
 	return
 }
 
-//go:wasmimport wasi:io/streams@0.2.0-rc-2023-11-10 [method]input-stream.blocking-read
+//go:wasmimport wasi:io/streams@0.2.0 [method]input-stream.blocking-read
 func (self InputStream) blocking_read(len uint64, result *cm.OKSizedResult[cm.List[uint8], StreamError])
 
 // Skip represents the method "wasi:io/streams.input-stream#skip".
@@ -119,7 +119,7 @@ func (self InputStream) Skip(len uint64) (result cm.OKSizedResult[uint64, Stream
 	return
 }
 
-//go:wasmimport wasi:io/streams@0.2.0-rc-2023-11-10 [method]input-stream.skip
+//go:wasmimport wasi:io/streams@0.2.0 [method]input-stream.skip
 func (self InputStream) skip(len uint64, result *cm.OKSizedResult[uint64, StreamError])
 
 // BlockingSkip represents the method "wasi:io/streams.input-stream.blocking-skip".
@@ -131,7 +131,7 @@ func (self InputStream) BlockingSkip(len uint64) (result cm.OKSizedResult[uint64
 	return
 }
 
-//go:wasmimport wasi:io/streams@0.2.0-rc-2023-11-10 [method]input-stream.blocking-skip
+//go:wasmimport wasi:io/streams@0.2.0 [method]input-stream.blocking-skip
 func (self InputStream) blocking_skip(len uint64, result *cm.OKSizedResult[uint64, StreamError])
 
 // Subscribe represents the method "wasi:io/streams.input-stream.subscribe".
@@ -146,7 +146,7 @@ func (self InputStream) Subscribe() Pollable {
 	return self.subscribe()
 }
 
-//go:wasmimport wasi:io/streams@0.2.0-rc-2023-11-10 [method]input-stream.subscribe
+//go:wasmimport wasi:io/streams@0.2.0 [method]input-stream.subscribe
 func (self InputStream) subscribe() Pollable
 
 // OutputStream represents the resource "wasi:io/streams.output-stream".
@@ -166,7 +166,7 @@ func (self OutputStream) ResourceDrop() {
 	self.resource_drop()
 }
 
-//go:wasmimport wasi:io/streams@0.2.0-rc-2023-11-10 [resource-drop]output-stream
+//go:wasmimport wasi:io/streams@0.2.0 [resource-drop]output-stream
 func (self OutputStream) resource_drop()
 
 // CheckWrite represents the method "wasi:io/streams.output-stream.check-write".
@@ -185,7 +185,7 @@ func (self OutputStream) CheckWrite() (result cm.OKSizedResult[uint64, StreamErr
 	return
 }
 
-//go:wasmimport wasi:io/streams@0.2.0-rc-2023-11-10 [method]output-stream.check-write
+//go:wasmimport wasi:io/streams@0.2.0 [method]output-stream.check-write
 func (self OutputStream) check_write(result *cm.OKSizedResult[uint64, StreamError])
 
 // Write represents the method "wasi:io/streams.output-stream.write".
@@ -202,7 +202,7 @@ func (self OutputStream) Write(contents cm.List[uint8]) (result cm.ErrResult[Str
 	return
 }
 
-//go:wasmimport wasi:io/streams@0.2.0-rc-2023-11-10 [method]output-stream.write
+//go:wasmimport wasi:io/streams@0.2.0 [method]output-stream.write
 func (self OutputStream) write(contents cm.List[uint8], result *cm.ErrResult[StreamError])
 
 // BlockingWriteAndFlush represents the method "wasi:io/streams.output-stream.blocking-write-and-flush".
@@ -238,7 +238,7 @@ func (self OutputStream) BlockingWriteAndFlush(contents cm.List[uint8]) (result 
 	return
 }
 
-//go:wasmimport wasi:io/streams@0.2.0-rc-2023-11-10 [method]output-stream.blocking-write-and-flush
+//go:wasmimport wasi:io/streams@0.2.0 [method]output-stream.blocking-write-and-flush
 func (self OutputStream) blocking_write_and_flush(contents cm.List[uint8], result *cm.ErrResult[StreamError])
 
 // Flush represents the method "wasi:io/streams.output-stream.flush".
@@ -258,7 +258,7 @@ func (self OutputStream) Flush() (result cm.ErrResult[StreamError]) {
 	return
 }
 
-//go:wasmimport wasi:io/streams@0.2.0-rc-2023-11-10 [method]output-stream.flush
+//go:wasmimport wasi:io/streams@0.2.0 [method]output-stream.flush
 func (self OutputStream) flush(result *cm.ErrResult[StreamError])
 
 // BlockingFlush represents the method "wasi:io/streams.output-stream.blocking-flush".
@@ -270,7 +270,7 @@ func (self OutputStream) BlockingFlush() (result cm.ErrResult[StreamError]) {
 	return
 }
 
-//go:wasmimport wasi:io/streams@0.2.0-rc-2023-11-10 [method]output-stream.blocking-flush
+//go:wasmimport wasi:io/streams@0.2.0 [method]output-stream.blocking-flush
 func (self OutputStream) blocking_flush(result *cm.ErrResult[StreamError])
 
 // Subscribe represents the method "wasi:io/streams.output-stream.subscribe".
@@ -289,7 +289,7 @@ func (self OutputStream) Subscribe() Pollable {
 	return self.subscribe()
 }
 
-//go:wasmimport wasi:io/streams@0.2.0-rc-2023-11-10 [method]output-stream.subscribe
+//go:wasmimport wasi:io/streams@0.2.0 [method]output-stream.subscribe
 func (self OutputStream) subscribe() Pollable
 
 // WriteZeroes represents the method "wasi:io/streams.output-stream.write-zeroes".
@@ -305,7 +305,7 @@ func (self OutputStream) WriteZeroes(len uint64) (result cm.ErrResult[StreamErro
 	return
 }
 
-//go:wasmimport wasi:io/streams@0.2.0-rc-2023-11-10 [method]output-stream.write-zeroes
+//go:wasmimport wasi:io/streams@0.2.0 [method]output-stream.write-zeroes
 func (self OutputStream) write_zeroes(len uint64, result *cm.ErrResult[StreamError])
 
 // BlockingWriteZeroesAndFlush represents the method "wasi:io/streams.output-stream.blocking-write-zeroes-and-flush".
@@ -341,7 +341,7 @@ func (self OutputStream) BlockingWriteZeroesAndFlush(len uint64) (result cm.ErrR
 	return
 }
 
-//go:wasmimport wasi:io/streams@0.2.0-rc-2023-11-10 [method]output-stream.blocking-write-zeroes-and-flush
+//go:wasmimport wasi:io/streams@0.2.0 [method]output-stream.blocking-write-zeroes-and-flush
 func (self OutputStream) blocking_write_zeroes_and_flush(len uint64, result *cm.ErrResult[StreamError])
 
 // Splice represents the method "wasi:io/streams.output-stream.splice".
@@ -364,7 +364,7 @@ func (self OutputStream) Splice(src InputStream, len uint64) (result cm.OKSizedR
 	return
 }
 
-//go:wasmimport wasi:io/streams@0.2.0-rc-2023-11-10 [method]output-stream.splice
+//go:wasmimport wasi:io/streams@0.2.0 [method]output-stream.splice
 func (self OutputStream) splice(src InputStream, len uint64, result *cm.OKSizedResult[uint64, StreamError])
 
 // BlockingSplice represents the method "wasi:io/streams.output-stream.blocking-splice".
@@ -379,5 +379,5 @@ func (self OutputStream) BlockingSplice(src InputStream, len uint64) (result cm.
 	return
 }
 
-//go:wasmimport wasi:io/streams@0.2.0-rc-2023-11-10 [method]output-stream.blocking-splice
+//go:wasmimport wasi:io/streams@0.2.0 [method]output-stream.blocking-splice
 func (self OutputStream) blocking_splice(src InputStream, len uint64, result *cm.OKSizedResult[uint64, StreamError])

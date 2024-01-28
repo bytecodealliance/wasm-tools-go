@@ -420,7 +420,7 @@ func (self Descriptor) ResourceDrop() {
 	self.resource_drop()
 }
 
-//go:wasmimport wasi:filesystem/types@0.2.0-rc-2023-11-10 [resource-drop]descriptor
+//go:wasmimport wasi:filesystem/types@0.2.0 [resource-drop]descriptor
 func (self Descriptor) resource_drop()
 
 // ReadViaStream represents the resource method "read-via-stream".
@@ -438,7 +438,7 @@ func (self Descriptor) ReadViaStream(offset FileSize) (result cm.Result[InputStr
 	return
 }
 
-//go:wasmimport wasi:filesystem/types@0.2.0-rc-2023-11-10 [method]descriptor.read-via-stream
+//go:wasmimport wasi:filesystem/types@0.2.0 [method]descriptor.read-via-stream
 func (self Descriptor) read_via_stream(result *cm.Result[InputStream, InputStream, ErrorCode])
 
 // WriteViaStream represents the resource method "write-via-stream".
@@ -454,7 +454,7 @@ func (self Descriptor) WriteViaStream(offset FileSize) (result cm.Result[OutputS
 	return
 }
 
-//go:wasmimport wasi:filesystem/types@0.2.0-rc-2023-11-10 [method]descriptor.append-via-stream
+//go:wasmimport wasi:filesystem/types@0.2.0 [method]descriptor.append-via-stream
 func (self Descriptor) write_via_stream(result *cm.Result[OutputStream, OutputStream, ErrorCode])
 
 // AppendViaStream represents the resource method "write-via-stream".
@@ -470,7 +470,7 @@ func (self Descriptor) AppendViaStream(offset FileSize) (result cm.Result[Output
 	return
 }
 
-//go:wasmimport wasi:filesystem/types@0.2.0-rc-2023-11-10 [method]descriptor.append-via-stream
+//go:wasmimport wasi:filesystem/types@0.2.0 [method]descriptor.append-via-stream
 func (self Descriptor) append_via_stream(result *cm.Result[OutputStream, OutputStream, ErrorCode])
 
 // Advise represents the resource method "advise".
@@ -483,7 +483,7 @@ func (self Descriptor) Advise(offset FileSize, length FileSize, advice Advice) (
 	return
 }
 
-//go:wasmimport wasi:filesystem/types@0.2.0-rc-2023-11-10 [method]descriptor.advise
+//go:wasmimport wasi:filesystem/types@0.2.0 [method]descriptor.advise
 func (self Descriptor) advise(offset FileSize, length FileSize, advice Advice, result *cm.ErrResult[ErrorCode])
 
 // SyncData represents the resource method "sync-data".
@@ -499,7 +499,7 @@ func (self Descriptor) SyncData() (result cm.ErrResult[ErrorCode]) {
 	return
 }
 
-//go:wasmimport wasi:filesystem/types@0.2.0-rc-2023-11-10 [method]descriptor.sync-data
+//go:wasmimport wasi:filesystem/types@0.2.0 [method]descriptor.sync-data
 func (self Descriptor) sync_data(result *cm.ErrResult[ErrorCode])
 
 // GetFlags represents the resource method "get-flags".
@@ -515,7 +515,7 @@ func (self Descriptor) GetFlags() (result cm.OKSizedResult[DescriptorFlags, Erro
 	return
 }
 
-//go:wasmimport wasi:filesystem/types@0.2.0-rc-2023-11-10 [method]descriptor.get-flags
+//go:wasmimport wasi:filesystem/types@0.2.0 [method]descriptor.get-flags
 func (self Descriptor) get_flags(result *cm.OKSizedResult[DescriptorFlags, ErrorCode])
 
 // GetType represents the resource method "get-type".
@@ -535,7 +535,7 @@ func (self Descriptor) GetType() (result cm.OKSizedResult[DescriptorType, ErrorC
 	return
 }
 
-//go:wasmimport wasi:filesystem/types@0.2.0-rc-2023-11-10 [method]descriptor.get-type
+//go:wasmimport wasi:filesystem/types@0.2.0 [method]descriptor.get-type
 func (self Descriptor) get_type(result *cm.OKSizedResult[DescriptorType, ErrorCode])
 
 // SetSize represents the resource method "set-size".
@@ -549,7 +549,7 @@ func (self Descriptor) SetSize(size FileSize) (result cm.ErrResult[ErrorCode]) {
 	return
 }
 
-//go:wasmimport wasi:filesystem/types@0.2.0-rc-2023-11-10 [method]descriptor.set-size
+//go:wasmimport wasi:filesystem/types@0.2.0 [method]descriptor.set-size
 func (self Descriptor) set_size(size FileSize, result *cm.ErrResult[ErrorCode])
 
 // SetTimes represents the resource method "set-times".
@@ -564,7 +564,7 @@ func (self Descriptor) SetTimes(dataAccessTimestamp NewTimestamp, dataModificati
 	return
 }
 
-//go:wasmimport wasi:filesystem/types@0.2.0-rc-2023-11-10 [method]descriptor.set-times
+//go:wasmimport wasi:filesystem/types@0.2.0 [method]descriptor.set-times
 func (self Descriptor) set_times(dataAccessTimestamp NewTimestamp, dataModificationTimestamp NewTimestamp, result *cm.ErrResult[ErrorCode])
 
 // Read represents the resource method "read".
@@ -591,7 +591,7 @@ func (self Descriptor) Read(
 	return
 }
 
-//go:wasmimport wasi:filesystem/types@0.2.0-rc-2023-11-10 [method]descriptor.read
+//go:wasmimport wasi:filesystem/types@0.2.0 [method]descriptor.read
 func (self Descriptor) read(length FileSize, offset FileSize, result *cm.OKSizedResult[cm.Tuple[cm.List[uint8], bool], ErrorCode])
 
 // Write represents the resource method "write".
@@ -610,7 +610,7 @@ func (self Descriptor) Write(buffer cm.List[uint8], offset FileSize) (result cm.
 	return
 }
 
-//go:wasmimport wasi:filesystem/types@0.2.0-rc-2023-11-10 [method]descriptor.write
+//go:wasmimport wasi:filesystem/types@0.2.0 [method]descriptor.write
 func (self Descriptor) write(buffer cm.List[uint8], offset FileSize, result *cm.OKSizedResult[FileSize, ErrorCode])
 
 // ReadDirectory represents the resource method "read-directory".
@@ -629,7 +629,7 @@ func (self Descriptor) ReadDirectory() (result cm.OKSizedResult[DirectoryEntrySt
 	return
 }
 
-//go:wasmimport wasi:filesystem/types@0.2.0-rc-2023-11-10 [method]descriptor.read-directory
+//go:wasmimport wasi:filesystem/types@0.2.0 [method]descriptor.read-directory
 func (self Descriptor) read_directory(result *cm.OKSizedResult[DirectoryEntryStream, ErrorCode])
 
 // Sync represents the resource method "sync".
@@ -645,7 +645,7 @@ func (self Descriptor) Sync() (result cm.ErrResult[ErrorCode]) {
 	return
 }
 
-//go:wasmimport wasi:filesystem/types@0.2.0-rc-2023-11-10 [method]descriptor.sync
+//go:wasmimport wasi:filesystem/types@0.2.0 [method]descriptor.sync
 func (self Descriptor) sync(result *cm.ErrResult[ErrorCode])
 
 // CreateDirectoryAt represents the resource method "create-directory-at".
@@ -658,7 +658,7 @@ func (self Descriptor) CreateDirectoryAt(path string) (result cm.ErrResult[Error
 	return
 }
 
-//go:wasmimport wasi:filesystem/types@0.2.0-rc-2023-11-10 [method]descriptor.create-directory-at
+//go:wasmimport wasi:filesystem/types@0.2.0 [method]descriptor.create-directory-at
 func (self Descriptor) create_directory_at(path string, result *cm.ErrResult[ErrorCode])
 
 // Stat represents the resource method "stat".
@@ -677,7 +677,7 @@ func (self Descriptor) Stat() (result cm.OKSizedResult[DescriptorStat, ErrorCode
 	return
 }
 
-//go:wasmimport wasi:filesystem/types@0.2.0-rc-2023-11-10 [method]descriptor.stat
+//go:wasmimport wasi:filesystem/types@0.2.0 [method]descriptor.stat
 func (self Descriptor) stat(result *cm.OKSizedResult[DescriptorStat, ErrorCode])
 
 // StatAt represents the resource method "stat-at".
@@ -694,7 +694,7 @@ func (self Descriptor) StatAt(pathFlags PathFlags, path string) (result cm.OKSiz
 	return
 }
 
-//go:wasmimport wasi:filesystem/types@0.2.0-rc-2023-11-10 [method]descriptor.stat-at
+//go:wasmimport wasi:filesystem/types@0.2.0 [method]descriptor.stat-at
 func (self Descriptor) stat_at(pathFlags PathFlags, path string, result *cm.OKSizedResult[DescriptorStat, ErrorCode])
 
 // SetTimesAt represents the resource method "set-times-at".
@@ -710,7 +710,7 @@ func (self Descriptor) SetTimesAt(pathFlags PathFlags, path string, dataAccessTi
 	return
 }
 
-//go:wasmimport wasi:filesystem/types@0.2.0-rc-2023-11-10 [method]descriptor.set-times-at
+//go:wasmimport wasi:filesystem/types@0.2.0 [method]descriptor.set-times-at
 func (self Descriptor) set_times_at(pathFlags PathFlags, path string, dataAccessTimestamp NewTimestamp, dataModificationTimestamp NewTimestamp, result *cm.ErrResult[ErrorCode])
 
 // LinkAt represents the resource method "link-at".
@@ -735,7 +735,7 @@ func (self Descriptor) LinkAt(
 	return
 }
 
-//go:wasmimport wasi:filesystem/types@0.2.0-rc-2023-11-10 [method]descriptor.link-at
+//go:wasmimport wasi:filesystem/types@0.2.0 [method]descriptor.link-at
 func (self Descriptor) link_at(oldPathFlags PathFlags, oldPath string, newDescriptor Descriptor, newPath string, result *cm.ErrResult[ErrorCode])
 
 // OpenAt represents the resource method "open-at".
@@ -776,7 +776,7 @@ func (self Descriptor) OpenAt(
 	return
 }
 
-//go:wasmimport wasi:filesystem/types@0.2.0-rc-2023-11-10 [method]descriptor.open-at
+//go:wasmimport wasi:filesystem/types@0.2.0 [method]descriptor.open-at
 func (self Descriptor) open_at(pathFlags PathFlags, path string, openFlags OpenFlags, flags DescriptorFlags, result *cm.OKSizedResult[Descriptor, ErrorCode])
 
 // ReadLinkAt represents the resource method "read-link-at".
@@ -795,7 +795,7 @@ func (self Descriptor) ReadLinkAt(
 	return
 }
 
-//go:wasmimport wasi:filesystem/types@0.2.0-rc-2023-11-10 [method]descriptor.read-link-at
+//go:wasmimport wasi:filesystem/types@0.2.0 [method]descriptor.read-link-at
 func (self Descriptor) read_link_at(path string, result *cm.OKSizedResult[string, ErrorCode])
 
 // RemoveDirectoryAt represents the resource method "remove-directory-at".
@@ -813,7 +813,7 @@ func (self Descriptor) RemoveDirectoryAt(
 	return
 }
 
-//go:wasmimport wasi:filesystem/types@0.2.0-rc-2023-11-10 [method]descriptor.remove-directory-at
+//go:wasmimport wasi:filesystem/types@0.2.0 [method]descriptor.remove-directory-at
 func (self Descriptor) remove_directory_at(path string, result *cm.ErrResult[ErrorCode])
 
 // RenameAt represents the resource method "rename-at".
@@ -835,7 +835,7 @@ func (self Descriptor) RenameAt(
 	return
 }
 
-//go:wasmimport wasi:filesystem/types@0.2.0-rc-2023-11-10 [method]descriptor.rename-at
+//go:wasmimport wasi:filesystem/types@0.2.0 [method]descriptor.rename-at
 func (self Descriptor) rename_at(oldPath string, newDescriptor Descriptor, newPath string, result *cm.ErrResult[ErrorCode])
 
 // SymlinkAt represents the resource method "symlink-at".
@@ -857,7 +857,7 @@ func (self Descriptor) SymlinkAt(
 	return
 }
 
-//go:wasmimport wasi:filesystem/types@0.2.0-rc-2023-11-10 [method]descriptor.symlink-at
+//go:wasmimport wasi:filesystem/types@0.2.0 [method]descriptor.symlink-at
 func (self Descriptor) symlink_at(oldPath string, newPath string, result *cm.ErrResult[ErrorCode])
 
 // UnlinkFileAt represents the resource method "unlink-file-at".
@@ -874,7 +874,7 @@ func (self Descriptor) UnlinkFileAt(
 	return
 }
 
-//go:wasmimport wasi:filesystem/types@0.2.0-rc-2023-11-10 [method]descriptor.unlink-file-at
+//go:wasmimport wasi:filesystem/types@0.2.0 [method]descriptor.unlink-file-at
 func (self Descriptor) unlink_file_at(path string, result *cm.ErrResult[ErrorCode])
 
 // IsSameObject represents the resource method "is-same-object".
@@ -889,7 +889,7 @@ func (self Descriptor) IsSameObject(other Descriptor) bool {
 	return self.is_same_object(other)
 }
 
-//go:wasmimport wasi:filesystem/types@0.2.0-rc-2023-11-10 [method]descriptor.is-same-object
+//go:wasmimport wasi:filesystem/types@0.2.0 [method]descriptor.is-same-object
 func (self Descriptor) is_same_object(other Descriptor) bool
 
 // MetadataHash represents the resource method "metadata-hash".
@@ -918,7 +918,7 @@ func (self Descriptor) MetadataHash() (result cm.OKSizedResult[MetadataHashValue
 	return
 }
 
-//go:wasmimport wasi:filesystem/types@0.2.0-rc-2023-11-10 [method]descriptor.metadata-hash
+//go:wasmimport wasi:filesystem/types@0.2.0 [method]descriptor.metadata-hash
 func (self Descriptor) metadata_hash(result *cm.OKSizedResult[MetadataHashValue, ErrorCode])
 
 // MetadataHashAt represents the resource method "metadata-hash-at".
@@ -938,7 +938,7 @@ func (self Descriptor) MetadataHashAt(
 	return
 }
 
-//go:wasmimport wasi:filesystem/types@0.2.0-rc-2023-11-10 [method]descriptor.metadata-hash-at
+//go:wasmimport wasi:filesystem/types@0.2.0 [method]descriptor.metadata-hash-at
 func (self Descriptor) metadata_hash_at(pathFlags PathFlags, path string, result *cm.OKSizedResult[MetadataHashValue, ErrorCode])
 
 // DirectoryEntryStream represents the resource "wasi:filesystem/types.directory-entry-stream".
@@ -951,7 +951,7 @@ func (self DirectoryEntryStream) ResourceDrop() {
 	self.resource_drop()
 }
 
-//go:wasmimport wasi:filesystem/types@0.2.0-rc-2023-11-10 [resource-drop]directory-entry-stream
+//go:wasmimport wasi:filesystem/types@0.2.0 [resource-drop]directory-entry-stream
 func (self DirectoryEntryStream) resource_drop()
 
 // ReadDirectoryEntry represents the method "read-directory-entry".
@@ -962,7 +962,7 @@ func (self DirectoryEntryStream) ReadDirectoryEntry() (result cm.OKSizedResult[c
 	return
 }
 
-//go:wasmimport wasi:filesystem/types@0.2.0-rc-2023-11-10 [method]directory-entry-stream.read-directory-entry
+//go:wasmimport wasi:filesystem/types@0.2.0 [method]directory-entry-stream.read-directory-entry
 func (self DirectoryEntryStream) read_directory_entry(result *cm.OKSizedResult[cm.Option[DirectoryEntry], ErrorCode])
 
 // FilesystemErrorCode represents the imported function "wasi:filesystem/types.filesystem-error-code"
@@ -982,5 +982,5 @@ func FilesystemErrorCode(err Error) (result cm.Option[ErrorCode]) {
 	return
 }
 
-//go:wasmimport wasi:filesystem/types@0.2.0-rc-2023-11-10 filesystem-error-code
+//go:wasmimport wasi:filesystem/types@0.2.0 filesystem-error-code
 func filesystem_error_code(err Error, result *cm.Option[ErrorCode])

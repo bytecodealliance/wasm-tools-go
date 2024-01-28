@@ -9,5 +9,5 @@ func Exit(status cm.UntypedResult) {
 	exit(status)
 }
 
-//go:wasmimport wasi:cli/exit@0.2.0-rc-2023-12-05 exit
+//go:wasmimport wasi:cli/exit@0.2.0 exit
 func exit(status cm.UntypedResult)

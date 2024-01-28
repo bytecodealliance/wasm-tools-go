@@ -17,7 +17,7 @@ func GetEnvironment() (result cm.List[cm.Tuple[string, string]]) {
 	return
 }
 
-//go:wasmimport wasi:cli/environment@0.2.0-rc-2023-12-05 get-environment
+//go:wasmimport wasi:cli/environment@0.2.0 get-environment
 func get_environment(result *cm.List[cm.Tuple[string, string]])
 
 // GetArguments represents the imported function "wasi:cli/environment.get-arguments".
@@ -28,7 +28,7 @@ func GetArguments() (result cm.List[string]) {
 	return
 }
 
-//go:wasmimport wasi:cli/environment@0.2.0-rc-2023-12-05 get-arguments
+//go:wasmimport wasi:cli/environment@0.2.0 get-arguments
 func get_arguments(result *cm.List[string])
 
 // InitialCWD represents the imported function "wasi:cli/environment.initial-cwd".
@@ -40,5 +40,5 @@ func InitialCWD() (result cm.Option[string]) {
 	return
 }
 
-//go:wasmimport wasi:cli/environment@0.2.0-rc-2023-12-05 initial-cwd
+//go:wasmimport wasi:cli/environment@0.2.0 initial-cwd
 func initial_cwd(result *cm.Option[string])
