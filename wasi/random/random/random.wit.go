@@ -1,4 +1,4 @@
-// Package random represents the interface "wasi:random".
+// Package random represents the interface "wasi:random/random".
 //
 // WASI Random is a random data API.
 //
