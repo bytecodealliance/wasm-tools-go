@@ -15,9 +15,10 @@
             },
             Functions: {},
             Package:   &wit.Package{
-                Name: wit.PackageName{
+                Name: wit.Ident{
                     Namespace: "a",
-                    Name:      "a",
+                    Package:   "a",
+                    Extension: "",
                     Version:   &semver.Version{Major:1, Minor:0, Patch:0, PreRelease:"", Metadata:""},
                     _node:     wit._node{},
                 },
@@ -45,9 +46,10 @@
             },
             Functions: {},
             Package:   &wit.Package{
-                Name: wit.PackageName{
+                Name: wit.Ident{
                     Namespace: "a",
-                    Name:      "a",
+                    Package:   "a",
+                    Extension: "",
                     Version:   &semver.Version{Major:2, Minor:0, Patch:0, PreRelease:"", Metadata:""},
                     _node:     wit._node{},
                 },
@@ -83,9 +85,10 @@
             },
             Functions: {},
             Package:   &wit.Package{
-                Name: wit.PackageName{
+                Name: wit.Ident{
                     Namespace: "foo",
-                    Name:      "versions",
+                    Package:   "versions",
+                    Extension: "",
                     Version:   (*semver.Version)(nil),
                     _node:     wit._node{},
                 },
@@ -136,9 +139,10 @@
     },
     Packages: {
         &wit.Package{
-            Name: wit.PackageName{
+            Name: wit.Ident{
                 Namespace: "a",
-                Name:      "a",
+                Package:   "a",
+                Extension: "",
                 Version:   &semver.Version{Major:1, Minor:0, Patch:0, PreRelease:"", Metadata:""},
                 _node:     wit._node{},
             },
@@ -149,9 +153,10 @@
             Docs:   wit.Docs{},
         },
         &wit.Package{
-            Name: wit.PackageName{
+            Name: wit.Ident{
                 Namespace: "a",
-                Name:      "a",
+                Package:   "a",
+                Extension: "",
                 Version:   &semver.Version{Major:2, Minor:0, Patch:0, PreRelease:"", Metadata:""},
                 _node:     wit._node{},
             },
@@ -162,9 +167,10 @@
             Docs:   wit.Docs{},
         },
         &wit.Package{
-            Name: wit.PackageName{
+            Name: wit.Ident{
                 Namespace: "foo",
-                Name:      "versions",
+                Package:   "versions",
+                Extension: "",
                 Version:   (*semver.Version)(nil),
                 _node:     wit._node{},
             },

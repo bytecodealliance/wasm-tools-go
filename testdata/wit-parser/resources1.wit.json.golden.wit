@@ -1,10 +1,10 @@
 package foo:resources1;
 
 interface resources1 {
-    resource r1 {
-        f1: func();
-    }
-    t1: func(a: borrow<r1>);
-    t2: func(a: own<r1>);
-    t3: func(a: own<r1>);
+	resource r1 {
+		f1: func();
+	}
+	t1: func(a: borrow<r1>);
+	t2: func(a: own<r1>);
+	t3: func(a: own<r1>);
 }

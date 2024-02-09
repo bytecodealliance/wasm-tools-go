@@ -34,9 +34,10 @@
             },
             Functions: {},
             Package:   &wit.Package{
-                Name: wit.PackageName{
+                Name: wit.Ident{
                     Namespace: "foo",
-                    Name:      "comments",
+                    Package:   "comments",
+                    Extension: "",
                     Version:   (*semver.Version)(nil),
                     _node:     wit._node{},
                 },
@@ -75,9 +76,10 @@
     },
     Packages: {
         &wit.Package{
-            Name: wit.PackageName{
+            Name: wit.Ident{
                 Namespace: "foo",
-                Name:      "comments",
+                Package:   "comments",
+                Extension: "",
                 Version:   (*semver.Version)(nil),
                 _node:     wit._node{},
             },

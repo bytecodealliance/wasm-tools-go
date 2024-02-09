@@ -355,9 +355,10 @@
             },
             Functions: {},
             Package:   &wit.Package{
-                Name: wit.PackageName{
+                Name: wit.Ident{
                     Namespace: "wasi",
-                    Name:      "filesystem",
+                    Package:   "filesystem",
+                    Extension: "",
                     Version:   (*semver.Version)(nil),
                     _node:     wit._node{},
                 },
@@ -724,9 +725,10 @@
     },
     Packages: {
         &wit.Package{
-            Name: wit.PackageName{
+            Name: wit.Ident{
                 Namespace: "wasi",
-                Name:      "filesystem",
+                Package:   "filesystem",
+                Extension: "",
                 Version:   (*semver.Version)(nil),
                 _node:     wit._node{},
             },

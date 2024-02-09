@@ -21,7 +21,7 @@ type _node struct{}
 func (_node) WIT(ctx Node, name string) string { return "/* TODO(" + name + ") */" }
 
 func indent(s string) string {
-	const ws = "    "
+	const ws = "\t"
 	return strings.ReplaceAll(strings.TrimSuffix(ws+strings.ReplaceAll(s, "\n", "\n"+ws), ws), ws+"\n", "\n")
 }
 
@@ -242,6 +242,9 @@ func (t *TypeDef) WIT(ctx Node, name string) string {
 		name = *t.Name
 	}
 	switch ctx := ctx.(type) {
+	case nil:
+		return t.Kind.WIT(nil, name)
+
 	// If context is another TypeDef, then this is an imported type.
 	case *TypeDef:
 		// Emit an type alias if same Owner.
@@ -352,7 +355,7 @@ func relativeName(o TypeOwner, p *Package) string {
 		return ""
 	}
 	qualifiedName := op.Name
-	qualifiedName.Name += "/" + name
+	qualifiedName.Package += "/" + name
 	return qualifiedName.String()
 }
 
@@ -382,6 +385,10 @@ func (r *Record) WIT(ctx Node, name string) string {
 //
 // [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
 func (f *Field) WIT(ctx Node, name string) string {
+	if ctx == nil {
+		// Omit docs
+		return escape(f.Name) + ": " + f.Type.WIT(f, "")
+	}
 	return f.Docs.WIT(ctx, "") + escape(f.Name) + ": " + f.Type.WIT(f, "")
 }
 
@@ -389,10 +396,7 @@ func (f *Field) WIT(ctx Node, name string) string {
 //
 // [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
 func (r *Resource) WIT(ctx Node, name string) string {
-	var b strings.Builder
-	b.WriteString("resource ")
-	b.WriteString(escape(name))
-	return b.String()
+	return "resource " + escape(name)
 }
 
 // WIT returns the [WIT] text format for [OwnedHandle] h.
@@ -440,7 +444,7 @@ func (f *Flags) WIT(ctx Node, name string) string {
 			if i > 0 {
 				b.WriteString(", ")
 			}
-			b.WriteString(f.Flags[i].WIT(f, ""))
+			b.WriteString(f.Flags[i].WIT(ctx, ""))
 		}
 	}
 	b.WriteRune('}')
@@ -451,6 +455,10 @@ func (f *Flags) WIT(ctx Node, name string) string {
 //
 // [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
 func (f *Flag) WIT(ctx Node, _ string) string {
+	if ctx == nil {
+		// Omit docs
+		return escape(f.Name)
+	}
 	return f.Docs.WIT(ctx, "") + escape(f.Name)
 }
 
@@ -478,7 +486,7 @@ func (t *Tuple) WIT(ctx Node, name string) string {
 // WIT returns the [WIT] text format for [Variant] v.
 //
 // [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
-func (v *Variant) WIT(_ Node, name string) string {
+func (v *Variant) WIT(ctx Node, name string) string {
 	var b strings.Builder
 	b.WriteString("variant ")
 	b.WriteString(escape(name))
@@ -489,7 +497,7 @@ func (v *Variant) WIT(_ Node, name string) string {
 			if i > 0 {
 				b.WriteString(",\n")
 			}
-			b.WriteString(indent(v.Cases[i].WIT(v, "")))
+			b.WriteString(indent(v.Cases[i].WIT(ctx, "")))
 		}
 		b.WriteRune('\n')
 	}
@@ -502,7 +510,9 @@ func (v *Variant) WIT(_ Node, name string) string {
 // [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
 func (c *Case) WIT(ctx Node, _ string) string {
 	var b strings.Builder
-	b.WriteString(c.Docs.WIT(ctx, ""))
+	if ctx != nil {
+		b.WriteString(c.Docs.WIT(ctx, ""))
+	}
 	b.WriteString(escape(c.Name))
 	if c.Type != nil {
 		b.WriteRune('(')
@@ -515,7 +525,7 @@ func (c *Case) WIT(ctx Node, _ string) string {
 // WIT returns the [WIT] text format for [Enum] e.
 //
 // [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
-func (e *Enum) WIT(_ Node, name string) string {
+func (e *Enum) WIT(ctx Node, name string) string {
 	var b strings.Builder
 	b.WriteString("enum ")
 	b.WriteString(escape(name))
@@ -526,7 +536,7 @@ func (e *Enum) WIT(_ Node, name string) string {
 			if i > 0 {
 				b.WriteString(",\n")
 			}
-			b.WriteString(indent(e.Cases[i].WIT(e, "")))
+			b.WriteString(indent(e.Cases[i].WIT(ctx, "")))
 		}
 		b.WriteRune('\n')
 	}
@@ -538,6 +548,10 @@ func (e *Enum) WIT(_ Node, name string) string {
 //
 // [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
 func (c *EnumCase) WIT(ctx Node, _ string) string {
+	if ctx == nil {
+		// Omit docs
+		return escape(c.Name)
+	}
 	return c.Docs.WIT(ctx, "") + escape(c.Name)
 }
 
@@ -669,7 +683,9 @@ func (f *Function) WIT(ctx Node, name string) string {
 		}
 	}
 	var b strings.Builder
-	b.WriteString(f.Docs.WIT(ctx, ""))
+	if ctx != nil {
+		b.WriteString(f.Docs.WIT(ctx, ""))
+	}
 	b.WriteString(escape(name))
 	var isConstructor, isMethod bool
 	switch f.Kind.(type) {

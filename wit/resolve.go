@@ -1,14 +1,10 @@
 package wit
 
 import (
-	"errors"
 	"fmt"
 	"sort"
 	"strconv"
-	"strings"
 	"unsafe"
-
-	"github.com/coreos/go-semver/semver"
 )
 
 // Resolve represents a fully resolved set of WIT ([WebAssembly Interface Type])
@@ -778,7 +774,7 @@ func (_type) isType() {}
 
 // ParseType parses a WIT [primitive type] string into
 // the associated Type implementation from this package.
-// It returns an error if the type string is not recoginized.
+// It returns an error if the type string is not recognized.
 //
 // [primitive type]: https://component-model.bytecodealliance.org/design/wit.html#primitive-types
 func ParseType(s string) (Type, error) {
@@ -1091,68 +1087,10 @@ type Param struct {
 //
 // [WIT package]: https://component-model.bytecodealliance.org/design/wit.html#packages
 type Package struct {
-	Name       PackageName
+	Name       Ident
 	Interfaces map[string]*Interface
 	Worlds     map[string]*World
 	Docs       Docs
-}
-
-// PackageName represents a [WebAssembly Component Model] package name,
-// such as [wasi:clocks@1.0.0]. It contains a namespace, name, and
-// optional [SemVer] version information.
-//
-// [WebAssembly Component Model]: https://component-model.bytecodealliance.org/introduction.html
-// [wasi:clocks@1.0.0]: https://github.com/WebAssembly/wasi-clocks
-// [SemVer]: https://semver.org/
-type PackageName struct {
-	// Namespace specifies the package namespace, such as "wasi" in "wasi:foo/bar".
-	Namespace string
-
-	// Name specifies the kebab-name of the package.
-	Name string
-
-	// Version contains optional major/minor version information.
-	Version *semver.Version
-
-	_node
-}
-
-// ParsePackageName parses a package string into a [PackageName],
-// returning any errors encountered. The resulting PackageName
-// may not be valid.
-func ParsePackageName(s string) (PackageName, error) {
-	var pn PackageName
-	name, ver, hasVer := strings.Cut(s, "@")
-	pn.Namespace, pn.Name, _ = strings.Cut(name, ":")
-	if hasVer {
-		var err error
-		pn.Version, err = semver.NewVersion(ver)
-		if err != nil {
-			return pn, err
-		}
-	}
-	return pn, pn.Validate()
-}
-
-// Validate validates p, returning any errors.
-// TODO: finish this.
-func (pn *PackageName) Validate() error {
-	switch {
-	case pn.Namespace == "":
-		return errors.New("missing package namespace")
-	case pn.Name == "":
-		return errors.New("missing package name")
-		// TODO: other validations
-	}
-	return nil
-}
-
-// String implements [fmt.Stringer], returning the canonical string representation of a [PackageName].
-func (pn *PackageName) String() string {
-	if pn.Version == nil {
-		return pn.Namespace + ":" + pn.Name
-	}
-	return pn.Namespace + ":" + pn.Name + "@" + pn.Version.String()
 }
 
 // Docs represent WIT documentation text extracted from comments.

@@ -75,9 +75,10 @@
                         },
                     },
                     Package: &wit.Package{
-                        Name: wit.PackageName{
+                        Name: wit.Ident{
                             Namespace: "examples",
-                            Name:      "exported-resource",
+                            Package:   "exported-resource",
+                            Extension: "",
                             Version:   &semver.Version{Major:0, Minor:2, Patch:0, PreRelease:"", Metadata:""},
                             _node:     wit._node{},
                         },
@@ -95,9 +96,10 @@
                 },
             },
             Package: &wit.Package{
-                Name: wit.PackageName{
+                Name: wit.Ident{
                     Namespace: "examples",
-                    Name:      "exported-resource",
+                    Package:   "exported-resource",
+                    Extension: "",
                     Version:   &semver.Version{Major:0, Minor:2, Patch:0, PreRelease:"", Metadata:""},
                     _node:     wit._node{},
                 },
@@ -259,9 +261,10 @@
                 },
             },
             Package: &wit.Package{
-                Name: wit.PackageName{
+                Name: wit.Ident{
                     Namespace: "examples",
-                    Name:      "exported-resource",
+                    Package:   "exported-resource",
+                    Extension: "",
                     Version:   &semver.Version{Major:0, Minor:2, Patch:0, PreRelease:"", Metadata:""},
                     _node:     wit._node{},
                 },
@@ -301,9 +304,10 @@
     },
     Packages: {
         &wit.Package{
-            Name: wit.PackageName{
+            Name: wit.Ident{
                 Namespace: "examples",
-                Name:      "exported-resource",
+                Package:   "exported-resource",
+                Extension: "",
                 Version:   &semver.Version{Major:0, Minor:2, Patch:0, PreRelease:"", Metadata:""},
                 _node:     wit._node{},
             },
