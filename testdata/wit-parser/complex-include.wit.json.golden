@@ -8,9 +8,10 @@
                     TypeDefs:  {},
                     Functions: {},
                     Package:   &wit.Package{
-                        Name: wit.PackageName{
+                        Name: wit.Ident{
                             Namespace: "foo",
-                            Name:      "bar",
+                            Package:   "bar",
+                            Extension: "",
                             Version:   (*semver.Version)(nil),
                             _node:     wit._node{},
                         },
@@ -40,9 +41,10 @@
                     TypeDefs:  {},
                     Functions: {},
                     Package:   &wit.Package{
-                        Name: wit.PackageName{
+                        Name: wit.Ident{
                             Namespace: "foo",
-                            Name:      "bar",
+                            Package:   "bar",
+                            Extension: "",
                             Version:   (*semver.Version)(nil),
                             _node:     wit._node{},
                         },
@@ -62,9 +64,10 @@
             },
             Exports: {},
             Package: &wit.Package{
-                Name: wit.PackageName{
+                Name: wit.Ident{
                     Namespace: "foo",
-                    Name:      "bar",
+                    Package:   "bar",
+                    Extension: "",
                     Version:   (*semver.Version)(nil),
                     _node:     wit._node{},
                 },
@@ -104,9 +107,10 @@
                     TypeDefs:  {},
                     Functions: {},
                     Package:   &wit.Package{
-                        Name: wit.PackageName{
+                        Name: wit.Ident{
                             Namespace: "foo",
-                            Name:      "baz",
+                            Package:   "baz",
+                            Extension: "",
                             Version:   (*semver.Version)(nil),
                             _node:     wit._node{},
                         },
@@ -136,9 +140,10 @@
                     TypeDefs:  {},
                     Functions: {},
                     Package:   &wit.Package{
-                        Name: wit.PackageName{
+                        Name: wit.Ident{
                             Namespace: "foo",
-                            Name:      "baz",
+                            Package:   "baz",
+                            Extension: "",
                             Version:   (*semver.Version)(nil),
                             _node:     wit._node{},
                         },
@@ -158,9 +163,10 @@
             },
             Exports: {},
             Package: &wit.Package{
-                Name: wit.PackageName{
+                Name: wit.Ident{
                     Namespace: "foo",
-                    Name:      "baz",
+                    Package:   "baz",
+                    Extension: "",
                     Version:   (*semver.Version)(nil),
                     _node:     wit._node{},
                 },
@@ -200,9 +206,10 @@
                     TypeDefs:  {},
                     Functions: {},
                     Package:   &wit.Package{
-                        Name: wit.PackageName{
+                        Name: wit.Ident{
                             Namespace: "foo",
-                            Name:      "root",
+                            Package:   "root",
+                            Extension: "",
                             Version:   (*semver.Version)(nil),
                             _node:     wit._node{},
                         },
@@ -269,9 +276,10 @@
                     TypeDefs:  {},
                     Functions: {},
                     Package:   &wit.Package{
-                        Name: wit.PackageName{
+                        Name: wit.Ident{
                             Namespace: "foo",
-                            Name:      "root",
+                            Package:   "root",
+                            Extension: "",
                             Version:   (*semver.Version)(nil),
                             _node:     wit._node{},
                         },
@@ -328,9 +336,10 @@
             },
             Exports: {},
             Package: &wit.Package{
-                Name: wit.PackageName{
+                Name: wit.Ident{
                     Namespace: "foo",
-                    Name:      "root",
+                    Package:   "root",
+                    Extension: "",
                     Version:   (*semver.Version)(nil),
                     _node:     wit._node{},
                 },
@@ -423,9 +432,10 @@
             },
             Exports: {},
             Package: &wit.Package{
-                Name: wit.PackageName{
+                Name: wit.Ident{
                     Namespace: "foo",
-                    Name:      "root",
+                    Package:   "root",
+                    Extension: "",
                     Version:   (*semver.Version)(nil),
                     _node:     wit._node{},
                 },
@@ -508,9 +518,10 @@
             },
             Exports: {},
             Package: &wit.Package{
-                Name: wit.PackageName{
+                Name: wit.Ident{
                     Namespace: "foo",
-                    Name:      "root",
+                    Package:   "root",
+                    Extension: "",
                     Version:   (*semver.Version)(nil),
                     _node:     wit._node{},
                 },
@@ -619,9 +630,10 @@
             },
             Exports: {},
             Package: &wit.Package{
-                Name: wit.PackageName{
+                Name: wit.Ident{
                     Namespace: "foo",
-                    Name:      "root",
+                    Package:   "root",
+                    Extension: "",
                     Version:   (*semver.Version)(nil),
                     _node:     wit._node{},
                 },
@@ -663,9 +675,10 @@
             TypeDefs:  {},
             Functions: {},
             Package:   &wit.Package{
-                Name: wit.PackageName{
+                Name: wit.Ident{
                     Namespace: "foo",
-                    Name:      "bar",
+                    Package:   "bar",
+                    Extension: "",
                     Version:   (*semver.Version)(nil),
                     _node:     wit._node{},
                 },
@@ -695,9 +708,10 @@
             TypeDefs:  {},
             Functions: {},
             Package:   &wit.Package{
-                Name: wit.PackageName{
+                Name: wit.Ident{
                     Namespace: "foo",
-                    Name:      "bar",
+                    Package:   "bar",
+                    Extension: "",
                     Version:   (*semver.Version)(nil),
                     _node:     wit._node{},
                 },
@@ -719,9 +733,10 @@
             TypeDefs:  {},
             Functions: {},
             Package:   &wit.Package{
-                Name: wit.PackageName{
+                Name: wit.Ident{
                     Namespace: "foo",
-                    Name:      "baz",
+                    Package:   "baz",
+                    Extension: "",
                     Version:   (*semver.Version)(nil),
                     _node:     wit._node{},
                 },
@@ -751,9 +766,10 @@
             TypeDefs:  {},
             Functions: {},
             Package:   &wit.Package{
-                Name: wit.PackageName{
+                Name: wit.Ident{
                     Namespace: "foo",
-                    Name:      "baz",
+                    Package:   "baz",
+                    Extension: "",
                     Version:   (*semver.Version)(nil),
                     _node:     wit._node{},
                 },
@@ -775,9 +791,10 @@
             TypeDefs:  {},
             Functions: {},
             Package:   &wit.Package{
-                Name: wit.PackageName{
+                Name: wit.Ident{
                     Namespace: "foo",
-                    Name:      "root",
+                    Package:   "root",
+                    Extension: "",
                     Version:   (*semver.Version)(nil),
                     _node:     wit._node{},
                 },
@@ -810,9 +827,10 @@
             TypeDefs:  {},
             Functions: {},
             Package:   &wit.Package{
-                Name: wit.PackageName{
+                Name: wit.Ident{
                     Namespace: "foo",
-                    Name:      "root",
+                    Package:   "root",
+                    Extension: "",
                     Version:   (*semver.Version)(nil),
                     _node:     wit._node{},
                 },
@@ -836,9 +854,10 @@
     TypeDefs: nil,
     Packages: {
         &wit.Package{
-            Name: wit.PackageName{
+            Name: wit.Ident{
                 Namespace: "foo",
-                Name:      "bar",
+                Package:   "bar",
+                Extension: "",
                 Version:   (*semver.Version)(nil),
                 _node:     wit._node{},
             },
@@ -852,9 +871,10 @@
             Docs: wit.Docs{},
         },
         &wit.Package{
-            Name: wit.PackageName{
+            Name: wit.Ident{
                 Namespace: "foo",
-                Name:      "baz",
+                Package:   "baz",
+                Extension: "",
                 Version:   (*semver.Version)(nil),
                 _node:     wit._node{},
             },
@@ -868,9 +888,10 @@
             Docs: wit.Docs{},
         },
         &wit.Package{
-            Name: wit.PackageName{
+            Name: wit.Ident{
                 Namespace: "foo",
-                Name:      "root",
+                Package:   "root",
+                Extension: "",
                 Version:   (*semver.Version)(nil),
                 _node:     wit._node{},
             },

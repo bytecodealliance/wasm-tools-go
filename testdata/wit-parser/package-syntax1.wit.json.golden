@@ -4,9 +4,10 @@
     TypeDefs:   nil,
     Packages:   {
         &wit.Package{
-            Name: wit.PackageName{
+            Name: wit.Ident{
                 Namespace: "foo",
-                Name:      "foo",
+                Package:   "foo",
+                Extension: "",
                 Version:   (*semver.Version)(nil),
                 _node:     wit._node{},
             },

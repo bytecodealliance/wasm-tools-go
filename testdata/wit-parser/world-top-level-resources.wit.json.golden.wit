@@ -1,25 +1,25 @@
 package foo:foo;
 
 interface handler {
-    use types.{request};
-    use types.{response};
-    handle: func(some: borrow<request>) -> borrow<response>;
-    handle-owned: func(some: own<request>) -> own<response>;
+	use types.{request};
+	use types.{response};
+	handle: func(some: borrow<request>) -> borrow<response>;
+	handle-owned: func(some: own<request>) -> own<response>;
 }
 
 interface types {
-    resource request {
-        bar: func(arg: list<u32>);
-        foo: func();
-    }
-    resource response {
-        bar: func(arg: list<u32>);
-        foo: func();
-    }
+	resource request {
+		bar: func(arg: list<u32>);
+		foo: func();
+	}
+	resource response {
+		bar: func(arg: list<u32>);
+		foo: func();
+	}
 }
 
 world proxy {
-    import handler;
-    import types;
-    export handler;
+	import handler;
+	import types;
+	export handler;
 }

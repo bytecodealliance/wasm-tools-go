@@ -1,13 +1,13 @@
 package some:dep;
 
 interface foo {
-    resource r;
+	resource r;
 }
 
 
 package foo:bar;
 
 interface foo {
-    use some:dep/foo.{r};
-    type t = own<r>;
+	use some:dep/foo.{r};
+	type t = own<r>;
 }
