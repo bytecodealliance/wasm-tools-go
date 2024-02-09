@@ -1,83 +1,81 @@
 &wit.Resolve{
     Worlds: {
         &wit.World{
-            Name:    "xo",
-            Imports: {},
-            Exports: {},
-            Package: &wit.Package{
+            _typeOwner: wit._typeOwner{},
+            Name:       "xo",
+            Imports:    {},
+            Exports:    {},
+            Package:    &wit.Package{
                 Name: wit.Ident{
                     Namespace: "foo",
                     Package:   "bar",
                     Extension: "",
                     Version:   (*semver.Version)(nil),
-                    _node:     wit._node{},
                 },
                 Interfaces: {},
                 Worlds:     {
                     "name": &wit.World{
+                        _typeOwner: wit._typeOwner{},
                         Name:       "name",
                         Imports:    {},
                         Exports:    {},
                         Package:    &wit.Package{(CYCLIC REFERENCE)},
                         Docs:       wit.Docs{},
-                        _typeOwner: wit._typeOwner{},
                     },
                     "x": &wit.World{
+                        _typeOwner: wit._typeOwner{},
                         Name:       "x",
                         Imports:    {},
                         Exports:    {},
                         Package:    &wit.Package{(CYCLIC REFERENCE)},
                         Docs:       wit.Docs{},
-                        _typeOwner: wit._typeOwner{},
                     },
                     "xo": &wit.World{(CYCLIC REFERENCE)},
                 },
                 Docs: wit.Docs{},
             },
-            Docs:       wit.Docs{},
-            _typeOwner: wit._typeOwner{},
+            Docs: wit.Docs{},
         },
         &wit.World{
-            Name:    "name",
-            Imports: {},
-            Exports: {},
-            Package: &wit.Package{
+            _typeOwner: wit._typeOwner{},
+            Name:       "name",
+            Imports:    {},
+            Exports:    {},
+            Package:    &wit.Package{
                 Name: wit.Ident{
                     Namespace: "foo",
                     Package:   "bar",
                     Extension: "",
                     Version:   (*semver.Version)(nil),
-                    _node:     wit._node{},
                 },
                 Interfaces: {},
                 Worlds:     {
                     "name": &wit.World{(CYCLIC REFERENCE)},
                     "x":    &wit.World{
+                        _typeOwner: wit._typeOwner{},
                         Name:       "x",
                         Imports:    {},
                         Exports:    {},
                         Package:    &wit.Package{(CYCLIC REFERENCE)},
                         Docs:       wit.Docs{},
-                        _typeOwner: wit._typeOwner{},
                     },
                     "xo": &wit.World{(CYCLIC REFERENCE)},
                 },
                 Docs: wit.Docs{},
             },
-            Docs:       wit.Docs{},
-            _typeOwner: wit._typeOwner{},
+            Docs: wit.Docs{},
         },
         &wit.World{
-            Name:    "x",
-            Imports: {},
-            Exports: {},
-            Package: &wit.Package{
+            _typeOwner: wit._typeOwner{},
+            Name:       "x",
+            Imports:    {},
+            Exports:    {},
+            Package:    &wit.Package{
                 Name: wit.Ident{
                     Namespace: "foo",
                     Package:   "bar",
                     Extension: "",
                     Version:   (*semver.Version)(nil),
-                    _node:     wit._node{},
                 },
                 Interfaces: {},
                 Worlds:     {
@@ -87,8 +85,7 @@
                 },
                 Docs: wit.Docs{},
             },
-            Docs:       wit.Docs{},
-            _typeOwner: wit._typeOwner{},
+            Docs: wit.Docs{},
         },
     },
     Interfaces: nil,
@@ -100,7 +97,6 @@
                 Package:   "bar",
                 Extension: "",
                 Version:   (*semver.Version)(nil),
-                _node:     wit._node{},
             },
             Interfaces: {},
             Worlds:     {

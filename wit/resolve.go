@@ -29,6 +29,8 @@ type Resolve struct {
 //
 // [WebAssembly component]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md#wit-worlds
 type World struct {
+	_typeOwner
+
 	Name    string
 	Imports map[string]WorldItem
 	Exports map[string]WorldItem
@@ -36,8 +38,6 @@ type World struct {
 	// The [Package] that this World belongs to. It must be non-nil when fully resolved.
 	Package *Package
 	Docs    Docs
-
-	_typeOwner
 }
 
 // AllFunctions [iterates] through all functions exported from or imported into a [World],
@@ -152,7 +152,7 @@ type WorldItem interface {
 }
 
 // _worldItem is an embeddable type that conforms to the [WorldItem] interface.
-type _worldItem struct{ _node }
+type _worldItem struct{}
 
 func (_worldItem) isWorldItem() {}
 
@@ -163,6 +163,9 @@ func (_worldItem) isWorldItem() {}
 // [collection of types and functions]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md#wit-interfaces.
 // [WebAssembly component]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md#wit-worlds
 type Interface struct {
+	_typeOwner
+	_worldItem
+
 	Name      *string
 	TypeDefs  map[string]*TypeDef
 	Functions map[string]*Function
@@ -170,9 +173,6 @@ type Interface struct {
 	// The [Package] that this Interface belongs to. It must be non-nil when fully resolved.
 	Package *Package
 	Docs    Docs
-
-	_typeOwner
-	_worldItem
 }
 
 // AllFunctions [iterates] through all functions in [Interface] i, calling yield for each.
@@ -192,13 +192,12 @@ func (i *Interface) AllFunctions(yield func(*Function) bool) bool {
 // and optionally belong to a [World] or [Interface].
 // It implements the [Node], [Sized], [Type], [TypeDefKind] interfaces.
 type TypeDef struct {
+	_type
+	_worldItem
 	Name  *string
 	Kind  TypeDefKind
 	Owner TypeOwner
 	Docs  Docs
-
-	_worldItem
-	_type
 }
 
 // Root returns the root [TypeDef] of [type alias] t.
@@ -288,10 +287,7 @@ type TypeDefKind interface {
 }
 
 // _typeDefKind is an embeddable type that conforms to the [TypeDefKind] interface.
-type _typeDefKind struct {
-	_node
-	_sized
-}
+type _typeDefKind struct{}
 
 func (_typeDefKind) isTypeDefKind() {}
 
@@ -300,8 +296,8 @@ func (_typeDefKind) isTypeDefKind() {}
 //
 // [record type]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md#item-record-bag-of-named-fields
 type Record struct {
-	Fields []Field
 	_typeDefKind
+	Fields []Field
 }
 
 // Size returns the [ABI byte size] for [Record] r.
@@ -384,8 +380,8 @@ func (_handle) Align() uintptr { return 4 }
 //
 // [owned handle]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md#handles
 type OwnedHandle struct {
-	Type *TypeDef
 	_handle
+	Type *TypeDef
 }
 
 // BorrowedHandle represents a WIT [borrowed handle].
@@ -393,8 +389,8 @@ type OwnedHandle struct {
 //
 // [borrowed handle]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md#handles
 type BorrowedHandle struct {
-	Type *TypeDef
 	_handle
+	Type *TypeDef
 }
 
 // Flags represents a WIT [flags type], stored as a bitfield.
@@ -402,8 +398,8 @@ type BorrowedHandle struct {
 //
 // [flags type]: https://component-model.bytecodealliance.org/design/wit.html#flags
 type Flags struct {
-	Flags []Flag
 	_typeDefKind
+	Flags []Flag
 }
 
 // Size returns the [ABI byte size] of [Flags] f.
@@ -448,8 +444,8 @@ type Flag struct {
 //
 // [tuple type]: https://component-model.bytecodealliance.org/design/wit.html#tuples
 type Tuple struct {
-	Types []Type
 	_typeDefKind
+	Types []Type
 }
 
 // Despecialize despecializes [Tuple] e into a [Record] with 0-based integer field names.
@@ -492,8 +488,8 @@ func (t *Tuple) Align() uintptr {
 //
 // [variant type]: https://component-model.bytecodealliance.org/design/wit.html#variants
 type Variant struct {
-	Cases []Case
 	_typeDefKind
+	Cases []Case
 }
 
 // Size returns the [ABI byte size] for [Variant] v.
@@ -547,8 +543,8 @@ type Case struct {
 //
 // [enum type]: https://component-model.bytecodealliance.org/design/wit.html#enums
 type Enum struct {
-	Cases []EnumCase
 	_typeDefKind
+	Cases []EnumCase
 }
 
 // Despecialize despecializes [Enum] e into a [Variant] with no associated types.
@@ -599,8 +595,8 @@ type EnumCase struct {
 //
 // [option type]: https://component-model.bytecodealliance.org/design/wit.html#options
 type Option struct {
-	Type Type
 	_typeDefKind
+	Type Type
 }
 
 // Despecialize despecializes [Option] o into a [Variant] with two cases, "none" and "some".
@@ -641,9 +637,9 @@ func (o *Option) Align() uintptr {
 //
 // [result type]: https://component-model.bytecodealliance.org/design/wit.html#results
 type Result struct {
+	_typeDefKind
 	OK  Type // optional associated Type (can be nil)
 	Err Type // optional associated Type (can be nil)
-	_typeDefKind
 }
 
 // Despecialize despecializes [Result] o into a [Variant] with two cases, "ok" and "error".
@@ -682,8 +678,8 @@ func (r *Result) Align() uintptr {
 //
 // [list type]: https://component-model.bytecodealliance.org/design/wit.html#lists
 type List struct {
-	Type Type
 	_typeDefKind
+	Type Type
 }
 
 // Size returns the [ABI byte size] for a [List].
@@ -702,8 +698,8 @@ func (*List) Align() uintptr { return 8 } // [2]int32
 // [future type]: https://github.com/bytecodealliance/wit-bindgen/issues/270
 // [WASI Preview 3]: https://bytecodealliance.org/articles/webassembly-the-updated-roadmap-for-developers
 type Future struct {
-	Type Type // optional associated Type (can be nil)
 	_typeDefKind
+	Type Type // optional associated Type (can be nil)
 }
 
 // Size returns the [ABI byte size] for a [Future].
@@ -724,9 +720,9 @@ func (*Future) Align() uintptr { return 0 }
 // [stream type]: https://github.com/WebAssembly/WASI/blob/main/docs/WitInWasi.md#streams
 // [WASI Preview 3]: https://bytecodealliance.org/articles/webassembly-the-updated-roadmap-for-developers
 type Stream struct {
+	_typeDefKind
 	Element Type // optional associated Type (can be nil)
 	End     Type // optional associated Type (can be nil)
-	_typeDefKind
 }
 
 // Size returns the [ABI byte size] for a [Stream].
@@ -749,7 +745,7 @@ type TypeOwner interface {
 	isTypeOwner()
 }
 
-type _typeOwner struct{ _node }
+type _typeOwner struct{}
 
 func (_typeOwner) AllFunctions(yield func(*Function) bool) bool { return false }
 func (_typeOwner) isTypeOwner()                                 {}
@@ -1000,13 +996,12 @@ type String struct{ _primitive[string] }
 //
 // [function]: https://component-model.bytecodealliance.org/design/wit.html#functions
 type Function struct {
+	_worldItem
 	Name    string
 	Kind    FunctionKind
 	Params  []Param // arguments to the function
 	Results []Param // a function can have a single anonymous result, or > 1 named results
 	Docs    Docs
-
-	_worldItem
 }
 
 // IsFreestanding returns true if [Function] f is a freestanding function,
@@ -1043,32 +1038,30 @@ type FunctionKind interface {
 }
 
 // _functionKind is an embeddable type that conforms to the [FunctionKind] interface.
-type _functionKind struct{ _node }
+type _functionKind struct{}
 
 func (_functionKind) isFunctionKind() {}
 
 // Freestanding represents a free-standing function that is not a method, static, or a constructor.
-type Freestanding struct {
-	_functionKind
-}
+type Freestanding struct{ _functionKind }
 
 // Method represents a function that is a method on its associated [Type].
 // The first argument to the function is self, an instance of [Type].
 type Method struct {
-	Type Type
 	_functionKind
+	Type Type
 }
 
 // Static represents a function that is a static method of its associated [Type].
 type Static struct {
-	Type Type
 	_functionKind
+	Type Type
 }
 
 // Constructor represents a function that is a constructor for its associated [Type].
 type Constructor struct {
-	Type Type
 	_functionKind
+	Type Type
 }
 
 // Param represents a parameter to or the result of a [Function].
@@ -1096,5 +1089,4 @@ type Package struct {
 // Docs represent WIT documentation text extracted from comments.
 type Docs struct {
 	Contents string // may be empty
-	_node
 }

@@ -1,34 +1,37 @@
 &wit.Resolve{
     Worlds: {
         &wit.World{
-            Name:    "foo",
-            Imports: {
+            _typeOwner: wit._typeOwner{},
+            Name:       "foo",
+            Imports:    {
                 "foo": &wit.Interface{
-                    Name:      (*string)(nil),
-                    TypeDefs:  {},
-                    Functions: {
+                    _typeOwner: wit._typeOwner{},
+                    _worldItem: wit._worldItem{},
+                    Name:       (*string)(nil),
+                    TypeDefs:   {},
+                    Functions:  {
                         "a": &wit.Function{
-                            Name:    "a",
-                            Kind:    &wit.Freestanding{},
-                            Params:  nil,
-                            Results: {
+                            _worldItem: wit._worldItem{},
+                            Name:       "a",
+                            Kind:       &wit.Freestanding{},
+                            Params:     nil,
+                            Results:    {
                                 {
                                     Name: "",
                                     Type: &wit.TypeDef{
-                                        Name: (*string)(nil),
-                                        Kind: &wit.List{
-                                            Type:         wit.U8{},
-                                            _typeDefKind: wit._typeDefKind{},
-                                        },
-                                        Owner:      nil,
-                                        Docs:       wit.Docs{},
-                                        _worldItem: wit._worldItem{},
                                         _type:      wit._type{},
+                                        _worldItem: wit._worldItem{},
+                                        Name:       (*string)(nil),
+                                        Kind:       &wit.List{
+                                            _typeDefKind: wit._typeDefKind{},
+                                            Type:         wit.U8{},
+                                        },
+                                        Owner: nil,
+                                        Docs:  wit.Docs{},
                                     },
                                 },
                             },
-                            Docs:       wit.Docs{},
-                            _worldItem: wit._worldItem{},
+                            Docs: wit.Docs{},
                         },
                     },
                     Package: &wit.Package{
@@ -37,7 +40,6 @@
                             Package:   "shared-items",
                             Extension: "",
                             Version:   (*semver.Version)(nil),
-                            _node:     wit._node{},
                         },
                         Interfaces: {},
                         Worlds:     {
@@ -45,40 +47,40 @@
                         },
                         Docs: wit.Docs{},
                     },
-                    Docs:       wit.Docs{},
-                    _typeOwner: wit._typeOwner{},
-                    _worldItem: wit._worldItem{},
+                    Docs: wit.Docs{},
                 },
             },
             Exports: {
                 "bar": &wit.Interface{
-                    Name:      (*string)(nil),
-                    TypeDefs:  {},
-                    Functions: {
+                    _typeOwner: wit._typeOwner{},
+                    _worldItem: wit._worldItem{},
+                    Name:       (*string)(nil),
+                    TypeDefs:   {},
+                    Functions:  {
                         "a": &wit.Function{
-                            Name:    "a",
-                            Kind:    &wit.Freestanding{},
-                            Params:  nil,
-                            Results: {
+                            _worldItem: wit._worldItem{},
+                            Name:       "a",
+                            Kind:       &wit.Freestanding{},
+                            Params:     nil,
+                            Results:    {
                                 {
                                     Name: "",
                                     Type: &wit.TypeDef{
-                                        Name: (*string)(nil),
-                                        Kind: &wit.Tuple{
-                                            Types: {
+                                        _type:      wit._type{},
+                                        _worldItem: wit._worldItem{},
+                                        Name:       (*string)(nil),
+                                        Kind:       &wit.Tuple{
+                                            _typeDefKind: wit._typeDefKind{},
+                                            Types:        {
                                                 &wit.TypeDef{(CYCLIC REFERENCE)},
                                             },
-                                            _typeDefKind: wit._typeDefKind{},
                                         },
-                                        Owner:      nil,
-                                        Docs:       wit.Docs{},
-                                        _worldItem: wit._worldItem{},
-                                        _type:      wit._type{},
+                                        Owner: nil,
+                                        Docs:  wit.Docs{},
                                     },
                                 },
                             },
-                            Docs:       wit.Docs{},
-                            _worldItem: wit._worldItem{},
+                            Docs: wit.Docs{},
                         },
                     },
                     Package: &wit.Package{
@@ -87,7 +89,6 @@
                             Package:   "shared-items",
                             Extension: "",
                             Version:   (*semver.Version)(nil),
-                            _node:     wit._node{},
                         },
                         Interfaces: {},
                         Worlds:     {
@@ -95,9 +96,7 @@
                         },
                         Docs: wit.Docs{},
                     },
-                    Docs:       wit.Docs{},
-                    _typeOwner: wit._typeOwner{},
-                    _worldItem: wit._worldItem{},
+                    Docs: wit.Docs{},
                 },
             },
             Package: &wit.Package{
@@ -106,7 +105,6 @@
                     Package:   "shared-items",
                     Extension: "",
                     Version:   (*semver.Version)(nil),
-                    _node:     wit._node{},
                 },
                 Interfaces: {},
                 Worlds:     {
@@ -114,37 +112,38 @@
                 },
                 Docs: wit.Docs{},
             },
-            Docs:       wit.Docs{},
-            _typeOwner: wit._typeOwner{},
+            Docs: wit.Docs{},
         },
     },
     Interfaces: {
         &wit.Interface{
-            Name:      (*string)(nil),
-            TypeDefs:  {},
-            Functions: {
+            _typeOwner: wit._typeOwner{},
+            _worldItem: wit._worldItem{},
+            Name:       (*string)(nil),
+            TypeDefs:   {},
+            Functions:  {
                 "a": &wit.Function{
-                    Name:    "a",
-                    Kind:    &wit.Freestanding{},
-                    Params:  nil,
-                    Results: {
+                    _worldItem: wit._worldItem{},
+                    Name:       "a",
+                    Kind:       &wit.Freestanding{},
+                    Params:     nil,
+                    Results:    {
                         {
                             Name: "",
                             Type: &wit.TypeDef{
-                                Name: (*string)(nil),
-                                Kind: &wit.List{
-                                    Type:         wit.U8{},
-                                    _typeDefKind: wit._typeDefKind{},
-                                },
-                                Owner:      nil,
-                                Docs:       wit.Docs{},
-                                _worldItem: wit._worldItem{},
                                 _type:      wit._type{},
+                                _worldItem: wit._worldItem{},
+                                Name:       (*string)(nil),
+                                Kind:       &wit.List{
+                                    _typeDefKind: wit._typeDefKind{},
+                                    Type:         wit.U8{},
+                                },
+                                Owner: nil,
+                                Docs:  wit.Docs{},
                             },
                         },
                     },
-                    Docs:       wit.Docs{},
-                    _worldItem: wit._worldItem{},
+                    Docs: wit.Docs{},
                 },
             },
             Package: &wit.Package{
@@ -153,7 +152,6 @@
                     Package:   "shared-items",
                     Extension: "",
                     Version:   (*semver.Version)(nil),
-                    _node:     wit._node{},
                 },
                 Interfaces: {},
                 Worlds:     {
@@ -161,38 +159,38 @@
                 },
                 Docs: wit.Docs{},
             },
-            Docs:       wit.Docs{},
-            _typeOwner: wit._typeOwner{},
-            _worldItem: wit._worldItem{},
+            Docs: wit.Docs{},
         },
         &wit.Interface{
-            Name:      (*string)(nil),
-            TypeDefs:  {},
-            Functions: {
+            _typeOwner: wit._typeOwner{},
+            _worldItem: wit._worldItem{},
+            Name:       (*string)(nil),
+            TypeDefs:   {},
+            Functions:  {
                 "a": &wit.Function{
-                    Name:    "a",
-                    Kind:    &wit.Freestanding{},
-                    Params:  nil,
-                    Results: {
+                    _worldItem: wit._worldItem{},
+                    Name:       "a",
+                    Kind:       &wit.Freestanding{},
+                    Params:     nil,
+                    Results:    {
                         {
                             Name: "",
                             Type: &wit.TypeDef{
-                                Name: (*string)(nil),
-                                Kind: &wit.Tuple{
-                                    Types: {
+                                _type:      wit._type{},
+                                _worldItem: wit._worldItem{},
+                                Name:       (*string)(nil),
+                                Kind:       &wit.Tuple{
+                                    _typeDefKind: wit._typeDefKind{},
+                                    Types:        {
                                         &wit.TypeDef{(CYCLIC REFERENCE)},
                                     },
-                                    _typeDefKind: wit._typeDefKind{},
                                 },
-                                Owner:      nil,
-                                Docs:       wit.Docs{},
-                                _worldItem: wit._worldItem{},
-                                _type:      wit._type{},
+                                Owner: nil,
+                                Docs:  wit.Docs{},
                             },
                         },
                     },
-                    Docs:       wit.Docs{},
-                    _worldItem: wit._worldItem{},
+                    Docs: wit.Docs{},
                 },
             },
             Package: &wit.Package{
@@ -201,7 +199,6 @@
                     Package:   "shared-items",
                     Extension: "",
                     Version:   (*semver.Version)(nil),
-                    _node:     wit._node{},
                 },
                 Interfaces: {},
                 Worlds:     {
@@ -209,35 +206,33 @@
                 },
                 Docs: wit.Docs{},
             },
-            Docs:       wit.Docs{},
-            _typeOwner: wit._typeOwner{},
-            _worldItem: wit._worldItem{},
+            Docs: wit.Docs{},
         },
     },
     TypeDefs: {
         &wit.TypeDef{
-            Name: (*string)(nil),
-            Kind: &wit.List{
-                Type:         wit.U8{},
-                _typeDefKind: wit._typeDefKind{},
-            },
-            Owner:      nil,
-            Docs:       wit.Docs{},
-            _worldItem: wit._worldItem{},
             _type:      wit._type{},
+            _worldItem: wit._worldItem{},
+            Name:       (*string)(nil),
+            Kind:       &wit.List{
+                _typeDefKind: wit._typeDefKind{},
+                Type:         wit.U8{},
+            },
+            Owner: nil,
+            Docs:  wit.Docs{},
         },
         &wit.TypeDef{
-            Name: (*string)(nil),
-            Kind: &wit.Tuple{
-                Types: {
+            _type:      wit._type{},
+            _worldItem: wit._worldItem{},
+            Name:       (*string)(nil),
+            Kind:       &wit.Tuple{
+                _typeDefKind: wit._typeDefKind{},
+                Types:        {
                     &wit.TypeDef{(CYCLIC REFERENCE)},
                 },
-                _typeDefKind: wit._typeDefKind{},
             },
-            Owner:      nil,
-            Docs:       wit.Docs{},
-            _worldItem: wit._worldItem{},
-            _type:      wit._type{},
+            Owner: nil,
+            Docs:  wit.Docs{},
         },
     },
     Packages: {
@@ -247,7 +242,6 @@
                 Package:   "shared-items",
                 Extension: "",
                 Version:   (*semver.Version)(nil),
-                _node:     wit._node{},
             },
             Interfaces: {},
             Worlds:     {

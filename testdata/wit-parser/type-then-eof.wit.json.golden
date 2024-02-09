@@ -2,21 +2,23 @@
     Worlds:     nil,
     Interfaces: {
         &wit.Interface{
-            Name:      &"foo",
-            TypeDefs:  {},
-            Functions: {
+            _typeOwner: wit._typeOwner{},
+            _worldItem: wit._worldItem{},
+            Name:       &"foo",
+            TypeDefs:   {},
+            Functions:  {
                 "foo": &wit.Function{
-                    Name:    "foo",
-                    Kind:    &wit.Freestanding{},
-                    Params:  nil,
-                    Results: {
+                    _worldItem: wit._worldItem{},
+                    Name:       "foo",
+                    Kind:       &wit.Freestanding{},
+                    Params:     nil,
+                    Results:    {
                         {
                             Name: "",
                             Type: wit.String{},
                         },
                     },
-                    Docs:       wit.Docs{},
-                    _worldItem: wit._worldItem{},
+                    Docs: wit.Docs{},
                 },
             },
             Package: &wit.Package{
@@ -25,7 +27,6 @@
                     Package:   "foo",
                     Extension: "",
                     Version:   (*semver.Version)(nil),
-                    _node:     wit._node{},
                 },
                 Interfaces: {
                     "foo": &wit.Interface{(CYCLIC REFERENCE)},
@@ -33,9 +34,7 @@
                 Worlds: {},
                 Docs:   wit.Docs{},
             },
-            Docs:       wit.Docs{},
-            _typeOwner: wit._typeOwner{},
-            _worldItem: wit._worldItem{},
+            Docs: wit.Docs{},
         },
     },
     TypeDefs: nil,
@@ -46,7 +45,6 @@
                 Package:   "foo",
                 Extension: "",
                 Version:   (*semver.Version)(nil),
-                _node:     wit._node{},
             },
             Interfaces: {
                 "foo": &wit.Interface{(CYCLIC REFERENCE)},

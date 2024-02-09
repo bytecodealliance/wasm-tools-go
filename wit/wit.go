@@ -16,10 +16,6 @@ type Node interface {
 	WIT(ctx Node, name string) string
 }
 
-type _node struct{}
-
-func (_node) WIT(ctx Node, name string) string { return "/* TODO(" + name + ") */" }
-
 func indent(s string) string {
 	const ws = "\t"
 	return strings.ReplaceAll(strings.TrimSuffix(ws+strings.ReplaceAll(s, "\n", "\n"+ws), ws), ws+"\n", "\n")

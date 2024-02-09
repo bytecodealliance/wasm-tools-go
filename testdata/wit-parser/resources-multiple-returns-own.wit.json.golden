@@ -2,37 +2,40 @@
     Worlds:     nil,
     Interfaces: {
         &wit.Interface{
-            Name:     &"resources1",
-            TypeDefs: {
+            _typeOwner: wit._typeOwner{},
+            _worldItem: wit._worldItem{},
+            Name:       &"resources1",
+            TypeDefs:   {
                 "r1": &wit.TypeDef{
+                    _type:      wit._type{},
+                    _worldItem: wit._worldItem{},
                     Name:       &"r1",
                     Kind:       &wit.Resource{},
                     Owner:      &wit.Interface{(CYCLIC REFERENCE)},
                     Docs:       wit.Docs{},
-                    _worldItem: wit._worldItem{},
-                    _type:      wit._type{},
                 },
             },
             Functions: {
                 "[method]r1.f1": &wit.Function{
-                    Name: "[method]r1.f1",
-                    Kind: &wit.Method{
-                        Type:          &wit.TypeDef{(CYCLIC REFERENCE)},
+                    _worldItem: wit._worldItem{},
+                    Name:       "[method]r1.f1",
+                    Kind:       &wit.Method{
                         _functionKind: wit._functionKind{},
+                        Type:          &wit.TypeDef{(CYCLIC REFERENCE)},
                     },
                     Params: {
                         {
                             Name: "self",
                             Type: &wit.TypeDef{
-                                Name: (*string)(nil),
-                                Kind: &wit.BorrowedHandle{
-                                    Type:    &wit.TypeDef{(CYCLIC REFERENCE)},
-                                    _handle: wit._handle{},
-                                },
-                                Owner:      nil,
-                                Docs:       wit.Docs{},
-                                _worldItem: wit._worldItem{},
                                 _type:      wit._type{},
+                                _worldItem: wit._worldItem{},
+                                Name:       (*string)(nil),
+                                Kind:       &wit.BorrowedHandle{
+                                    _handle: wit._handle{},
+                                    Type:    &wit.TypeDef{(CYCLIC REFERENCE)},
+                                },
+                                Owner: nil,
+                                Docs:  wit.Docs{},
                             },
                         },
                     },
@@ -44,43 +47,42 @@
                         {
                             Name: "handle",
                             Type: &wit.TypeDef{
-                                Name: (*string)(nil),
-                                Kind: &wit.OwnedHandle{
-                                    Type:    &wit.TypeDef{(CYCLIC REFERENCE)},
-                                    _handle: wit._handle{},
-                                },
-                                Owner:      nil,
-                                Docs:       wit.Docs{},
-                                _worldItem: wit._worldItem{},
                                 _type:      wit._type{},
+                                _worldItem: wit._worldItem{},
+                                Name:       (*string)(nil),
+                                Kind:       &wit.OwnedHandle{
+                                    _handle: wit._handle{},
+                                    Type:    &wit.TypeDef{(CYCLIC REFERENCE)},
+                                },
+                                Owner: nil,
+                                Docs:  wit.Docs{},
                             },
                         },
                     },
-                    Docs:       wit.Docs{},
-                    _worldItem: wit._worldItem{},
+                    Docs: wit.Docs{},
                 },
                 "t1": &wit.Function{
-                    Name:   "t1",
-                    Kind:   &wit.Freestanding{},
-                    Params: {
+                    _worldItem: wit._worldItem{},
+                    Name:       "t1",
+                    Kind:       &wit.Freestanding{},
+                    Params:     {
                         {
                             Name: "a",
                             Type: &wit.TypeDef{
-                                Name: (*string)(nil),
-                                Kind: &wit.OwnedHandle{
-                                    Type:    &wit.TypeDef{(CYCLIC REFERENCE)},
-                                    _handle: wit._handle{},
-                                },
-                                Owner:      nil,
-                                Docs:       wit.Docs{},
-                                _worldItem: wit._worldItem{},
                                 _type:      wit._type{},
+                                _worldItem: wit._worldItem{},
+                                Name:       (*string)(nil),
+                                Kind:       &wit.OwnedHandle{
+                                    _handle: wit._handle{},
+                                    Type:    &wit.TypeDef{(CYCLIC REFERENCE)},
+                                },
+                                Owner: nil,
+                                Docs:  wit.Docs{},
                             },
                         },
                     },
-                    Results:    nil,
-                    Docs:       wit.Docs{},
-                    _worldItem: wit._worldItem{},
+                    Results: nil,
+                    Docs:    wit.Docs{},
                 },
             },
             Package: &wit.Package{
@@ -89,7 +91,6 @@
                     Package:   "resources1",
                     Extension: "",
                     Version:   (*semver.Version)(nil),
-                    _node:     wit._node{},
                 },
                 Interfaces: {
                     "resources1": &wit.Interface{(CYCLIC REFERENCE)},
@@ -97,41 +98,39 @@
                 Worlds: {},
                 Docs:   wit.Docs{},
             },
-            Docs:       wit.Docs{},
-            _typeOwner: wit._typeOwner{},
-            _worldItem: wit._worldItem{},
+            Docs: wit.Docs{},
         },
     },
     TypeDefs: {
         &wit.TypeDef{
+            _type:      wit._type{},
+            _worldItem: wit._worldItem{},
             Name:       &"r1",
             Kind:       &wit.Resource{},
             Owner:      &wit.Interface{(CYCLIC REFERENCE)},
             Docs:       wit.Docs{},
-            _worldItem: wit._worldItem{},
-            _type:      wit._type{},
         },
         &wit.TypeDef{
-            Name: (*string)(nil),
-            Kind: &wit.BorrowedHandle{
-                Type:    &wit.TypeDef{(CYCLIC REFERENCE)},
-                _handle: wit._handle{},
-            },
-            Owner:      nil,
-            Docs:       wit.Docs{},
-            _worldItem: wit._worldItem{},
             _type:      wit._type{},
+            _worldItem: wit._worldItem{},
+            Name:       (*string)(nil),
+            Kind:       &wit.BorrowedHandle{
+                _handle: wit._handle{},
+                Type:    &wit.TypeDef{(CYCLIC REFERENCE)},
+            },
+            Owner: nil,
+            Docs:  wit.Docs{},
         },
         &wit.TypeDef{
-            Name: (*string)(nil),
-            Kind: &wit.OwnedHandle{
-                Type:    &wit.TypeDef{(CYCLIC REFERENCE)},
-                _handle: wit._handle{},
-            },
-            Owner:      nil,
-            Docs:       wit.Docs{},
-            _worldItem: wit._worldItem{},
             _type:      wit._type{},
+            _worldItem: wit._worldItem{},
+            Name:       (*string)(nil),
+            Kind:       &wit.OwnedHandle{
+                _handle: wit._handle{},
+                Type:    &wit.TypeDef{(CYCLIC REFERENCE)},
+            },
+            Owner: nil,
+            Docs:  wit.Docs{},
         },
     },
     Packages: {
@@ -141,7 +140,6 @@
                 Package:   "resources1",
                 Extension: "",
                 Version:   (*semver.Version)(nil),
-                _node:     wit._node{},
             },
             Interfaces: {
                 "resources1": &wit.Interface{(CYCLIC REFERENCE)},

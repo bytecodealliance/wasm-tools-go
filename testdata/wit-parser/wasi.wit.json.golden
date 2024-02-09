@@ -2,12 +2,17 @@
     Worlds:     nil,
     Interfaces: {
         &wit.Interface{
-            Name:     &"wasi",
-            TypeDefs: {
+            _typeOwner: wit._typeOwner{},
+            _worldItem: wit._worldItem{},
+            Name:       &"wasi",
+            TypeDefs:   {
                 "clockid": &wit.TypeDef{
-                    Name: &"clockid",
-                    Kind: &wit.Enum{
-                        Cases: {
+                    _type:      wit._type{},
+                    _worldItem: wit._worldItem{},
+                    Name:       &"clockid",
+                    Kind:       &wit.Enum{
+                        _typeDefKind: wit._typeDefKind{},
+                        Cases:        {
                             {
                                 Name: "realtime",
                                 Docs: wit.Docs{},
@@ -17,17 +22,17 @@
                                 Docs: wit.Docs{},
                             },
                         },
-                        _typeDefKind: wit._typeDefKind{},
                     },
-                    Owner:      &wit.Interface{(CYCLIC REFERENCE)},
-                    Docs:       wit.Docs{},
-                    _worldItem: wit._worldItem{},
-                    _type:      wit._type{},
+                    Owner: &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:  wit.Docs{},
                 },
                 "errno": &wit.TypeDef{
-                    Name: &"errno",
-                    Kind: &wit.Enum{
-                        Cases: {
+                    _type:      wit._type{},
+                    _worldItem: wit._worldItem{},
+                    Name:       &"errno",
+                    Kind:       &wit.Enum{
+                        _typeDefKind: wit._typeDefKind{},
+                        Cases:        {
                             {
                                 Name: "success",
                                 Docs: wit.Docs{},
@@ -337,20 +342,17 @@
                                 Docs: wit.Docs{},
                             },
                         },
-                        _typeDefKind: wit._typeDefKind{},
                     },
-                    Owner:      &wit.Interface{(CYCLIC REFERENCE)},
-                    Docs:       wit.Docs{},
-                    _worldItem: wit._worldItem{},
-                    _type:      wit._type{},
+                    Owner: &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:  wit.Docs{},
                 },
                 "timestamp": &wit.TypeDef{
+                    _type:      wit._type{},
+                    _worldItem: wit._worldItem{},
                     Name:       &"timestamp",
                     Kind:       wit.U64{},
                     Owner:      &wit.Interface{(CYCLIC REFERENCE)},
                     Docs:       wit.Docs{},
-                    _worldItem: wit._worldItem{},
-                    _type:      wit._type{},
                 },
             },
             Functions: {},
@@ -360,7 +362,6 @@
                     Package:   "filesystem",
                     Extension: "",
                     Version:   (*semver.Version)(nil),
-                    _node:     wit._node{},
                 },
                 Interfaces: {
                     "wasi": &wit.Interface{(CYCLIC REFERENCE)},
@@ -368,16 +369,17 @@
                 Worlds: {},
                 Docs:   wit.Docs{},
             },
-            Docs:       wit.Docs{},
-            _typeOwner: wit._typeOwner{},
-            _worldItem: wit._worldItem{},
+            Docs: wit.Docs{},
         },
     },
     TypeDefs: {
         &wit.TypeDef{
-            Name: &"clockid",
-            Kind: &wit.Enum{
-                Cases: {
+            _type:      wit._type{},
+            _worldItem: wit._worldItem{},
+            Name:       &"clockid",
+            Kind:       &wit.Enum{
+                _typeDefKind: wit._typeDefKind{},
+                Cases:        {
                     {
                         Name: "realtime",
                         Docs: wit.Docs{},
@@ -387,25 +389,25 @@
                         Docs: wit.Docs{},
                     },
                 },
-                _typeDefKind: wit._typeDefKind{},
             },
-            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
-            Docs:       wit.Docs{},
-            _worldItem: wit._worldItem{},
-            _type:      wit._type{},
+            Owner: &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:  wit.Docs{},
         },
         &wit.TypeDef{
+            _type:      wit._type{},
+            _worldItem: wit._worldItem{},
             Name:       &"timestamp",
             Kind:       wit.U64{},
             Owner:      &wit.Interface{(CYCLIC REFERENCE)},
             Docs:       wit.Docs{},
-            _worldItem: wit._worldItem{},
-            _type:      wit._type{},
         },
         &wit.TypeDef{
-            Name: &"errno",
-            Kind: &wit.Enum{
-                Cases: {
+            _type:      wit._type{},
+            _worldItem: wit._worldItem{},
+            Name:       &"errno",
+            Kind:       &wit.Enum{
+                _typeDefKind: wit._typeDefKind{},
+                Cases:        {
                     {
                         Name: "success",
                         Docs: wit.Docs{},
@@ -715,12 +717,9 @@
                         Docs: wit.Docs{},
                     },
                 },
-                _typeDefKind: wit._typeDefKind{},
             },
-            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
-            Docs:       wit.Docs{},
-            _worldItem: wit._worldItem{},
-            _type:      wit._type{},
+            Owner: &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:  wit.Docs{},
         },
     },
     Packages: {
@@ -730,7 +729,6 @@
                 Package:   "filesystem",
                 Extension: "",
                 Version:   (*semver.Version)(nil),
-                _node:     wit._node{},
             },
             Interfaces: {
                 "wasi": &wit.Interface{(CYCLIC REFERENCE)},
