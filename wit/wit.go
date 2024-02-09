@@ -13,6 +13,7 @@ import (
 //
 // [WebAssembly Interface Type]: https://component-model.bytecodealliance.org/design/wit.html
 type Node interface {
+	WITKind() string
 	WIT(ctx Node, name string) string
 }
 
@@ -41,6 +42,9 @@ func unwrap(s string) string {
 	return b.String()
 }
 
+// WITKind returns the WIT kind.
+func (*Resolve) WITKind() string { return "resolve" }
+
 // WIT returns the [WIT] text format for [Resolve] r. Note that the return value could
 // represent multiple files, so may not be precisely valid WIT text.
 //
@@ -56,6 +60,9 @@ func (r *Resolve) WIT(_ Node, _ string) string {
 	}
 	return b.String()
 }
+
+// WITKind returns the WIT kind.
+func (*Docs) WITKind() string { return "docs" }
 
 // WIT returns the [WIT] text format for [Docs] d.
 //
@@ -106,6 +113,9 @@ const (
 	LineLength = 80
 )
 
+// WITKind returns the WIT kind.
+func (*World) WITKind() string { return "world" }
+
 // WIT returns the [WIT] text format for [World] w.
 //
 // [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
@@ -155,6 +165,9 @@ func (w *World) itemWIT(motion, name string, v WorldItem) string {
 	}
 	panic("BUG: unknown WorldItem")
 }
+
+// WITKind returns the WIT kind.
+func (*Interface) WITKind() string { return "interface" }
 
 // WIT returns the [WIT] text format for [Interface] i.
 //
@@ -228,6 +241,12 @@ func (i *Interface) WIT(ctx Node, name string) string {
 	}
 	b.WriteRune('}')
 	return b.String()
+}
+
+// WITKind returns the [WIT] kind.
+func (t *TypeDef) WITKind() string {
+	// TODO: should this be prefixed with "alias" if t.Root() != t?
+	return t.Root().Kind.WITKind()
 }
 
 // WIT returns the [WIT] text format for [TypeDef] t.
@@ -355,6 +374,9 @@ func relativeName(o TypeOwner, p *Package) string {
 	return qualifiedName.String()
 }
 
+// WITKind returns the WIT kind.
+func (*Record) WITKind() string { return "record" }
+
 // WIT returns the [WIT] text format for [Record] r.
 //
 // [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
@@ -377,6 +399,9 @@ func (r *Record) WIT(ctx Node, name string) string {
 	return unwrap(b.String())
 }
 
+// WITKind returns the WIT kind.
+func (*Field) WITKind() string { return "field" }
+
 // WIT returns the [WIT] text format for [Field] f.
 //
 // [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
@@ -388,12 +413,18 @@ func (f *Field) WIT(ctx Node, name string) string {
 	return f.Docs.WIT(ctx, "") + escape(f.Name) + ": " + f.Type.WIT(f, "")
 }
 
+// WITKind returns the WIT kind.
+func (*Resource) WITKind() string { return "resource" }
+
 // WIT returns the [WIT] text format for [Resource] r.
 //
 // [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
 func (r *Resource) WIT(ctx Node, name string) string {
 	return "resource " + escape(name)
 }
+
+// WITKind returns the WIT kind.
+func (*OwnedHandle) WITKind() string { return "owned handle" }
 
 // WIT returns the [WIT] text format for [OwnedHandle] h.
 //
@@ -411,6 +442,9 @@ func (h *OwnedHandle) WIT(ctx Node, name string) string {
 	return b.String()
 }
 
+// WITKind returns the WIT kind.
+func (*BorrowedHandle) WITKind() string { return "borrowed handle" }
+
 // WIT returns the [WIT] text format for [BorrowedHandle] h.
 //
 // [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
@@ -426,6 +460,9 @@ func (h *BorrowedHandle) WIT(ctx Node, name string) string {
 	b.WriteRune('>')
 	return b.String()
 }
+
+// WITKind returns the WIT kind.
+func (*Flags) WITKind() string { return "flags" }
 
 // WIT returns the [WIT] text format for [Flags] f.
 //
@@ -447,6 +484,9 @@ func (f *Flags) WIT(ctx Node, name string) string {
 	return unwrap(b.String())
 }
 
+// WITKind returns the WIT kind.
+func (*Flag) WITKind() string { return "flag" }
+
 // WIT returns the [WIT] text format for [Flag] f.
 //
 // [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
@@ -457,6 +497,9 @@ func (f *Flag) WIT(ctx Node, _ string) string {
 	}
 	return f.Docs.WIT(ctx, "") + escape(f.Name)
 }
+
+// WITKind returns the WIT kind.
+func (*Tuple) WITKind() string { return "tuple" }
 
 // WIT returns the [WIT] text format for [Tuple] t.
 //
@@ -478,6 +521,9 @@ func (t *Tuple) WIT(ctx Node, name string) string {
 	b.WriteString(">")
 	return b.String()
 }
+
+// WITKind returns the WIT kind.
+func (*Variant) WITKind() string { return "variant" }
 
 // WIT returns the [WIT] text format for [Variant] v.
 //
@@ -501,7 +547,10 @@ func (v *Variant) WIT(ctx Node, name string) string {
 	return unwrap(b.String())
 }
 
-// WIT returns the [WIT] text format for [Case] c.
+// WITKind returns the WIT kind.
+func (*Case) WITKind() string { return "variant case" }
+
+// WIT returns the [WIT] text format for [Variant] [Case] c.
 //
 // [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
 func (c *Case) WIT(ctx Node, _ string) string {
@@ -517,6 +566,9 @@ func (c *Case) WIT(ctx Node, _ string) string {
 	}
 	return b.String()
 }
+
+// WITKind returns the WIT kind.
+func (*Enum) WITKind() string { return "enum" }
 
 // WIT returns the [WIT] text format for [Enum] e.
 //
@@ -540,6 +592,9 @@ func (e *Enum) WIT(ctx Node, name string) string {
 	return unwrap(b.String())
 }
 
+// WITKind returns the WIT kind.
+func (*EnumCase) WITKind() string { return "enum case" }
+
 // WIT returns the [WIT] text format for [EnumCase] c.
 //
 // [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
@@ -550,6 +605,9 @@ func (c *EnumCase) WIT(ctx Node, _ string) string {
 	}
 	return c.Docs.WIT(ctx, "") + escape(c.Name)
 }
+
+// WITKind returns the WIT kind.
+func (*Option) WITKind() string { return "option" }
 
 // WIT returns the [WIT] text format for [Option] o.
 //
@@ -566,6 +624,9 @@ func (o *Option) WIT(_ Node, name string) string {
 	b.WriteRune('>')
 	return b.String()
 }
+
+// WITKind returns the WIT kind.
+func (*Result) WITKind() string { return "result" }
 
 // WIT returns the [WIT] text format for [Result] r.
 //
@@ -595,6 +656,9 @@ func (r *Result) WIT(_ Node, name string) string {
 	return b.String()
 }
 
+// WITKind returns the WIT kind.
+func (*List) WITKind() string { return "list" }
+
 // WIT returns the [WIT] text format for [List] l.
 //
 // [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
@@ -610,6 +674,9 @@ func (l *List) WIT(_ Node, name string) string {
 	b.WriteRune('>')
 	return b.String()
 }
+
+// WITKind returns the WIT kind.
+func (*Future) WITKind() string { return "future" }
 
 // WIT returns the [WIT] text format for [Future] f.
 //
@@ -629,6 +696,9 @@ func (f *Future) WIT(_ Node, name string) string {
 	}
 	return b.String()
 }
+
+// WITKind returns the WIT kind.
+func (*Stream) WITKind() string { return "stream" }
 
 // WIT returns the [WIT] text format for [Stream] s.
 //
@@ -658,7 +728,10 @@ func (s *Stream) WIT(_ Node, name string) string {
 	return b.String()
 }
 
-// WIT returns the [WIT] text format for this [TypeDefKind].
+// WITKind returns the WIT kind.
+func (_primitive[T]) WITKind() string { return "type" }
+
+// WIT returns the [WIT] text format for this [_primitive].
 //
 // [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
 func (p _primitive[T]) WIT(_ Node, name string) string {
@@ -667,6 +740,9 @@ func (p _primitive[T]) WIT(_ Node, name string) string {
 	}
 	return p.String()
 }
+
+// WITKind returns the WIT kind.
+func (*Function) WITKind() string { return "function" }
 
 // WIT returns the [WIT] text format for [Function] f.
 //
@@ -727,6 +803,9 @@ func paramsWIT(params []Param, isMethod bool) string {
 	return b.String()
 }
 
+// WITKind returns the WIT kind.
+func (*Param) WITKind() string { return "param" }
+
 // WIT returns the [WIT] text format of [Param] p.
 //
 // [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
@@ -736,6 +815,9 @@ func (p *Param) WIT(_ Node, _ string) string {
 	}
 	return p.Name + ": " + p.Type.WIT(p, "")
 }
+
+// WITKind returns the WIT kind.
+func (*Package) WITKind() string { return "package" }
 
 // WIT returns the [WIT] text format of [Package] p.
 //
