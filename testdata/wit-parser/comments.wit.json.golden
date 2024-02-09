@@ -2,34 +2,36 @@
     Worlds:     nil,
     Interfaces: {
         &wit.Interface{
-            Name:     &"foo",
-            TypeDefs: {
+            _typeOwner: wit._typeOwner{},
+            _worldItem: wit._worldItem{},
+            Name:       &"foo",
+            TypeDefs:   {
                 "bar": &wit.TypeDef{
-                    Name: &"bar",
-                    Kind: &wit.Stream{
-                        Element: &wit.TypeDef{
+                    _type:      wit._type{},
+                    _worldItem: wit._worldItem{},
+                    Name:       &"bar",
+                    Kind:       &wit.Stream{
+                        _typeDefKind: wit._typeDefKind{},
+                        Element:      &wit.TypeDef{
+                            _type:      wit._type{},
+                            _worldItem: wit._worldItem{},
                             Name:       &"x",
                             Kind:       wit.U32{},
                             Owner:      &wit.Interface{(CYCLIC REFERENCE)},
                             Docs:       wit.Docs{},
-                            _worldItem: wit._worldItem{},
-                            _type:      wit._type{},
                         },
-                        End:          nil,
-                        _typeDefKind: wit._typeDefKind{},
+                        End: nil,
                     },
-                    Owner:      &wit.Interface{(CYCLIC REFERENCE)},
-                    Docs:       wit.Docs{},
-                    _worldItem: wit._worldItem{},
-                    _type:      wit._type{},
+                    Owner: &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:  wit.Docs{},
                 },
                 "x": &wit.TypeDef{
+                    _type:      wit._type{},
+                    _worldItem: wit._worldItem{},
                     Name:       &"x",
                     Kind:       wit.U32{},
                     Owner:      &wit.Interface{(CYCLIC REFERENCE)},
                     Docs:       wit.Docs{},
-                    _worldItem: wit._worldItem{},
-                    _type:      wit._type{},
                 },
             },
             Functions: {},
@@ -39,7 +41,6 @@
                     Package:   "comments",
                     Extension: "",
                     Version:   (*semver.Version)(nil),
-                    _node:     wit._node{},
                 },
                 Interfaces: {
                     "foo": &wit.Interface{(CYCLIC REFERENCE)},
@@ -47,31 +48,29 @@
                 Worlds: {},
                 Docs:   wit.Docs{},
             },
-            Docs:       wit.Docs{},
-            _typeOwner: wit._typeOwner{},
-            _worldItem: wit._worldItem{},
+            Docs: wit.Docs{},
         },
     },
     TypeDefs: {
         &wit.TypeDef{
+            _type:      wit._type{},
+            _worldItem: wit._worldItem{},
             Name:       &"x",
             Kind:       wit.U32{},
             Owner:      &wit.Interface{(CYCLIC REFERENCE)},
             Docs:       wit.Docs{},
-            _worldItem: wit._worldItem{},
-            _type:      wit._type{},
         },
         &wit.TypeDef{
-            Name: &"bar",
-            Kind: &wit.Stream{
+            _type:      wit._type{},
+            _worldItem: wit._worldItem{},
+            Name:       &"bar",
+            Kind:       &wit.Stream{
+                _typeDefKind: wit._typeDefKind{},
                 Element:      &wit.TypeDef{(CYCLIC REFERENCE)},
                 End:          nil,
-                _typeDefKind: wit._typeDefKind{},
             },
-            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
-            Docs:       wit.Docs{},
-            _worldItem: wit._worldItem{},
-            _type:      wit._type{},
+            Owner: &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:  wit.Docs{},
         },
     },
     Packages: {
@@ -81,7 +80,6 @@
                 Package:   "comments",
                 Extension: "",
                 Version:   (*semver.Version)(nil),
-                _node:     wit._node{},
             },
             Interfaces: {
                 "foo": &wit.Interface{(CYCLIC REFERENCE)},

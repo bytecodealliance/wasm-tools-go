@@ -9,7 +9,6 @@
                 Package:   "bar",
                 Extension: "",
                 Version:   (*semver.Version)(nil),
-                _node:     wit._node{},
             },
             Interfaces: {},
             Worlds:     {},

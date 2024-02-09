@@ -1,40 +1,40 @@
 &wit.Resolve{
     Worlds: {
         &wit.World{
-            Name:    "imports",
-            Imports: {
+            _typeOwner: wit._typeOwner{},
+            Name:       "imports",
+            Imports:    {
                 "interface-0": &wit.Interface{
-                    Name:      &"insecure-seed",
-                    TypeDefs:  {},
-                    Functions: {
+                    _typeOwner: wit._typeOwner{},
+                    _worldItem: wit._worldItem{},
+                    Name:       &"insecure-seed",
+                    TypeDefs:   {},
+                    Functions:  {
                         "insecure-seed": &wit.Function{
-                            Name:    "insecure-seed",
-                            Kind:    &wit.Freestanding{},
-                            Params:  nil,
-                            Results: {
+                            _worldItem: wit._worldItem{},
+                            Name:       "insecure-seed",
+                            Kind:       &wit.Freestanding{},
+                            Params:     nil,
+                            Results:    {
                                 {
                                     Name: "",
                                     Type: &wit.TypeDef{
-                                        Name: (*string)(nil),
-                                        Kind: &wit.Tuple{
-                                            Types: {
+                                        _type:      wit._type{},
+                                        _worldItem: wit._worldItem{},
+                                        Name:       (*string)(nil),
+                                        Kind:       &wit.Tuple{
+                                            _typeDefKind: wit._typeDefKind{},
+                                            Types:        {
                                                 wit.U64{},
                                                 wit.U64{},
                                             },
-                                            _typeDefKind: wit._typeDefKind{},
                                         },
-                                        Owner:      nil,
-                                        Docs:       wit.Docs{},
-                                        _worldItem: wit._worldItem{},
-                                        _type:      wit._type{},
+                                        Owner: nil,
+                                        Docs:  wit.Docs{},
                                     },
                                 },
                             },
-                            Docs: wit.Docs{
-                                Contents: "Return a 128-bit value that may contain a pseudo-random value.\n\nThe returned value is not required to be computed from a CSPRNG, and may\neven be entirely deterministic. Host implementations are encouraged to\nprovide pseudo-random values to any program exposed to\nattacker-controlled content, to enable DoS protection built into many\nlanguages' hash-map implementations.\n\nThis function is intended to only be called once, by a source language\nto initialize Denial Of Service (DoS) protection in its hash-map\nimplementation.\n\n# Expected future evolution\n\nThis will likely be changed to a value import, to prevent it from being\ncalled multiple times and potentially used for purposes other than DoS\nprotection.",
-                                _node:    wit._node{},
-                            },
-                            _worldItem: wit._worldItem{},
+                            Docs: wit.Docs{Contents:"Return a 128-bit value that may contain a pseudo-random value.\n\nThe returned value is not required to be computed from a CSPRNG, and may\neven be entirely deterministic. Host implementations are encouraged to\nprovide pseudo-random values to any program exposed to\nattacker-controlled content, to enable DoS protection built into many\nlanguages' hash-map implementations.\n\nThis function is intended to only be called once, by a source language\nto initialize Denial Of Service (DoS) protection in its hash-map\nimplementation.\n\n# Expected future evolution\n\nThis will likely be changed to a value import, to prevent it from being\ncalled multiple times and potentially used for purposes other than DoS\nprotection."},
                         },
                     },
                     Package: &wit.Package{
@@ -43,17 +43,19 @@
                             Package:   "random",
                             Extension: "",
                             Version:   (*semver.Version)(nil),
-                            _node:     wit._node{},
                         },
                         Interfaces: {
                             "insecure": &wit.Interface{
-                                Name:      &"insecure",
-                                TypeDefs:  {},
-                                Functions: {
+                                _typeOwner: wit._typeOwner{},
+                                _worldItem: wit._worldItem{},
+                                Name:       &"insecure",
+                                TypeDefs:   {},
+                                Functions:  {
                                     "get-insecure-random-bytes": &wit.Function{
-                                        Name:   "get-insecure-random-bytes",
-                                        Kind:   &wit.Freestanding{(CYCLIC REFERENCE)},
-                                        Params: {
+                                        _worldItem: wit._worldItem{},
+                                        Name:       "get-insecure-random-bytes",
+                                        Kind:       &wit.Freestanding{(CYCLIC REFERENCE)},
+                                        Params:     {
                                             {
                                                 Name: "len",
                                                 Type: wit.U64{},
@@ -63,58 +65,49 @@
                                             {
                                                 Name: "",
                                                 Type: &wit.TypeDef{
-                                                    Name: (*string)(nil),
-                                                    Kind: &wit.List{
-                                                        Type:         wit.U8{},
-                                                        _typeDefKind: wit._typeDefKind{},
-                                                    },
-                                                    Owner:      nil,
-                                                    Docs:       wit.Docs{},
-                                                    _worldItem: wit._worldItem{},
                                                     _type:      wit._type{},
+                                                    _worldItem: wit._worldItem{},
+                                                    Name:       (*string)(nil),
+                                                    Kind:       &wit.List{
+                                                        _typeDefKind: wit._typeDefKind{},
+                                                        Type:         wit.U8{},
+                                                    },
+                                                    Owner: nil,
+                                                    Docs:  wit.Docs{},
                                                 },
                                             },
                                         },
-                                        Docs: wit.Docs{
-                                            Contents: "Return `len` insecure pseudo-random bytes.\n\nThis function is not cryptographically secure. Do not use it for\nanything related to security.\n\nThere are no requirements on the values of the returned bytes, however\nimplementations are encouraged to return evenly distributed values with\na long period.",
-                                            _node:    wit._node{},
-                                        },
-                                        _worldItem: wit._worldItem{},
+                                        Docs: wit.Docs{Contents:"Return `len` insecure pseudo-random bytes.\n\nThis function is not cryptographically secure. Do not use it for\nanything related to security.\n\nThere are no requirements on the values of the returned bytes, however\nimplementations are encouraged to return evenly distributed values with\na long period."},
                                     },
                                     "get-insecure-random-u64": &wit.Function{
-                                        Name:    "get-insecure-random-u64",
-                                        Kind:    &wit.Freestanding{(CYCLIC REFERENCE)},
-                                        Params:  nil,
-                                        Results: {
+                                        _worldItem: wit._worldItem{},
+                                        Name:       "get-insecure-random-u64",
+                                        Kind:       &wit.Freestanding{(CYCLIC REFERENCE)},
+                                        Params:     nil,
+                                        Results:    {
                                             {
                                                 Name: "",
                                                 Type: wit.U64{},
                                             },
                                         },
-                                        Docs: wit.Docs{
-                                            Contents: "Return an insecure pseudo-random `u64` value.\n\nThis function returns the same type of pseudo-random data as\n`get-insecure-random-bytes`, represented as a `u64`.",
-                                            _node:    wit._node{},
-                                        },
-                                        _worldItem: wit._worldItem{},
+                                        Docs: wit.Docs{Contents:"Return an insecure pseudo-random `u64` value.\n\nThis function returns the same type of pseudo-random data as\n`get-insecure-random-bytes`, represented as a `u64`."},
                                     },
                                 },
                                 Package: &wit.Package{(CYCLIC REFERENCE)},
-                                Docs:    wit.Docs{
-                                    Contents: "The insecure interface for insecure pseudo-random numbers.\n\nIt is intended to be portable at least between Unix-family platforms and\nWindows.",
-                                    _node:    wit._node{},
-                                },
-                                _typeOwner: wit._typeOwner{},
-                                _worldItem: wit._worldItem{},
+                                Docs:    wit.Docs{Contents:"The insecure interface for insecure pseudo-random numbers.\n\nIt is intended to be portable at least between Unix-family platforms and\nWindows."},
                             },
                             "insecure-seed": &wit.Interface{(CYCLIC REFERENCE)},
                             "random":        &wit.Interface{
-                                Name:      &"random",
-                                TypeDefs:  {},
-                                Functions: {
+                                _typeOwner: wit._typeOwner{},
+                                _worldItem: wit._worldItem{},
+                                Name:       &"random",
+                                TypeDefs:   {},
+                                Functions:  {
                                     "get-random-bytes": &wit.Function{
-                                        Name:   "get-random-bytes",
-                                        Kind:   &wit.Freestanding{(CYCLIC REFERENCE)},
-                                        Params: {
+                                        _worldItem: wit._worldItem{},
+                                        Name:       "get-random-bytes",
+                                        Kind:       &wit.Freestanding{(CYCLIC REFERENCE)},
+                                        Params:     {
                                             {
                                                 Name: "len",
                                                 Type: wit.U64{},
@@ -124,48 +117,36 @@
                                             {
                                                 Name: "",
                                                 Type: &wit.TypeDef{
-                                                    Name: (*string)(nil),
-                                                    Kind: &wit.List{
-                                                        Type:         wit.U8{},
-                                                        _typeDefKind: wit._typeDefKind{},
-                                                    },
-                                                    Owner:      nil,
-                                                    Docs:       wit.Docs{},
-                                                    _worldItem: wit._worldItem{},
                                                     _type:      wit._type{},
+                                                    _worldItem: wit._worldItem{},
+                                                    Name:       (*string)(nil),
+                                                    Kind:       &wit.List{
+                                                        _typeDefKind: wit._typeDefKind{},
+                                                        Type:         wit.U8{},
+                                                    },
+                                                    Owner: nil,
+                                                    Docs:  wit.Docs{},
                                                 },
                                             },
                                         },
-                                        Docs: wit.Docs{
-                                            Contents: "Return `len` cryptographically-secure random or pseudo-random bytes.\n\nThis function must produce data at least as cryptographically secure and\nfast as an adequately seeded cryptographically-secure pseudo-random\nnumber generator (CSPRNG). It must not block, from the perspective of\nthe calling program, under any circumstances, including on the first\nrequest and on requests for numbers of bytes. The returned data must\nalways be unpredictable.\n\nThis function must always return fresh data. Deterministic environments\nmust omit this function, rather than implementing it with deterministic\ndata.",
-                                            _node:    wit._node{},
-                                        },
-                                        _worldItem: wit._worldItem{},
+                                        Docs: wit.Docs{Contents:"Return `len` cryptographically-secure random or pseudo-random bytes.\n\nThis function must produce data at least as cryptographically secure and\nfast as an adequately seeded cryptographically-secure pseudo-random\nnumber generator (CSPRNG). It must not block, from the perspective of\nthe calling program, under any circumstances, including on the first\nrequest and on requests for numbers of bytes. The returned data must\nalways be unpredictable.\n\nThis function must always return fresh data. Deterministic environments\nmust omit this function, rather than implementing it with deterministic\ndata."},
                                     },
                                     "get-random-u64": &wit.Function{
-                                        Name:    "get-random-u64",
-                                        Kind:    &wit.Freestanding{(CYCLIC REFERENCE)},
-                                        Params:  nil,
-                                        Results: {
+                                        _worldItem: wit._worldItem{},
+                                        Name:       "get-random-u64",
+                                        Kind:       &wit.Freestanding{(CYCLIC REFERENCE)},
+                                        Params:     nil,
+                                        Results:    {
                                             {
                                                 Name: "",
                                                 Type: wit.U64{},
                                             },
                                         },
-                                        Docs: wit.Docs{
-                                            Contents: "Return a cryptographically-secure random or pseudo-random `u64` value.\n\nThis function returns the same type of data as `get-random-bytes`,\nrepresented as a `u64`.",
-                                            _node:    wit._node{},
-                                        },
-                                        _worldItem: wit._worldItem{},
+                                        Docs: wit.Docs{Contents:"Return a cryptographically-secure random or pseudo-random `u64` value.\n\nThis function returns the same type of data as `get-random-bytes`,\nrepresented as a `u64`."},
                                     },
                                 },
                                 Package: &wit.Package{(CYCLIC REFERENCE)},
-                                Docs:    wit.Docs{
-                                    Contents: "WASI Random is a random data API.\n\nIt is intended to be portable at least between Unix-family platforms and\nWindows.",
-                                    _node:    wit._node{},
-                                },
-                                _typeOwner: wit._typeOwner{},
-                                _worldItem: wit._worldItem{},
+                                Docs:    wit.Docs{Contents:"WASI Random is a random data API.\n\nIt is intended to be portable at least between Unix-family platforms and\nWindows."},
                             },
                         },
                         Worlds: {
@@ -173,21 +154,19 @@
                         },
                         Docs: wit.Docs{},
                     },
-                    Docs: wit.Docs{
-                        Contents: "The insecure-seed interface for seeding hash-map DoS resistance.\n\nIt is intended to be portable at least between Unix-family platforms and\nWindows.",
-                        _node:    wit._node{},
-                    },
-                    _typeOwner: wit._typeOwner{},
-                    _worldItem: wit._worldItem{},
+                    Docs: wit.Docs{Contents:"The insecure-seed interface for seeding hash-map DoS resistance.\n\nIt is intended to be portable at least between Unix-family platforms and\nWindows."},
                 },
                 "interface-1": &wit.Interface{
-                    Name:      &"insecure",
-                    TypeDefs:  {},
-                    Functions: {
+                    _typeOwner: wit._typeOwner{},
+                    _worldItem: wit._worldItem{},
+                    Name:       &"insecure",
+                    TypeDefs:   {},
+                    Functions:  {
                         "get-insecure-random-bytes": &wit.Function{
-                            Name:   "get-insecure-random-bytes",
-                            Kind:   &wit.Freestanding{},
-                            Params: {
+                            _worldItem: wit._worldItem{},
+                            Name:       "get-insecure-random-bytes",
+                            Kind:       &wit.Freestanding{},
+                            Params:     {
                                 {
                                     Name: "len",
                                     Type: wit.U64{},
@@ -197,39 +176,32 @@
                                 {
                                     Name: "",
                                     Type: &wit.TypeDef{
-                                        Name: (*string)(nil),
-                                        Kind: &wit.List{
-                                            Type:         wit.U8{},
-                                            _typeDefKind: wit._typeDefKind{},
-                                        },
-                                        Owner:      nil,
-                                        Docs:       wit.Docs{},
-                                        _worldItem: wit._worldItem{},
                                         _type:      wit._type{},
+                                        _worldItem: wit._worldItem{},
+                                        Name:       (*string)(nil),
+                                        Kind:       &wit.List{
+                                            _typeDefKind: wit._typeDefKind{},
+                                            Type:         wit.U8{},
+                                        },
+                                        Owner: nil,
+                                        Docs:  wit.Docs{},
                                     },
                                 },
                             },
-                            Docs: wit.Docs{
-                                Contents: "Return `len` insecure pseudo-random bytes.\n\nThis function is not cryptographically secure. Do not use it for\nanything related to security.\n\nThere are no requirements on the values of the returned bytes, however\nimplementations are encouraged to return evenly distributed values with\na long period.",
-                                _node:    wit._node{},
-                            },
-                            _worldItem: wit._worldItem{},
+                            Docs: wit.Docs{Contents:"Return `len` insecure pseudo-random bytes.\n\nThis function is not cryptographically secure. Do not use it for\nanything related to security.\n\nThere are no requirements on the values of the returned bytes, however\nimplementations are encouraged to return evenly distributed values with\na long period."},
                         },
                         "get-insecure-random-u64": &wit.Function{
-                            Name:    "get-insecure-random-u64",
-                            Kind:    &wit.Freestanding{},
-                            Params:  nil,
-                            Results: {
+                            _worldItem: wit._worldItem{},
+                            Name:       "get-insecure-random-u64",
+                            Kind:       &wit.Freestanding{},
+                            Params:     nil,
+                            Results:    {
                                 {
                                     Name: "",
                                     Type: wit.U64{},
                                 },
                             },
-                            Docs: wit.Docs{
-                                Contents: "Return an insecure pseudo-random `u64` value.\n\nThis function returns the same type of pseudo-random data as\n`get-insecure-random-bytes`, represented as a `u64`.",
-                                _node:    wit._node{},
-                            },
-                            _worldItem: wit._worldItem{},
+                            Docs: wit.Docs{Contents:"Return an insecure pseudo-random `u64` value.\n\nThis function returns the same type of pseudo-random data as\n`get-insecure-random-bytes`, represented as a `u64`."},
                         },
                     },
                     Package: &wit.Package{
@@ -238,19 +210,21 @@
                             Package:   "random",
                             Extension: "",
                             Version:   (*semver.Version)(nil),
-                            _node:     wit._node{},
                         },
                         Interfaces: {
                             "insecure":      &wit.Interface{(CYCLIC REFERENCE)},
                             "insecure-seed": &wit.Interface{(CYCLIC REFERENCE)},
                             "random":        &wit.Interface{
-                                Name:      &"random",
-                                TypeDefs:  {},
-                                Functions: {
+                                _typeOwner: wit._typeOwner{},
+                                _worldItem: wit._worldItem{},
+                                Name:       &"random",
+                                TypeDefs:   {},
+                                Functions:  {
                                     "get-random-bytes": &wit.Function{
-                                        Name:   "get-random-bytes",
-                                        Kind:   &wit.Freestanding{(CYCLIC REFERENCE)},
-                                        Params: {
+                                        _worldItem: wit._worldItem{},
+                                        Name:       "get-random-bytes",
+                                        Kind:       &wit.Freestanding{(CYCLIC REFERENCE)},
+                                        Params:     {
                                             {
                                                 Name: "len",
                                                 Type: wit.U64{},
@@ -262,36 +236,24 @@
                                                 Type: &wit.TypeDef{(CYCLIC REFERENCE)},
                                             },
                                         },
-                                        Docs: wit.Docs{
-                                            Contents: "Return `len` cryptographically-secure random or pseudo-random bytes.\n\nThis function must produce data at least as cryptographically secure and\nfast as an adequately seeded cryptographically-secure pseudo-random\nnumber generator (CSPRNG). It must not block, from the perspective of\nthe calling program, under any circumstances, including on the first\nrequest and on requests for numbers of bytes. The returned data must\nalways be unpredictable.\n\nThis function must always return fresh data. Deterministic environments\nmust omit this function, rather than implementing it with deterministic\ndata.",
-                                            _node:    wit._node{},
-                                        },
-                                        _worldItem: wit._worldItem{},
+                                        Docs: wit.Docs{Contents:"Return `len` cryptographically-secure random or pseudo-random bytes.\n\nThis function must produce data at least as cryptographically secure and\nfast as an adequately seeded cryptographically-secure pseudo-random\nnumber generator (CSPRNG). It must not block, from the perspective of\nthe calling program, under any circumstances, including on the first\nrequest and on requests for numbers of bytes. The returned data must\nalways be unpredictable.\n\nThis function must always return fresh data. Deterministic environments\nmust omit this function, rather than implementing it with deterministic\ndata."},
                                     },
                                     "get-random-u64": &wit.Function{
-                                        Name:    "get-random-u64",
-                                        Kind:    &wit.Freestanding{(CYCLIC REFERENCE)},
-                                        Params:  nil,
-                                        Results: {
+                                        _worldItem: wit._worldItem{},
+                                        Name:       "get-random-u64",
+                                        Kind:       &wit.Freestanding{(CYCLIC REFERENCE)},
+                                        Params:     nil,
+                                        Results:    {
                                             {
                                                 Name: "",
                                                 Type: wit.U64{},
                                             },
                                         },
-                                        Docs: wit.Docs{
-                                            Contents: "Return a cryptographically-secure random or pseudo-random `u64` value.\n\nThis function returns the same type of data as `get-random-bytes`,\nrepresented as a `u64`.",
-                                            _node:    wit._node{},
-                                        },
-                                        _worldItem: wit._worldItem{},
+                                        Docs: wit.Docs{Contents:"Return a cryptographically-secure random or pseudo-random `u64` value.\n\nThis function returns the same type of data as `get-random-bytes`,\nrepresented as a `u64`."},
                                     },
                                 },
                                 Package: &wit.Package{(CYCLIC REFERENCE)},
-                                Docs:    wit.Docs{
-                                    Contents: "WASI Random is a random data API.\n\nIt is intended to be portable at least between Unix-family platforms and\nWindows.",
-                                    _node:    wit._node{},
-                                },
-                                _typeOwner: wit._typeOwner{},
-                                _worldItem: wit._worldItem{},
+                                Docs:    wit.Docs{Contents:"WASI Random is a random data API.\n\nIt is intended to be portable at least between Unix-family platforms and\nWindows."},
                             },
                         },
                         Worlds: {
@@ -299,21 +261,19 @@
                         },
                         Docs: wit.Docs{},
                     },
-                    Docs: wit.Docs{
-                        Contents: "The insecure interface for insecure pseudo-random numbers.\n\nIt is intended to be portable at least between Unix-family platforms and\nWindows.",
-                        _node:    wit._node{},
-                    },
-                    _typeOwner: wit._typeOwner{},
-                    _worldItem: wit._worldItem{},
+                    Docs: wit.Docs{Contents:"The insecure interface for insecure pseudo-random numbers.\n\nIt is intended to be portable at least between Unix-family platforms and\nWindows."},
                 },
                 "interface-2": &wit.Interface{
-                    Name:      &"random",
-                    TypeDefs:  {},
-                    Functions: {
+                    _typeOwner: wit._typeOwner{},
+                    _worldItem: wit._worldItem{},
+                    Name:       &"random",
+                    TypeDefs:   {},
+                    Functions:  {
                         "get-random-bytes": &wit.Function{
-                            Name:   "get-random-bytes",
-                            Kind:   &wit.Freestanding{},
-                            Params: {
+                            _worldItem: wit._worldItem{},
+                            Name:       "get-random-bytes",
+                            Kind:       &wit.Freestanding{},
+                            Params:     {
                                 {
                                     Name: "len",
                                     Type: wit.U64{},
@@ -323,39 +283,32 @@
                                 {
                                     Name: "",
                                     Type: &wit.TypeDef{
-                                        Name: (*string)(nil),
-                                        Kind: &wit.List{
-                                            Type:         wit.U8{},
-                                            _typeDefKind: wit._typeDefKind{},
-                                        },
-                                        Owner:      nil,
-                                        Docs:       wit.Docs{},
-                                        _worldItem: wit._worldItem{},
                                         _type:      wit._type{},
+                                        _worldItem: wit._worldItem{},
+                                        Name:       (*string)(nil),
+                                        Kind:       &wit.List{
+                                            _typeDefKind: wit._typeDefKind{},
+                                            Type:         wit.U8{},
+                                        },
+                                        Owner: nil,
+                                        Docs:  wit.Docs{},
                                     },
                                 },
                             },
-                            Docs: wit.Docs{
-                                Contents: "Return `len` cryptographically-secure random or pseudo-random bytes.\n\nThis function must produce data at least as cryptographically secure and\nfast as an adequately seeded cryptographically-secure pseudo-random\nnumber generator (CSPRNG). It must not block, from the perspective of\nthe calling program, under any circumstances, including on the first\nrequest and on requests for numbers of bytes. The returned data must\nalways be unpredictable.\n\nThis function must always return fresh data. Deterministic environments\nmust omit this function, rather than implementing it with deterministic\ndata.",
-                                _node:    wit._node{},
-                            },
-                            _worldItem: wit._worldItem{},
+                            Docs: wit.Docs{Contents:"Return `len` cryptographically-secure random or pseudo-random bytes.\n\nThis function must produce data at least as cryptographically secure and\nfast as an adequately seeded cryptographically-secure pseudo-random\nnumber generator (CSPRNG). It must not block, from the perspective of\nthe calling program, under any circumstances, including on the first\nrequest and on requests for numbers of bytes. The returned data must\nalways be unpredictable.\n\nThis function must always return fresh data. Deterministic environments\nmust omit this function, rather than implementing it with deterministic\ndata."},
                         },
                         "get-random-u64": &wit.Function{
-                            Name:    "get-random-u64",
-                            Kind:    &wit.Freestanding{},
-                            Params:  nil,
-                            Results: {
+                            _worldItem: wit._worldItem{},
+                            Name:       "get-random-u64",
+                            Kind:       &wit.Freestanding{},
+                            Params:     nil,
+                            Results:    {
                                 {
                                     Name: "",
                                     Type: wit.U64{},
                                 },
                             },
-                            Docs: wit.Docs{
-                                Contents: "Return a cryptographically-secure random or pseudo-random `u64` value.\n\nThis function returns the same type of data as `get-random-bytes`,\nrepresented as a `u64`.",
-                                _node:    wit._node{},
-                            },
-                            _worldItem: wit._worldItem{},
+                            Docs: wit.Docs{Contents:"Return a cryptographically-secure random or pseudo-random `u64` value.\n\nThis function returns the same type of data as `get-random-bytes`,\nrepresented as a `u64`."},
                         },
                     },
                     Package: &wit.Package{
@@ -364,7 +317,6 @@
                             Package:   "random",
                             Extension: "",
                             Version:   (*semver.Version)(nil),
-                            _node:     wit._node{},
                         },
                         Interfaces: {
                             "insecure":      &wit.Interface{(CYCLIC REFERENCE)},
@@ -376,12 +328,7 @@
                         },
                         Docs: wit.Docs{},
                     },
-                    Docs: wit.Docs{
-                        Contents: "WASI Random is a random data API.\n\nIt is intended to be portable at least between Unix-family platforms and\nWindows.",
-                        _node:    wit._node{},
-                    },
-                    _typeOwner: wit._typeOwner{},
-                    _worldItem: wit._worldItem{},
+                    Docs: wit.Docs{Contents:"WASI Random is a random data API.\n\nIt is intended to be portable at least between Unix-family platforms and\nWindows."},
                 },
             },
             Exports: {},
@@ -391,17 +338,19 @@
                     Package:   "random",
                     Extension: "",
                     Version:   (*semver.Version)(nil),
-                    _node:     wit._node{},
                 },
                 Interfaces: {
                     "insecure": &wit.Interface{
-                        Name:      &"insecure",
-                        TypeDefs:  {},
-                        Functions: {
+                        _typeOwner: wit._typeOwner{},
+                        _worldItem: wit._worldItem{},
+                        Name:       &"insecure",
+                        TypeDefs:   {},
+                        Functions:  {
                             "get-insecure-random-bytes": &wit.Function{
-                                Name:   "get-insecure-random-bytes",
-                                Kind:   &wit.Freestanding{},
-                                Params: {
+                                _worldItem: wit._worldItem{},
+                                Name:       "get-insecure-random-bytes",
+                                Kind:       &wit.Freestanding{},
+                                Params:     {
                                     {
                                         Name: "len",
                                         Type: wit.U64{},
@@ -411,99 +360,84 @@
                                     {
                                         Name: "",
                                         Type: &wit.TypeDef{
-                                            Name: (*string)(nil),
-                                            Kind: &wit.List{
-                                                Type:         wit.U8{},
-                                                _typeDefKind: wit._typeDefKind{},
-                                            },
-                                            Owner:      nil,
-                                            Docs:       wit.Docs{},
-                                            _worldItem: wit._worldItem{},
                                             _type:      wit._type{},
+                                            _worldItem: wit._worldItem{},
+                                            Name:       (*string)(nil),
+                                            Kind:       &wit.List{
+                                                _typeDefKind: wit._typeDefKind{},
+                                                Type:         wit.U8{},
+                                            },
+                                            Owner: nil,
+                                            Docs:  wit.Docs{},
                                         },
                                     },
                                 },
-                                Docs: wit.Docs{
-                                    Contents: "Return `len` insecure pseudo-random bytes.\n\nThis function is not cryptographically secure. Do not use it for\nanything related to security.\n\nThere are no requirements on the values of the returned bytes, however\nimplementations are encouraged to return evenly distributed values with\na long period.",
-                                    _node:    wit._node{},
-                                },
-                                _worldItem: wit._worldItem{},
+                                Docs: wit.Docs{Contents:"Return `len` insecure pseudo-random bytes.\n\nThis function is not cryptographically secure. Do not use it for\nanything related to security.\n\nThere are no requirements on the values of the returned bytes, however\nimplementations are encouraged to return evenly distributed values with\na long period."},
                             },
                             "get-insecure-random-u64": &wit.Function{
-                                Name:    "get-insecure-random-u64",
-                                Kind:    &wit.Freestanding{},
-                                Params:  nil,
-                                Results: {
+                                _worldItem: wit._worldItem{},
+                                Name:       "get-insecure-random-u64",
+                                Kind:       &wit.Freestanding{},
+                                Params:     nil,
+                                Results:    {
                                     {
                                         Name: "",
                                         Type: wit.U64{},
                                     },
                                 },
-                                Docs: wit.Docs{
-                                    Contents: "Return an insecure pseudo-random `u64` value.\n\nThis function returns the same type of pseudo-random data as\n`get-insecure-random-bytes`, represented as a `u64`.",
-                                    _node:    wit._node{},
-                                },
-                                _worldItem: wit._worldItem{},
+                                Docs: wit.Docs{Contents:"Return an insecure pseudo-random `u64` value.\n\nThis function returns the same type of pseudo-random data as\n`get-insecure-random-bytes`, represented as a `u64`."},
                             },
                         },
                         Package: &wit.Package{(CYCLIC REFERENCE)},
-                        Docs:    wit.Docs{
-                            Contents: "The insecure interface for insecure pseudo-random numbers.\n\nIt is intended to be portable at least between Unix-family platforms and\nWindows.",
-                            _node:    wit._node{},
-                        },
-                        _typeOwner: wit._typeOwner{},
-                        _worldItem: wit._worldItem{},
+                        Docs:    wit.Docs{Contents:"The insecure interface for insecure pseudo-random numbers.\n\nIt is intended to be portable at least between Unix-family platforms and\nWindows."},
                     },
                     "insecure-seed": &wit.Interface{
-                        Name:      &"insecure-seed",
-                        TypeDefs:  {},
-                        Functions: {
+                        _typeOwner: wit._typeOwner{},
+                        _worldItem: wit._worldItem{},
+                        Name:       &"insecure-seed",
+                        TypeDefs:   {},
+                        Functions:  {
                             "insecure-seed": &wit.Function{
-                                Name:    "insecure-seed",
-                                Kind:    &wit.Freestanding{},
-                                Params:  nil,
-                                Results: {
+                                _worldItem: wit._worldItem{},
+                                Name:       "insecure-seed",
+                                Kind:       &wit.Freestanding{},
+                                Params:     nil,
+                                Results:    {
                                     {
                                         Name: "",
                                         Type: &wit.TypeDef{
-                                            Name: (*string)(nil),
-                                            Kind: &wit.Tuple{
-                                                Types: {
+                                            _type:      wit._type{},
+                                            _worldItem: wit._worldItem{},
+                                            Name:       (*string)(nil),
+                                            Kind:       &wit.Tuple{
+                                                _typeDefKind: wit._typeDefKind{},
+                                                Types:        {
                                                     wit.U64{},
                                                     wit.U64{},
                                                 },
-                                                _typeDefKind: wit._typeDefKind{},
                                             },
-                                            Owner:      nil,
-                                            Docs:       wit.Docs{},
-                                            _worldItem: wit._worldItem{},
-                                            _type:      wit._type{},
+                                            Owner: nil,
+                                            Docs:  wit.Docs{},
                                         },
                                     },
                                 },
-                                Docs: wit.Docs{
-                                    Contents: "Return a 128-bit value that may contain a pseudo-random value.\n\nThe returned value is not required to be computed from a CSPRNG, and may\neven be entirely deterministic. Host implementations are encouraged to\nprovide pseudo-random values to any program exposed to\nattacker-controlled content, to enable DoS protection built into many\nlanguages' hash-map implementations.\n\nThis function is intended to only be called once, by a source language\nto initialize Denial Of Service (DoS) protection in its hash-map\nimplementation.\n\n# Expected future evolution\n\nThis will likely be changed to a value import, to prevent it from being\ncalled multiple times and potentially used for purposes other than DoS\nprotection.",
-                                    _node:    wit._node{},
-                                },
-                                _worldItem: wit._worldItem{},
+                                Docs: wit.Docs{Contents:"Return a 128-bit value that may contain a pseudo-random value.\n\nThe returned value is not required to be computed from a CSPRNG, and may\neven be entirely deterministic. Host implementations are encouraged to\nprovide pseudo-random values to any program exposed to\nattacker-controlled content, to enable DoS protection built into many\nlanguages' hash-map implementations.\n\nThis function is intended to only be called once, by a source language\nto initialize Denial Of Service (DoS) protection in its hash-map\nimplementation.\n\n# Expected future evolution\n\nThis will likely be changed to a value import, to prevent it from being\ncalled multiple times and potentially used for purposes other than DoS\nprotection."},
                             },
                         },
                         Package: &wit.Package{(CYCLIC REFERENCE)},
-                        Docs:    wit.Docs{
-                            Contents: "The insecure-seed interface for seeding hash-map DoS resistance.\n\nIt is intended to be portable at least between Unix-family platforms and\nWindows.",
-                            _node:    wit._node{},
-                        },
-                        _typeOwner: wit._typeOwner{},
-                        _worldItem: wit._worldItem{},
+                        Docs:    wit.Docs{Contents:"The insecure-seed interface for seeding hash-map DoS resistance.\n\nIt is intended to be portable at least between Unix-family platforms and\nWindows."},
                     },
                     "random": &wit.Interface{
-                        Name:      &"random",
-                        TypeDefs:  {},
-                        Functions: {
+                        _typeOwner: wit._typeOwner{},
+                        _worldItem: wit._worldItem{},
+                        Name:       &"random",
+                        TypeDefs:   {},
+                        Functions:  {
                             "get-random-bytes": &wit.Function{
-                                Name:   "get-random-bytes",
-                                Kind:   &wit.Freestanding{},
-                                Params: {
+                                _worldItem: wit._worldItem{},
+                                Name:       "get-random-bytes",
+                                Kind:       &wit.Freestanding{},
+                                Params:     {
                                     {
                                         Name: "len",
                                         Type: wit.U64{},
@@ -513,48 +447,36 @@
                                     {
                                         Name: "",
                                         Type: &wit.TypeDef{
-                                            Name: (*string)(nil),
-                                            Kind: &wit.List{
-                                                Type:         wit.U8{},
-                                                _typeDefKind: wit._typeDefKind{},
-                                            },
-                                            Owner:      nil,
-                                            Docs:       wit.Docs{},
-                                            _worldItem: wit._worldItem{},
                                             _type:      wit._type{},
+                                            _worldItem: wit._worldItem{},
+                                            Name:       (*string)(nil),
+                                            Kind:       &wit.List{
+                                                _typeDefKind: wit._typeDefKind{},
+                                                Type:         wit.U8{},
+                                            },
+                                            Owner: nil,
+                                            Docs:  wit.Docs{},
                                         },
                                     },
                                 },
-                                Docs: wit.Docs{
-                                    Contents: "Return `len` cryptographically-secure random or pseudo-random bytes.\n\nThis function must produce data at least as cryptographically secure and\nfast as an adequately seeded cryptographically-secure pseudo-random\nnumber generator (CSPRNG). It must not block, from the perspective of\nthe calling program, under any circumstances, including on the first\nrequest and on requests for numbers of bytes. The returned data must\nalways be unpredictable.\n\nThis function must always return fresh data. Deterministic environments\nmust omit this function, rather than implementing it with deterministic\ndata.",
-                                    _node:    wit._node{},
-                                },
-                                _worldItem: wit._worldItem{},
+                                Docs: wit.Docs{Contents:"Return `len` cryptographically-secure random or pseudo-random bytes.\n\nThis function must produce data at least as cryptographically secure and\nfast as an adequately seeded cryptographically-secure pseudo-random\nnumber generator (CSPRNG). It must not block, from the perspective of\nthe calling program, under any circumstances, including on the first\nrequest and on requests for numbers of bytes. The returned data must\nalways be unpredictable.\n\nThis function must always return fresh data. Deterministic environments\nmust omit this function, rather than implementing it with deterministic\ndata."},
                             },
                             "get-random-u64": &wit.Function{
-                                Name:    "get-random-u64",
-                                Kind:    &wit.Freestanding{},
-                                Params:  nil,
-                                Results: {
+                                _worldItem: wit._worldItem{},
+                                Name:       "get-random-u64",
+                                Kind:       &wit.Freestanding{},
+                                Params:     nil,
+                                Results:    {
                                     {
                                         Name: "",
                                         Type: wit.U64{},
                                     },
                                 },
-                                Docs: wit.Docs{
-                                    Contents: "Return a cryptographically-secure random or pseudo-random `u64` value.\n\nThis function returns the same type of data as `get-random-bytes`,\nrepresented as a `u64`.",
-                                    _node:    wit._node{},
-                                },
-                                _worldItem: wit._worldItem{},
+                                Docs: wit.Docs{Contents:"Return a cryptographically-secure random or pseudo-random `u64` value.\n\nThis function returns the same type of data as `get-random-bytes`,\nrepresented as a `u64`."},
                             },
                         },
                         Package: &wit.Package{(CYCLIC REFERENCE)},
-                        Docs:    wit.Docs{
-                            Contents: "WASI Random is a random data API.\n\nIt is intended to be portable at least between Unix-family platforms and\nWindows.",
-                            _node:    wit._node{},
-                        },
-                        _typeOwner: wit._typeOwner{},
-                        _worldItem: wit._worldItem{},
+                        Docs:    wit.Docs{Contents:"WASI Random is a random data API.\n\nIt is intended to be portable at least between Unix-family platforms and\nWindows."},
                     },
                 },
                 Worlds: {
@@ -562,43 +484,41 @@
                 },
                 Docs: wit.Docs{},
             },
-            Docs:       wit.Docs{},
-            _typeOwner: wit._typeOwner{},
+            Docs: wit.Docs{},
         },
     },
     Interfaces: {
         &wit.Interface{
-            Name:      &"insecure-seed",
-            TypeDefs:  {},
-            Functions: {
+            _typeOwner: wit._typeOwner{},
+            _worldItem: wit._worldItem{},
+            Name:       &"insecure-seed",
+            TypeDefs:   {},
+            Functions:  {
                 "insecure-seed": &wit.Function{
-                    Name:    "insecure-seed",
-                    Kind:    &wit.Freestanding{},
-                    Params:  nil,
-                    Results: {
+                    _worldItem: wit._worldItem{},
+                    Name:       "insecure-seed",
+                    Kind:       &wit.Freestanding{},
+                    Params:     nil,
+                    Results:    {
                         {
                             Name: "",
                             Type: &wit.TypeDef{
-                                Name: (*string)(nil),
-                                Kind: &wit.Tuple{
-                                    Types: {
+                                _type:      wit._type{},
+                                _worldItem: wit._worldItem{},
+                                Name:       (*string)(nil),
+                                Kind:       &wit.Tuple{
+                                    _typeDefKind: wit._typeDefKind{},
+                                    Types:        {
                                         wit.U64{},
                                         wit.U64{},
                                     },
-                                    _typeDefKind: wit._typeDefKind{},
                                 },
-                                Owner:      nil,
-                                Docs:       wit.Docs{},
-                                _worldItem: wit._worldItem{},
-                                _type:      wit._type{},
+                                Owner: nil,
+                                Docs:  wit.Docs{},
                             },
                         },
                     },
-                    Docs: wit.Docs{
-                        Contents: "Return a 128-bit value that may contain a pseudo-random value.\n\nThe returned value is not required to be computed from a CSPRNG, and may\neven be entirely deterministic. Host implementations are encouraged to\nprovide pseudo-random values to any program exposed to\nattacker-controlled content, to enable DoS protection built into many\nlanguages' hash-map implementations.\n\nThis function is intended to only be called once, by a source language\nto initialize Denial Of Service (DoS) protection in its hash-map\nimplementation.\n\n# Expected future evolution\n\nThis will likely be changed to a value import, to prevent it from being\ncalled multiple times and potentially used for purposes other than DoS\nprotection.",
-                        _node:    wit._node{},
-                    },
-                    _worldItem: wit._worldItem{},
+                    Docs: wit.Docs{Contents:"Return a 128-bit value that may contain a pseudo-random value.\n\nThe returned value is not required to be computed from a CSPRNG, and may\neven be entirely deterministic. Host implementations are encouraged to\nprovide pseudo-random values to any program exposed to\nattacker-controlled content, to enable DoS protection built into many\nlanguages' hash-map implementations.\n\nThis function is intended to only be called once, by a source language\nto initialize Denial Of Service (DoS) protection in its hash-map\nimplementation.\n\n# Expected future evolution\n\nThis will likely be changed to a value import, to prevent it from being\ncalled multiple times and potentially used for purposes other than DoS\nprotection."},
                 },
             },
             Package: &wit.Package{
@@ -607,17 +527,19 @@
                     Package:   "random",
                     Extension: "",
                     Version:   (*semver.Version)(nil),
-                    _node:     wit._node{},
                 },
                 Interfaces: {
                     "insecure": &wit.Interface{
-                        Name:      &"insecure",
-                        TypeDefs:  {},
-                        Functions: {
+                        _typeOwner: wit._typeOwner{},
+                        _worldItem: wit._worldItem{},
+                        Name:       &"insecure",
+                        TypeDefs:   {},
+                        Functions:  {
                             "get-insecure-random-bytes": &wit.Function{
-                                Name:   "get-insecure-random-bytes",
-                                Kind:   &wit.Freestanding{(CYCLIC REFERENCE)},
-                                Params: {
+                                _worldItem: wit._worldItem{},
+                                Name:       "get-insecure-random-bytes",
+                                Kind:       &wit.Freestanding{(CYCLIC REFERENCE)},
+                                Params:     {
                                     {
                                         Name: "len",
                                         Type: wit.U64{},
@@ -627,58 +549,49 @@
                                     {
                                         Name: "",
                                         Type: &wit.TypeDef{
-                                            Name: (*string)(nil),
-                                            Kind: &wit.List{
-                                                Type:         wit.U8{},
-                                                _typeDefKind: wit._typeDefKind{},
-                                            },
-                                            Owner:      nil,
-                                            Docs:       wit.Docs{},
-                                            _worldItem: wit._worldItem{},
                                             _type:      wit._type{},
+                                            _worldItem: wit._worldItem{},
+                                            Name:       (*string)(nil),
+                                            Kind:       &wit.List{
+                                                _typeDefKind: wit._typeDefKind{},
+                                                Type:         wit.U8{},
+                                            },
+                                            Owner: nil,
+                                            Docs:  wit.Docs{},
                                         },
                                     },
                                 },
-                                Docs: wit.Docs{
-                                    Contents: "Return `len` insecure pseudo-random bytes.\n\nThis function is not cryptographically secure. Do not use it for\nanything related to security.\n\nThere are no requirements on the values of the returned bytes, however\nimplementations are encouraged to return evenly distributed values with\na long period.",
-                                    _node:    wit._node{},
-                                },
-                                _worldItem: wit._worldItem{},
+                                Docs: wit.Docs{Contents:"Return `len` insecure pseudo-random bytes.\n\nThis function is not cryptographically secure. Do not use it for\nanything related to security.\n\nThere are no requirements on the values of the returned bytes, however\nimplementations are encouraged to return evenly distributed values with\na long period."},
                             },
                             "get-insecure-random-u64": &wit.Function{
-                                Name:    "get-insecure-random-u64",
-                                Kind:    &wit.Freestanding{(CYCLIC REFERENCE)},
-                                Params:  nil,
-                                Results: {
+                                _worldItem: wit._worldItem{},
+                                Name:       "get-insecure-random-u64",
+                                Kind:       &wit.Freestanding{(CYCLIC REFERENCE)},
+                                Params:     nil,
+                                Results:    {
                                     {
                                         Name: "",
                                         Type: wit.U64{},
                                     },
                                 },
-                                Docs: wit.Docs{
-                                    Contents: "Return an insecure pseudo-random `u64` value.\n\nThis function returns the same type of pseudo-random data as\n`get-insecure-random-bytes`, represented as a `u64`.",
-                                    _node:    wit._node{},
-                                },
-                                _worldItem: wit._worldItem{},
+                                Docs: wit.Docs{Contents:"Return an insecure pseudo-random `u64` value.\n\nThis function returns the same type of pseudo-random data as\n`get-insecure-random-bytes`, represented as a `u64`."},
                             },
                         },
                         Package: &wit.Package{(CYCLIC REFERENCE)},
-                        Docs:    wit.Docs{
-                            Contents: "The insecure interface for insecure pseudo-random numbers.\n\nIt is intended to be portable at least between Unix-family platforms and\nWindows.",
-                            _node:    wit._node{},
-                        },
-                        _typeOwner: wit._typeOwner{},
-                        _worldItem: wit._worldItem{},
+                        Docs:    wit.Docs{Contents:"The insecure interface for insecure pseudo-random numbers.\n\nIt is intended to be portable at least between Unix-family platforms and\nWindows."},
                     },
                     "insecure-seed": &wit.Interface{(CYCLIC REFERENCE)},
                     "random":        &wit.Interface{
-                        Name:      &"random",
-                        TypeDefs:  {},
-                        Functions: {
+                        _typeOwner: wit._typeOwner{},
+                        _worldItem: wit._worldItem{},
+                        Name:       &"random",
+                        TypeDefs:   {},
+                        Functions:  {
                             "get-random-bytes": &wit.Function{
-                                Name:   "get-random-bytes",
-                                Kind:   &wit.Freestanding{(CYCLIC REFERENCE)},
-                                Params: {
+                                _worldItem: wit._worldItem{},
+                                Name:       "get-random-bytes",
+                                Kind:       &wit.Freestanding{(CYCLIC REFERENCE)},
+                                Params:     {
                                     {
                                         Name: "len",
                                         Type: wit.U64{},
@@ -688,48 +601,36 @@
                                     {
                                         Name: "",
                                         Type: &wit.TypeDef{
-                                            Name: (*string)(nil),
-                                            Kind: &wit.List{
-                                                Type:         wit.U8{},
-                                                _typeDefKind: wit._typeDefKind{},
-                                            },
-                                            Owner:      nil,
-                                            Docs:       wit.Docs{},
-                                            _worldItem: wit._worldItem{},
                                             _type:      wit._type{},
+                                            _worldItem: wit._worldItem{},
+                                            Name:       (*string)(nil),
+                                            Kind:       &wit.List{
+                                                _typeDefKind: wit._typeDefKind{},
+                                                Type:         wit.U8{},
+                                            },
+                                            Owner: nil,
+                                            Docs:  wit.Docs{},
                                         },
                                     },
                                 },
-                                Docs: wit.Docs{
-                                    Contents: "Return `len` cryptographically-secure random or pseudo-random bytes.\n\nThis function must produce data at least as cryptographically secure and\nfast as an adequately seeded cryptographically-secure pseudo-random\nnumber generator (CSPRNG). It must not block, from the perspective of\nthe calling program, under any circumstances, including on the first\nrequest and on requests for numbers of bytes. The returned data must\nalways be unpredictable.\n\nThis function must always return fresh data. Deterministic environments\nmust omit this function, rather than implementing it with deterministic\ndata.",
-                                    _node:    wit._node{},
-                                },
-                                _worldItem: wit._worldItem{},
+                                Docs: wit.Docs{Contents:"Return `len` cryptographically-secure random or pseudo-random bytes.\n\nThis function must produce data at least as cryptographically secure and\nfast as an adequately seeded cryptographically-secure pseudo-random\nnumber generator (CSPRNG). It must not block, from the perspective of\nthe calling program, under any circumstances, including on the first\nrequest and on requests for numbers of bytes. The returned data must\nalways be unpredictable.\n\nThis function must always return fresh data. Deterministic environments\nmust omit this function, rather than implementing it with deterministic\ndata."},
                             },
                             "get-random-u64": &wit.Function{
-                                Name:    "get-random-u64",
-                                Kind:    &wit.Freestanding{(CYCLIC REFERENCE)},
-                                Params:  nil,
-                                Results: {
+                                _worldItem: wit._worldItem{},
+                                Name:       "get-random-u64",
+                                Kind:       &wit.Freestanding{(CYCLIC REFERENCE)},
+                                Params:     nil,
+                                Results:    {
                                     {
                                         Name: "",
                                         Type: wit.U64{},
                                     },
                                 },
-                                Docs: wit.Docs{
-                                    Contents: "Return a cryptographically-secure random or pseudo-random `u64` value.\n\nThis function returns the same type of data as `get-random-bytes`,\nrepresented as a `u64`.",
-                                    _node:    wit._node{},
-                                },
-                                _worldItem: wit._worldItem{},
+                                Docs: wit.Docs{Contents:"Return a cryptographically-secure random or pseudo-random `u64` value.\n\nThis function returns the same type of data as `get-random-bytes`,\nrepresented as a `u64`."},
                             },
                         },
                         Package: &wit.Package{(CYCLIC REFERENCE)},
-                        Docs:    wit.Docs{
-                            Contents: "WASI Random is a random data API.\n\nIt is intended to be portable at least between Unix-family platforms and\nWindows.",
-                            _node:    wit._node{},
-                        },
-                        _typeOwner: wit._typeOwner{},
-                        _worldItem: wit._worldItem{},
+                        Docs:    wit.Docs{Contents:"WASI Random is a random data API.\n\nIt is intended to be portable at least between Unix-family platforms and\nWindows."},
                     },
                 },
                 Worlds: {
@@ -737,21 +638,19 @@
                 },
                 Docs: wit.Docs{},
             },
-            Docs: wit.Docs{
-                Contents: "The insecure-seed interface for seeding hash-map DoS resistance.\n\nIt is intended to be portable at least between Unix-family platforms and\nWindows.",
-                _node:    wit._node{},
-            },
-            _typeOwner: wit._typeOwner{},
-            _worldItem: wit._worldItem{},
+            Docs: wit.Docs{Contents:"The insecure-seed interface for seeding hash-map DoS resistance.\n\nIt is intended to be portable at least between Unix-family platforms and\nWindows."},
         },
         &wit.Interface{
-            Name:      &"insecure",
-            TypeDefs:  {},
-            Functions: {
+            _typeOwner: wit._typeOwner{},
+            _worldItem: wit._worldItem{},
+            Name:       &"insecure",
+            TypeDefs:   {},
+            Functions:  {
                 "get-insecure-random-bytes": &wit.Function{
-                    Name:   "get-insecure-random-bytes",
-                    Kind:   &wit.Freestanding{},
-                    Params: {
+                    _worldItem: wit._worldItem{},
+                    Name:       "get-insecure-random-bytes",
+                    Kind:       &wit.Freestanding{},
+                    Params:     {
                         {
                             Name: "len",
                             Type: wit.U64{},
@@ -761,39 +660,32 @@
                         {
                             Name: "",
                             Type: &wit.TypeDef{
-                                Name: (*string)(nil),
-                                Kind: &wit.List{
-                                    Type:         wit.U8{},
-                                    _typeDefKind: wit._typeDefKind{},
-                                },
-                                Owner:      nil,
-                                Docs:       wit.Docs{},
-                                _worldItem: wit._worldItem{},
                                 _type:      wit._type{},
+                                _worldItem: wit._worldItem{},
+                                Name:       (*string)(nil),
+                                Kind:       &wit.List{
+                                    _typeDefKind: wit._typeDefKind{},
+                                    Type:         wit.U8{},
+                                },
+                                Owner: nil,
+                                Docs:  wit.Docs{},
                             },
                         },
                     },
-                    Docs: wit.Docs{
-                        Contents: "Return `len` insecure pseudo-random bytes.\n\nThis function is not cryptographically secure. Do not use it for\nanything related to security.\n\nThere are no requirements on the values of the returned bytes, however\nimplementations are encouraged to return evenly distributed values with\na long period.",
-                        _node:    wit._node{},
-                    },
-                    _worldItem: wit._worldItem{},
+                    Docs: wit.Docs{Contents:"Return `len` insecure pseudo-random bytes.\n\nThis function is not cryptographically secure. Do not use it for\nanything related to security.\n\nThere are no requirements on the values of the returned bytes, however\nimplementations are encouraged to return evenly distributed values with\na long period."},
                 },
                 "get-insecure-random-u64": &wit.Function{
-                    Name:    "get-insecure-random-u64",
-                    Kind:    &wit.Freestanding{},
-                    Params:  nil,
-                    Results: {
+                    _worldItem: wit._worldItem{},
+                    Name:       "get-insecure-random-u64",
+                    Kind:       &wit.Freestanding{},
+                    Params:     nil,
+                    Results:    {
                         {
                             Name: "",
                             Type: wit.U64{},
                         },
                     },
-                    Docs: wit.Docs{
-                        Contents: "Return an insecure pseudo-random `u64` value.\n\nThis function returns the same type of pseudo-random data as\n`get-insecure-random-bytes`, represented as a `u64`.",
-                        _node:    wit._node{},
-                    },
-                    _worldItem: wit._worldItem{},
+                    Docs: wit.Docs{Contents:"Return an insecure pseudo-random `u64` value.\n\nThis function returns the same type of pseudo-random data as\n`get-insecure-random-bytes`, represented as a `u64`."},
                 },
             },
             Package: &wit.Package{
@@ -802,19 +694,21 @@
                     Package:   "random",
                     Extension: "",
                     Version:   (*semver.Version)(nil),
-                    _node:     wit._node{},
                 },
                 Interfaces: {
                     "insecure":      &wit.Interface{(CYCLIC REFERENCE)},
                     "insecure-seed": &wit.Interface{(CYCLIC REFERENCE)},
                     "random":        &wit.Interface{
-                        Name:      &"random",
-                        TypeDefs:  {},
-                        Functions: {
+                        _typeOwner: wit._typeOwner{},
+                        _worldItem: wit._worldItem{},
+                        Name:       &"random",
+                        TypeDefs:   {},
+                        Functions:  {
                             "get-random-bytes": &wit.Function{
-                                Name:   "get-random-bytes",
-                                Kind:   &wit.Freestanding{(CYCLIC REFERENCE)},
-                                Params: {
+                                _worldItem: wit._worldItem{},
+                                Name:       "get-random-bytes",
+                                Kind:       &wit.Freestanding{(CYCLIC REFERENCE)},
+                                Params:     {
                                     {
                                         Name: "len",
                                         Type: wit.U64{},
@@ -826,36 +720,24 @@
                                         Type: &wit.TypeDef{(CYCLIC REFERENCE)},
                                     },
                                 },
-                                Docs: wit.Docs{
-                                    Contents: "Return `len` cryptographically-secure random or pseudo-random bytes.\n\nThis function must produce data at least as cryptographically secure and\nfast as an adequately seeded cryptographically-secure pseudo-random\nnumber generator (CSPRNG). It must not block, from the perspective of\nthe calling program, under any circumstances, including on the first\nrequest and on requests for numbers of bytes. The returned data must\nalways be unpredictable.\n\nThis function must always return fresh data. Deterministic environments\nmust omit this function, rather than implementing it with deterministic\ndata.",
-                                    _node:    wit._node{},
-                                },
-                                _worldItem: wit._worldItem{},
+                                Docs: wit.Docs{Contents:"Return `len` cryptographically-secure random or pseudo-random bytes.\n\nThis function must produce data at least as cryptographically secure and\nfast as an adequately seeded cryptographically-secure pseudo-random\nnumber generator (CSPRNG). It must not block, from the perspective of\nthe calling program, under any circumstances, including on the first\nrequest and on requests for numbers of bytes. The returned data must\nalways be unpredictable.\n\nThis function must always return fresh data. Deterministic environments\nmust omit this function, rather than implementing it with deterministic\ndata."},
                             },
                             "get-random-u64": &wit.Function{
-                                Name:    "get-random-u64",
-                                Kind:    &wit.Freestanding{(CYCLIC REFERENCE)},
-                                Params:  nil,
-                                Results: {
+                                _worldItem: wit._worldItem{},
+                                Name:       "get-random-u64",
+                                Kind:       &wit.Freestanding{(CYCLIC REFERENCE)},
+                                Params:     nil,
+                                Results:    {
                                     {
                                         Name: "",
                                         Type: wit.U64{},
                                     },
                                 },
-                                Docs: wit.Docs{
-                                    Contents: "Return a cryptographically-secure random or pseudo-random `u64` value.\n\nThis function returns the same type of data as `get-random-bytes`,\nrepresented as a `u64`.",
-                                    _node:    wit._node{},
-                                },
-                                _worldItem: wit._worldItem{},
+                                Docs: wit.Docs{Contents:"Return a cryptographically-secure random or pseudo-random `u64` value.\n\nThis function returns the same type of data as `get-random-bytes`,\nrepresented as a `u64`."},
                             },
                         },
                         Package: &wit.Package{(CYCLIC REFERENCE)},
-                        Docs:    wit.Docs{
-                            Contents: "WASI Random is a random data API.\n\nIt is intended to be portable at least between Unix-family platforms and\nWindows.",
-                            _node:    wit._node{},
-                        },
-                        _typeOwner: wit._typeOwner{},
-                        _worldItem: wit._worldItem{},
+                        Docs:    wit.Docs{Contents:"WASI Random is a random data API.\n\nIt is intended to be portable at least between Unix-family platforms and\nWindows."},
                     },
                 },
                 Worlds: {
@@ -863,21 +745,19 @@
                 },
                 Docs: wit.Docs{},
             },
-            Docs: wit.Docs{
-                Contents: "The insecure interface for insecure pseudo-random numbers.\n\nIt is intended to be portable at least between Unix-family platforms and\nWindows.",
-                _node:    wit._node{},
-            },
-            _typeOwner: wit._typeOwner{},
-            _worldItem: wit._worldItem{},
+            Docs: wit.Docs{Contents:"The insecure interface for insecure pseudo-random numbers.\n\nIt is intended to be portable at least between Unix-family platforms and\nWindows."},
         },
         &wit.Interface{
-            Name:      &"random",
-            TypeDefs:  {},
-            Functions: {
+            _typeOwner: wit._typeOwner{},
+            _worldItem: wit._worldItem{},
+            Name:       &"random",
+            TypeDefs:   {},
+            Functions:  {
                 "get-random-bytes": &wit.Function{
-                    Name:   "get-random-bytes",
-                    Kind:   &wit.Freestanding{},
-                    Params: {
+                    _worldItem: wit._worldItem{},
+                    Name:       "get-random-bytes",
+                    Kind:       &wit.Freestanding{},
+                    Params:     {
                         {
                             Name: "len",
                             Type: wit.U64{},
@@ -887,39 +767,32 @@
                         {
                             Name: "",
                             Type: &wit.TypeDef{
-                                Name: (*string)(nil),
-                                Kind: &wit.List{
-                                    Type:         wit.U8{},
-                                    _typeDefKind: wit._typeDefKind{},
-                                },
-                                Owner:      nil,
-                                Docs:       wit.Docs{},
-                                _worldItem: wit._worldItem{},
                                 _type:      wit._type{},
+                                _worldItem: wit._worldItem{},
+                                Name:       (*string)(nil),
+                                Kind:       &wit.List{
+                                    _typeDefKind: wit._typeDefKind{},
+                                    Type:         wit.U8{},
+                                },
+                                Owner: nil,
+                                Docs:  wit.Docs{},
                             },
                         },
                     },
-                    Docs: wit.Docs{
-                        Contents: "Return `len` cryptographically-secure random or pseudo-random bytes.\n\nThis function must produce data at least as cryptographically secure and\nfast as an adequately seeded cryptographically-secure pseudo-random\nnumber generator (CSPRNG). It must not block, from the perspective of\nthe calling program, under any circumstances, including on the first\nrequest and on requests for numbers of bytes. The returned data must\nalways be unpredictable.\n\nThis function must always return fresh data. Deterministic environments\nmust omit this function, rather than implementing it with deterministic\ndata.",
-                        _node:    wit._node{},
-                    },
-                    _worldItem: wit._worldItem{},
+                    Docs: wit.Docs{Contents:"Return `len` cryptographically-secure random or pseudo-random bytes.\n\nThis function must produce data at least as cryptographically secure and\nfast as an adequately seeded cryptographically-secure pseudo-random\nnumber generator (CSPRNG). It must not block, from the perspective of\nthe calling program, under any circumstances, including on the first\nrequest and on requests for numbers of bytes. The returned data must\nalways be unpredictable.\n\nThis function must always return fresh data. Deterministic environments\nmust omit this function, rather than implementing it with deterministic\ndata."},
                 },
                 "get-random-u64": &wit.Function{
-                    Name:    "get-random-u64",
-                    Kind:    &wit.Freestanding{},
-                    Params:  nil,
-                    Results: {
+                    _worldItem: wit._worldItem{},
+                    Name:       "get-random-u64",
+                    Kind:       &wit.Freestanding{},
+                    Params:     nil,
+                    Results:    {
                         {
                             Name: "",
                             Type: wit.U64{},
                         },
                     },
-                    Docs: wit.Docs{
-                        Contents: "Return a cryptographically-secure random or pseudo-random `u64` value.\n\nThis function returns the same type of data as `get-random-bytes`,\nrepresented as a `u64`.",
-                        _node:    wit._node{},
-                    },
-                    _worldItem: wit._worldItem{},
+                    Docs: wit.Docs{Contents:"Return a cryptographically-secure random or pseudo-random `u64` value.\n\nThis function returns the same type of data as `get-random-bytes`,\nrepresented as a `u64`."},
                 },
             },
             Package: &wit.Package{
@@ -928,7 +801,6 @@
                     Package:   "random",
                     Extension: "",
                     Version:   (*semver.Version)(nil),
-                    _node:     wit._node{},
                 },
                 Interfaces: {
                     "insecure":      &wit.Interface{(CYCLIC REFERENCE)},
@@ -940,39 +812,34 @@
                 },
                 Docs: wit.Docs{},
             },
-            Docs: wit.Docs{
-                Contents: "WASI Random is a random data API.\n\nIt is intended to be portable at least between Unix-family platforms and\nWindows.",
-                _node:    wit._node{},
-            },
-            _typeOwner: wit._typeOwner{},
-            _worldItem: wit._worldItem{},
+            Docs: wit.Docs{Contents:"WASI Random is a random data API.\n\nIt is intended to be portable at least between Unix-family platforms and\nWindows."},
         },
     },
     TypeDefs: {
         &wit.TypeDef{
-            Name: (*string)(nil),
-            Kind: &wit.Tuple{
-                Types: {
+            _type:      wit._type{},
+            _worldItem: wit._worldItem{},
+            Name:       (*string)(nil),
+            Kind:       &wit.Tuple{
+                _typeDefKind: wit._typeDefKind{},
+                Types:        {
                     wit.U64{},
                     wit.U64{},
                 },
-                _typeDefKind: wit._typeDefKind{},
             },
-            Owner:      nil,
-            Docs:       wit.Docs{},
-            _worldItem: wit._worldItem{},
-            _type:      wit._type{},
+            Owner: nil,
+            Docs:  wit.Docs{},
         },
         &wit.TypeDef{
-            Name: (*string)(nil),
-            Kind: &wit.List{
-                Type:         wit.U8{},
-                _typeDefKind: wit._typeDefKind{},
-            },
-            Owner:      nil,
-            Docs:       wit.Docs{},
-            _worldItem: wit._worldItem{},
             _type:      wit._type{},
+            _worldItem: wit._worldItem{},
+            Name:       (*string)(nil),
+            Kind:       &wit.List{
+                _typeDefKind: wit._typeDefKind{},
+                Type:         wit.U8{},
+            },
+            Owner: nil,
+            Docs:  wit.Docs{},
         },
     },
     Packages: {
@@ -982,7 +849,6 @@
                 Package:   "random",
                 Extension: "",
                 Version:   (*semver.Version)(nil),
-                _node:     wit._node{},
             },
             Interfaces: {
                 "insecure":      &wit.Interface{(CYCLIC REFERENCE)},

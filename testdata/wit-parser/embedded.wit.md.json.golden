@@ -2,32 +2,34 @@
     Worlds:     nil,
     Interfaces: {
         &wit.Interface{
-            Name:      &"foo",
-            TypeDefs:  {},
-            Functions: {
+            _typeOwner: wit._typeOwner{},
+            _worldItem: wit._worldItem{},
+            Name:       &"foo",
+            TypeDefs:   {},
+            Functions:  {
                 "x": &wit.Function{
+                    _worldItem: wit._worldItem{},
                     Name:       "x",
                     Kind:       &wit.Freestanding{},
                     Params:     nil,
                     Results:    nil,
                     Docs:       wit.Docs{},
-                    _worldItem: wit._worldItem{},
                 },
                 "y": &wit.Function{
+                    _worldItem: wit._worldItem{},
                     Name:       "y",
                     Kind:       &wit.Freestanding{},
                     Params:     nil,
                     Results:    nil,
                     Docs:       wit.Docs{},
-                    _worldItem: wit._worldItem{},
                 },
                 "z": &wit.Function{
+                    _worldItem: wit._worldItem{},
                     Name:       "z",
                     Kind:       &wit.Freestanding{},
                     Params:     nil,
                     Results:    nil,
                     Docs:       wit.Docs{},
-                    _worldItem: wit._worldItem{},
                 },
             },
             Package: &wit.Package{
@@ -36,7 +38,6 @@
                     Package:   "foo",
                     Extension: "",
                     Version:   (*semver.Version)(nil),
-                    _node:     wit._node{},
                 },
                 Interfaces: {
                     "foo": &wit.Interface{(CYCLIC REFERENCE)},
@@ -44,9 +45,7 @@
                 Worlds: {},
                 Docs:   wit.Docs{},
             },
-            Docs:       wit.Docs{},
-            _typeOwner: wit._typeOwner{},
-            _worldItem: wit._worldItem{},
+            Docs: wit.Docs{},
         },
     },
     TypeDefs: nil,
@@ -57,7 +56,6 @@
                 Package:   "foo",
                 Extension: "",
                 Version:   (*semver.Version)(nil),
-                _node:     wit._node{},
             },
             Interfaces: {
                 "foo": &wit.Interface{(CYCLIC REFERENCE)},

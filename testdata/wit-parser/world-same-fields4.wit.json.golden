@@ -1,18 +1,21 @@
 &wit.Resolve{
     Worlds: {
         &wit.World{
-            Name:    "foo",
-            Imports: {
+            _typeOwner: wit._typeOwner{},
+            Name:       "foo",
+            Imports:    {
                 "interface-0": &wit.Interface{
-                    Name:     &"shared-items",
-                    TypeDefs: {
+                    _typeOwner: wit._typeOwner{},
+                    _worldItem: wit._worldItem{},
+                    Name:       &"shared-items",
+                    TypeDefs:   {
                         "a": &wit.TypeDef{
+                            _type:      wit._type{},
+                            _worldItem: wit._worldItem{},
                             Name:       &"a",
                             Kind:       wit.U32{},
                             Owner:      &wit.Interface{(CYCLIC REFERENCE)},
                             Docs:       wit.Docs{},
-                            _worldItem: wit._worldItem{},
-                            _type:      wit._type{},
                         },
                     },
                     Functions: {},
@@ -22,7 +25,6 @@
                             Package:   "foo",
                             Extension: "",
                             Version:   (*semver.Version)(nil),
-                            _node:     wit._node{},
                         },
                         Interfaces: {
                             "shared-items": &wit.Interface{(CYCLIC REFERENCE)},
@@ -32,21 +34,20 @@
                         },
                         Docs: wit.Docs{},
                     },
-                    Docs:       wit.Docs{},
-                    _typeOwner: wit._typeOwner{},
-                    _worldItem: wit._worldItem{},
+                    Docs: wit.Docs{},
                 },
                 "shared-items": &wit.Interface{
-                    Name:      (*string)(nil),
-                    TypeDefs:  {},
-                    Functions: {},
-                    Package:   &wit.Package{
+                    _typeOwner: wit._typeOwner{},
+                    _worldItem: wit._worldItem{},
+                    Name:       (*string)(nil),
+                    TypeDefs:   {},
+                    Functions:  {},
+                    Package:    &wit.Package{
                         Name: wit.Ident{
                             Namespace: "foo",
                             Package:   "foo",
                             Extension: "",
                             Version:   (*semver.Version)(nil),
-                            _node:     wit._node{},
                         },
                         Interfaces: {
                             "shared-items": &wit.Interface{(CYCLIC REFERENCE)},
@@ -56,22 +57,22 @@
                         },
                         Docs: wit.Docs{},
                     },
-                    Docs:       wit.Docs{},
-                    _typeOwner: wit._typeOwner{},
-                    _worldItem: wit._worldItem{},
+                    Docs: wit.Docs{},
                 },
             },
             Exports: {
                 "a-name": &wit.Interface{
-                    Name:     (*string)(nil),
-                    TypeDefs: {
+                    _typeOwner: wit._typeOwner{},
+                    _worldItem: wit._worldItem{},
+                    Name:       (*string)(nil),
+                    TypeDefs:   {
                         "a": &wit.TypeDef{
+                            _type:      wit._type{},
+                            _worldItem: wit._worldItem{},
                             Name:       &"a",
                             Kind:       &wit.TypeDef{(CYCLIC REFERENCE)},
                             Owner:      &wit.Interface{(CYCLIC REFERENCE)},
                             Docs:       wit.Docs{},
-                            _worldItem: wit._worldItem{},
-                            _type:      wit._type{},
                         },
                     },
                     Functions: {},
@@ -81,7 +82,6 @@
                             Package:   "foo",
                             Extension: "",
                             Version:   (*semver.Version)(nil),
-                            _node:     wit._node{},
                         },
                         Interfaces: {
                             "shared-items": &wit.Interface{(CYCLIC REFERENCE)},
@@ -91,9 +91,7 @@
                         },
                         Docs: wit.Docs{},
                     },
-                    Docs:       wit.Docs{},
-                    _typeOwner: wit._typeOwner{},
-                    _worldItem: wit._worldItem{},
+                    Docs: wit.Docs{},
                 },
             },
             Package: &wit.Package{
@@ -102,26 +100,25 @@
                     Package:   "foo",
                     Extension: "",
                     Version:   (*semver.Version)(nil),
-                    _node:     wit._node{},
                 },
                 Interfaces: {
                     "shared-items": &wit.Interface{
-                        Name:     &"shared-items",
-                        TypeDefs: {
+                        _typeOwner: wit._typeOwner{},
+                        _worldItem: wit._worldItem{},
+                        Name:       &"shared-items",
+                        TypeDefs:   {
                             "a": &wit.TypeDef{
+                                _type:      wit._type{},
+                                _worldItem: wit._worldItem{},
                                 Name:       &"a",
                                 Kind:       wit.U32{},
                                 Owner:      &wit.Interface{(CYCLIC REFERENCE)},
                                 Docs:       wit.Docs{},
-                                _worldItem: wit._worldItem{},
-                                _type:      wit._type{},
                             },
                         },
-                        Functions:  {},
-                        Package:    &wit.Package{(CYCLIC REFERENCE)},
-                        Docs:       wit.Docs{},
-                        _typeOwner: wit._typeOwner{},
-                        _worldItem: wit._worldItem{},
+                        Functions: {},
+                        Package:   &wit.Package{(CYCLIC REFERENCE)},
+                        Docs:      wit.Docs{},
                     },
                 },
                 Worlds: {
@@ -129,21 +126,22 @@
                 },
                 Docs: wit.Docs{},
             },
-            Docs:       wit.Docs{},
-            _typeOwner: wit._typeOwner{},
+            Docs: wit.Docs{},
         },
     },
     Interfaces: {
         &wit.Interface{
-            Name:     &"shared-items",
-            TypeDefs: {
+            _typeOwner: wit._typeOwner{},
+            _worldItem: wit._worldItem{},
+            Name:       &"shared-items",
+            TypeDefs:   {
                 "a": &wit.TypeDef{
+                    _type:      wit._type{},
+                    _worldItem: wit._worldItem{},
                     Name:       &"a",
                     Kind:       wit.U32{},
                     Owner:      &wit.Interface{(CYCLIC REFERENCE)},
                     Docs:       wit.Docs{},
-                    _worldItem: wit._worldItem{},
-                    _type:      wit._type{},
                 },
             },
             Functions: {},
@@ -153,7 +151,6 @@
                     Package:   "foo",
                     Extension: "",
                     Version:   (*semver.Version)(nil),
-                    _node:     wit._node{},
                 },
                 Interfaces: {
                     "shared-items": &wit.Interface{(CYCLIC REFERENCE)},
@@ -163,21 +160,20 @@
                 },
                 Docs: wit.Docs{},
             },
-            Docs:       wit.Docs{},
-            _typeOwner: wit._typeOwner{},
-            _worldItem: wit._worldItem{},
+            Docs: wit.Docs{},
         },
         &wit.Interface{
-            Name:      (*string)(nil),
-            TypeDefs:  {},
-            Functions: {},
-            Package:   &wit.Package{
+            _typeOwner: wit._typeOwner{},
+            _worldItem: wit._worldItem{},
+            Name:       (*string)(nil),
+            TypeDefs:   {},
+            Functions:  {},
+            Package:    &wit.Package{
                 Name: wit.Ident{
                     Namespace: "foo",
                     Package:   "foo",
                     Extension: "",
                     Version:   (*semver.Version)(nil),
-                    _node:     wit._node{},
                 },
                 Interfaces: {
                     "shared-items": &wit.Interface{(CYCLIC REFERENCE)},
@@ -187,20 +183,20 @@
                 },
                 Docs: wit.Docs{},
             },
-            Docs:       wit.Docs{},
-            _typeOwner: wit._typeOwner{},
-            _worldItem: wit._worldItem{},
+            Docs: wit.Docs{},
         },
         &wit.Interface{
-            Name:     (*string)(nil),
-            TypeDefs: {
+            _typeOwner: wit._typeOwner{},
+            _worldItem: wit._worldItem{},
+            Name:       (*string)(nil),
+            TypeDefs:   {
                 "a": &wit.TypeDef{
+                    _type:      wit._type{},
+                    _worldItem: wit._worldItem{},
                     Name:       &"a",
                     Kind:       &wit.TypeDef{(CYCLIC REFERENCE)},
                     Owner:      &wit.Interface{(CYCLIC REFERENCE)},
                     Docs:       wit.Docs{},
-                    _worldItem: wit._worldItem{},
-                    _type:      wit._type{},
                 },
             },
             Functions: {},
@@ -210,7 +206,6 @@
                     Package:   "foo",
                     Extension: "",
                     Version:   (*semver.Version)(nil),
-                    _node:     wit._node{},
                 },
                 Interfaces: {
                     "shared-items": &wit.Interface{(CYCLIC REFERENCE)},
@@ -220,27 +215,25 @@
                 },
                 Docs: wit.Docs{},
             },
-            Docs:       wit.Docs{},
-            _typeOwner: wit._typeOwner{},
-            _worldItem: wit._worldItem{},
+            Docs: wit.Docs{},
         },
     },
     TypeDefs: {
         &wit.TypeDef{
+            _type:      wit._type{},
+            _worldItem: wit._worldItem{},
             Name:       &"a",
             Kind:       wit.U32{},
             Owner:      &wit.Interface{(CYCLIC REFERENCE)},
             Docs:       wit.Docs{},
-            _worldItem: wit._worldItem{},
-            _type:      wit._type{},
         },
         &wit.TypeDef{
+            _type:      wit._type{},
+            _worldItem: wit._worldItem{},
             Name:       &"a",
             Kind:       &wit.TypeDef{(CYCLIC REFERENCE)},
             Owner:      &wit.Interface{(CYCLIC REFERENCE)},
             Docs:       wit.Docs{},
-            _worldItem: wit._worldItem{},
-            _type:      wit._type{},
         },
     },
     Packages: {
@@ -250,7 +243,6 @@
                 Package:   "foo",
                 Extension: "",
                 Version:   (*semver.Version)(nil),
-                _node:     wit._node{},
             },
             Interfaces: {
                 "shared-items": &wit.Interface{(CYCLIC REFERENCE)},

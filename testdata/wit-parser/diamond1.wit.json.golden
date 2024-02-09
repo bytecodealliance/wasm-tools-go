@@ -1,19 +1,21 @@
 &wit.Resolve{
     Worlds: {
         &wit.World{
-            Name:    "foo",
-            Imports: {
+            _typeOwner: wit._typeOwner{},
+            Name:       "foo",
+            Imports:    {
                 "interface-0": &wit.Interface{
-                    Name:      &"types",
-                    TypeDefs:  {},
-                    Functions: {},
-                    Package:   &wit.Package{
+                    _typeOwner: wit._typeOwner{},
+                    _worldItem: wit._worldItem{},
+                    Name:       &"types",
+                    TypeDefs:   {},
+                    Functions:  {},
+                    Package:    &wit.Package{
                         Name: wit.Ident{
                             Namespace: "foo",
                             Package:   "dep1",
                             Extension: "",
                             Version:   (*semver.Version)(nil),
-                            _node:     wit._node{},
                         },
                         Interfaces: {
                             "types": &wit.Interface{(CYCLIC REFERENCE)},
@@ -21,21 +23,20 @@
                         Worlds: {},
                         Docs:   wit.Docs{},
                     },
-                    Docs:       wit.Docs{},
-                    _typeOwner: wit._typeOwner{},
-                    _worldItem: wit._worldItem{},
+                    Docs: wit.Docs{},
                 },
                 "interface-1": &wit.Interface{
-                    Name:      &"types",
-                    TypeDefs:  {},
-                    Functions: {},
-                    Package:   &wit.Package{
+                    _typeOwner: wit._typeOwner{},
+                    _worldItem: wit._worldItem{},
+                    Name:       &"types",
+                    TypeDefs:   {},
+                    Functions:  {},
+                    Package:    &wit.Package{
                         Name: wit.Ident{
                             Namespace: "foo",
                             Package:   "dep2",
                             Extension: "",
                             Version:   (*semver.Version)(nil),
-                            _node:     wit._node{},
                         },
                         Interfaces: {
                             "types": &wit.Interface{(CYCLIC REFERENCE)},
@@ -43,9 +44,7 @@
                         Worlds: {},
                         Docs:   wit.Docs{},
                     },
-                    Docs:       wit.Docs{},
-                    _typeOwner: wit._typeOwner{},
-                    _worldItem: wit._worldItem{},
+                    Docs: wit.Docs{},
                 },
             },
             Exports: {},
@@ -55,7 +54,6 @@
                     Package:   "foo",
                     Extension: "",
                     Version:   (*semver.Version)(nil),
-                    _node:     wit._node{},
                 },
                 Interfaces: {},
                 Worlds:     {
@@ -63,22 +61,22 @@
                 },
                 Docs: wit.Docs{},
             },
-            Docs:       wit.Docs{},
-            _typeOwner: wit._typeOwner{},
+            Docs: wit.Docs{},
         },
     },
     Interfaces: {
         &wit.Interface{
-            Name:      &"types",
-            TypeDefs:  {},
-            Functions: {},
-            Package:   &wit.Package{
+            _typeOwner: wit._typeOwner{},
+            _worldItem: wit._worldItem{},
+            Name:       &"types",
+            TypeDefs:   {},
+            Functions:  {},
+            Package:    &wit.Package{
                 Name: wit.Ident{
                     Namespace: "foo",
                     Package:   "dep1",
                     Extension: "",
                     Version:   (*semver.Version)(nil),
-                    _node:     wit._node{},
                 },
                 Interfaces: {
                     "types": &wit.Interface{(CYCLIC REFERENCE)},
@@ -86,21 +84,20 @@
                 Worlds: {},
                 Docs:   wit.Docs{},
             },
-            Docs:       wit.Docs{},
-            _typeOwner: wit._typeOwner{},
-            _worldItem: wit._worldItem{},
+            Docs: wit.Docs{},
         },
         &wit.Interface{
-            Name:      &"types",
-            TypeDefs:  {},
-            Functions: {},
-            Package:   &wit.Package{
+            _typeOwner: wit._typeOwner{},
+            _worldItem: wit._worldItem{},
+            Name:       &"types",
+            TypeDefs:   {},
+            Functions:  {},
+            Package:    &wit.Package{
                 Name: wit.Ident{
                     Namespace: "foo",
                     Package:   "dep2",
                     Extension: "",
                     Version:   (*semver.Version)(nil),
-                    _node:     wit._node{},
                 },
                 Interfaces: {
                     "types": &wit.Interface{(CYCLIC REFERENCE)},
@@ -108,9 +105,7 @@
                 Worlds: {},
                 Docs:   wit.Docs{},
             },
-            Docs:       wit.Docs{},
-            _typeOwner: wit._typeOwner{},
-            _worldItem: wit._worldItem{},
+            Docs: wit.Docs{},
         },
     },
     TypeDefs: nil,
@@ -121,7 +116,6 @@
                 Package:   "dep1",
                 Extension: "",
                 Version:   (*semver.Version)(nil),
-                _node:     wit._node{},
             },
             Interfaces: {
                 "types": &wit.Interface{(CYCLIC REFERENCE)},
@@ -135,7 +129,6 @@
                 Package:   "dep2",
                 Extension: "",
                 Version:   (*semver.Version)(nil),
-                _node:     wit._node{},
             },
             Interfaces: {
                 "types": &wit.Interface{(CYCLIC REFERENCE)},
@@ -149,7 +142,6 @@
                 Package:   "foo",
                 Extension: "",
                 Version:   (*semver.Version)(nil),
-                _node:     wit._node{},
             },
             Interfaces: {},
             Worlds:     {
