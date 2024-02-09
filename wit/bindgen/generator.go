@@ -204,7 +204,7 @@ func (g *generator) defineWorld(w *wit.World) error {
 
 	file := pkg.File(id.Extension + GoSuffix)
 	var b strings.Builder
-	fmt.Fprintf(&b, "Package %s represents the world \"%s\".\n", pkg.Name, id.String())
+	fmt.Fprintf(&b, "Package %s represents the %s \"%s\".\n", pkg.Name, w.WITKind(), id.String())
 	if w.Docs.Contents != "" {
 		b.WriteString("\n")
 		b.WriteString(w.Docs.Contents)
@@ -243,7 +243,7 @@ func (g *generator) defineInterface(i *wit.Interface, name string) error {
 
 	file := pkg.File(id.Extension + GoSuffix)
 	var b strings.Builder
-	fmt.Fprintf(&b, "Package %s represents the interface \"%s\".\n", pkg.Name, id.String())
+	fmt.Fprintf(&b, "Package %s represents the %s \"%s\".\n", pkg.Name, i.WITKind(), id.String())
 	if i.Docs.Contents != "" {
 		b.WriteString("\n")
 		b.WriteString(i.Docs.Contents)
@@ -291,7 +291,7 @@ func (g *generator) defineTypeDef(t *wit.TypeDef, name string) error {
 	pkg := decl.Package
 	file := pkg.File(ownerID.Extension + GoSuffix)
 
-	fmt.Fprintf(file, "// %s represents the type \"%s#%s\".\n", decl.Name, ownerID.String(), name)
+	fmt.Fprintf(file, "// %s represents the %s \"%s#%s\".\n", decl.Name, t.WITKind(), ownerID.String(), name)
 	fmt.Fprintf(file, "//\n")
 	fmt.Fprint(file, gen.FormatDocComments(t.WIT(nil, "")))
 	fmt.Fprintf(file, "//\n")
@@ -372,7 +372,7 @@ func (g *generator) defineImportedFunction(f *wit.Function, ownerID wit.Ident) e
 	g.funcDecls[f] = funcDecl
 	snakeDecl := file.Decl(SnakeName(f.Name))
 
-	fmt.Fprintf(file, "// %s represents the function \"%s#%s\".\n", funcDecl.Name, ownerID.String(), f.Name)
+	fmt.Fprintf(file, "// %s represents the %s \"%s#%s\".\n", funcDecl.Name, f.WITKind(), ownerID.String(), f.Name)
 	if f.Docs.Contents != "" {
 		fmt.Fprintf(file, "//\n%s", gen.FormatDocComments(f.Docs.Contents))
 	}
