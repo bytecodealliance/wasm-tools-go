@@ -805,25 +805,35 @@ func ParseType(s string) (Type, error) {
 	return nil, fmt.Errorf("unknown primitive type %q", s)
 }
 
-// Primitive is a type constriant of the Go equivalents of WIT [primitive types].
+// PrimitiveTypes is a type constraint of the Go equivalents of WIT [primitive types].
 //
 // [primitive types]: https://component-model.bytecodealliance.org/design/wit.html#primitive-types
-type Primitive interface {
+type PrimitiveTypes interface {
 	bool | int8 | uint8 | int16 | uint16 | int32 | uint32 | int64 | uint64 | float32 | float64 | char | string
 }
 
 // char is defined because [rune] is an alias of [int32]
 type char rune
 
+// Primitive is a type constraint of the Go equivalents of WIT [primitive types].
+//
+// [primitive types]: https://component-model.bytecodealliance.org/design/wit.html#primitive-types
+type Primitive interface {
+	Node
+	Sized
+	TypeDefKind
+	isPrimitive()
+}
+
 // _primitive represents a WebAssembly Component Model [primitive type]
 // mapped to its equivalent Go type.
 // It conforms to the [Node], [Sized], [Type], and [TypeDefKind] interfaces.
 //
 // [primitive type]: https://component-model.bytecodealliance.org/design/wit.html#primitive-types
-type _primitive[T Primitive] struct{ _type }
+type _primitive[T PrimitiveTypes] struct{ _type }
 
-// _primitive is a generic embeddable type that conforms to the [Type] interface.
-func (_primitive[T]) isType() {}
+// isPrimitive conforms to the [Primitive] interface.
+func (_primitive[T]) isPrimitive() {}
 
 // Size returns the byte size for values of this type.
 func (_primitive[T]) Size() uintptr {

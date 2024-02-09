@@ -299,62 +299,118 @@ func (g *generator) defineTypeDef(t *wit.TypeDef, name string) error {
 		fmt.Fprintf(file, "//\n%s", gen.FormatDocComments(t.Docs.Contents))
 	}
 	fmt.Fprintf(file, "type %s ", decl.Name)
-	g.printTypeDef(file, t)
+	fmt.Fprint(file, g.typeDefExpr(file, t))
 	fmt.Fprint(file, "\n\n")
 
 	return nil
 }
 
-func (g *generator) printTypeDef(file *gen.File, t *wit.TypeDef) error {
+func (g *generator) typeDefExpr(file *gen.File, t *wit.TypeDef) string {
 	switch kind := t.Kind.(type) {
-	// [Record], [Resource], [Handle], [Flags], [Tuple], [Variant], [Enum],
-	// [Option], [Result], [List], [Future], [Stream], or [Type].
-	case *wit.Resource:
-		return g.printResource(file, kind)
-	case *wit.OwnedHandle:
-		fmt.Fprintf(file, "any /* TODO: *wit.OwnedHandle */")
-	case *wit.BorrowedHandle:
-		fmt.Fprintf(file, "any /* TODO: *wit.BorrowedHandle */")
-	case *wit.Flags:
-		fmt.Fprintf(file, "any /* TODO: *wit.Flags */")
-	case *wit.Record:
-		fmt.Fprintf(file, "any /* TODO: *wit.Record */")
-	case *wit.Tuple:
-		fmt.Fprintf(file, "any /* TODO: *wit.Tuple */")
-	case *wit.Variant:
-		fmt.Fprintf(file, "any /* TODO: *wit.Variant */")
-	case *wit.Enum:
-		fmt.Fprintf(file, "any /* TODO: *wit.Enum */")
-	case *wit.Option:
-		fmt.Fprintf(file, "any /* TODO: *wit.Option */")
-	case *wit.Result:
-		fmt.Fprintf(file, "any /* TODO: *wit.Result */")
-	case *wit.List:
-		fmt.Fprintf(file, "any /* TODO: *wit.List */")
-	case *wit.Future:
-		fmt.Fprintf(file, "any /* TODO: *wit.Future */")
-	case *wit.Stream:
-		fmt.Fprintf(file, "any /* TODO: *wit.Stream */")
-	// wit.Type is last because wit.TypeDef implements wit.Type
-	// TODO: be more specific?
 	case wit.Type:
-		_ = kind
-		fmt.Fprintf(file, "any /* TODO: wit.Type */")
+		return g.typeExpr(file, kind)
+	case *wit.Record:
+		return g.recordExpr(file, kind)
+	case *wit.Resource:
+		return g.resourceExpr(file, kind)
+	case *wit.OwnedHandle:
+		return "any /* TODO: *wit.OwnedHandle */"
+	case *wit.BorrowedHandle:
+		return "any /* TODO: *wit.BorrowedHandle */"
+	case *wit.Flags:
+		return "any /* TODO: *wit.Flags */"
+	case *wit.Enum:
+		return g.enumExpr(file, kind)
+	case *wit.Tuple:
+		return "any /* TODO: *wit.Tuple */"
+	case *wit.Variant:
+		return "any /* TODO: *wit.Variant */"
+	case *wit.Option:
+		return g.optionExpr(file, kind)
+	case *wit.Result:
+		return "any /* TODO: *wit.Result */"
+	case *wit.List:
+		return "any /* TODO: *wit.List */"
+	case *wit.Future:
+		return "any /* TODO: *wit.Future */"
+	case *wit.Stream:
+		return "any /* TODO: *wit.Stream */"
+	default:
+		panic(fmt.Sprintf("BUG: unknown wit.TypeDef %T", t)) // should never reach here
 	}
-	return nil
 }
 
-func (g *generator) printResource(file *gen.File, r *wit.Resource) error {
-	cm := file.Import(g.opts.cmPackage)
-	fmt.Fprintf(file, "%s.Resource\n\n", cm)
-	fmt.Fprintf(file, "// TODO: resource methods")
-	return nil
+func (g *generator) typeExpr(file *gen.File, t wit.Type) string {
+	switch t := t.(type) {
+	case *wit.TypeDef:
+		return g.typeDefExpr(file, t)
+	case wit.Primitive:
+		return g.primitiveExpr(file, t)
+	default:
+		panic(fmt.Sprintf("BUG: unknown wit.Type %T", t)) // should never reach here
+	}
 }
 
-func (g *generator) printOption(file *gen.File, r *wit.Option) error {
-	cm := file.Import(g.opts.cmPackage)
-	fmt.Fprintf(file, "%s.Option[any /* TODO */]\n\n", cm)
-	return nil
+func (g *generator) primitiveExpr(file *gen.File, p wit.Primitive) string {
+	switch p := p.(type) {
+	case wit.Bool:
+		return "bool"
+	case wit.S8:
+		return "sint8"
+	case wit.U8:
+		return "uint8"
+	case wit.S16:
+		return "sint16"
+	case wit.U16:
+		return "uint16"
+	case wit.S32:
+		return "sint32"
+	case wit.U32:
+		return "uint32"
+	case wit.S64:
+		return "sint64"
+	case wit.U64:
+		return "uint64"
+	case wit.Float32:
+		return "float32"
+	case wit.Float64:
+		return "float64"
+	case wit.Char:
+		return "rune"
+	case wit.String:
+		return "string"
+	default:
+		panic(fmt.Sprintf("BUG: unknown wit.Primitive %T", p)) // should never reach here
+	}
+}
+
+func (g *generator) recordExpr(file *gen.File, r *wit.Record) string {
+	var b strings.Builder
+	b.WriteString("struct { /* TODO: record fields */ }")
+	return b.String()
+}
+
+func (g *generator) resourceExpr(file *gen.File, r *wit.Resource) string {
+	var b strings.Builder
+	b.WriteString(file.Import(g.opts.cmPackage))
+	b.WriteString(".Resource")
+	b.WriteString("\n\n// TODO: resource methods")
+	return b.String()
+}
+
+func (g *generator) enumExpr(file *gen.File, e *wit.Enum) string {
+	var b strings.Builder
+	disc := wit.Discriminant(uint32(e.Size()))
+	b.WriteString(g.typeExpr(file, disc))
+	b.WriteString("\n\n// TODO: const enum cases")
+	return b.String()
+}
+
+func (g *generator) optionExpr(file *gen.File, r *wit.Option) string {
+	var b strings.Builder
+	b.WriteString(file.Import(g.opts.cmPackage))
+	b.WriteString(".Option[any /* TODO */]")
+	return b.String()
 }
 
 func (g *generator) defineImportedFunction(f *wit.Function, ownerID wit.Ident) error {
