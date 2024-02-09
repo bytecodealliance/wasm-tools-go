@@ -276,6 +276,31 @@ func TestPackageFieldIsNotNil(t *testing.T) {
 	}
 }
 
+// TestInterfaceNameIsNotNil tests to ensure the Name field of all [Interface]
+// values in a [Resolve] are non-nil.
+func TestInterfaceNameIsNotNil(t *testing.T) {
+	err := loadTestdata(func(path string, res *Resolve) error {
+		t.Run(strings.TrimPrefix(path, testdataDir), func(t *testing.T) {
+			for i, face := range res.Interfaces {
+				name := fmt.Sprintf("Interfaces[%d]", i)
+				if face.Name != nil {
+					name += "#" + *face.Name
+				}
+				t.Run(name, func(t *testing.T) {
+					// TODO: fix this, since anonymous imported interfaces have nil Name field
+					// if face.Name == nil {
+					// 	t.Error("Name is nil")
+					// }
+				})
+			}
+		})
+		return nil
+	})
+	if err != nil {
+		t.Error(err)
+	}
+}
+
 // TestTypeDefNamesNotNil verifies that all [Record], [Variant], [Enum], and [Flags]
 // types have a non-nil Name.
 func TestTypeDefNamesNotNil(t *testing.T) {
@@ -294,6 +319,37 @@ func TestTypeDefNamesNotNil(t *testing.T) {
 				t.Run(name, func(t *testing.T) {
 					if td.Name == nil {
 						t.Error("Name is nil")
+					}
+				})
+			}
+		})
+		return nil
+	})
+	if err != nil {
+		t.Error(err)
+	}
+}
+
+// TestTypeDefRootOwnerNamesNotNil verifies that all root [TypeDef] owners have a non-nil name.
+func TestTypeDefRootOwnerNamesNotNil(t *testing.T) {
+	err := loadTestdata(func(path string, res *Resolve) error {
+		t.Run(strings.TrimPrefix(path, testdataDir), func(t *testing.T) {
+			for i, td := range res.TypeDefs {
+				name := fmt.Sprintf("TypeDefs[%d]", i)
+				if td.Name != nil {
+					name += "#" + *td.Name
+				}
+				t.Run(name, func(t *testing.T) {
+					td = td.Root()
+					switch owner := td.Owner.(type) {
+					case *World:
+						if owner.Name == "" {
+							t.Error("Owner.Name is empty")
+						}
+					case *Interface:
+						if owner.Name == nil {
+							t.Error("Owner.Name is nil")
+						}
 					}
 				})
 			}

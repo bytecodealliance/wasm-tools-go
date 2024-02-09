@@ -193,10 +193,10 @@ func (c *packageCodec) DecodeField(dec codec.Decoder, name string) error {
 }
 
 // DecodeString implements the [codec.StringDecoder] interface
-// to decode a string value into a valid [PackageName].
-func (pn *PackageName) DecodeString(s string) error {
+// to decode a string value into an [Ident].
+func (pn *Ident) DecodeString(s string) error {
 	var err error
-	*pn, err = ParsePackageName(s)
+	*pn, err = ParseIdent(s)
 	return err
 }
 
@@ -235,7 +235,7 @@ func (c *worldItemCodec) DecodeField(dec codec.Decoder, name string) error {
 	return err
 }
 
-// typeCodec translates WIT type strings or reference IDs into a Type.
+// typeCodec translates WIT type strings or reference Idents into a Type.
 type typeCodec struct {
 	t *Type
 	*Resolve
