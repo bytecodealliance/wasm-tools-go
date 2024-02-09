@@ -6,10 +6,10 @@ import (
 	"os"
 
 	"github.com/urfave/cli/v3"
-	"github.com/ydnar/wasm-tools-go/bindgen"
 	"github.com/ydnar/wasm-tools-go/internal/codec"
 	"github.com/ydnar/wasm-tools-go/internal/go/gen"
 	"github.com/ydnar/wasm-tools-go/internal/witcli"
+	"github.com/ydnar/wasm-tools-go/wit/bindgen"
 )
 
 // Command is the CLI command for wit.
