@@ -1,0 +1,57 @@
+package bindgen
+
+import (
+	"strings"
+	"unicode"
+
+	"github.com/ydnar/wasm-tools-go/internal/go/gen"
+)
+
+// GoPackageName generates a Go local package name (e.g. "json").
+func GoPackageName(name string) string {
+	return strings.Map(func(c rune) rune {
+		if notLetterDigit(c) {
+			return -1
+		}
+		return c
+	}, strings.ToLower(name))
+}
+
+// GoName returns an idiomatic (exported CamelCase) Go name for a WIT name.
+// It may conflict with a Go keyword or predeclared identifier.
+func GoName(name string) string {
+	var b strings.Builder
+	for _, word := range words(strings.ToLower(name)) {
+		if s, ok := Words[word]; ok {
+			b.WriteString(s)
+		} else if gen.Initialisms[word] {
+			b.WriteString(strings.ToUpper(word))
+		} else {
+			runes := []rune(word)
+			runes[0] = unicode.ToUpper(runes[0])
+			b.WriteString(string(runes))
+		}
+	}
+	return b.String()
+}
+
+// SnakeName returns a snake_case name for a WIT name.
+func SnakeName(name string) string {
+	return strings.Join(words(strings.ToLower(name)), "_")
+}
+
+func words(name string) []string {
+	return strings.FieldsFunc(name, notLetterDigit)
+}
+
+func notLetterDigit(c rune) bool {
+	return !unicode.IsLetter(c) && !unicode.IsDigit(c)
+}
+
+// Words is a set of common WASI words and their Go replacements.
+var Words = map[string]string{
+	"cwd":      "CWD",
+	"datetime": "DateTime",
+	"ipv4":     "IPv4",
+	"ipv6":     "IPv6",
+}
