@@ -7,6 +7,7 @@ require (
 	github.com/kr/pretty v0.1.0
 	github.com/sergi/go-diff v1.3.1
 	github.com/urfave/cli/v3 v3.0.0-alpha8
+	golang.org/x/mod v0.15.0
 )
 
 require (
