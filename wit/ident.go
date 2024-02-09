@@ -28,8 +28,6 @@ type Ident struct {
 
 	// Version optionally specifies version information.
 	Version *semver.Version
-
-	_node
 }
 
 // ParseIdent parses a WIT identifier string into an [Ident],

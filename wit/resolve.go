@@ -152,7 +152,7 @@ type WorldItem interface {
 }
 
 // _worldItem is an embeddable type that conforms to the [WorldItem] interface.
-type _worldItem struct{ _node }
+type _worldItem struct{}
 
 func (_worldItem) isWorldItem() {}
 
@@ -288,10 +288,7 @@ type TypeDefKind interface {
 }
 
 // _typeDefKind is an embeddable type that conforms to the [TypeDefKind] interface.
-type _typeDefKind struct {
-	_node
-	_sized
-}
+type _typeDefKind struct{}
 
 func (_typeDefKind) isTypeDefKind() {}
 
@@ -749,7 +746,7 @@ type TypeOwner interface {
 	isTypeOwner()
 }
 
-type _typeOwner struct{ _node }
+type _typeOwner struct{}
 
 func (_typeOwner) AllFunctions(yield func(*Function) bool) bool { return false }
 func (_typeOwner) isTypeOwner()                                 {}
@@ -1043,7 +1040,7 @@ type FunctionKind interface {
 }
 
 // _functionKind is an embeddable type that conforms to the [FunctionKind] interface.
-type _functionKind struct{ _node }
+type _functionKind struct{}
 
 func (_functionKind) isFunctionKind() {}
 
@@ -1096,5 +1093,4 @@ type Package struct {
 // Docs represent WIT documentation text extracted from comments.
 type Docs struct {
 	Contents string // may be empty
-	_node
 }
