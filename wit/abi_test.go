@@ -37,7 +37,7 @@ func TestAlign(t *testing.T) {
 
 func TestDiscriminant(t *testing.T) {
 	tests := []struct {
-		n    uint32
+		n    int
 		want Type
 	}{
 		{0, U8{}}, {1, U8{}}, {5, U8{}}, {8, U8{}}, {255, U8{}}, {256, U8{}},

@@ -400,7 +400,7 @@ func (g *generator) resourceExpr(file *gen.File, r *wit.Resource) string {
 
 func (g *generator) enumExpr(file *gen.File, e *wit.Enum) string {
 	var b strings.Builder
-	disc := wit.Discriminant(uint32(e.Size()))
+	disc := wit.Discriminant(len(e.Cases))
 	b.WriteString(g.typeExpr(file, disc))
 	b.WriteString("\n\n// TODO: const enum cases")
 	return b.String()
