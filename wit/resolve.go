@@ -496,7 +496,7 @@ type Variant struct {
 //
 // [ABI byte size]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#size
 func (v *Variant) Size() uintptr {
-	s := Discriminant(uint32(len(v.Cases))).Size()
+	s := Discriminant(len(v.Cases)).Size()
 	s = Align(s, v.maxCaseAlign())
 	s += v.maxCaseSize()
 	return Align(s, v.Align())
@@ -506,7 +506,7 @@ func (v *Variant) Size() uintptr {
 //
 // [ABI byte alignment]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#alignment
 func (v *Variant) Align() uintptr {
-	return max(Discriminant(uint32(len(v.Cases))).Align(), v.maxCaseAlign())
+	return max(Discriminant(len(v.Cases)).Align(), v.maxCaseAlign())
 }
 
 func (v *Variant) maxCaseSize() uintptr {
@@ -805,25 +805,34 @@ func ParseType(s string) (Type, error) {
 	return nil, fmt.Errorf("unknown primitive type %q", s)
 }
 
-// Primitive is a type constriant of the Go equivalents of WIT [primitive types].
+// primitive is a type constraint of the Go equivalents of WIT [primitive types].
 //
 // [primitive types]: https://component-model.bytecodealliance.org/design/wit.html#primitive-types
-type Primitive interface {
+type primitive interface {
 	bool | int8 | uint8 | int16 | uint16 | int32 | uint32 | int64 | uint64 | float32 | float64 | char | string
 }
 
 // char is defined because [rune] is an alias of [int32]
 type char rune
 
-// _primitive represents a WebAssembly Component Model [primitive type]
-// mapped to its equivalent Go type.
-// It conforms to the [Node], [Sized], [Type], and [TypeDefKind] interfaces.
+// Primitive is the interface implemented by WIT [primitive types].
+// It also conforms to the [Node], [Sized], [Type], and [TypeDefKind] interfaces.
+//
+// [primitive types]: https://component-model.bytecodealliance.org/design/wit.html#primitive-types
+type Primitive interface {
+	Type
+	isPrimitive()
+}
+
+// _primitive is an embeddable struct that conforms to the [PrimitiveType] interface.
+// It represents a WebAssembly Component Model [primitive type] mapped to its equivalent Go type.
+// It also conforms to the [Node], [Sized], [Type], and [TypeDefKind] interfaces.
 //
 // [primitive type]: https://component-model.bytecodealliance.org/design/wit.html#primitive-types
-type _primitive[T Primitive] struct{ _type }
+type _primitive[T primitive] struct{ _type }
 
-// _primitive is a generic embeddable type that conforms to the [Type] interface.
-func (_primitive[T]) isType() {}
+// isPrimitive conforms to the [Primitive] interface.
+func (_primitive[T]) isPrimitive() {}
 
 // Size returns the byte size for values of this type.
 func (_primitive[T]) Size() uintptr {

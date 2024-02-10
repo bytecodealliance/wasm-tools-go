@@ -9,7 +9,7 @@ func Align(ptr, align uintptr) uintptr {
 // Used by the [Canonical ABI] for [Variant] types.
 //
 // [Canonical ABI]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#alignment
-func Discriminant(n uint32) Type {
+func Discriminant(n int) Type {
 	switch {
 	case n <= 1<<8:
 		return U8{}
