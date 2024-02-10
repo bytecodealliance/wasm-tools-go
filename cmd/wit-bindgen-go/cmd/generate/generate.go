@@ -32,11 +32,17 @@ var Command = &cli.Command{
 			Name:  "map",
 			Usage: "maps WIT identifiers to Go identifiers",
 		},
+		&cli.BoolFlag{
+			Name:  "dry-run",
+			Usage: "do not write files; print to stdout",
+		},
 	},
 	Action: action,
 }
 
 func action(ctx context.Context, cmd *cli.Command) error {
+	dryRun := cmd.Bool("dry-run")
+
 	out := cmd.String("out")
 	info, err := os.Stat(out)
 	if err != nil {
@@ -84,9 +90,15 @@ func action(ctx context.Context, cmd *cli.Command) error {
 				return err
 			}
 
-			// fmt.Println(string(b))
-
 			path := filepath.Join(dir, file.Name)
+			fmt.Fprintf(os.Stderr, "Generated: %s\n", path)
+
+			if dryRun {
+				fmt.Println(string(b))
+				fmt.Println()
+				continue
+			}
+
 			f, err := os.Create(path)
 			if err != nil {
 				return err
@@ -100,7 +112,6 @@ func action(ctx context.Context, cmd *cli.Command) error {
 				return fmt.Errorf("wrote %d bytes to %s, expected %d", n, path, len(b))
 			}
 
-			fmt.Fprintf(os.Stderr, "Generated file: %s\n", path)
 		}
 	}
 
