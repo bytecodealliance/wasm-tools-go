@@ -48,7 +48,7 @@ func notLetterDigit(c rune) bool {
 	return !unicode.IsLetter(c) && !unicode.IsDigit(c)
 }
 
-// CommonWords maps common WASI words to opinionated Go replacements.
+// CommonWords maps common WASI words to opinionated Go equivalents.
 var CommonWords = map[string]string{
 	"cabi":     "CABI",
 	"datetime": "DateTime",
