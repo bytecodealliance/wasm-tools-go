@@ -22,7 +22,7 @@ func GoPackageName(name string) string {
 func GoName(name string) string {
 	var b strings.Builder
 	for _, word := range words(strings.ToLower(name)) {
-		if s, ok := Words[word]; ok {
+		if s, ok := CommonWords[word]; ok {
 			b.WriteString(s)
 		} else if gen.Initialisms[word] {
 			b.WriteString(strings.ToUpper(word))
@@ -48,10 +48,11 @@ func notLetterDigit(c rune) bool {
 	return !unicode.IsLetter(c) && !unicode.IsDigit(c)
 }
 
-// Words is a set of common WASI words and their Go replacements.
-var Words = map[string]string{
-	"cwd":      "CWD",
+// CommonWords maps common WASI words to opinionated Go equivalents.
+var CommonWords = map[string]string{
+	"cabi":     "CABI",
 	"datetime": "DateTime",
+	"filesize": "FileSize",
 	"ipv4":     "IPv4",
 	"ipv6":     "IPv6",
 }
