@@ -163,7 +163,7 @@ func (g *generator) declareTypeDef(t *wit.TypeDef) error {
 	decl := file.Decl(GoName(name))
 	g.typeDecls[t] = decl
 
-	fmt.Fprintf(os.Stderr, "Type:\t%s.%s\n\t%s.%s\n", ownerID.String(), name, decl.Package.Path, decl.Name)
+	// fmt.Fprintf(os.Stderr, "Type:\t%s.%s\n\t%s.%s\n", ownerID.String(), name, decl.Package.Path, decl.Name)
 
 	return nil
 }
