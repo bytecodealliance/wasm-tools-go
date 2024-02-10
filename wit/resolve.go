@@ -805,32 +805,31 @@ func ParseType(s string) (Type, error) {
 	return nil, fmt.Errorf("unknown primitive type %q", s)
 }
 
-// PrimitiveTypes is a type constraint of the Go equivalents of WIT [primitive types].
+// primitive is a type constraint of the Go equivalents of WIT [primitive types].
 //
 // [primitive types]: https://component-model.bytecodealliance.org/design/wit.html#primitive-types
-type PrimitiveTypes interface {
+type primitive interface {
 	bool | int8 | uint8 | int16 | uint16 | int32 | uint32 | int64 | uint64 | float32 | float64 | char | string
 }
 
 // char is defined because [rune] is an alias of [int32]
 type char rune
 
-// Primitive is a type constraint of the Go equivalents of WIT [primitive types].
+// Primitive is the interface implemented by WIT [primitive types].
+// It also conforms to the [Node], [Sized], [Type], and [TypeDefKind] interfaces.
 //
 // [primitive types]: https://component-model.bytecodealliance.org/design/wit.html#primitive-types
 type Primitive interface {
-	Node
-	Sized
-	TypeDefKind
+	Type
 	isPrimitive()
 }
 
-// _primitive represents a WebAssembly Component Model [primitive type]
-// mapped to its equivalent Go type.
-// It conforms to the [Node], [Sized], [Type], and [TypeDefKind] interfaces.
+// _primitive is an embeddable struct that conforms to the [PrimitiveType] interface.
+// It represents a WebAssembly Component Model [primitive type] mapped to its equivalent Go type.
+// It also conforms to the [Node], [Sized], [Type], and [TypeDefKind] interfaces.
 //
 // [primitive type]: https://component-model.bytecodealliance.org/design/wit.html#primitive-types
-type _primitive[T PrimitiveTypes] struct{ _type }
+type _primitive[T primitive] struct{ _type }
 
 // isPrimitive conforms to the [Primitive] interface.
 func (_primitive[T]) isPrimitive() {}
