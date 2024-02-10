@@ -111,7 +111,6 @@ func action(ctx context.Context, cmd *cli.Command) error {
 			if n != len(b) {
 				return fmt.Errorf("wrote %d bytes to %s, expected %d", n, path, len(b))
 			}
-
 		}
 	}
 
