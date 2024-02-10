@@ -127,10 +127,12 @@ var reserved = mapWords(
 // Initialisms is a set of common initialisms.
 var Initialisms = mapWords(
 	"acl",
+	"abi",
 	"api",
 	"ascii",
 	"cpu",
 	"css",
+	"cwd",
 	"dns",
 	"eof",
 	"guid",
