@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/urfave/cli/v3"
 	"github.com/ydnar/wasm-tools-go/internal/codec"
@@ -36,10 +38,15 @@ var Command = &cli.Command{
 
 func action(ctx context.Context, cmd *cli.Command) error {
 	out := cmd.String("out")
-	if !isDir(out) {
+	info, err := os.Stat(out)
+	if err != nil {
+		return err
+	}
+	if !info.IsDir() {
 		return fmt.Errorf("%s is not a directory", out)
 	}
 	fmt.Fprintf(os.Stderr, "Output dir: %s\n", out)
+	outPerm := info.Mode().Perm()
 
 	pkgPath, err := gen.PackagePath(out)
 	if err != nil {
@@ -65,23 +72,37 @@ func action(ctx context.Context, cmd *cli.Command) error {
 	for _, pkg := range packages {
 		for _, filename := range codec.SortedKeys(pkg.Files) {
 			file := pkg.Files[filename]
-			fmt.Fprintf(os.Stderr, "Generated file: %s/%s\n\n", pkg.Path, file.Name)
+
+			dir := filepath.Join(out, strings.TrimPrefix(file.Package.Path, pkgPath))
+			err := os.MkdirAll(dir, outPerm)
+			if err != nil {
+				return err
+			}
+
 			b, err := file.Bytes()
 			if err != nil {
 				return err
 			}
-			fmt.Println(string(b))
+
+			// fmt.Println(string(b))
+
+			path := filepath.Join(dir, file.Name)
+			f, err := os.Create(path)
+			if err != nil {
+				return err
+			}
+			n, err := f.Write(b)
+			f.Close()
+			if err != nil {
+				return err
+			}
+			if n != len(b) {
+				return fmt.Errorf("wrote %d bytes to %s, expected %d", n, path, len(b))
+			}
+
+			fmt.Fprintf(os.Stderr, "Generated file: %s\n", path)
 		}
-		fmt.Fprintln(os.Stderr)
 	}
 
 	return nil
-}
-
-func isDir(path string) bool {
-	info, err := os.Stat(path)
-	if err != nil {
-		return false
-	}
-	return info.IsDir()
 }
