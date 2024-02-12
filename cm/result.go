@@ -10,6 +10,38 @@ const (
 	ResultErr = true
 )
 
+// OKResult represents a result with only an OK type.
+//
+// TODO: change this to an alias when https://github.com/golang/go/issues/46477 is implemented.
+type OKResult[OK any] struct {
+	Result[OK, OK, struct{}]
+}
+
+// ErrResult represents a result with only an error type.
+//
+// TODO: change this to an alias when https://github.com/golang/go/issues/46477 is implemented.
+type ErrResult[Err any] struct {
+	Result[Err, struct{}, Err]
+}
+
+// OKSizedResult represents a result sized to hold the OK type.
+// The size of the OK type must be greater than or equal to the size of the Err type.
+// For results with two zero-length types, use UnsizedResult.
+//
+// TODO: change this to an alias when https://github.com/golang/go/issues/46477 is implemented.
+type OKSizedResult[OK any, Err any] struct {
+	Result[OK, OK, Err]
+}
+
+// ErrSizedResult represents a result sized to hold the Err type.
+// The size of the Err type must be greater than or equal to the size of the OK type.
+// For results with two zero-length types, use UnsizedResult.
+//
+// TODO: change this to an alias when https://github.com/golang/go/issues/46477 is implemented.
+type ErrSizedResult[OK any, Err any] struct {
+	Result[Err, OK, Err]
+}
+
 // Result is a tagged union representing either the OK type or the Err type.
 // Either OK or Err must have non-zero size, e.g. both cannot be struct{} or a zero-length array.
 // For results with zero-sized or no associated types, use [UntypedResult].
