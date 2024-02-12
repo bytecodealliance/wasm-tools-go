@@ -18,12 +18,6 @@ type Variant[Disc Discriminant, Shape, Align any] struct {
 	data Shape
 }
 
-type variant[Disc Discriminant, Shape, Align any] interface {
-	isVariant(Disc, Shape, Align)
-}
-
-func (Variant[Disc, Shape, Align]) isVariant(Disc, Shape, Align) {}
-
 // NewVariant returns a [Variant] with tag of type Disc, storage and GC shape of type Shape,
 // aligned to type Align, with a value of type T.
 func NewVariant[Disc Discriminant, Shape, Align any, T any](tag Disc, data T) Variant[Disc, Shape, Align] {
@@ -38,42 +32,46 @@ func NewVariant[Disc Discriminant, Shape, Align any, T any](tag Disc, data T) Va
 
 // New returns a [Variant] with tag of type Disc, storage and GC shape of type Shape,
 // aligned to type Align, with a value of type T.
-func New[V variant[Disc, Shape, Align], Disc Discriminant, Shape, Align any, T any](tag Disc, data T) V {
+func New[V ~struct {
+	tag  Disc
+	_    [0]Align
+	data Shape
+}, Disc Discriminant, Shape, Align any, T any](tag Disc, data T) V {
 	var v Variant[Disc, Shape, Align]
 	if BoundsCheck && unsafe.Sizeof(data) > unsafe.Sizeof(v.data) {
 		panic("NewVariant: size of requested type greater than size of data type")
 	}
 	v.tag = tag
-	*(*T)(unsafe.Pointer(&v.data)) = data
-	return *(*V)(unsafe.Pointer(&v))
+	v.data = *(*Shape)(unsafe.Pointer(&data))
+	return V(v)
 }
 
-// Tag returns the variant tag value.
-func (v *Variant[Disc, Shape, Align]) Tag() Disc {
-	return v.tag
+// Tag returns the tag of [Variant] v.
+func Tag[V ~struct {
+	tag  Disc
+	_    [0]Align
+	data Shape
+}, Disc Discriminant, Shape, Align any](v *V) Disc {
+	v2 := (*Variant[Disc, Shape, Align])(unsafe.Pointer(v))
+	return v2.tag
 }
 
-// Set sets the [Variant] case to tag, and data to data.
-func (v *Variant[Disc, Shape, Align]) Set(tag Disc, data unsafe.Pointer) {
-	v.tag = tag
-	v.data = *(*Shape)(data)
-}
-
-// Case returns a non-nil pointer if the [Variant] case is equal to tag, otherwise it returns nil.
-func (v *Variant[Disc, Shape, Align]) Case(tag Disc) unsafe.Pointer {
-	if v.tag == tag {
-		return v.Data()
-	}
-	return nil
-}
-
-// Data returns an unsafe.Pointer to the data field in v.
-func (v *Variant[Disc, Shape, Align]) Data() unsafe.Pointer {
-	return unsafe.Pointer(&v.data)
+// Is returns true if the [Variant] case is equal to tag.
+func Is[V ~struct {
+	tag  Disc
+	_    [0]Align
+	data Shape
+}, Disc Discriminant, Shape, Align any](v *V, tag Disc) bool {
+	v2 := (*Variant[Disc, Shape, Align])(unsafe.Pointer(v))
+	return v2.tag == tag
 }
 
 // Case returns a non-nil *T if the [Variant] case is equal to tag, otherwise it returns nil.
-func Case[T any, V variant[Disc, Shape, Align], Disc Discriminant, Shape, Align any](v *V, tag Disc) *T {
+func Case[T any, V ~struct {
+	tag  Disc
+	_    [0]Align
+	data Shape
+}, Disc Discriminant, Shape, Align any](v *V, tag Disc) *T {
 	if BoundsCheck {
 		if unsafe.Sizeof(*(*T)(nil)) > unsafe.Sizeof(*(*Shape)(nil)) {
 			panic("Get: size of requested type greater than size of data type")
@@ -84,16 +82,4 @@ func Case[T any, V variant[Disc, Shape, Align], Disc Discriminant, Shape, Align 
 		return (*T)(unsafe.Pointer(&v2.data))
 	}
 	return nil
-}
-
-// SetCase sets the [Variant] case to tag and data to data.
-func SetCase[T any, V ~*Variant[Disc, Shape, Align], Disc Discriminant, Shape, Align any](v V, tag Disc, data T) {
-	v2 := (*Variant[Disc, Shape, Align])(v)
-	if BoundsCheck {
-		if unsafe.Sizeof(*(*T)(nil)) > unsafe.Sizeof(v2.data) {
-			panic("Get: size of requested type greater than size of data type")
-		}
-	}
-	v2.tag = tag
-	*((*T)(unsafe.Pointer(&v2.data))) = data
 }
