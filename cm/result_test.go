@@ -7,8 +7,8 @@ import (
 
 var (
 	_ result[string, bool] = &Result[string, string, bool]{}
-	_ result[string, bool] = &Result[string, string, bool]{}
-	_ result[bool, string] = &Result[string, bool, string]{}
+	_ result[string, bool] = &OKSizedResult[string, bool]{}
+	_ result[bool, string] = &ErrSizedResult[bool, string]{}
 )
 
 type result[OK, Err any] interface {
@@ -27,6 +27,10 @@ func TestResultLayout(t *testing.T) {
 		size   uintptr
 		offset uintptr
 	}{
+		{"result", UntypedResult(false), 1, 0},
+		{"ok", UntypedResult(ResultOK), 1, 0},
+		{"err", UntypedResult(ResultErr), 1, 0},
+
 		{"result<string, string>", Result[string, string, string]{}, sizePlusAlignOf[string](), ptrSize},
 		{"result<bool, string>", Result[string, bool, string]{}, sizePlusAlignOf[string](), ptrSize},
 		{"result<string, _>", Result[string, string, struct{}]{}, sizePlusAlignOf[string](), ptrSize},
@@ -40,15 +44,15 @@ func TestResultLayout(t *testing.T) {
 		{"result<u32, u8>", Result[uint32, uint32, uint8]{}, 8, alignOf[uint32]()},
 		{"result<[9]u8, u64>", Result[[9]byte, [9]byte, uint64]{}, 24, alignOf[uint64]()},
 
-		{"result<string, _>", Result[string, string, struct{}]{}, sizePlusAlignOf[string](), ptrSize},
-		{"result<string, _>", Result[string, string, struct{}]{}, sizePlusAlignOf[string](), ptrSize},
-		{"result<string, bool>", Result[string, string, bool]{}, sizePlusAlignOf[string](), ptrSize},
-		{"result<[9]u8, u64>", Result[[9]byte, [9]byte, uint64]{}, 24, alignOf[uint64]()},
+		{"result<string, _>", OKResult[string]{}, sizePlusAlignOf[string](), ptrSize},
+		{"result<string, _>", OKSizedResult[string, struct{}]{}, sizePlusAlignOf[string](), ptrSize},
+		{"result<string, bool>", OKSizedResult[string, bool]{}, sizePlusAlignOf[string](), ptrSize},
+		{"result<[9]u8, u64>", OKSizedResult[[9]byte, uint64]{}, 24, alignOf[uint64]()},
 
-		{"result<_, string>", Result[string, struct{}, string]{}, sizePlusAlignOf[string](), ptrSize},
-		{"result<_, string>", Result[string, struct{}, string]{}, sizePlusAlignOf[string](), ptrSize},
-		{"result<bool, string>", Result[string, bool, string]{}, sizePlusAlignOf[string](), ptrSize},
-		{"result<u64, [9]u8>", Result[[9]byte, uint64, [9]byte]{}, 24, alignOf[uint64]()},
+		{"result<_, string>", ErrResult[string]{}, sizePlusAlignOf[string](), ptrSize},
+		{"result<_, string>", ErrSizedResult[struct{}, string]{}, sizePlusAlignOf[string](), ptrSize},
+		{"result<bool, string>", ErrSizedResult[bool, string]{}, sizePlusAlignOf[string](), ptrSize},
+		{"result<u64, [9]u8>", ErrSizedResult[uint64, [9]byte]{}, 24, alignOf[uint64]()},
 	}
 
 	for _, tt := range tests {

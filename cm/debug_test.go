@@ -68,3 +68,15 @@ func (r Result[S, OK, Err]) DataAlign() uintptr {
 func (r Result[S, OK, Err]) DataOffset() uintptr {
 	return tinyunsafe.OffsetOf(&r, &r.data)
 }
+
+func (r UntypedResult) Size() uintptr {
+	return unsafe.Sizeof(r)
+}
+
+func (r UntypedResult) DataAlign() uintptr {
+	return 0
+}
+
+func (r UntypedResult) DataOffset() uintptr {
+	return 0
+}
