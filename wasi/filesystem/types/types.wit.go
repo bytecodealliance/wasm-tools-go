@@ -187,50 +187,42 @@ type LinkCount = uint64
 // NewTimestamp represents the variant "wasi:filesystem/types.new-timestamp".
 //
 // When setting a timestamp, this gives the value to set it to.
-type NewTimestamp struct {
-	v cm.Variant[uint8, DateTime, struct{}]
-}
+type NewTimestamp cm.Variant[uint8, DateTime, struct{}]
 
 // NewTimestampNoChange returns a NewTimestamp with variant case "no-change".
 func NewTimestampNoChange() NewTimestamp {
-	var result NewTimestamp
-	cm.Set(&result.v, 0, struct{}{})
-	return result
+	return cm.New[NewTimestamp](0, struct{}{})
 }
 
 // NoChange represents variant case "no-change".
 //
 // Leave the timestamp set to its previous value.
 func (self *NewTimestamp) NoChange() bool {
-	return self.v.Is(0)
+	return cm.Tag(self) == 0
 }
 
 // NewTimestampNow returns a NewTimestamp with variant case "now".
 func NewTimestampNow() NewTimestamp {
-	var result NewTimestamp
-	cm.Set(&result.v, 1, struct{}{})
-	return result
+	return cm.New[NewTimestamp](1, struct{}{})
 }
 
 // Now represents variant case "now".
 //
 // Leave the timestamp set to its previous value.
 func (self *NewTimestamp) Now() bool {
-	return self.v.Is(1)
+	return cm.Tag(self) == 1
 }
 
 // Timestamp represents variant case "timestamp(datetime)".
 //
 // Set the timestamp to the given value.
-func (self *NewTimestamp) Timestamp() (DateTime, bool) {
-	return cm.Get[DateTime](&self.v, 2)
+func (self *NewTimestamp) Timestamp() *DateTime {
+	return cm.Case[DateTime](self, 2)
 }
 
 // NewTimestampTimestamp returns a NewTimestamp with variant case "timestamp(datetime)".
 func NewTimestampTimestamp(v DateTime) NewTimestamp {
-	var result NewTimestamp
-	cm.Set(&result.v, 2, v)
-	return result
+	return cm.New[NewTimestamp](1, v)
 }
 
 // DirectoryEntry represents the record "wasi:filesystem/types.directory-entry".
