@@ -12,7 +12,7 @@ const (
 
 // Result is a tagged union representing either the OK type or the Err type.
 // Either OK or Err must have non-zero size, e.g. both cannot be struct{} or a zero-length array.
-// For results with zero-sized or no associated types, use UntypedResult.
+// For results with zero-sized or no associated types, use [UntypedResult].
 type Result[Shape, OK, Err any] struct {
 	isErr bool
 	_     [0]OK
@@ -63,4 +63,31 @@ func (r *Result[Shape, OK, Err]) Err() *Err {
 		return nil
 	}
 	return (*Err)(unsafe.Pointer(&r.data))
+}
+
+// UntypedResult represents an untyped result, e.g. result or result<_, _>.
+// Its associated types are implicitly struct{}, and it is represented as a Go bool.
+type UntypedResult bool
+
+// IsErr returns true if r represents the error case.
+func (r UntypedResult) IsErr() bool {
+	return bool(r)
+}
+
+// OK returns a non-nil pointer if r represents the OK case.
+// If r represents an error, then it returns nil.
+func (r UntypedResult) OK() *struct{} {
+	if r {
+		return nil
+	}
+	return &struct{}{}
+}
+
+// Err returns a non-nil pointer if r represents the error case.
+// If r represents the OK case, then it returns nil.
+func (r UntypedResult) Err() *struct{} {
+	if !r {
+		return nil
+	}
+	return &struct{}{}
 }
