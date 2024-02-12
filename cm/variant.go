@@ -21,12 +21,12 @@ type Variant[Disc Discriminant, Shape, Align any] struct {
 // NewVariant returns a [Variant] with tag of type Disc, storage and GC shape of type Shape,
 // aligned to type Align, with a value of type T.
 func NewVariant[Disc Discriminant, Shape, Align any, T any](tag Disc, data T) Variant[Disc, Shape, Align] {
-	var v Variant[Disc, Shape, Align]
-	if BoundsCheck && unsafe.Sizeof(data) > unsafe.Sizeof(v.data) {
+	if BoundsCheck && unsafe.Sizeof(*(*T)(nil)) > unsafe.Sizeof(*(*Shape)(nil)) {
 		panic("NewVariant: size of requested type greater than size of data type")
 	}
+	var v Variant[Disc, Shape, Align]
 	v.tag = tag
-	*((*T)(unsafe.Pointer(&v.data))) = data
+	v.data = *(*Shape)(unsafe.Pointer(&data))
 	return v
 }
 
@@ -37,10 +37,10 @@ func New[V ~struct {
 	_    [0]Align
 	data Shape
 }, Disc Discriminant, Shape, Align any, T any](tag Disc, data T) V {
-	var v Variant[Disc, Shape, Align]
-	if BoundsCheck && unsafe.Sizeof(data) > unsafe.Sizeof(v.data) {
+	if BoundsCheck && unsafe.Sizeof(*(*T)(nil)) > unsafe.Sizeof(*(*Shape)(nil)) {
 		panic("NewVariant: size of requested type greater than size of data type")
 	}
+	var v Variant[Disc, Shape, Align]
 	v.tag = tag
 	v.data = *(*Shape)(unsafe.Pointer(&data))
 	return V(v)
@@ -62,8 +62,7 @@ func Is[V ~struct {
 	_    [0]Align
 	data Shape
 }, Disc Discriminant, Shape, Align any](v *V, tag Disc) bool {
-	v2 := (*Variant[Disc, Shape, Align])(unsafe.Pointer(v))
-	return v2.tag == tag
+	return (*Variant[Disc, Shape, Align])(unsafe.Pointer(v)).tag == tag
 }
 
 // Case returns a non-nil *T if the [Variant] case is equal to tag, otherwise it returns nil.
@@ -72,10 +71,8 @@ func Case[T any, V ~struct {
 	_    [0]Align
 	data Shape
 }, Disc Discriminant, Shape, Align any](v *V, tag Disc) *T {
-	if BoundsCheck {
-		if unsafe.Sizeof(*(*T)(nil)) > unsafe.Sizeof(*(*Shape)(nil)) {
-			panic("Get: size of requested type greater than size of data type")
-		}
+	if BoundsCheck && unsafe.Sizeof(*(*T)(nil)) > unsafe.Sizeof(*(*Shape)(nil)) {
+		panic("Get: size of requested type greater than size of data type")
 	}
 	v2 := (*Variant[Disc, Shape, Align])(unsafe.Pointer(v))
 	if v2.tag == tag {
