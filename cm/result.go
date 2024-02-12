@@ -52,22 +52,22 @@ type Result[Shape, OK, Err any] struct {
 	data  Shape
 }
 
-// OKResult returns an OK [Result] with GC shape Shape and type OK and Err.
-func OKResult[Shape, OK, Err any](ok OK) Result[Shape, OK, Err] {
+// OK returns an OK [Result] with GC shape Shape and type OK and Err.
+func OK[Shape, OK, Err any](ok OK) Result[Shape, OK, Err] {
 	var r Result[Shape, OK, Err]
 	if BoundsCheck && unsafe.Sizeof(ok) > unsafe.Sizeof(r.data) {
-		panic("OKResult: size of requested type greater than size of data type")
+		panic("OK: size of requested type greater than size of data type")
 	}
 	r.isErr = ResultOK
 	*((*OK)(unsafe.Pointer(&r.data))) = ok
 	return r
 }
 
-// ErrResult returns an error [Error] with GC shape Shape and type OK and Err.
-func ErrResult[Shape, OK, Err any](err Err) Result[Shape, OK, Err] {
+// Err returns an error [Result] with GC shape Shape and type OK and Err.
+func Err[Shape, OK, Err any](err Err) Result[Shape, OK, Err] {
 	var r Result[Shape, OK, Err]
 	if BoundsCheck && unsafe.Sizeof(err) > unsafe.Sizeof(r.data) {
-		panic("ErrResult: size of requested type greater than size of data type")
+		panic("Err: size of requested type greater than size of data type")
 	}
 	r.isErr = ResultErr
 	*((*Err)(unsafe.Pointer(&r.data))) = err
