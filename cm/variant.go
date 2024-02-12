@@ -38,7 +38,7 @@ func New[V ~struct {
 	data Shape
 }, Disc Discriminant, Shape, Align any, T any](tag Disc, data T) V {
 	if BoundsCheck && unsafe.Sizeof(*(*T)(nil)) > unsafe.Sizeof(*(*Shape)(nil)) {
-		panic("NewVariant: size of requested type greater than size of data type")
+		panic("New: size of requested type greater than size of data type")
 	}
 	var v Variant[Disc, Shape, Align]
 	v.tag = tag
@@ -72,7 +72,7 @@ func Case[T any, V ~struct {
 	data Shape
 }, Disc Discriminant, Shape, Align any](v *V, tag Disc) *T {
 	if BoundsCheck && unsafe.Sizeof(*(*T)(nil)) > unsafe.Sizeof(*(*Shape)(nil)) {
-		panic("Get: size of requested type greater than size of data type")
+		panic("Case: size of requested type greater than size of data type")
 	}
 	v2 := (*Variant[Disc, Shape, Align])(unsafe.Pointer(v))
 	if v2.tag == tag {
