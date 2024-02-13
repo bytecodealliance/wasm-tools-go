@@ -119,6 +119,11 @@ func (g *generator) generate() ([]*gen.Package, error) {
 }
 
 func (g *generator) detectVersionedPackages() {
+	if g.opts.versioned {
+		g.versioned = true
+		fmt.Fprintf(os.Stderr, "Generated versions for all package(s)\n")
+		return
+	}
 	packages := make(map[string]string)
 	for _, pkg := range g.res.Packages {
 		id := pkg.Name
@@ -460,13 +465,13 @@ func (g *generator) packageForIdent(id wit.Ident) *gen.Package {
 	}
 
 	// Create a new package
-	path := id.Namespace + "/" + id.Package + "/" + GoPackageName(id.Extension)
+	path := id.Namespace + "/" + id.Package + "/" + id.Extension
 	if g.opts.packageRoot != "" && g.opts.packageRoot != "std" {
 		path = g.opts.packageRoot + "/" + path
 	}
 	name := id.Extension
 	if g.versioned && id.Version != nil {
-		path += "/v" + id.Version.String()
+		path += "-" + id.Version.String()
 	}
 
 	name = GoPackageName(name)
