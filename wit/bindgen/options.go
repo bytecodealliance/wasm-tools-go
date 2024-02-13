@@ -25,6 +25,9 @@ type options struct {
 	// Default: github.com/ydnar/wasm-tools-go/cm.
 	cmPackage string
 
+	// versioned determines if Go packages are generated with version numbers.
+	versioned bool
+
 	// idents maps WIT identifiers to Go identifiers. Examples:
 	// "wasi:clocks" -> "wasi/clocks"
 	// "wasi:clocks/wall-clock" -> "wasi/clocks/wall"
@@ -75,6 +78,15 @@ func PackageName(name string) Option {
 func CMPackage(path string) Option {
 	return optionFunc(func(opts *options) error {
 		opts.cmPackage = path
+		return nil
+	})
+}
+
+// Versioned returns an [Option] that that specifies that all generated Go packages
+// will have versions that match WIT versions.
+func Versioned(versioned bool) Option {
+	return optionFunc(func(opts *options) error {
+		opts.versioned = versioned
 		return nil
 	})
 }
