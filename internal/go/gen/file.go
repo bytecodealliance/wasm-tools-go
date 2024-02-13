@@ -79,8 +79,8 @@ func (f *File) Bytes() ([]byte, error) {
 // It additionally checks the file-scoped declarations (local package names).
 // It returns the package-unique name (which may be different than name).
 func (f *File) Declare(name string) Ident {
-	name = Unique(name, IsReserved, HasKey(f.Imports), HasKey(f.Package.Idents))
-	f.Package.Idents[name] = true
+	name = Unique(name, IsReserved, HasKey(f.Imports), HasKey(f.Package.Declared))
+	f.Package.Declared[name] = true
 	return Ident{
 		Package: f.Package,
 		Name:    name,
@@ -95,7 +95,7 @@ func (f *File) Import(path string) string {
 	if f.Imports[path] != "" {
 		return f.Imports[path]
 	}
-	name = Unique(name, IsReserved, HasKey(f.Imports), HasKey(f.Package.Idents))
+	name = Unique(name, IsReserved, HasKey(f.Imports), HasKey(f.Package.Declared))
 	f.Imports[path] = name
 	return name
 }

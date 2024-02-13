@@ -12,17 +12,17 @@ type Package struct {
 	// Files is the list of Go source files in this package.
 	Files map[string]*File
 
-	// Idents represents package-scoped identifiers,
+	// Declared tracks declared package-scoped identifiers,
 	// including constants, variables, and functions.
-	Idents map[string]bool
+	Declared map[string]bool
 }
 
 // NewPackage returns a newly instantiated Package for path.
 // The local name may optionally be specified with a "#name" suffix.
 func NewPackage(path string) *Package {
 	p := &Package{
-		Files:  make(map[string]*File),
-		Idents: make(map[string]bool),
+		Files:    make(map[string]*File),
+		Declared: make(map[string]bool),
 	}
 	p.Path, p.Name = ParseSelector(path)
 	return p
