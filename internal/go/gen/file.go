@@ -75,13 +75,13 @@ func (f *File) Bytes() ([]byte, error) {
 	return format.Source(b.Bytes())
 }
 
-// Decl adds a package-scoped declaration to f and f.Package.
+// Declare adds a package-scoped identifier to [File] f.
 // It additionally checks the file-scoped declarations (local package names).
 // It returns the package-unique name (which may be different than name).
-func (f *File) Decl(name string) Decl {
-	name = Unique(name, IsReserved, HasKey(f.Imports), HasKey(f.Package.Decls))
-	f.Package.Decls[name] = true
-	return Decl{
+func (f *File) Declare(name string) Ident {
+	name = Unique(name, IsReserved, HasKey(f.Imports), HasKey(f.Package.Idents))
+	f.Package.Idents[name] = true
+	return Ident{
 		Package: f.Package,
 		Name:    name,
 	}
@@ -95,7 +95,7 @@ func (f *File) Import(path string) string {
 	if f.Imports[path] != "" {
 		return f.Imports[path]
 	}
-	name = Unique(name, IsReserved, HasKey(f.Imports), HasKey(f.Package.Decls))
+	name = Unique(name, IsReserved, HasKey(f.Imports), HasKey(f.Package.Idents))
 	f.Imports[path] = name
 	return name
 }

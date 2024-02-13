@@ -55,14 +55,14 @@ type generator struct {
 	// interfacePackages map [wit.Interface] to Go packages.
 	interfacePackages map[*wit.Interface]*gen.Package
 
-	// typeDecls map [wit.TypeDef] to their equivalent Go declaration.
-	typeDecls map[*wit.TypeDef]gen.Decl
+	// types map [wit.TypeDef] to their equivalent Go identifier.
+	types map[*wit.TypeDef]gen.Ident
 
-	// funcDecls map [wit.Function] to their equivalent Go declaration.
-	funcDecls map[*wit.Function]gen.Decl
+	// funcs map [wit.Function] to their equivalent Go identifier.
+	funcs map[*wit.Function]gen.Ident
 
 	// defined represent whether a type or function has been defined.
-	defined map[gen.Decl]bool
+	defined map[gen.Ident]bool
 }
 
 func newGenerator(res *wit.Resolve, opts ...Option) (*generator, error) {
@@ -71,9 +71,9 @@ func newGenerator(res *wit.Resolve, opts ...Option) (*generator, error) {
 		witPackages:       make(map[string]*gen.Package),
 		worldPackages:     make(map[*wit.World]*gen.Package),
 		interfacePackages: make(map[*wit.Interface]*gen.Package),
-		typeDecls:         make(map[*wit.TypeDef]gen.Decl),
-		funcDecls:         make(map[*wit.Function]gen.Decl),
-		defined:           make(map[gen.Decl]bool),
+		types:             make(map[*wit.TypeDef]gen.Ident),
+		funcs:             make(map[*wit.Function]gen.Ident),
+		defined:           make(map[gen.Ident]bool),
 	}
 	err := g.opts.apply(opts...)
 	if err != nil {
@@ -169,8 +169,8 @@ func (g *generator) declareTypeDef(t *wit.TypeDef) error {
 
 	pkg := g.packageForIdent(ownerID)
 	file := pkg.File(ownerID.Extension + GoSuffix)
-	decl := file.Decl(GoName(name))
-	g.typeDecls[t] = decl
+	id := file.Declare(GoName(name))
+	g.types[t] = id
 
 	// fmt.Fprintf(os.Stderr, "Type:\t%s.%s\n\t%s.%s\n", ownerID.String(), name, decl.Package.Path, decl.Name)
 
@@ -275,11 +275,11 @@ func (g *generator) defineTypeDef(t *wit.TypeDef, name string) error {
 		name = *t.Name
 	}
 
-	decl := g.typeDecls[t]
-	if decl == (gen.Decl{}) {
+	id := g.types[t]
+	if id == (gen.Ident{}) {
 		return fmt.Errorf("typedef %s not declared", name)
 	}
-	if g.defined[decl] {
+	if g.defined[id] {
 		return nil
 	}
 	// TODO: should we emit data for aliases?
@@ -297,17 +297,17 @@ func (g *generator) defineTypeDef(t *wit.TypeDef, name string) error {
 		ownerID.Extension = *owner.Name // FIXME: this might panic
 	}
 
-	pkg := decl.Package
+	pkg := id.Package
 	file := pkg.File(ownerID.Extension + GoSuffix)
 
-	fmt.Fprintf(file, "// %s represents the %s \"%s#%s\".\n", decl.Name, t.WITKind(), ownerID.String(), name)
+	fmt.Fprintf(file, "// %s represents the %s \"%s#%s\".\n", id.Name, t.WITKind(), ownerID.String(), name)
 	fmt.Fprintf(file, "//\n")
 	fmt.Fprint(file, gen.FormatDocComments(t.WIT(nil, "")))
 	fmt.Fprintf(file, "//\n")
 	if t.Docs.Contents != "" {
 		fmt.Fprintf(file, "//\n%s", gen.FormatDocComments(t.Docs.Contents))
 	}
-	fmt.Fprintf(file, "type %s ", decl.Name)
+	fmt.Fprintf(file, "type %s ", id.Name)
 	fmt.Fprint(file, g.typeDefExpr(file, t))
 	fmt.Fprint(file, "\n\n")
 
@@ -426,16 +426,16 @@ func (g *generator) defineImportedFunction(f *wit.Function, ownerID wit.Ident) e
 	if !f.IsFreestanding() {
 		return nil
 	}
-	if _, ok := g.funcDecls[f]; ok {
+	if _, ok := g.funcs[f]; ok {
 		return nil
 	}
 
 	pkg := g.packageForIdent(ownerID)
 	file := pkg.File(ownerID.Extension + GoSuffix)
 
-	funcDecl := file.Decl(GoName(f.Name))
-	g.funcDecls[f] = funcDecl
-	snakeDecl := file.Decl(SnakeName(f.Name))
+	funcDecl := file.Declare(GoName(f.Name))
+	g.funcs[f] = funcDecl
+	snakeDecl := file.Declare(SnakeName(f.Name))
 
 	fmt.Fprintf(file, "// %s represents the %s \"%s#%s\".\n", funcDecl.Name, f.WITKind(), ownerID.String(), f.Name)
 	if f.Docs.Contents != "" {

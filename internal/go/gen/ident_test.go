@@ -2,39 +2,31 @@ package gen
 
 import "testing"
 
-func TestParseIdent(t *testing.T) {
+func TestParseSelector(t *testing.T) {
 	tests := []struct {
-		s       string
-		want    Ident
-		wantErr bool
+		s    string
+		path string
+		name string
 	}{
-		{"io", Ident{"io", "io"}, false},
-		{"io/fs", Ident{"io/fs", "fs"}, false},
-		{"encoding/json", Ident{"encoding/json", "json"}, false},
-		{"encoding/xml", Ident{"encoding/xml", "xml"}, false},
-		{"encoding/xml#xml", Ident{"encoding/xml", "xml"}, false},
-		{"encoding/xml#encxml", Ident{"encoding/xml", "encxml"}, false},
-		{"encoding/xml#Encoder", Ident{"encoding/xml", "Encoder"}, false},
-		{"encoding/xml#Decoder", Ident{"encoding/xml", "Decoder"}, false},
-		{"wasi/clocks", Ident{"wasi/clocks", "clocks"}, false},
-		{"wasi/clocks#clocks", Ident{"wasi/clocks", "clocks"}, false},
-		{"wasi/clocks/wallclock", Ident{"wasi/clocks/wallclock", "wallclock"}, false},
-		{"wasi/clocks/wallclock#wallclock", Ident{"wasi/clocks/wallclock", "wallclock"}, false},
-		{"wasi/clocks/wallclock#DateTime", Ident{"wasi/clocks/wallclock", "DateTime"}, false},
+		{"io", "io", "io"},
+		{"io/fs", "io/fs", "fs"},
+		{"encoding/json", "encoding/json", "json"},
+		{"encoding/xml", "encoding/xml", "xml"},
+		{"encoding/xml#xml", "encoding/xml", "xml"},
+		{"encoding/xml#encxml", "encoding/xml", "encxml"},
+		{"encoding/xml#Encoder", "encoding/xml", "Encoder"},
+		{"encoding/xml#Decoder", "encoding/xml", "Decoder"},
+		{"wasi/clocks", "wasi/clocks", "clocks"},
+		{"wasi/clocks#clocks", "wasi/clocks", "clocks"},
+		{"wasi/clocks/wallclock", "wasi/clocks/wallclock", "wallclock"},
+		{"wasi/clocks/wallclock#wallclock", "wasi/clocks/wallclock", "wallclock"},
+		{"wasi/clocks/wallclock#DateTime", "wasi/clocks/wallclock", "DateTime"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.s, func(t *testing.T) {
-			got, err := ParseIdent(tt.s)
-			if tt.wantErr && err == nil {
-				t.Errorf("ParseIdent(%q): expected error, got nil error", tt.s)
-			} else if !tt.wantErr && err != nil {
-				t.Errorf("ParseIdent(%q): expected no error, got error: %v", tt.s, err)
-			}
-			if err != nil {
-				return
-			}
-			if got != tt.want {
-				t.Errorf("ParseIdent(%q): %v, expected %v", tt.s, got, tt.want)
+			path, name := ParseSelector(tt.s)
+			if path != tt.path || name != tt.name {
+				t.Errorf("ParseSelector(%q): %q, %q; expected %q, %q", tt.s, path, name, tt.path, tt.name)
 			}
 		})
 	}
