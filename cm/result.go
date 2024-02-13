@@ -97,6 +97,18 @@ func (r *Result[Shape, OK, Err]) Err() *Err {
 	return (*Err)(unsafe.Pointer(&r.data))
 }
 
+// Unwrap returns non-nil *OK pointer and nil *Err pointer if r represents the OK case.
+// It returns a nil *OK pointer and non-nil *Err pointer if r represents the error case.
+//
+// One, and only one, of the return values is guaranteed to be non-nil. It will never return
+// two nil pointers or two non-nil pointers.
+func (r *Result[Shape, OK, Err]) Unwrap() (*OK, *Err) {
+	if r.isErr {
+		return nil, (*Err)(unsafe.Pointer(&r.data))
+	}
+	return (*OK)(unsafe.Pointer(&r.data)), nil
+}
+
 // UntypedResult represents an untyped result, e.g. result or result<_, _>.
 // Its associated types are implicitly struct{}, and it is represented as a Go bool.
 type UntypedResult bool
@@ -122,4 +134,15 @@ func (r UntypedResult) Err() *struct{} {
 		return nil
 	}
 	return &struct{}{}
+}
+
+// Unwrap returns non-nil *OK pointer and nil *Err pointer if r represents the OK case.
+// It returns a nil *OK pointer and non-nil *Err pointer if r represents the error case.
+//
+// See [Result] for more information.
+func (r UntypedResult) Unwrap() (*struct{}, *struct{}) {
+	if r {
+		return nil, &struct{}{}
+	}
+	return &struct{}{}, nil
 }
