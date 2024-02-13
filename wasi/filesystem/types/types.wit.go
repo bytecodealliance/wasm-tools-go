@@ -426,12 +426,12 @@ func (self Descriptor) resource_drop()
 //
 // Note: This allows using `read-stream`, which is similar to `read` in POSIX.
 func (self Descriptor) ReadViaStream(offset FileSize) (result cm.Result[InputStream, InputStream, ErrorCode]) {
-	self.read_via_stream(&result)
+	self.read_via_stream(offset, &result)
 	return
 }
 
 //go:wasmimport wasi:filesystem/types@0.2.0 [method]descriptor.read-via-stream
-func (self Descriptor) read_via_stream(result *cm.Result[InputStream, InputStream, ErrorCode])
+func (self Descriptor) read_via_stream(offset FileSize, result *cm.Result[InputStream, InputStream, ErrorCode])
 
 // WriteViaStream represents the resource method "write-via-stream".
 //
@@ -442,12 +442,12 @@ func (self Descriptor) read_via_stream(result *cm.Result[InputStream, InputStrea
 // Note: This allows using `write-stream`, which is similar to `write` in
 // POSIX.
 func (self Descriptor) WriteViaStream(offset FileSize) (result cm.Result[OutputStream, OutputStream, ErrorCode]) {
-	self.write_via_stream(&result)
+	self.write_via_stream(offset, &result)
 	return
 }
 
 //go:wasmimport wasi:filesystem/types@0.2.0 [method]descriptor.append-via-stream
-func (self Descriptor) write_via_stream(result *cm.Result[OutputStream, OutputStream, ErrorCode])
+func (self Descriptor) write_via_stream(offset FileSize, result *cm.Result[OutputStream, OutputStream, ErrorCode])
 
 // AppendViaStream represents the resource method "write-via-stream".
 //
@@ -458,12 +458,12 @@ func (self Descriptor) write_via_stream(result *cm.Result[OutputStream, OutputSt
 // Note: This allows using `write-stream`, which is similar to `write` with
 // `O_APPEND` in in POSIX.
 func (self Descriptor) AppendViaStream(offset FileSize) (result cm.Result[OutputStream, OutputStream, ErrorCode]) {
-	self.append_via_stream(&result)
+	self.append_via_stream(offset, &result)
 	return
 }
 
 //go:wasmimport wasi:filesystem/types@0.2.0 [method]descriptor.append-via-stream
-func (self Descriptor) append_via_stream(result *cm.Result[OutputStream, OutputStream, ErrorCode])
+func (self Descriptor) append_via_stream(offset FileSize, result *cm.Result[OutputStream, OutputStream, ErrorCode])
 
 // Advise represents the resource method "advise".
 //
