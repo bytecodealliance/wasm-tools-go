@@ -4,132 +4,79 @@ import "unsafe"
 
 // Discriminant is the set of types that can represent the tag or discriminator of a variant.
 // Use bool for 2-value variants, results, or option<T> types, uint8 where there are 256 or
-// fewer cases, uint16 for up to 65,536 cases, or uint32 for anything greater.s
+// fewer cases, uint16 for up to 65,536 cases, or uint32 for anything greater.
 type Discriminant interface {
 	bool | uint8 | uint16 | uint32
 }
 
 // Variant represents a loosely-typed Component Model variant.
 // Shape and Align must be non-zero sized types. To create a variant with no associated
-// types, use UntypedVariant. To create a variant with only zero-sized types
-// like struct{} or [0]int, use UnsizedVariant.
+// types, use UntypedVariant. For variants with zero-width or no associated types, use an enum.
 type Variant[Disc Discriminant, Shape, Align any] struct {
 	tag  Disc
 	_    [0]Align
 	data Shape
 }
 
-// Tag returns the variant tag value.
-func (v *Variant[Disc, Shape, Align]) Tag() Disc {
-	return v.tag
-}
-
-// Data returns an unsafe.Pointer to the data field in v.
-func (v *Variant[Disc, Shape, Align]) Data() unsafe.Pointer {
-	return unsafe.Pointer(&v.data)
-}
-
-// Is returns true if the variant tag value equals tag
-func (v *Variant[Disc, Shape, Align]) Is(tag Disc) bool {
-	return v.tag == tag
-}
-
-// As coerces the value in Variant v into type T.
-func As[T any, Disc Discriminant, Shape, Align any](v *Variant[Disc, Shape, Align]) (data T) {
-	if BoundsCheck && unsafe.Sizeof(data) > unsafe.Sizeof(v.data) {
-		panic("As: size of requested type greater than size of data type")
-	}
-	return *((*T)(unsafe.Pointer(&v.data)))
-}
-
-// Get returns a value of type T and true if the Variant tag is tag,
-// or returns the zero value of T and false.
-func Get[T any, Disc Discriminant, Shape, Align any](v *Variant[Disc, Shape, Align], tag Disc) (data T, ok bool) {
-	if BoundsCheck && unsafe.Sizeof(data) > unsafe.Sizeof(v.data) {
-		panic("Get: size of requested type greater than size of data type")
-	}
-	if v.tag != tag {
-		var zero T
-		return zero, false
-	}
-	return *((*T)(unsafe.Pointer(&v.data))), true
-}
-
-// Set sets the tag and value of Variant v.
-func Set[T any, Disc Discriminant, Shape, Align any](v *Variant[Disc, Shape, Align], tag Disc, data T) {
-	if BoundsCheck && unsafe.Sizeof(data) > unsafe.Sizeof(v.data) {
-		panic("Set: size of requested type greater than size of data type")
-	}
-	v.tag = tag
-	*((*T)(unsafe.Pointer(&v.data))) = data
-}
-
-// NewVariant returns a new variant with tag of type Disc, storage and GC shape of type Shape,
-// setting the tag and value of type T.
+// NewVariant returns a [Variant] with tag of type Disc, storage and GC shape of type Shape,
+// aligned to type Align, with a value of type T.
 func NewVariant[Disc Discriminant, Shape, Align any, T any](tag Disc, data T) Variant[Disc, Shape, Align] {
-	var v Variant[Disc, Shape, Align]
-	if BoundsCheck && unsafe.Sizeof(data) > unsafe.Sizeof(v.data) {
+	if BoundsCheck && unsafe.Sizeof(*(*T)(nil)) > unsafe.Sizeof(*(*Shape)(nil)) {
 		panic("NewVariant: size of requested type greater than size of data type")
 	}
+	var v Variant[Disc, Shape, Align]
 	v.tag = tag
-	*((*T)(unsafe.Pointer(&v.data))) = data
+	v.data = *(*Shape)(unsafe.Pointer(&data))
 	return v
 }
 
-// Variant2 represents a variant with 2 cases, where at least one case has an
-// associated type with a non-zero size.
-// Use UnsizedVariant2 if both T0 or T1 are zero-sized.
-// The memory layout will have additional padding if both T0 and T1 are zero-sized.
-type Variant2[Shape, T0, T1 any] struct {
-	Variant[bool, Shape, align2[T0, T1]]
+// New returns a [Variant] with tag of type Disc, storage and GC shape of type Shape,
+// aligned to type Align, with a value of type T.
+func New[V ~struct {
+	tag  Disc
+	_    [0]Align
+	data Shape
+}, Disc Discriminant, Shape, Align any, T any](tag Disc, data T) V {
+	if BoundsCheck && unsafe.Sizeof(*(*T)(nil)) > unsafe.Sizeof(*(*Shape)(nil)) {
+		panic("New: size of requested type greater than size of data type")
+	}
+	var v Variant[Disc, Shape, Align]
+	v.tag = tag
+	v.data = *(*Shape)(unsafe.Pointer(&data))
+	return V(v)
 }
 
-type align2[T0, T1 any] struct {
-	_ [0]T0
-	_ [0]T1
+// Tag returns the tag of [Variant] v.
+func Tag[V ~struct {
+	tag  Disc
+	_    [0]Align
+	data Shape
+}, Disc Discriminant, Shape, Align any](v *V) Disc {
+	v2 := (*Variant[Disc, Shape, Align])(unsafe.Pointer(v))
+	return v2.tag
 }
 
-func (v *Variant2[S, T0, T1]) Case0() (val T0, ok bool) {
-	return Get[T0](&v.Variant, false)
+// Is returns true if the [Variant] case is equal to tag.
+func Is[V ~struct {
+	tag  Disc
+	_    [0]Align
+	data Shape
+}, Disc Discriminant, Shape, Align any](v *V, tag Disc) bool {
+	return (*Variant[Disc, Shape, Align])(unsafe.Pointer(v)).tag == tag
 }
 
-func (v *Variant2[S, T0, T1]) Case1() (val T1, ok bool) {
-	return Get[T1](&v.Variant, true)
+// Case returns a non-nil *T if the [Variant] case is equal to tag, otherwise it returns nil.
+func Case[T any, V ~struct {
+	tag  Disc
+	_    [0]Align
+	data Shape
+}, Disc Discriminant, Shape, Align any](v *V, tag Disc) *T {
+	if BoundsCheck && unsafe.Sizeof(*(*T)(nil)) > unsafe.Sizeof(*(*Shape)(nil)) {
+		panic("Case: size of requested type greater than size of data type")
+	}
+	v2 := (*Variant[Disc, Shape, Align])(unsafe.Pointer(v))
+	if v2.tag == tag {
+		return (*T)(unsafe.Pointer(&v2.data))
+	}
+	return nil
 }
-
-func (v *Variant2[S, T0, T1]) Set0(data T0) {
-	Set[T0](&v.Variant, false, data)
-}
-
-func (v *Variant2[S, T0, T1]) Set1(data T1) {
-	Set[T1](&v.Variant, true, data)
-}
-
-// UnsizedVariant2 represents a variant with 2 zero-sized associated types, e.g. struct{} or [0]T.
-// Use Variant2 if either T0 or T1 has a non-zero size.
-// Loads and stores may panic if T0 or T1 has a non-zero size.
-type UnsizedVariant2[T0, T1 any] bool
-
-func (v *UnsizedVariant2[T0, T1]) Tag() bool {
-	return bool(*v)
-}
-
-func (v *UnsizedVariant2[T0, T1]) Case0() (data T0, ok bool) {
-	return data, bool(*v)
-}
-
-func (v *UnsizedVariant2[T0, T1]) Case1() (data T1, ok bool) {
-	return data, bool(*v)
-}
-
-func (v *UnsizedVariant2[T0, T1]) Set0(data T0) {
-	*v = false
-}
-
-func (v *UnsizedVariant2[T0, T1]) Set1(data T1) {
-	*v = true
-}
-
-// UntypedVariant2 represents an untyped variant with 2 cases.
-// The associated types are defaulted to struct{}.
-type UntypedVariant2 = UnsizedVariant2[struct{}, struct{}]

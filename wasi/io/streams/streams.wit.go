@@ -23,17 +23,15 @@ type (
 // StreamError represents variant "wasi:io/streams.stream-error".
 //
 // An error for input-stream and output-stream operations.
-type StreamError struct {
-	v cm.Variant[bool, Error, Error]
-}
+type StreamError cm.Variant[uint8, Error, Error]
 
 // LastOperationFailed represents variant case "last-operation-failed(error)".
 //
 // The last operation (a write or flush) failed before completion.
 //
 // More information is available in the `error` payload.
-func (self *StreamError) LastOperationFailed() (Error, bool) {
-	return cm.Get[Error](&self.v, false)
+func (self *StreamError) LastOperationFailed() *Error {
+	return cm.Case[Error](self, 0)
 }
 
 // Closed represents variant case "closed".
@@ -42,7 +40,7 @@ func (self *StreamError) LastOperationFailed() (Error, bool) {
 // stream. A closed output-stream will return this error on all
 // future operations.
 func (self *StreamError) Closed() bool {
-	return self.v.Is(true)
+	return cm.Tag(self) == 1
 }
 
 // InputStream represents the resource "wasi:io/streams.input-stream".

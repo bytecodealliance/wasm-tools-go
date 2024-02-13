@@ -36,32 +36,20 @@ func zeroPtr[T any]() *T {
 // VariantDebug is an interface used in tests to validate layout of variant types.
 type VariantDebug interface {
 	Size() uintptr
-	ValAlign() uintptr
-	ValOffset() uintptr
+	DataAlign() uintptr
+	DataOffset() uintptr
 }
 
-func (v Variant2[Shape, T0, T1]) Size() uintptr {
+func (v Variant[Disc, Shape, Align]) Size() uintptr {
 	return unsafe.Sizeof(v)
 }
 
-func (v Variant2[Shape, T0, T1]) ValAlign() uintptr {
-	return unsafe.Alignof(v.Variant.data)
+func (v Variant[Disc, Shape, Align]) DataAlign() uintptr {
+	return unsafe.Alignof(v.data)
 }
 
-func (v Variant2[Shape, T0, T1]) ValOffset() uintptr {
-	return tinyunsafe.OffsetOf(&v, &v.Variant.data)
-}
-
-func (v UnsizedVariant2[T0, T1]) Size() uintptr {
-	return unsafe.Sizeof(v)
-}
-
-func (v UnsizedVariant2[T0, T1]) ValAlign() uintptr {
-	return 0
-}
-
-func (v UnsizedVariant2[T0, T1]) ValOffset() uintptr {
-	return 0
+func (v Variant[Disc, Shape, Align]) DataOffset() uintptr {
+	return tinyunsafe.OffsetOf(&v, &v.data)
 }
 
 // ResultDebug is an interface used in tests to validate layout of result types.
@@ -73,22 +61,22 @@ func (r Result[S, OK, Err]) Size() uintptr {
 	return unsafe.Sizeof(r)
 }
 
-func (r Result[S, OK, Err]) ValAlign() uintptr {
-	return r.v.ValAlign()
+func (r Result[S, OK, Err]) DataAlign() uintptr {
+	return unsafe.Alignof(r.data)
 }
 
-func (r Result[S, OK, Err]) ValOffset() uintptr {
-	return r.v.ValOffset()
+func (r Result[S, OK, Err]) DataOffset() uintptr {
+	return tinyunsafe.OffsetOf(&r, &r.data)
 }
 
-func (r UnsizedResult[OK, Err]) Size() uintptr {
+func (r UntypedResult) Size() uintptr {
 	return unsafe.Sizeof(r)
 }
 
-func (r UnsizedResult[OK, Err]) ValAlign() uintptr {
+func (r UntypedResult) DataAlign() uintptr {
 	return 0
 }
 
-func (r UnsizedResult[OK, Err]) ValOffset() uintptr {
+func (r UntypedResult) DataOffset() uintptr {
 	return 0
 }

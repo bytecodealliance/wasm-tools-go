@@ -187,50 +187,42 @@ type LinkCount = uint64
 // NewTimestamp represents the variant "wasi:filesystem/types.new-timestamp".
 //
 // When setting a timestamp, this gives the value to set it to.
-type NewTimestamp struct {
-	v cm.Variant[uint8, DateTime, struct{}]
-}
+type NewTimestamp cm.Variant[uint8, DateTime, struct{}]
 
 // NewTimestampNoChange returns a NewTimestamp with variant case "no-change".
 func NewTimestampNoChange() NewTimestamp {
-	var result NewTimestamp
-	cm.Set(&result.v, 0, struct{}{})
-	return result
+	return cm.New[NewTimestamp](0, struct{}{})
 }
 
 // NoChange represents variant case "no-change".
 //
 // Leave the timestamp set to its previous value.
 func (self *NewTimestamp) NoChange() bool {
-	return self.v.Is(0)
+	return cm.Tag(self) == 0
 }
 
 // NewTimestampNow returns a NewTimestamp with variant case "now".
 func NewTimestampNow() NewTimestamp {
-	var result NewTimestamp
-	cm.Set(&result.v, 1, struct{}{})
-	return result
+	return cm.New[NewTimestamp](1, struct{}{})
 }
 
 // Now represents variant case "now".
 //
 // Leave the timestamp set to its previous value.
 func (self *NewTimestamp) Now() bool {
-	return self.v.Is(1)
+	return cm.Tag(self) == 1
 }
 
 // Timestamp represents variant case "timestamp(datetime)".
 //
 // Set the timestamp to the given value.
-func (self *NewTimestamp) Timestamp() (DateTime, bool) {
-	return cm.Get[DateTime](&self.v, 2)
+func (self *NewTimestamp) Timestamp() *DateTime {
+	return cm.Case[DateTime](self, 2)
 }
 
 // NewTimestampTimestamp returns a NewTimestamp with variant case "timestamp(datetime)".
 func NewTimestampTimestamp(v DateTime) NewTimestamp {
-	var result NewTimestamp
-	cm.Set(&result.v, 2, v)
-	return result
+	return cm.New[NewTimestamp](1, v)
 }
 
 // DirectoryEntry represents the record "wasi:filesystem/types.directory-entry".
@@ -434,12 +426,12 @@ func (self Descriptor) resource_drop()
 //
 // Note: This allows using `read-stream`, which is similar to `read` in POSIX.
 func (self Descriptor) ReadViaStream(offset FileSize) (result cm.Result[InputStream, InputStream, ErrorCode]) {
-	self.read_via_stream(&result)
+	self.read_via_stream(offset, &result)
 	return
 }
 
 //go:wasmimport wasi:filesystem/types@0.2.0 [method]descriptor.read-via-stream
-func (self Descriptor) read_via_stream(result *cm.Result[InputStream, InputStream, ErrorCode])
+func (self Descriptor) read_via_stream(offset FileSize, result *cm.Result[InputStream, InputStream, ErrorCode])
 
 // WriteViaStream represents the resource method "write-via-stream".
 //
@@ -450,12 +442,12 @@ func (self Descriptor) read_via_stream(result *cm.Result[InputStream, InputStrea
 // Note: This allows using `write-stream`, which is similar to `write` in
 // POSIX.
 func (self Descriptor) WriteViaStream(offset FileSize) (result cm.Result[OutputStream, OutputStream, ErrorCode]) {
-	self.write_via_stream(&result)
+	self.write_via_stream(offset, &result)
 	return
 }
 
 //go:wasmimport wasi:filesystem/types@0.2.0 [method]descriptor.append-via-stream
-func (self Descriptor) write_via_stream(result *cm.Result[OutputStream, OutputStream, ErrorCode])
+func (self Descriptor) write_via_stream(offset FileSize, result *cm.Result[OutputStream, OutputStream, ErrorCode])
 
 // AppendViaStream represents the resource method "write-via-stream".
 //
@@ -466,12 +458,12 @@ func (self Descriptor) write_via_stream(result *cm.Result[OutputStream, OutputSt
 // Note: This allows using `write-stream`, which is similar to `write` with
 // `O_APPEND` in in POSIX.
 func (self Descriptor) AppendViaStream(offset FileSize) (result cm.Result[OutputStream, OutputStream, ErrorCode]) {
-	self.append_via_stream(&result)
+	self.append_via_stream(offset, &result)
 	return
 }
 
 //go:wasmimport wasi:filesystem/types@0.2.0 [method]descriptor.append-via-stream
-func (self Descriptor) append_via_stream(result *cm.Result[OutputStream, OutputStream, ErrorCode])
+func (self Descriptor) append_via_stream(offset FileSize, result *cm.Result[OutputStream, OutputStream, ErrorCode])
 
 // Advise represents the resource method "advise".
 //

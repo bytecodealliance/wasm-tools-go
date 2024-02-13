@@ -13,10 +13,9 @@ var (
 
 type result[OK, Err any] interface {
 	IsErr() bool
-	SetOK(OK)
-	SetErr(Err)
-	OK() (ok OK, isOK bool)
-	Err() (err Err, isErr bool)
+	OK() *OK
+	Err() *Err
+	Unwrap() (*OK, *Err)
 }
 
 func TestResultLayout(t *testing.T) {
@@ -32,9 +31,6 @@ func TestResultLayout(t *testing.T) {
 		{"result", UntypedResult(false), 1, 0},
 		{"ok", UntypedResult(ResultOK), 1, 0},
 		{"err", UntypedResult(ResultErr), 1, 0},
-
-		{"result<_, _>", UnsizedResult[struct{}, struct{}](false), 1, 0},
-		{"result<[0]u8, _>", UnsizedResult[[0]byte, struct{}](false), 1, 0},
 
 		{"result<string, string>", Result[string, string, string]{}, sizePlusAlignOf[string](), ptrSize},
 		{"result<bool, string>", Result[string, bool, string]{}, sizePlusAlignOf[string](), ptrSize},
@@ -66,9 +62,27 @@ func TestResultLayout(t *testing.T) {
 			if got, want := tt.r.Size(), tt.size; got != want {
 				t.Errorf("(%s).Size() == %v, expected %v", typ, got, want)
 			}
-			if got, want := tt.r.ValOffset(), tt.offset; got != want {
-				t.Errorf("(%s).ValOffset() == %v, expected %v", typ, got, want)
+			if got, want := tt.r.DataOffset(), tt.offset; got != want {
+				t.Errorf("(%s).DataOffset() == %v, expected %v", typ, got, want)
 			}
 		})
+	}
+}
+
+func TestResultUnwrap(t *testing.T) {
+	r1 := OK[string, string, struct{}]("hello")
+	if ok, err := r1.Unwrap(); ok == nil {
+		t.Errorf("Unwrap: %v %v, expected non-nil OK", ok, err)
+	}
+	if ok, err := r1.Unwrap(); err != nil {
+		t.Errorf("Unwrap: %v %v, expected nil Err", ok, err)
+	}
+
+	r2 := Err[string, struct{}, bool](true)
+	if ok, err := r2.Unwrap(); ok != nil {
+		t.Errorf("Unwrap: %v %v, expected nil OK", ok, err)
+	}
+	if ok, err := r2.Unwrap(); err == nil {
+		t.Errorf("Unwrap: %v %v, expected non-nil Err", ok, err)
 	}
 }
