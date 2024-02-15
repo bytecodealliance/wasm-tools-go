@@ -745,3 +745,19 @@ func (g *generator) packageFor(id wit.Ident) *gen.Package {
 
 	return pkg
 }
+
+type stringWriter interface {
+	WriteString(string) (int, error)
+}
+
+func writeStrings(w stringWriter, strings ...string) (int, error) {
+	var total int
+	for _, s := range strings {
+		n, err := w.WriteString(s)
+		total += n
+		if err != nil {
+			break
+		}
+	}
+	return total, nil
+}
