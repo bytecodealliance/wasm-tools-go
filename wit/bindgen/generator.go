@@ -495,8 +495,8 @@ func (g *generator) enumRep(file *gen.File, typeName gen.Ident, e *wit.Enum) str
 	b.WriteString("\n\n")
 	b.WriteString("const (\n")
 	for i, c := range e.Cases {
-		b.WriteString(gen.FormatDocComments(c.Docs.Contents, false))
 		caseName := file.Declare(typeName.Name + GoName(c.Name, true))
+		b.WriteString(gen.FormatDocComments(c.Docs.Contents, false))
 		b.WriteString(caseName.Name)
 		if i == 0 {
 			b.WriteRune(' ')
@@ -528,23 +528,21 @@ func (g *generator) variantRep(file *gen.File, typeName gen.Ident, v *wit.Varian
 	b.WriteString(g.typeRep(file, shape))
 	b.WriteString(", ")
 	b.WriteString(g.typeRep(file, align))
-	b.WriteRune(']')
+	b.WriteString("]\n\n")
 
-	// b.WriteString(g.typeRep(file, disc))
-	// b.WriteString("\n\n")
-	// b.WriteString("const (\n")
-	// for i, c := range e.Cases {
-	// 	b.WriteString(gen.FormatDocComments(c.Docs.Contents, false))
-	// 	caseName := file.Declare(typeName.Name + GoName(c.Name, true))
-	// 	b.WriteString(caseName.Name)
-	// 	if i == 0 {
-	// 		b.WriteRune(' ')
-	// 		b.WriteString(typeName.Name)
-	// 		b.WriteString(" = iota")
-	// 	}
-	// 	b.WriteString("\n\n")
-	// }
-	// b.WriteString(")\n")
+	// Emit cases
+	for _, c := range v.Cases {
+		caseName := file.Declare(typeName.Name + GoName(c.Name, true))
+		writeStrings(&b, "// ", caseName.Name, " represents the ", c.WITKind(), " ", "\"", c.Name, "\".\n")
+		b.WriteString("//\n")
+		b.WriteString(gen.FormatDocComments(c.Docs.Contents, false))
+		b.WriteString("func ")
+		b.WriteString(caseName.Name)
+		b.WriteString("() ")
+		b.WriteString(typeName.Name)
+		b.WriteString("// TODO: variant case function body")
+		b.WriteString("\n\n")
+	}
 	return b.String()
 }
 
