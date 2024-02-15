@@ -521,7 +521,8 @@ func (g *generator) variantRep(file *gen.File, typeName gen.Ident, v *wit.Varian
 
 	// Emit type
 	var b strings.Builder
-	b.WriteString(file.Import(g.opts.cmPackage))
+	cm := file.Import(g.opts.cmPackage)
+	b.WriteString(cm)
 	b.WriteString(".Variant[")
 	b.WriteString(g.typeRep(file, disc))
 	b.WriteString(", ")
@@ -531,17 +532,22 @@ func (g *generator) variantRep(file *gen.File, typeName gen.Ident, v *wit.Varian
 	b.WriteString("]\n\n")
 
 	// Emit cases
-	for _, c := range v.Cases {
+	for i, c := range v.Cases {
 		caseName := file.Declare(typeName.Name + GoName(c.Name, true))
 		writeStrings(&b, "// ", caseName.Name, " returns a [", typeName.Name, "] of case \"", c.Name, "\".\n")
 		b.WriteString("//\n")
 		b.WriteString(gen.FormatDocComments(c.Docs.Contents, false))
-		b.WriteString("func ")
-		b.WriteString(caseName.Name)
-		b.WriteString("() ")
-		b.WriteString(typeName.Name)
-		b.WriteString("// TODO: variant case function body")
-		b.WriteString("\n\n")
+		writeStrings(&b, "func ", caseName.Name, "(")
+		dataName := "data"
+		if c.Type != nil {
+			writeStrings(&b, dataName, " ", g.typeRep(file, c.Type))
+		}
+		writeStrings(&b, ") ", typeName.Name, " {")
+		if c.Type == nil {
+			writeStrings(&b, "var ", dataName, " ", g.typeRep(file, c.Type), "\n")
+		}
+		writeStrings(&b, "return ", cm, ".New[", typeName.Name, "](", strconv.Itoa(i), ", ", dataName, ")\n")
+		b.WriteString("}\n\n")
 	}
 	return b.String()
 }
