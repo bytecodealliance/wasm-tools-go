@@ -514,8 +514,22 @@ func (g *generator) variantRep(file *gen.File, typeName gen.Ident, v *wit.Varian
 	if e := v.Enum(); e != nil {
 		return g.enumRep(file, typeName, e)
 	}
+
+	disc := wit.Discriminant(len(v.Cases))
+	shape := variantShape(v)
+	align := variantAlign(v)
+
+	// Emit type
 	var b strings.Builder
-	// disc := wit.Discriminant(len(v.Cases))
+	b.WriteString(file.Import(g.opts.cmPackage))
+	b.WriteString(".Variant[")
+	b.WriteString(g.typeRep(file, disc))
+	b.WriteString(", ")
+	b.WriteString(g.typeRep(file, shape))
+	b.WriteString(", ")
+	b.WriteString(g.typeRep(file, align))
+	b.WriteRune(']')
+
 	// b.WriteString(g.typeRep(file, disc))
 	// b.WriteString("\n\n")
 	// b.WriteString("const (\n")
