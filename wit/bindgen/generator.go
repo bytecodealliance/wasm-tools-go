@@ -533,7 +533,7 @@ func (g *generator) variantRep(file *gen.File, typeName gen.Ident, v *wit.Varian
 	// Emit cases
 	for _, c := range v.Cases {
 		caseName := file.Declare(typeName.Name + GoName(c.Name, true))
-		writeStrings(&b, "// ", caseName.Name, " represents the ", c.WITKind(), " ", "\"", c.Name, "\".\n")
+		writeStrings(&b, "// ", caseName.Name, " returns a [", typeName.Name, "] of case \"", c.Name, "\".\n")
 		b.WriteString("//\n")
 		b.WriteString(gen.FormatDocComments(c.Docs.Contents, false))
 		b.WriteString("func ")
