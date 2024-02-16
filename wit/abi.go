@@ -19,12 +19,13 @@ func Discriminant(n int) Type {
 	return U32{}
 }
 
-// Sized is the interface implemented by any type that reports its [ABI byte size], [alignment],
-// and whether the type contains a pointer.
+// ABI is the interface implemented by any type that reports its [Canonical ABI] [size], [alignment],
+// and whether the type contains a pointer (e.g. [List] or [String]).
 //
-// [ABI byte size]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#size
+// [Canonical ABI]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md
+// [size]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#size
 // [alignment]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#alignment
-type Sized interface {
+type ABI interface {
 	Size() uintptr
 	Align() uintptr
 	HasPointer() bool
