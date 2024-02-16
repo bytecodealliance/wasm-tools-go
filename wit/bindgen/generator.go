@@ -549,15 +549,16 @@ func (g *generator) variantRep(file *gen.File, typeName gen.Ident, v *wit.Varian
 		b.WriteString("}\n\n")
 
 		// Emit getter
-		stringio.Write(&b, "func (self *", typeName.Name, ") ", caseName, "() ")
 		if c.Type == nil {
-			// Case without associated type returns bool
-			b.WriteString("bool {\n")
+			// Case without an associated type returns bool
+			stringio.Write(&b, "// ", caseName, " returns true if [", typeName.Name, "] represents the variant case \"", c.Name, "\".\n")
+			stringio.Write(&b, "func (self *", typeName.Name, ") ", caseName, "() bool {\n")
 			stringio.Write(&b, "return ", cm, ".Tag(self) == ", caseNum)
 			b.WriteString("}\n\n")
 		} else {
-			// Case with associated type returns pointer to associated type
-			stringio.Write(&b, "*", typeRep, " {\n")
+			// Case with associated type T returns *T
+			stringio.Write(&b, "// ", caseName, " returns a non-nil *[", typeRep, "] if [", typeName.Name, "] represents the variant case \"", c.Name, "\".\n")
+			stringio.Write(&b, "func (self *", typeName.Name, ") ", caseName, "() *", typeRep, " {\n")
 			stringio.Write(&b, "return ", cm, ".Case[", typeRep, "](self, ", caseNum, ")")
 			b.WriteString("}\n\n")
 		}
