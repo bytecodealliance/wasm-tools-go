@@ -14,6 +14,7 @@ import (
 
 	"github.com/ydnar/wasm-tools-go/internal/codec"
 	"github.com/ydnar/wasm-tools-go/internal/go/gen"
+	"github.com/ydnar/wasm-tools-go/internal/stringio"
 	"github.com/ydnar/wasm-tools-go/wit"
 )
 
@@ -522,24 +523,24 @@ func (g *generator) variantRep(file *gen.File, typeName gen.Ident, v *wit.Varian
 	// Emit type
 	var b strings.Builder
 	cm := file.Import(g.opts.cmPackage)
-	writeStrings(&b, cm, ".Variant[", g.typeRep(file, disc), ", ", g.typeRep(file, shape), ", ", g.typeRep(file, align), "]\n\n")
+	stringio.Write(&b, cm, ".Variant[", g.typeRep(file, disc), ", ", g.typeRep(file, shape), ", ", g.typeRep(file, align), "]\n\n")
 
 	// Emit cases
 	for i, c := range v.Cases {
 		caseName := file.Declare(typeName.Name + GoName(c.Name, true))
-		writeStrings(&b, "// ", caseName.Name, " returns a [", typeName.Name, "] of case \"", c.Name, "\".\n")
+		stringio.Write(&b, "// ", caseName.Name, " returns a [", typeName.Name, "] of case \"", c.Name, "\".\n")
 		b.WriteString("//\n")
 		b.WriteString(gen.FormatDocComments(c.Docs.Contents, false))
-		writeStrings(&b, "func ", caseName.Name, "(")
+		stringio.Write(&b, "func ", caseName.Name, "(")
 		dataName := "data"
 		if c.Type != nil {
-			writeStrings(&b, dataName, " ", g.typeRep(file, c.Type))
+			stringio.Write(&b, dataName, " ", g.typeRep(file, c.Type))
 		}
-		writeStrings(&b, ") ", typeName.Name, " {")
+		stringio.Write(&b, ") ", typeName.Name, " {")
 		if c.Type == nil {
-			writeStrings(&b, "var ", dataName, " ", g.typeRep(file, c.Type), "\n")
+			stringio.Write(&b, "var ", dataName, " ", g.typeRep(file, c.Type), "\n")
 		}
-		writeStrings(&b, "return ", cm, ".New[", typeName.Name, "](", strconv.Itoa(i), ", ", dataName, ")\n")
+		stringio.Write(&b, "return ", cm, ".New[", typeName.Name, "](", strconv.Itoa(i), ", ", dataName, ")\n")
 		b.WriteString("}\n\n")
 	}
 	return b.String()
@@ -741,20 +742,4 @@ func (g *generator) packageFor(id wit.Ident) *gen.Package {
 	g.witPackages[id.String()] = pkg
 
 	return pkg
-}
-
-type stringWriter interface {
-	WriteString(string) (int, error)
-}
-
-func writeStrings(w stringWriter, strings ...string) (int, error) {
-	var total int
-	for _, s := range strings {
-		n, err := w.WriteString(s)
-		total += n
-		if err != nil {
-			break
-		}
-	}
-	return total, nil
 }
