@@ -426,7 +426,7 @@ func (_handle) Align() uintptr { return 4 }
 // This will always return false.
 func (_handle) HasPointer() bool { return false }
 
-// Flat returns the [flattened] ABI representation for this type.
+// Flat returns the [flattened] ABI representation of this type.
 //
 // [flattened]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
 func (_handle) Flat() []Type { return []Type{U32{}} }
