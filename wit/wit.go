@@ -379,6 +379,26 @@ func relativeName(o TypeOwner, p *Package) string {
 }
 
 // WITKind returns the WIT kind.
+func (*Pointer) WITKind() string { return "pointer" }
+
+// WIT returns the [WIT] text format for [Pointer] p.
+// Note: there is no canonical WIT representation of a pointer.
+// This method exists solely to implement the [Node] interface.
+//
+// [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
+func (p *Pointer) WIT(_ Node, name string) string {
+	var b strings.Builder
+	if name != "" {
+		b.WriteString("type ")
+		b.WriteString(escape(name))
+		b.WriteString(" = ")
+	}
+	b.WriteRune('*')
+	b.WriteString(p.Type.WIT(p, ""))
+	return b.String()
+}
+
+// WITKind returns the WIT kind.
 func (*Record) WITKind() string { return "record" }
 
 // WIT returns the [WIT] text format for [Record] r.
