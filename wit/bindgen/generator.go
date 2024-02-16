@@ -522,14 +522,7 @@ func (g *generator) variantRep(file *gen.File, typeName gen.Ident, v *wit.Varian
 	// Emit type
 	var b strings.Builder
 	cm := file.Import(g.opts.cmPackage)
-	b.WriteString(cm)
-	b.WriteString(".Variant[")
-	b.WriteString(g.typeRep(file, disc))
-	b.WriteString(", ")
-	b.WriteString(g.typeRep(file, shape))
-	b.WriteString(", ")
-	b.WriteString(g.typeRep(file, align))
-	b.WriteString("]\n\n")
+	writeStrings(&b, cm, ".Variant[", g.typeRep(file, disc), ", ", g.typeRep(file, shape), ", ", g.typeRep(file, align), "]\n\n")
 
 	// Emit cases
 	for i, c := range v.Cases {
