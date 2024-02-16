@@ -553,25 +553,15 @@ func (g *generator) resultRep(file *gen.File, r *wit.Result) string {
 	case r.OK == nil && r.Err == nil:
 		b.WriteString(".UntypedResult")
 	case r.OK == nil:
-		b.WriteString(".ErrResult[")
-		b.WriteString(g.typeRep(file, r.Err))
-		b.WriteRune(']')
+		stringio.Write(&b, ".ErrResult[", g.typeRep(file, r.Err), "]")
 	case r.Err == nil:
-		b.WriteString(".OKResult[")
-		b.WriteString(g.typeRep(file, r.OK))
-		b.WriteRune(']')
+		stringio.Write(&b, ".OKResult[", g.typeRep(file, r.OK), "]")
 	default:
-		b.WriteString(".Result[")
 		shape := r.OK
 		if r.Err.Size() > r.OK.Size() {
 			shape = r.Err
 		}
-		b.WriteString(g.typeRep(file, shape))
-		b.WriteString(", ")
-		b.WriteString(g.typeRep(file, r.OK))
-		b.WriteString(", ")
-		b.WriteString(g.typeRep(file, r.Err))
-		b.WriteRune(']')
+		stringio.Write(&b, ".Result[", g.typeRep(file, shape), ", ", g.typeRep(file, r.OK), ", ", g.typeRep(file, r.Err), "]")
 	}
 	return b.String()
 }
