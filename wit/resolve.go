@@ -401,7 +401,8 @@ func (_handle) Size() uintptr { return 4 }
 // [ABI byte alignment]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#alignment
 func (_handle) Align() uintptr { return 4 }
 
-// HasPointer returns whether the ABI representation of a _handle contains a pointer.
+// HasPointer returns whether the ABI representation of this type contains a pointer.
+// This will always return false.
 func (_handle) HasPointer() bool { return false }
 
 // Own represents an WIT [owned handle].
@@ -997,6 +998,7 @@ func (_primitive[T]) Align() uintptr {
 }
 
 // HasPointer returns whether the ABI representation of this type contains a pointer.
+// This will only return true for [String].
 func (_primitive[T]) HasPointer() bool {
 	var v T
 	switch any(v).(type) {
