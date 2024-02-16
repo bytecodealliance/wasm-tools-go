@@ -1311,6 +1311,78 @@ func (f *Function) IsStatic() bool {
 	return is
 }
 
+const (
+	// MaxFlatParams is the maximum number of flattened parameters a function can have
+	// as defined in the Component Model [Canonical ABI].
+	//
+	// [Canonical ABI]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
+	MaxFlatParams = 16
+
+	// MaxFlatResults is the maximum number of flattened results a function can have
+	// as defined in the Component Model [Canonical ABI].
+	//
+	// [Canonical ABI]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
+	MaxFlatResults = 1
+)
+
+// CoreFunction returns a [Core WebAssembly function] of [Function] f.
+// Its params and results may be [flattened] according to the Canonical ABI specification.
+// The flattening rules vary based on whether the returned function is imported or exported,
+// e.g. using go:wasmimport or go:wasmexport.
+//
+// [Core WebAssembly function]: https://webassembly.github.io/spec/core/syntax/modules.html#syntax-func
+// [flattened]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
+func (f *Function) CoreFunction(export bool) *Function {
+	if len(f.Params) == 0 && len(f.Results) == 0 {
+		return f
+	}
+
+	// Clone the function
+	cf := *f
+
+	if len(flatParams(f.Params)) > MaxFlatParams {
+		cf.Params = []Param{combineParams("params", f.Params)}
+	}
+
+	if len(flatParams(f.Results)) > MaxFlatResults {
+		result := combineParams("params", f.Params)
+		cf.Params = append(cf.Params, result)
+		// cf.Results =
+	}
+
+	return &cf
+}
+
+func flatParams(params []Param) []Type {
+	flat := make([]Type, 0, len(params))
+	for _, p := range params {
+		flat = append(flat, p.Type.Flat()...)
+	}
+	return flat
+}
+
+func combineParams(name string, params []Param) Param {
+	r := &Record{}
+	for _, p := range params {
+		r.Fields = append(r.Fields,
+			Field{
+				Name: p.Name,
+				Type: p.Type,
+			})
+	}
+	return newParam("params", r)
+}
+
+func newParam(name string, t TypeDefKind) Param {
+	return Param{
+		Name: name,
+		Type: &TypeDef{
+			Name: &name,
+			Kind: t,
+		},
+	}
+}
+
 // FunctionKind represents the kind of a WIT [function], which can be one of
 // [Freestanding], [Method], [Static], or [Constructor].
 //
