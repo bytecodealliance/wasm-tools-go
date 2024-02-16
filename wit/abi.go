@@ -20,15 +20,17 @@ func Discriminant(n int) Type {
 }
 
 // ABI is the interface implemented by any type that reports its [Canonical ABI] [size], [alignment],
-// and whether the type contains a pointer (e.g. [List] or [String]).
+// whether the type contains a pointer (e.g. [List] or [String]), and its [flat] ABI representation.
 //
 // [Canonical ABI]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md
 // [size]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#size
 // [alignment]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#alignment
+// [flat]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
 type ABI interface {
 	Size() uintptr
 	Align() uintptr
 	HasPointer() bool
+	Flat() []Type
 }
 
 // Despecializer is the interface implemented by any [TypeDefKind] that can

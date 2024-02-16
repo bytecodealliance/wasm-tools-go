@@ -243,6 +243,13 @@ func (t *TypeDef) HasPointer() bool {
 	return t.Kind.HasPointer()
 }
 
+// Flat returns the [flattened] ABI representation of [TypeDef] t.
+//
+// [flattened]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
+func (t *TypeDef) Flat() []Type {
+	return t.Kind.Flat()
+}
+
 // Constructor returns the constructor for [TypeDef] t, or nil if none.
 // Currently t must be a [Resource] to have a constructor.
 func (t *TypeDef) Constructor() *Function {
@@ -342,6 +349,17 @@ func (r *Record) HasPointer() bool {
 	return false
 }
 
+// Flat returns the [flattened] ABI representation of [Record] r.
+//
+// [flattened]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
+func (r *Record) Flat() []Type {
+	flat := make([]Type, 0, len(r.Fields))
+	for _, f := range r.Fields {
+		flat = append(flat, f.Type.Flat()...)
+	}
+	return flat
+}
+
 // Field represents a field in a [Record].
 type Field struct {
 	Name string
@@ -368,9 +386,12 @@ func (*Resource) Align() uintptr { return 4 }
 // HasPointer returns whether the [ABI] representation of [Resource] contains a pointer.
 //
 // [ABI byte alignment]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md
-func (r *Resource) HasPointer() bool {
-	return false
-}
+func (*Resource) HasPointer() bool { return false }
+
+// Flat returns the [flattened] ABI representation of [Resource].
+//
+// [flattened]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
+func (*Resource) Flat() []Type { return []Type{U32{}} }
 
 // Handle represents a WIT [handle type].
 // It conforms to the [Node], [ABI], and [TypeDefKind] interfaces.
@@ -404,6 +425,11 @@ func (_handle) Align() uintptr { return 4 }
 // HasPointer returns whether the ABI representation of this type contains a pointer.
 // This will always return false.
 func (_handle) HasPointer() bool { return false }
+
+// Flat returns the [flattened] ABI representation for this type.
+//
+// [flattened]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
+func (_handle) Flat() []Type { return []Type{U32{}} }
 
 // Own represents an WIT [owned handle].
 // It implements the [Handle], [Node], [ABI], and [TypeDefKind] interfaces.
@@ -465,6 +491,17 @@ func (f *Flags) Align() uintptr {
 //
 // [ABI]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md
 func (*Flags) HasPointer() bool { return false }
+
+// Flat returns the [flattened] ABI representation of [Flags] f.
+//
+// [flattened]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
+func (f *Flags) Flat() []Type {
+	flat := make([]Type, (len(f.Flags)+31)>>5)
+	for i := range flat {
+		flat[i] = U32{}
+	}
+	return flat
+}
 
 // Flag represents a single flag value in a [Flags] type.
 // It implements the [Node] interface.
@@ -539,6 +576,13 @@ func (t *Tuple) HasPointer() bool {
 	return t.Despecialize().HasPointer()
 }
 
+// Flat returns the [flattened] ABI representation of [Tuple] t.
+//
+// [flattened]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
+func (t *Tuple) Flat() []Type {
+	return t.Despecialize().Flat()
+}
+
 // Variant represents a WIT [variant type], a tagged/discriminated union.
 // A variant type declares one or more cases. Each case has a name and, optionally,
 // a type of data associated with that case.
@@ -609,6 +653,23 @@ func (v *Variant) HasPointer() bool {
 		}
 	}
 	return false
+}
+
+// Flat returns the [flattened] ABI representation of [Variant] v.
+//
+// [flattened]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
+func (v *Variant) Flat() []Type {
+	var flat []Type
+	for i, t := range v.Types() {
+		for j, f := range t.Flat() {
+			if j > len(flat) {
+				flat = append(flat, t)
+			} else if f.Size() > t.Size() {
+				flat[i] = f
+			}
+		}
+	}
+	return append(Discriminant(len(v.Cases)).Flat(), flat...)
 }
 
 func (v *Variant) maxCaseSize() uintptr {
@@ -690,6 +751,13 @@ func (e *Enum) HasPointer() bool {
 	return e.Despecialize().HasPointer()
 }
 
+// Flat returns the [flattened] ABI representation of [Enum] e.
+//
+// [flattened]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
+func (v *Enum) Flat() []Type {
+	return Discriminant(len(v.Cases)).Flat()
+}
+
 // EnumCase represents a single case in an [Enum].
 // It implements the [Node] interface.
 type EnumCase struct {
@@ -743,7 +811,14 @@ func (o *Option) Align() uintptr {
 //
 // [ABI]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md
 func (o *Option) HasPointer() bool {
-	return o.Type.HasPointer()
+	return o.Despecialize().HasPointer()
+}
+
+// Flat returns the [flattened] ABI representation of [Option] o.
+//
+// [flattened]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
+func (o *Option) Flat() []Type {
+	return o.Despecialize().Flat()
 }
 
 // Result represents a WIT [result type], which is the result of a function call,
@@ -796,6 +871,13 @@ func (r *Result) HasPointer() bool {
 	return r.Despecialize().HasPointer()
 }
 
+// Flat returns the [flattened] ABI representation of [Result] r.
+//
+// [flattened]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
+func (r *Result) Flat() []Type {
+	return r.Despecialize().Flat()
+}
+
 // List represents a WIT [list type], which is an ordered vector of an arbitrary type.
 // It implements the [Node], [ABI], and [TypeDefKind] interfaces.
 //
@@ -820,6 +902,11 @@ func (*List) Align() uintptr { return 8 } // [2]int32
 //
 // [ABI]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md
 func (*List) HasPointer() bool { return true }
+
+// Flat returns the [flattened] ABI representation of [List].
+//
+// [flattened]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
+func (*List) Flat() []Type { return []Type{U32{}, U32{}} }
 
 // Future represents a WIT [future type], expected to be part of [WASI Preview 3].
 // It implements the [Node], [ABI], and [TypeDefKind] interfaces.
@@ -849,6 +936,12 @@ func (*Future) Align() uintptr { return 0 }
 // [ABI]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md
 func (*Future) HasPointer() bool { return false }
 
+// Flat returns the [flattened] ABI representation of [Future].
+// TODO: what is the ABI representation of a stream?
+//
+// [flattened]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
+func (*Future) Flat() []Type { return nil }
+
 // Stream represents a WIT [stream type], expected to be part of [WASI Preview 3].
 // It implements the [Node], [ABI], and [TypeDefKind] interfaces.
 //
@@ -877,6 +970,12 @@ func (*Stream) Align() uintptr { return 0 }
 //
 // [ABI]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md
 func (*Stream) HasPointer() bool { return false }
+
+// Flat returns the [flattened] ABI representation of [Stream].
+// TODO: what is the ABI representation of a stream?
+//
+// [flattened]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
+func (*Stream) Flat() []Type { return nil }
 
 // TypeOwner is the interface implemented by any type that can own a TypeDef,
 // currently [World] and [Interface].
@@ -1006,6 +1105,27 @@ func (_primitive[T]) HasPointer() bool {
 		return true
 	default:
 		return false
+	}
+}
+
+// Flat returns the [flattened] ABI representation of this type.
+//
+// [flattened]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
+func (_primitive[T]) Flat() []Type {
+	var v T
+	switch any(v).(type) {
+	case bool, int8, uint8, int16, uint16, int, uint32, char:
+		return []Type{U32{}}
+	case int64, uint64:
+		return []Type{U64{}}
+	case float32:
+		return []Type{Float32{}}
+	case float64:
+		return []Type{Float64{}}
+	case string:
+		return []Type{U32{}, U32{}}
+	default:
+		panic(fmt.Sprintf("BUG: Flat: unknown primitive type %T", v)) // should never reach here
 	}
 }
 
