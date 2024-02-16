@@ -26,9 +26,9 @@ interface types {
 	type t28 = tuple<u32>;
 	type t29 = tuple<u32, u64>;
 	type t3 = u32;
-	flags t30 {}
-	flags t31 {a, b, c}
-	flags t32 {a, b, c}
+	flags t30 { }
+	flags t31 { a, b, c }
+	flags t32 { a, b, c }
 	variant t33 { a }
 	variant t34 { a, b }
 	variant t35 { a, b }

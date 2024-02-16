@@ -19,19 +19,17 @@ func Discriminant(n int) Type {
 	return U32{}
 }
 
-// Sized is the interface implemented by any type that reports its [ABI byte size] and [alignment].
+// ABI is the interface implemented by any type that reports its [Canonical ABI] [size], [alignment],
+// and whether the type contains a pointer (e.g. [List] or [String]).
 //
-// [ABI byte size]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#size
+// [Canonical ABI]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md
+// [size]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#size
 // [alignment]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#alignment
-type Sized interface {
+type ABI interface {
 	Size() uintptr
 	Align() uintptr
+	HasPointer() bool
 }
-
-type _sized struct{}
-
-func (_sized) Size() uintptr  { panic("BUG: unimplemented") }
-func (_sized) Align() uintptr { panic("BUG: unimplemented") }
 
 // Despecializer is the interface implemented by any [TypeDefKind] that can
 // [despecialize] itself into another TypeDefKind. Examples include [Result],

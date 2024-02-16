@@ -39,7 +39,11 @@ func unwrap(s string) string {
 		}
 		b.WriteString(strings.Trim(line, " \t\r\n"))
 	}
-	return b.String()
+	line, found := strings.CutSuffix(b.String(), ", }")
+	if found {
+		line += " }"
+	}
+	return line
 }
 
 // WITKind returns the WIT kind.
@@ -388,14 +392,14 @@ func (r *Record) WIT(ctx Node, name string) string {
 	if len(r.Fields) > 0 {
 		b.WriteRune('\n')
 		for i := range r.Fields {
-			if i > 0 {
-				b.WriteString(",\n")
-			}
 			b.WriteString(indent(r.Fields[i].WIT(ctx, "")))
+			b.WriteString(",\n")
 		}
-		b.WriteRune('\n')
 	}
 	b.WriteRune('}')
+	if ctx == nil {
+		return b.String()
+	}
 	return unwrap(b.String())
 }
 
@@ -424,12 +428,12 @@ func (r *Resource) WIT(ctx Node, name string) string {
 }
 
 // WITKind returns the WIT kind.
-func (*OwnedHandle) WITKind() string { return "owned handle" }
+func (*Own) WITKind() string { return "owned handle" }
 
-// WIT returns the [WIT] text format for [OwnedHandle] h.
+// WIT returns the [WIT] text format for [Own] h.
 //
 // [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
-func (h *OwnedHandle) WIT(ctx Node, name string) string {
+func (o *Own) WIT(ctx Node, name string) string {
 	var b strings.Builder
 	if name != "" {
 		b.WriteString("type ")
@@ -437,28 +441,28 @@ func (h *OwnedHandle) WIT(ctx Node, name string) string {
 		b.WriteString(" = ")
 	}
 	b.WriteString("own<")
-	b.WriteString(h.Type.WIT(h, ""))
+	b.WriteString(o.Type.WIT(o, ""))
 	b.WriteRune('>')
 	return b.String()
 }
 
 // WITKind returns the WIT kind.
-func (*BorrowedHandle) WITKind() string { return "borrowed handle" }
+func (*Borrow) WITKind() string { return "borrowed handle" }
 
-// WIT returns the [WIT] text format for [BorrowedHandle] h.
+// WIT returns the [WIT] text format for [Borrow] h.
 //
 // [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
-func (h *BorrowedHandle) WIT(ctx Node, name string) string {
-	var b strings.Builder
+func (b *Borrow) WIT(ctx Node, name string) string {
+	var s strings.Builder
 	if name != "" {
-		b.WriteString("type ")
-		b.WriteString(escape(name))
-		b.WriteString(" = ")
+		s.WriteString("type ")
+		s.WriteString(escape(name))
+		s.WriteString(" = ")
 	}
-	b.WriteString("borrow<")
-	b.WriteString(h.Type.WIT(h, ""))
-	b.WriteRune('>')
-	return b.String()
+	s.WriteString("borrow<")
+	s.WriteString(b.Type.WIT(b, ""))
+	s.WriteRune('>')
+	return s.String()
 }
 
 // WITKind returns the WIT kind.
@@ -471,16 +475,17 @@ func (f *Flags) WIT(ctx Node, name string) string {
 	var b strings.Builder
 	b.WriteString("flags ")
 	b.WriteString(escape(name))
-	b.WriteString(" {")
+	b.WriteString(" {\n")
 	if len(f.Flags) > 0 {
 		for i := range f.Flags {
-			if i > 0 {
-				b.WriteString(", ")
-			}
-			b.WriteString(f.Flags[i].WIT(ctx, ""))
+			b.WriteString(indent(f.Flags[i].WIT(ctx, "")))
+			b.WriteString(",\n")
 		}
 	}
 	b.WriteRune('}')
+	if ctx == nil {
+		return b.String()
+	}
 	return unwrap(b.String())
 }
 
@@ -536,14 +541,14 @@ func (v *Variant) WIT(ctx Node, name string) string {
 	if len(v.Cases) > 0 {
 		b.WriteRune('\n')
 		for i := range v.Cases {
-			if i > 0 {
-				b.WriteString(",\n")
-			}
 			b.WriteString(indent(v.Cases[i].WIT(ctx, "")))
+			b.WriteString(",\n")
 		}
-		b.WriteRune('\n')
 	}
 	b.WriteRune('}')
+	if ctx == nil {
+		return b.String()
+	}
 	return unwrap(b.String())
 }
 
@@ -589,6 +594,9 @@ func (e *Enum) WIT(ctx Node, name string) string {
 		b.WriteRune('\n')
 	}
 	b.WriteRune('}')
+	if ctx == nil {
+		return b.String()
+	}
 	return unwrap(b.String())
 }
 

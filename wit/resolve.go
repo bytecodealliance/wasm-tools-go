@@ -190,7 +190,7 @@ func (i *Interface) AllFunctions(yield func(*Function) bool) bool {
 
 // TypeDef represents a WIT type definition. A TypeDef may be named or anonymous,
 // and optionally belong to a [World] or [Interface].
-// It implements the [Node], [Sized], [Type], [TypeDefKind] interfaces.
+// It implements the [Node], [ABI], [Type], [TypeDefKind] interfaces.
 type TypeDef struct {
 	_type
 	_worldItem
@@ -236,6 +236,13 @@ func (t *TypeDef) Align() uintptr {
 	return t.Kind.Align()
 }
 
+// HasPointer returns whether the [ABI] representation of [TypeDef] t contains a pointer.
+//
+// [ABI]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md
+func (t *TypeDef) HasPointer() bool {
+	return t.Kind.HasPointer()
+}
+
 // Constructor returns the constructor for [TypeDef] t, or nil if none.
 // Currently t must be a [Resource] to have a constructor.
 func (t *TypeDef) Constructor() *Function {
@@ -279,10 +286,10 @@ func (t *TypeDef) StaticFunctions() []*Function {
 // TypeDefKind represents the underlying type in a [TypeDef], which can be one of
 // [Record], [Resource], [Handle], [Flags], [Tuple], [Variant], [Enum],
 // [Option], [Result], [List], [Future], [Stream], or [Type].
-// It implements the [Node] and [Sized] interfaces.
+// It implements the [Node] and [ABI] interfaces.
 type TypeDefKind interface {
 	Node
-	Sized
+	ABI
 	isTypeDefKind()
 }
 
@@ -292,7 +299,7 @@ type _typeDefKind struct{}
 func (_typeDefKind) isTypeDefKind() {}
 
 // Record represents a WIT [record type], akin to a struct.
-// It implements the [Node], [Sized], and [TypeDefKind] interfaces.
+// It implements the [Node], [ABI], and [TypeDefKind] interfaces.
 //
 // [record type]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md#item-record-bag-of-named-fields
 type Record struct {
@@ -323,6 +330,18 @@ func (r *Record) Align() uintptr {
 	return a
 }
 
+// HasPointer returns whether the [ABI] representation of [Record] r contains a pointer.
+//
+// [ABI]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md
+func (r *Record) HasPointer() bool {
+	for _, f := range r.Fields {
+		if f.Type.HasPointer() {
+			return true
+		}
+	}
+	return false
+}
+
 // Field represents a field in a [Record].
 type Field struct {
 	Name string
@@ -331,7 +350,7 @@ type Field struct {
 }
 
 // Resource represents a WIT [resource type].
-// It implements the [Node], [Sized], and [TypeDefKind] interfaces.
+// It implements the [Node], [ABI], and [TypeDefKind] interfaces.
 //
 // [resource type]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md#item-resource
 type Resource struct{ _typeDefKind }
@@ -346,8 +365,15 @@ func (r *Resource) Size() uintptr { return 4 }
 // [ABI byte alignment]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#alignment
 func (r *Resource) Align() uintptr { return 4 }
 
+// HasPointer returns whether the [ABI] representation of [Resource] r contains a pointer.
+//
+// [ABI byte alignment]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md
+func (r *Resource) HasPointer() bool {
+	return false
+}
+
 // Handle represents a WIT [handle type].
-// It conforms to the [Node], [Sized], and [TypeDefKind] interfaces.
+// It conforms to the [Node], [ABI], and [TypeDefKind] interfaces.
 // Handles represent the passing of unique ownership of a resource between
 // two components. When the owner of an owned handle drops that handle,
 // the resource is destroyed. In contrast, a borrowed handle represents
@@ -375,26 +401,29 @@ func (_handle) Size() uintptr { return 4 }
 // [ABI byte alignment]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#alignment
 func (_handle) Align() uintptr { return 4 }
 
-// OwnedHandle represents an WIT [owned handle].
-// It implements the [Handle], [Node], [Sized], and [TypeDefKind] interfaces.
+// HasPointer returns whether the ABI representation of a _handle contains a pointer.
+func (_handle) HasPointer() bool { return false }
+
+// Own represents an WIT [owned handle].
+// It implements the [Handle], [Node], [ABI], and [TypeDefKind] interfaces.
 //
 // [owned handle]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md#handles
-type OwnedHandle struct {
+type Own struct {
 	_handle
 	Type *TypeDef
 }
 
-// BorrowedHandle represents a WIT [borrowed handle].
-// It implements the [Handle], [Node], [Sized], and [TypeDefKind] interfaces.
+// Borrow represents a WIT [borrowed handle].
+// It implements the [Handle], [Node], [ABI], and [TypeDefKind] interfaces.
 //
 // [borrowed handle]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md#handles
-type BorrowedHandle struct {
+type Borrow struct {
 	_handle
 	Type *TypeDef
 }
 
 // Flags represents a WIT [flags type], stored as a bitfield.
-// It implements the [Node], [Sized], and [TypeDefKind] interfaces.
+// It implements the [Node], [ABI], and [TypeDefKind] interfaces.
 //
 // [flags type]: https://component-model.bytecodealliance.org/design/wit.html#flags
 type Flags struct {
@@ -430,6 +459,12 @@ func (f *Flags) Align() uintptr {
 	return 4
 }
 
+// HasPointer returns whether the [ABI] representation of [Flags] contains a pointer.
+// This always returns false.
+//
+// [ABI]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md
+func (*Flags) HasPointer() bool { return false }
+
 // Flag represents a single flag value in a [Flags] type.
 // It implements the [Node] interface.
 type Flag struct {
@@ -440,12 +475,27 @@ type Flag struct {
 // Tuple represents a WIT [tuple type].
 // A tuple type is an ordered fixed length sequence of values of specified types.
 // It is similar to a [Record], except that the fields are identified by their order instead of by names.
-// It implements the [Node], [Sized], and [TypeDefKind] interfaces.
+// It implements the [Node], [ABI], and [TypeDefKind] interfaces.
 //
 // [tuple type]: https://component-model.bytecodealliance.org/design/wit.html#tuples
 type Tuple struct {
 	_typeDefKind
 	Types []Type
+}
+
+// MonoType returns a non-nil [Type] if all types in t
+// are the same. Returns nil if t contains more than one type.
+func (t *Tuple) MonoType() Type {
+	if len(t.Types) == 0 {
+		return nil
+	}
+	typ := t.Types[0]
+	for i := 0; i < len(t.Types); i++ {
+		if t.Types[i] != typ {
+			return nil
+		}
+	}
+	return typ
 }
 
 // Despecialize despecializes [Tuple] e into a [Record] with 0-based integer field names.
@@ -481,15 +531,55 @@ func (t *Tuple) Align() uintptr {
 	return t.Despecialize().Align()
 }
 
+// HasPointer returns whether the [ABI] representation of a [Tuple] contains a pointer.
+//
+// [ABI]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md
+func (t *Tuple) HasPointer() bool {
+	return t.Despecialize().HasPointer()
+}
+
 // Variant represents a WIT [variant type], a tagged/discriminated union.
 // A variant type declares one or more cases. Each case has a name and, optionally,
 // a type of data associated with that case.
-// It implements the [Node], [Sized], and [TypeDefKind] interfaces.
+// It implements the [Node], [ABI], and [TypeDefKind] interfaces.
 //
 // [variant type]: https://component-model.bytecodealliance.org/design/wit.html#variants
 type Variant struct {
 	_typeDefKind
 	Cases []Case
+}
+
+// Enum attempts to represent [Variant] v as an [Enum].
+// This will only succeed if v has no associated types. If v has
+// associated types, then it will return nil.
+func (v *Variant) Enum() *Enum {
+	types := v.Types()
+	if len(types) > 0 {
+		return nil
+	}
+	e := &Enum{
+		Cases: make([]EnumCase, len(v.Cases)),
+	}
+	for i := range v.Cases {
+		e.Cases[i].Name = v.Cases[i].Name
+		e.Cases[i].Docs = v.Cases[i].Docs
+	}
+	return e
+}
+
+// Types returns the unique associated types in [Variant] v.
+func (v *Variant) Types() []Type {
+	var types []Type
+	typeMap := make(map[Type]bool)
+	for i := range v.Cases {
+		t := v.Cases[i].Type
+		if t == nil || typeMap[t] {
+			continue
+		}
+		types = append(types, t)
+		typeMap[t] = true
+	}
+	return types
 }
 
 // Size returns the [ABI byte size] for [Variant] v.
@@ -507,6 +597,17 @@ func (v *Variant) Size() uintptr {
 // [ABI byte alignment]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#alignment
 func (v *Variant) Align() uintptr {
 	return max(Discriminant(len(v.Cases)).Align(), v.maxCaseAlign())
+}
+
+// HasPointer returns true if [Variant] v has an associated type
+// that contains a pointer (e.g. string, list).
+func (v *Variant) HasPointer() bool {
+	for _, t := range v.Types() {
+		if t.HasPointer() {
+			return true
+		}
+	}
+	return false
 }
 
 func (v *Variant) maxCaseSize() uintptr {
@@ -539,7 +640,7 @@ type Case struct {
 
 // Enum represents a WIT [enum type], which is a [Variant] without associated data.
 // The equivalent in Go is a set of const identifiers declared with iota.
-// It implements the [Node], [Sized], and [TypeDefKind] interfaces.
+// It implements the [Node], [ABI], and [TypeDefKind] interfaces.
 //
 // [enum type]: https://component-model.bytecodealliance.org/design/wit.html#enums
 type Enum struct {
@@ -581,6 +682,13 @@ func (e *Enum) Align() uintptr {
 	return e.Despecialize().Align()
 }
 
+// HasPointer returns whether the [ABI] representation of an [Enum] contains a pointer.
+//
+// [ABI]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md
+func (e *Enum) HasPointer() bool {
+	return e.Despecialize().HasPointer()
+}
+
 // EnumCase represents a single case in an [Enum].
 // It implements the [Node] interface.
 type EnumCase struct {
@@ -591,7 +699,7 @@ type EnumCase struct {
 // Option represents a WIT [option type], a special case of [Variant]. An Option can
 // contain a value of a single type, either build-in or user defined, or no value.
 // The equivalent in Go for an option<string> could be represented as *string.
-// It implements the [Node], [Sized], and [TypeDefKind] interfaces.
+// It implements the [Node], [ABI], and [TypeDefKind] interfaces.
 //
 // [option type]: https://component-model.bytecodealliance.org/design/wit.html#options
 type Option struct {
@@ -630,10 +738,17 @@ func (o *Option) Align() uintptr {
 	return o.Despecialize().Align()
 }
 
+// HasPointer returns whether the [ABI] representation of an [Option] contains a pointer.
+//
+// [ABI]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md
+func (o *Option) HasPointer() bool {
+	return o.Type.HasPointer()
+}
+
 // Result represents a WIT [result type], which is the result of a function call,
 // returning an optional value and/or an optional error. It is roughly equivalent to
 // the Go pattern of returning (T, error).
-// It implements the [Node], [Sized], and [TypeDefKind] interfaces.
+// It implements the [Node], [ABI], and [TypeDefKind] interfaces.
 //
 // [result type]: https://component-model.bytecodealliance.org/design/wit.html#results
 type Result struct {
@@ -673,8 +788,15 @@ func (r *Result) Align() uintptr {
 	return r.Despecialize().Align()
 }
 
+// HasPointer returns whether the [ABI] representation of a [Result] contains a pointer.
+//
+// [ABI]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md
+func (r *Result) HasPointer() bool {
+	return r.Despecialize().HasPointer()
+}
+
 // List represents a WIT [list type], which is an ordered vector of an arbitrary type.
-// It implements the [Node], [Sized], and [TypeDefKind] interfaces.
+// It implements the [Node], [ABI], and [TypeDefKind] interfaces.
 //
 // [list type]: https://component-model.bytecodealliance.org/design/wit.html#lists
 type List struct {
@@ -692,8 +814,14 @@ func (*List) Size() uintptr { return 8 } // [2]int32
 // [ABI byte alignment]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#alignment
 func (*List) Align() uintptr { return 8 } // [2]int32
 
+// HasPointer returns whether the [ABI] representation of a [List] contains a pointer.
+// This always returns true.
+//
+// [ABI]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md
+func (*List) HasPointer() bool { return true }
+
 // Future represents a WIT [future type], expected to be part of [WASI Preview 3].
-// It implements the [Node], [Sized], and [TypeDefKind] interfaces.
+// It implements the [Node], [ABI], and [TypeDefKind] interfaces.
 //
 // [future type]: https://github.com/bytecodealliance/wit-bindgen/issues/270
 // [WASI Preview 3]: https://bytecodealliance.org/articles/webassembly-the-updated-roadmap-for-developers
@@ -714,8 +842,14 @@ func (*Future) Size() uintptr { return 0 }
 // [ABI byte alignment]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#alignment
 func (*Future) Align() uintptr { return 0 }
 
+// HasPointer returns whether the [ABI] representation of a [Future] contains a pointer.
+// TODO: what is the ABI representation of a stream?
+//
+// [ABI]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md
+func (*Future) HasPointer() bool { return false }
+
 // Stream represents a WIT [stream type], expected to be part of [WASI Preview 3].
-// It implements the [Node], [Sized], and [TypeDefKind] interfaces.
+// It implements the [Node], [ABI], and [TypeDefKind] interfaces.
 //
 // [stream type]: https://github.com/WebAssembly/WASI/blob/main/docs/WitInWasi.md#streams
 // [WASI Preview 3]: https://bytecodealliance.org/articles/webassembly-the-updated-roadmap-for-developers
@@ -737,6 +871,12 @@ func (*Stream) Size() uintptr { return 0 }
 // [ABI byte alignment]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#alignment
 func (*Stream) Align() uintptr { return 0 }
 
+// HasPointer returns whether the [ABI] representation of a [Stream] contains a pointer.
+// TODO: what is the ABI representation of a stream?
+//
+// [ABI]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md
+func (*Stream) HasPointer() bool { return false }
+
 // TypeOwner is the interface implemented by any type that can own a TypeDef,
 // currently [World] and [Interface].
 type TypeOwner interface {
@@ -752,18 +892,18 @@ func (_typeOwner) isTypeOwner()                                 {}
 
 // Type is the interface implemented by any type definition. This can be a
 // [primitive type] or a user-defined type in a [TypeDef].
-// It also conforms to the [Node], [Sized], and [TypeDefKind] interfaces.
+// It also conforms to the [Node], [ABI], and [TypeDefKind] interfaces.
 //
 // [primitive type]: https://component-model.bytecodealliance.org/design/wit.html#primitive-types
 type Type interface {
 	Node
-	Sized
+	ABI
 	TypeDefKind
 	isType()
 }
 
 // _type is an embeddable struct that conforms to the [Type] interface.
-// It also implements the [Node], [Sized], and [TypeDefKind] interfaces.
+// It also implements the [Node], [ABI], and [TypeDefKind] interfaces.
 type _type struct{ _typeDefKind }
 
 func (_type) isType() {}
@@ -816,7 +956,7 @@ type primitive interface {
 type char rune
 
 // Primitive is the interface implemented by WIT [primitive types].
-// It also conforms to the [Node], [Sized], [Type], and [TypeDefKind] interfaces.
+// It also conforms to the [Node], [ABI], [Type], and [TypeDefKind] interfaces.
 //
 // [primitive types]: https://component-model.bytecodealliance.org/design/wit.html#primitive-types
 type Primitive interface {
@@ -826,7 +966,7 @@ type Primitive interface {
 
 // _primitive is an embeddable struct that conforms to the [PrimitiveType] interface.
 // It represents a WebAssembly Component Model [primitive type] mapped to its equivalent Go type.
-// It also conforms to the [Node], [Sized], [Type], and [TypeDefKind] interfaces.
+// It also conforms to the [Node], [ABI], [Type], and [TypeDefKind] interfaces.
 //
 // [primitive type]: https://component-model.bytecodealliance.org/design/wit.html#primitive-types
 type _primitive[T primitive] struct{ _type }
@@ -853,6 +993,17 @@ func (_primitive[T]) Align() uintptr {
 		return 4 // int32
 	default:
 		return unsafe.Alignof(v)
+	}
+}
+
+// HasPointer returns whether the ABI representation of this type contains a pointer.
+func (_primitive[T]) HasPointer() bool {
+	var v T
+	switch any(v).(type) {
+	case string:
+		return true
+	default:
+		return false
 	}
 }
 
@@ -896,7 +1047,7 @@ func (_primitive[T]) String() string {
 
 // Bool represents the WIT [primitive type] bool, a boolean value either true or false.
 // It is equivalent to the Go type [bool].
-// It implements the [Node], [Sized], [Type], and [TypeDefKind] interfaces.
+// It implements the [Node], [ABI], [Type], and [TypeDefKind] interfaces.
 //
 // [primitive type]: https://component-model.bytecodealliance.org/design/wit.html#primitive-types
 // [bool]: https://pkg.go.dev/builtin#bool
@@ -904,7 +1055,7 @@ type Bool struct{ _primitive[bool] }
 
 // S8 represents the WIT [primitive type] s8, a signed 8-bit integer.
 // It is equivalent to the Go type [int8].
-// It implements the [Node], [Sized], [Type], and [TypeDefKind] interfaces.
+// It implements the [Node], [ABI], [Type], and [TypeDefKind] interfaces.
 //
 // [primitive type]: https://component-model.bytecodealliance.org/design/wit.html#primitive-types
 // [int8]: https://pkg.go.dev/builtin#int8
@@ -912,7 +1063,7 @@ type S8 struct{ _primitive[int8] }
 
 // U8 represents the WIT [primitive type] u8, an unsigned 8-bit integer.
 // It is equivalent to the Go type [uint8].
-// It implements the [Node], [Sized], [Type], and [TypeDefKind] interfaces.
+// It implements the [Node], [ABI], [Type], and [TypeDefKind] interfaces.
 //
 // [primitive type]: https://component-model.bytecodealliance.org/design/wit.html#primitive-types
 // [uint8]: https://pkg.go.dev/builtin#uint8
@@ -920,7 +1071,7 @@ type U8 struct{ _primitive[uint8] }
 
 // S16 represents the WIT [primitive type] s16, a signed 16-bit integer.
 // It is equivalent to the Go type [int16].
-// It implements the [Node], [Sized], [Type], and [TypeDefKind] interfaces.
+// It implements the [Node], [ABI], [Type], and [TypeDefKind] interfaces.
 //
 // [primitive type]: https://component-model.bytecodealliance.org/design/wit.html#primitive-types
 // [int16]: https://pkg.go.dev/builtin#int16
@@ -928,7 +1079,7 @@ type S16 struct{ _primitive[int16] }
 
 // U16 represents the WIT [primitive type] u16, an unsigned 16-bit integer.
 // It is equivalent to the Go type [uint16].
-// It implements the [Node], [Sized], [Type], and [TypeDefKind] interfaces.
+// It implements the [Node], [ABI], [Type], and [TypeDefKind] interfaces.
 //
 // [primitive type]: https://component-model.bytecodealliance.org/design/wit.html#primitive-types
 // [uint16]: https://pkg.go.dev/builtin#uint16
@@ -936,7 +1087,7 @@ type U16 struct{ _primitive[uint16] }
 
 // S32 represents the WIT [primitive type] s32, a signed 32-bit integer.
 // It is equivalent to the Go type [int32].
-// It implements the [Node], [Sized], [Type], and [TypeDefKind] interfaces.
+// It implements the [Node], [ABI], [Type], and [TypeDefKind] interfaces.
 //
 // [primitive type]: https://component-model.bytecodealliance.org/design/wit.html#primitive-types
 // [int32]: https://pkg.go.dev/builtin#int32
@@ -944,7 +1095,7 @@ type S32 struct{ _primitive[int32] }
 
 // U32 represents the WIT [primitive type] u32, an unsigned 32-bit integer.
 // It is equivalent to the Go type [uint32].
-// It implements the [Node], [Sized], [Type], and [TypeDefKind] interfaces.
+// It implements the [Node], [ABI], [Type], and [TypeDefKind] interfaces.
 //
 // [primitive type]: https://component-model.bytecodealliance.org/design/wit.html#primitive-types
 // [uint32]: https://pkg.go.dev/builtin#uint32
@@ -952,7 +1103,7 @@ type U32 struct{ _primitive[uint32] }
 
 // S64 represents the WIT [primitive type] s64, a signed 64-bit integer.
 // It is equivalent to the Go type [int64].
-// It implements the [Node], [Sized], [Type], and [TypeDefKind] interfaces.
+// It implements the [Node], [ABI], [Type], and [TypeDefKind] interfaces.
 //
 // [primitive type]: https://component-model.bytecodealliance.org/design/wit.html#primitive-types
 // [int64]: https://pkg.go.dev/builtin#int64
@@ -960,7 +1111,7 @@ type S64 struct{ _primitive[int64] }
 
 // U64 represents the WIT [primitive type] u64, an unsigned 64-bit integer.
 // It is equivalent to the Go type [uint64].
-// It implements the [Node], [Sized], [Type], and [TypeDefKind] interfaces.
+// It implements the [Node], [ABI], [Type], and [TypeDefKind] interfaces.
 //
 // [primitive type]: https://component-model.bytecodealliance.org/design/wit.html#primitive-types
 // [uint64]: https://pkg.go.dev/builtin#uint64
@@ -968,7 +1119,7 @@ type U64 struct{ _primitive[uint64] }
 
 // Float32 represents the WIT [primitive type] float32, a 32-bit floating point value.
 // It is equivalent to the Go type [float32].
-// It implements the [Node], [Sized], [Type], and [TypeDefKind] interfaces.
+// It implements the [Node], [ABI], [Type], and [TypeDefKind] interfaces.
 //
 // [primitive type]: https://component-model.bytecodealliance.org/design/wit.html#primitive-types
 // [float32]: https://pkg.go.dev/builtin#float32
@@ -976,7 +1127,7 @@ type Float32 struct{ _primitive[float32] }
 
 // Float64 represents the WIT [primitive type] float64, a 64-bit floating point value.
 // It is equivalent to the Go type [float64].
-// It implements the [Node], [Sized], [Type], and [TypeDefKind] interfaces.
+// It implements the [Node], [ABI], [Type], and [TypeDefKind] interfaces.
 //
 // [primitive type]: https://component-model.bytecodealliance.org/design/wit.html#primitive-types
 // [float64]: https://pkg.go.dev/builtin#float64
@@ -984,7 +1135,7 @@ type Float64 struct{ _primitive[float64] }
 
 // Char represents the WIT [primitive type] char, a single Unicode character,
 // specifically a [Unicode scalar value]. It is equivalent to the Go type [rune].
-// It implements the [Node], [Sized], [Type], and [TypeDefKind] interfaces.
+// It implements the [Node], [ABI], [Type], and [TypeDefKind] interfaces.
 //
 // [primitive type]: https://component-model.bytecodealliance.org/design/wit.html#primitive-types
 // [Unicode scalar value]: https://unicode.org/glossary/#unicode_scalar_value
@@ -993,7 +1144,7 @@ type Char struct{ _primitive[char] }
 
 // String represents the WIT [primitive type] string, a finite string of Unicode characters.
 // It is equivalent to the Go type [string].
-// It implements the [Node], [Sized], [Type], and [TypeDefKind] interfaces.
+// It implements the [Node], [ABI], [Type], and [TypeDefKind] interfaces.
 //
 // [primitive type]: https://component-model.bytecodealliance.org/design/wit.html#primitive-types
 // [string]: https://pkg.go.dev/builtin#string
