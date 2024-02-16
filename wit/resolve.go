@@ -140,7 +140,7 @@ func worldItemTypeSort(i WorldItem) int {
 	case *Function:
 		return 2
 	}
-	panic("BUG: unknown WorldItem type")
+	panic("BUG: worldItemTypeSort: unknown WorldItem type")
 }
 
 // A WorldItem is any item that can be exported from or imported into a [World],
@@ -355,17 +355,17 @@ type Field struct {
 // [resource type]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md#item-resource
 type Resource struct{ _typeDefKind }
 
-// Size returns the [ABI byte size] for [Resource] r.
+// Size returns the [ABI byte size] for [Resource].
 //
 // [ABI byte size]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#size
-func (r *Resource) Size() uintptr { return 4 }
+func (*Resource) Size() uintptr { return 4 }
 
-// Align returns the [ABI byte alignment] for [Resource] r.
+// Align returns the [ABI byte alignment] for [Resource].
 //
 // [ABI byte alignment]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#alignment
-func (r *Resource) Align() uintptr { return 4 }
+func (*Resource) Align() uintptr { return 4 }
 
-// HasPointer returns whether the [ABI] representation of [Resource] r contains a pointer.
+// HasPointer returns whether the [ABI] representation of [Resource] contains a pointer.
 //
 // [ABI byte alignment]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md
 func (r *Resource) HasPointer() bool {
@@ -683,7 +683,7 @@ func (e *Enum) Align() uintptr {
 	return e.Despecialize().Align()
 }
 
-// HasPointer returns whether the [ABI] representation of an [Enum] contains a pointer.
+// HasPointer returns whether the [ABI] representation of [Enum] e contains a pointer.
 //
 // [ABI]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md
 func (e *Enum) HasPointer() bool {
@@ -1043,7 +1043,7 @@ func (_primitive[T]) String() string {
 	case string:
 		return "string"
 	default:
-		panic(fmt.Sprintf("BUG: unknown primitive type %T", v)) // should never reach here
+		panic(fmt.Sprintf("BUG: String: unknown primitive type %T", v)) // should never reach here
 	}
 }
 
