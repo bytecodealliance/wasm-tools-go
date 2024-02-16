@@ -1368,14 +1368,20 @@ func (f *Function) CoreFunction(export bool) *Function {
 	// Clone the function
 	cf := *f
 
+	// Max 16 params
 	if len(flatParams(f.Params)) > MaxFlatParams {
 		cf.Params = []Param{combineParams("params", f.Params)}
 	}
 
+	// Max 1 result
 	if len(flatParams(f.Results)) > MaxFlatResults {
-		result := combineParams("params", f.Params)
-		cf.Params = append(cf.Params, result)
-		// cf.Results =
+		results := combineParams("results", f.Params)
+		if export {
+			cf.Results = []Param{results}
+		} else {
+			cf.Params = append(cf.Params, results)
+			cf.Results = nil
+		}
 	}
 
 	return &cf
@@ -1389,24 +1395,27 @@ func flatParams(params []Param) []Type {
 	return flat
 }
 
+// combineParams returns a pointer to
 func combineParams(name string, params []Param) Param {
-	r := &Record{}
-	for _, p := range params {
-		r.Fields = append(r.Fields,
-			Field{
-				Name: p.Name,
-				Type: p.Type,
-			})
+	var t Type
+	if len(params) == 1 {
+		t = params[0].Type
+	} else {
+		r := &Record{}
+		t = &TypeDef{Kind: r}
+		for _, p := range params {
+			r.Fields = append(r.Fields,
+				Field{
+					Name: p.Name,
+					Type: p.Type,
+				})
+		}
 	}
-	return newParam("params", r)
-}
-
-func newParam(name string, t TypeDefKind) Param {
 	return Param{
 		Name: name,
 		Type: &TypeDef{
 			Name: &name,
-			Kind: t,
+			Kind: &Pointer{Type: t},
 		},
 	}
 }
