@@ -33,10 +33,10 @@ func TestVariantLayout(t *testing.T) {
 		typ := typeName(tt.v)
 		t.Run(tt.name, func(t *testing.T) {
 			if got, want := tt.v.Size(), tt.size; got != want {
-				t.Errorf("(%s).Size() == %v, expected %v", typ, got, want)
+				t.Errorf("(%s).Size(): %v, expected %v", typ, got, want)
 			}
 			if got, want := tt.v.DataOffset(), tt.offset; got != want {
-				t.Errorf("(%s).DataOffset() == %v, expected %v", typ, got, want)
+				t.Errorf("(%s).DataOffset(): %v, expected %v", typ, got, want)
 			}
 		})
 	}

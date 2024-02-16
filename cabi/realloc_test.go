@@ -35,7 +35,7 @@ func TestRealloc(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got := realloc(unsafePointer(tt.ptr), tt.size, tt.align, tt.newsize)
 			if (tt.want < threshold && uintptr(got) != tt.want) || (tt.want >= threshold && uintptr(got) < threshold) {
-				t.Errorf("realloc(%d, %d, %d, %d) == %d, expected %d",
+				t.Errorf("realloc(%d, %d, %d, %d): %d, expected %d",
 					tt.ptr, tt.size, tt.align, tt.newsize, got, tt.want)
 			}
 			if uintptr(got)%tt.align != 0 {

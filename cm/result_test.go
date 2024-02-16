@@ -60,10 +60,10 @@ func TestResultLayout(t *testing.T) {
 		typ := typeName(tt.r)
 		t.Run(tt.name, func(t *testing.T) {
 			if got, want := tt.r.Size(), tt.size; got != want {
-				t.Errorf("(%s).Size() == %v, expected %v", typ, got, want)
+				t.Errorf("(%s).Size(): %v, expected %v", typ, got, want)
 			}
 			if got, want := tt.r.DataOffset(), tt.offset; got != want {
-				t.Errorf("(%s).DataOffset() == %v, expected %v", typ, got, want)
+				t.Errorf("(%s).DataOffset(): %v, expected %v", typ, got, want)
 			}
 		})
 	}
@@ -72,17 +72,17 @@ func TestResultLayout(t *testing.T) {
 func TestResultUnwrap(t *testing.T) {
 	r1 := OK[string, string, struct{}]("hello")
 	if ok, err := r1.Unwrap(); ok == nil {
-		t.Errorf("Unwrap: %v %v, expected non-nil OK", ok, err)
+		t.Errorf("Unwrap(): %v %v, expected non-nil OK", ok, err)
 	}
 	if ok, err := r1.Unwrap(); err != nil {
-		t.Errorf("Unwrap: %v %v, expected nil Err", ok, err)
+		t.Errorf("Unwrap(): %v %v, expected nil Err", ok, err)
 	}
 
 	r2 := Err[string, struct{}, bool](true)
 	if ok, err := r2.Unwrap(); ok != nil {
-		t.Errorf("Unwrap: %v %v, expected nil OK", ok, err)
+		t.Errorf("Unwrap(): %v %v, expected nil OK", ok, err)
 	}
 	if ok, err := r2.Unwrap(); err == nil {
-		t.Errorf("Unwrap: %v %v, expected non-nil Err", ok, err)
+		t.Errorf("Unwrap(): %v %v, expected non-nil Err", ok, err)
 	}
 }
