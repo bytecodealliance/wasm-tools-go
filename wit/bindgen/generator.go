@@ -527,21 +527,40 @@ func (g *generator) variantRep(file *gen.File, typeName gen.Ident, v *wit.Varian
 
 	// Emit cases
 	for i, c := range v.Cases {
-		caseName := file.Declare(typeName.Name + GoName(c.Name, true))
-		stringio.Write(&b, "// ", caseName.Name, " returns a [", typeName.Name, "] of case \"", c.Name, "\".\n")
+		caseNum := strconv.Itoa(i)
+		caseName := GoName(c.Name, true)
+		constructorName := file.Declare(typeName.Name + caseName)
+		typeRep := g.typeRep(file, c.Type)
+
+		// Emit constructor
+		stringio.Write(&b, "// ", constructorName.Name, " returns a [", typeName.Name, "] of case \"", c.Name, "\".\n")
 		b.WriteString("//\n")
 		b.WriteString(gen.FormatDocComments(c.Docs.Contents, false))
-		stringio.Write(&b, "func ", caseName.Name, "(")
+		stringio.Write(&b, "func ", constructorName.Name, "(")
 		dataName := "data"
 		if c.Type != nil {
-			stringio.Write(&b, dataName, " ", g.typeRep(file, c.Type))
+			stringio.Write(&b, dataName, " ", typeRep)
 		}
 		stringio.Write(&b, ") ", typeName.Name, " {")
 		if c.Type == nil {
-			stringio.Write(&b, "var ", dataName, " ", g.typeRep(file, c.Type), "\n")
+			stringio.Write(&b, "var ", dataName, " ", typeRep, "\n")
 		}
-		stringio.Write(&b, "return ", cm, ".New[", typeName.Name, "](", strconv.Itoa(i), ", ", dataName, ")\n")
+		stringio.Write(&b, "return ", cm, ".New[", typeName.Name, "](", caseNum, ", ", dataName, ")\n")
 		b.WriteString("}\n\n")
+
+		// Emit getter
+		stringio.Write(&b, "func (self *", typeName.Name, ") ", caseName, "() ")
+		if c.Type == nil {
+			// Case without associated type returns bool
+			b.WriteString("bool {\n")
+			stringio.Write(&b, "return ", cm, ".Tag(self) == ", caseNum)
+			b.WriteString("}\n\n")
+		} else {
+			// Case with associated type returns pointer to associated type
+			stringio.Write(&b, "*", typeRep, " {\n")
+			stringio.Write(&b, "return ", cm, ".Case[", typeRep, "](self, ", caseNum, ")")
+			b.WriteString("}\n\n")
+		}
 	}
 	return b.String()
 }
