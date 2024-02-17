@@ -638,9 +638,12 @@ func (g *generator) defineImportedFunction(f *wit.Function, ownerID wit.Ident) e
 	g.funcs[f] = funcID
 	snakeID := file.Declare(SnakeName(f.Name))
 
+	// Func and import func share a scope to simplify things
+	scope := gen.NewScope(pkg)
+
 	var b bytes.Buffer
 
-	fmt.Fprintf(&b, "// %s represents the imported Component Model %s \"%s#%s\".\n", funcID.Name, f.WITKind(), ownerID.String(), f.Name)
+	stringio.Write(&b, "// ", funcID.Name, " represents the imported Component Model ", f.WITKind(), " \"", ownerID.String(), "#", f.Name, "\".\n")
 	b.WriteString("//\n")
 	b.WriteString(gen.FormatDocComments(f.WIT(nil, f.Name), true))
 	b.WriteString("//\n")
@@ -650,9 +653,7 @@ func (g *generator) defineImportedFunction(f *wit.Function, ownerID wit.Ident) e
 	}
 
 	// Emit function name
-	b.WriteString("func ")
-	b.WriteString(funcID.Name)
-	b.WriteRune('(')
+	stringio.Write(&b, "func ", funcID.Name, "(")
 
 	// Emit params
 	params := make(map[string]string, len(f.Params))
@@ -660,22 +661,21 @@ func (g *generator) defineImportedFunction(f *wit.Function, ownerID wit.Ident) e
 		if i > 0 {
 			b.WriteString(", ")
 		}
-		params[p.Name] = GoName(p.Name, false)
+		params[p.Name] = scope.UniqueName(GoName(p.Name, false))
 		b.WriteString(params[p.Name])
 		b.WriteRune(' ')
 		b.WriteString(g.typeRep(file, p.Type))
 	}
-	b.WriteString(")")
+	b.WriteString(") ")
 
 	// Emit results
 	results := make(map[string]string, len(f.Results))
 	if len(f.Results) == 1 {
 		r := f.Results[0]
 		if r.Name == "" {
-			results[r.Name] = "result"
-		} else {
-			results[r.Name] = GoName(r.Name, false)
+			r.Name = scope.UniqueName("result")
 		}
+		results[r.Name] = scope.UniqueName(GoName(r.Name, false))
 		b.WriteString(g.typeRep(file, r.Type))
 	} else if len(f.Results) > 0 {
 		b.WriteRune('(')
@@ -683,21 +683,15 @@ func (g *generator) defineImportedFunction(f *wit.Function, ownerID wit.Ident) e
 			if i > 0 {
 				b.WriteString(", ")
 			}
-			results[r.Name] = GoName(r.Name, false)
-			b.WriteString(results[r.Name])
-			b.WriteRune(' ')
-			b.WriteString(g.typeRep(file, r.Type))
+			results[r.Name] = scope.UniqueName(GoName(r.Name, false))
+			stringio.Write(&b, results[r.Name], " ", g.typeRep(file, r.Type))
 		}
 		b.WriteRune(')')
 	}
 	b.WriteString("\n\n")
 
 	// Emit wasmimport func
-	b.WriteString("//go:wasmimport ")
-	b.WriteString(ownerID.String())
-	b.WriteRune(' ')
-	b.WriteString(f.Name)
-	b.WriteRune('\n')
+	stringio.Write(&b, "//go:wasmimport ", ownerID.String(), " ", f.Name, "\n")
 	b.WriteString("func ")
 	b.WriteString(snakeID.Name)
 	b.WriteString("(/* TODO: wasmimport params */)\n")
