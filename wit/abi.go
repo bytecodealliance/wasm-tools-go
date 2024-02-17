@@ -56,3 +56,93 @@ func Despecialize(k TypeDefKind) TypeDefKind {
 	}
 	return k
 }
+
+const (
+	// MaxFlatParams is the maximum number of flattened parameters a function can have
+	// as defined in the Component Model [Canonical ABI].
+	//
+	// [Canonical ABI]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
+	MaxFlatParams = 16
+
+	// MaxFlatResults is the maximum number of flattened results a function can have
+	// as defined in the Component Model [Canonical ABI].
+	//
+	// [Canonical ABI]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
+	MaxFlatResults = 1
+)
+
+// CoreFunction returns a [Core WebAssembly function] of [Function] f.
+// Its params and results may be [flattened] according to the Canonical ABI specification.
+// The flattening rules vary based on whether the returned function is imported or exported,
+// e.g. using go:wasmimport or go:wasmexport.
+//
+// [Core WebAssembly function]: https://webassembly.github.io/spec/core/syntax/modules.html#syntax-func
+// [flattened]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
+func (f *Function) CoreFunction(export bool) *Function {
+	if len(f.Params) == 0 && len(f.Results) == 0 {
+		return f
+	}
+
+	// Clone the function
+	cf := *f
+
+	// Max 16 params
+	if len(flatParams(f.Params)) > MaxFlatParams {
+		cf.Params = []Param{compoundParam("param", "params", f.Params)}
+	}
+
+	// Max 1 result
+	if len(flatParams(f.Results)) > MaxFlatResults {
+		p := compoundParam("result", "results", f.Params)
+		if export {
+			cf.Results = []Param{p}
+		} else {
+			cf.Params = append(cf.Params, p)
+			cf.Results = nil
+		}
+	}
+
+	return &cf
+}
+
+func flatParams(params []Param) []Type {
+	flat := make([]Type, 0, len(params))
+	for _, p := range params {
+		flat = append(flat, p.Type.Flat()...)
+	}
+	return flat
+}
+
+// compoundParam returns a single param that represents
+// the combined param(s), using a [Pointer].
+func compoundParam(singular, plural string, params []Param) Param {
+	if len(params) == 0 {
+		panic("BUG: combineParams: len(params) == 0")
+	}
+
+	name := params[0].Name
+	var t Type
+
+	if len(params) == 1 {
+		if name == "" {
+			name = singular
+		}
+		t = params[0].Type
+	} else {
+		name = plural
+		r := &Record{}
+		t = &TypeDef{Kind: r}
+		for _, p := range params {
+			r.Fields = append(r.Fields,
+				Field{
+					Name: p.Name,
+					Type: p.Type,
+				})
+		}
+	}
+
+	return Param{
+		Name: name,
+		Type: &TypeDef{Kind: &Pointer{Type: t}},
+	}
+}
