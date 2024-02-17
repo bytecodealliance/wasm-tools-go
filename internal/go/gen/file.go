@@ -31,11 +31,24 @@ type File struct {
 	// Package this file belongs to.
 	Package *Package
 
+	// Scope is the naming scope of this file, used for package import names.
+	Scope
+
 	// Imports maps Go package imports from package path to local name, e.g. {"encoding/json": "json"}.
 	Imports map[string]string
 
 	// Content is the file contents.
 	Content []byte
+}
+
+// NewFile returns a newly initialized file.
+func NewFile(pkg *Package, name string) *File {
+	return &File{
+		Name:    name,
+		Package: pkg,
+		Scope:   NewScope(pkg),
+		Imports: make(map[string]string),
+	}
 }
 
 // IsGo returns true if f represents a Go file.
@@ -91,12 +104,7 @@ func (f *File) Bytes() ([]byte, error) {
 // It additionally checks the file-scoped declarations (local package names).
 // It returns the package-unique name (which may be different than name).
 func (f *File) Declare(name string) Ident {
-	name = Unique(name, IsReserved, HasKey(f.Imports), HasKey(f.Package.Declared))
-	f.Package.Declared[name] = true
-	return Ident{
-		Package: f.Package,
-		Name:    name,
-	}
+	return f.Package.Declare(f.UniqueName(name))
 }
 
 // Import imports the Go package specified by path, returning the local name for the imported package.
@@ -108,12 +116,10 @@ func (f *File) Import(path string) string {
 		// Can't import self
 		return ""
 	}
-	if f.Imports[path] != "" {
-		return f.Imports[path]
+	if f.Imports[path] == "" {
+		f.Imports[path] = f.UniqueName(name)
 	}
-	name = Unique(name, IsReserved, HasKey(f.Imports), HasKey(f.Package.Declared))
-	f.Imports[path] = name
-	return name
+	return f.Imports[path]
 }
 
 // Ident returns a file and package-relative string representation of id.

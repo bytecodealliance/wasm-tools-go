@@ -738,12 +738,12 @@ func (g *generator) packageFor(id wit.Ident) *gen.Package {
 
 	name = GoPackageName(name)
 	// Ensure local name doesn’t conflict with Go keywords or predeclared identifiers
-	if gen.Unique(name, gen.IsReserved) != name {
+	if gen.UniqueName(name, gen.IsReserved) != name {
 		// Try with package prefix, like error -> ioerror
 		name = id.Package + name
-		if gen.Unique(name, gen.IsReserved) != name {
+		if gen.UniqueName(name, gen.IsReserved) != name {
 			// Try with namespace prefix, like ioerror -> wasiioerror
-			name = gen.Unique(id.Namespace+name, gen.IsReserved)
+			name = gen.UniqueName(id.Namespace+name, gen.IsReserved)
 		}
 	}
 
