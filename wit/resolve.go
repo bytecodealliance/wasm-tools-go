@@ -1326,11 +1326,11 @@ type Function struct {
 // If f is a freestanding function, this returns nil.
 func (f *Function) Type() Type {
 	switch kind := f.Kind.(type) {
-	case Constructor:
+	case *Constructor:
 		return kind.Type
-	case Static:
+	case *Static:
 		return kind.Type
-	case Method:
+	case *Method:
 		return kind.Type
 	default:
 		return nil

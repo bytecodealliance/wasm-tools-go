@@ -334,6 +334,7 @@ func (g *generator) defineTypeDef(t *wit.TypeDef, name string) error {
 	file := pkg.File(ownerID.Extension + GoSuffix)
 	file.GeneratedBy = g.opts.generatedBy
 
+	// Define the type
 	fmt.Fprintf(file, "// %s represents the %s \"%s#%s\".\n", goName, t.WITKind(), ownerID.String(), name)
 	fmt.Fprintf(file, "//\n")
 	fmt.Fprint(file, gen.FormatDocComments(t.WIT(nil, ""), true))
@@ -346,6 +347,28 @@ func (g *generator) defineTypeDef(t *wit.TypeDef, name string) error {
 	fmt.Fprint(file, "\n\n")
 
 	g.defined[t] = true
+
+	// Define any associated functions
+	if f := t.Constructor(); f != nil {
+		err := g.defineImportedFunction(f, ownerID)
+		if err != nil {
+			return nil
+		}
+	}
+
+	for _, f := range t.StaticFunctions() {
+		err := g.defineImportedFunction(f, ownerID)
+		if err != nil {
+			return nil
+		}
+	}
+
+	for _, f := range t.Methods() {
+		err := g.defineImportedFunction(f, ownerID)
+		if err != nil {
+			return nil
+		}
+	}
 
 	return nil
 }
@@ -639,7 +662,6 @@ func (g *generator) resourceRep(file *gen.File, r *wit.Resource) string {
 	var b strings.Builder
 	b.WriteString(file.Import(g.opts.cmPackage))
 	b.WriteString(".Resource")
-	b.WriteString("\n\n// TODO: resource methods")
 	return b.String()
 }
 
@@ -662,15 +684,16 @@ func (g *generator) defineImportedFunction(f *wit.Function, ownerID wit.Ident) e
 
 	// TODO: handle exported functions
 	core := f.CoreFunction(false)
-	flattened := core != f
 
 	var selfType *wit.TypeDef
 	var selfName string
 	var selfScope gen.Scope
+	var shortName string
 	var name string
 	var snakeName string
 	switch f.Kind.(type) {
 	case *wit.Freestanding:
+		shortName = f.Name
 		name = file.Declare(GoName(f.Name, true))
 		snakeName = file.Declare(SnakeName(f.Name))
 
@@ -679,29 +702,30 @@ func (g *generator) defineImportedFunction(f *wit.Function, ownerID wit.Ident) e
 		selfScope = g.scopes[selfType]
 		selfName = g.typeDefNames[selfType]
 		name = file.Declare("New" + selfName)
+		// func new_typename(params...)
 		snakeName = file.Declare("new_" + SnakeName(*selfType.Name))
 
 	case *wit.Static:
 		selfType = f.Type().(*wit.TypeDef)
 		selfScope = g.scopes[selfType]
 		selfName = g.typeDefNames[selfType]
-		base := strings.TrimPrefix(f.Name, "[static]")
-		name = file.Declare(selfName + GoName(base, true))
-		snakeName = file.Declare(SnakeName(*selfType.Name + "-" + base))
+		shortName = strings.TrimPrefix(f.Name, "[static]"+*selfType.Name+".")
+		name = file.Declare(selfName + GoName(shortName, true))
+		// func typename_name(params...)
+		snakeName = file.Declare(SnakeName(*selfType.Name + "-" + shortName))
 
 	case *wit.Method:
 		selfType = f.Type().(*wit.TypeDef)
 		selfScope = g.scopes[selfType]
-		selfName = g.typeDefNames[selfType]
-		base := strings.TrimPrefix(f.Name, "[method]")
+		shortName = strings.TrimPrefix(f.Name, "[method]"+*selfType.Name+".")
 		// TODO: the snake (wasmimport) function is not a method if flattened
-		name = selfScope.UniqueName(selfName + GoName(base, true))
-		if flattened {
-			// func typename_methodname(params...)
-			snakeName = file.Declare(SnakeName(*selfType.Name + "-" + base))
+		name = selfScope.UniqueName(GoName(shortName, true))
+		if core.Params[0] != f.Params[0] {
+			// func typename_name(params...)
+			snakeName = file.Declare(SnakeName(*selfType.Name + "-" + shortName))
 		} else {
-			// func (self *T) methodname(params...)
-			snakeName = selfScope.UniqueName(SnakeName(base))
+			// func (self *T) name(params...)
+			snakeName = selfScope.UniqueName(SnakeName(shortName))
 		}
 	}
 	_ = selfType
@@ -717,9 +741,15 @@ func (g *generator) defineImportedFunction(f *wit.Function, ownerID wit.Ident) e
 
 	var b bytes.Buffer
 
-	stringio.Write(&b, "// ", name, " represents the imported Component Model ", f.WITKind(), " \"", ownerID.String(), "#", f.Name, "\".\n")
+	stringio.Write(&b, "// ", name, " represents the ", f.WITKind(), " \"")
+	if f.IsFreestanding() {
+		stringio.Write(&b, ownerID.String(), "#", shortName)
+	} else {
+		stringio.Write(&b, shortName)
+	}
+	b.WriteString("\".\n")
 	b.WriteString("//\n")
-	b.WriteString(gen.FormatDocComments(f.WIT(nil, f.Name), true))
+	b.WriteString(gen.FormatDocComments(f.WIT(nil, shortName), true))
 	b.WriteString("//\n")
 	if f.Docs.Contents != "" {
 		b.WriteString("//\n")
@@ -729,33 +759,37 @@ func (g *generator) defineImportedFunction(f *wit.Function, ownerID wit.Ident) e
 	// Emit function name
 	b.WriteString("func ")
 	if f.IsMethod() {
-		stringio.Write(&b, "(self *", g.typeRep(file, selfType), ") ", name)
+		stringio.Write(&b, "(self ", g.typeRep(file, selfType), ") ", name)
 	} else {
 		b.WriteString(name)
 	}
 	b.WriteRune('(')
 
-	// Emit params
-	params := make(map[string]string, len(f.Params))
-	for i, p := range f.Params {
+	// Emit paramNames
+	params := f.Params
+	if f.IsMethod() {
+		params = params[1:]
+	}
+	paramNames := make(map[string]string, len(params))
+	for i, p := range params {
 		if i > 0 {
 			b.WriteString(", ")
 		}
-		params[p.Name] = scope.UniqueName(GoName(p.Name, false))
-		b.WriteString(params[p.Name])
+		paramNames[p.Name] = scope.UniqueName(GoName(p.Name, false))
+		b.WriteString(paramNames[p.Name])
 		b.WriteRune(' ')
 		b.WriteString(g.typeRep(file, p.Type))
 	}
 	b.WriteString(") ")
 
-	// Emit results
-	results := make(map[string]string, len(f.Results))
+	// Emit resultNames
+	resultNames := make(map[string]string, len(f.Results))
 	if len(f.Results) == 1 {
 		r := f.Results[0]
 		if r.Name == "" {
 			r.Name = scope.UniqueName("result")
 		}
-		results[r.Name] = scope.UniqueName(GoName(r.Name, false))
+		resultNames[r.Name] = scope.UniqueName(GoName(r.Name, false))
 		b.WriteString(g.typeRep(file, r.Type))
 	} else if len(f.Results) > 0 {
 		b.WriteRune('(')
@@ -763,8 +797,8 @@ func (g *generator) defineImportedFunction(f *wit.Function, ownerID wit.Ident) e
 			if i > 0 {
 				b.WriteString(", ")
 			}
-			results[r.Name] = scope.UniqueName(GoName(r.Name, false))
-			stringio.Write(&b, results[r.Name], " ", g.typeRep(file, r.Type))
+			resultNames[r.Name] = scope.UniqueName(GoName(r.Name, false))
+			stringio.Write(&b, resultNames[r.Name], " ", g.typeRep(file, r.Type))
 		}
 		b.WriteRune(')')
 	}

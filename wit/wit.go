@@ -769,8 +769,21 @@ func (p _primitive[T]) WIT(_ Node, name string) string {
 	return p.TypeName()
 }
 
-// WITKind returns the WIT kind.
-func (*Function) WITKind() string { return "function" }
+// WITKind returns the WIT kind for [Function] f.
+func (f *Function) WITKind() string {
+	switch f.Kind.(type) {
+	case *Freestanding:
+		return "function"
+	case *Constructor:
+		return "constructor"
+	case *Static:
+		return "static function"
+	case *Method:
+		return "method"
+	default:
+		panic("unknown function type for func " + f.Name)
+	}
+}
 
 // WIT returns the [WIT] text format for [Function] f.
 //
