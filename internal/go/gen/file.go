@@ -103,7 +103,7 @@ func (f *File) Bytes() ([]byte, error) {
 // Declare adds a package-scoped identifier to [File] f.
 // It additionally checks the file-scoped declarations (local package names).
 // It returns the package-unique name (which may be different than name).
-func (f *File) Declare(name string) Ident {
+func (f *File) Declare(name string) string {
 	return f.Package.Declare(f.UniqueName(name))
 }
 

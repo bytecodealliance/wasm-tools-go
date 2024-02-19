@@ -172,9 +172,8 @@ func (g *generator) declareTypeDef(t *wit.TypeDef) error {
 	file := pkg.File(ownerID.Extension + GoSuffix)
 	file.GeneratedBy = g.opts.generatedBy
 
-	id := file.Declare(GoName(name, true))
-	g.typeDefPackages[t] = id.Package
-	g.typeDefNames[t] = id.Name
+	g.typeDefPackages[t] = pkg
+	g.typeDefNames[t] = file.Declare(GoName(name, true))
 	g.scopes[t] = gen.NewScope(nil)
 
 	// fmt.Fprintf(os.Stderr, "Type:\t%s.%s\n\t%s.%s\n", ownerID.String(), name, decl.Package.Path, decl.Name)
@@ -507,7 +506,7 @@ func (g *generator) flagsRep(file *gen.File, name string, flags *wit.Flags) stri
 	for i, flag := range flags.Flags {
 		b.WriteString(gen.FormatDocComments(flag.Docs.Contents, false))
 		flagName := file.Declare(name + GoName(flag.Name, true))
-		b.WriteString(flagName.Name)
+		b.WriteString(flagName)
 		if i == 0 {
 			b.WriteRune(' ')
 			b.WriteString(name)
@@ -528,7 +527,7 @@ func (g *generator) enumRep(file *gen.File, name string, e *wit.Enum) string {
 	for i, c := range e.Cases {
 		caseName := file.Declare(name + GoName(c.Name, true))
 		b.WriteString(gen.FormatDocComments(c.Docs.Contents, false))
-		b.WriteString(caseName.Name)
+		b.WriteString(caseName)
 		if i == 0 {
 			b.WriteRune(' ')
 			b.WriteString(name)
@@ -563,10 +562,10 @@ func (g *generator) variantRep(file *gen.File, name string, v *wit.Variant) stri
 		typeRep := g.typeRep(file, c.Type)
 
 		// Emit constructor
-		stringio.Write(&b, "// ", constructorName.Name, " returns a [", name, "] of case \"", c.Name, "\".\n")
+		stringio.Write(&b, "// ", constructorName, " returns a [", name, "] of case \"", c.Name, "\".\n")
 		b.WriteString("//\n")
 		b.WriteString(gen.FormatDocComments(c.Docs.Contents, false))
-		stringio.Write(&b, "func ", constructorName.Name, "(")
+		stringio.Write(&b, "func ", constructorName, "(")
 		dataName := "data"
 		if c.Type != nil {
 			stringio.Write(&b, dataName, " ", typeRep)
@@ -672,23 +671,23 @@ func (g *generator) defineImportedFunction(f *wit.Function, ownerID wit.Ident) e
 	var snakeName string
 	switch f.Kind.(type) {
 	case *wit.Freestanding:
-		name = file.Declare(GoName(f.Name, true)).Name
-		snakeName = file.Declare(SnakeName(f.Name)).Name
+		name = file.Declare(GoName(f.Name, true))
+		snakeName = file.Declare(SnakeName(f.Name))
 
 	case *wit.Constructor:
 		selfType = f.Type().(*wit.TypeDef)
 		selfScope = g.scopes[selfType]
 		selfName = g.typeDefNames[selfType]
-		name = file.Declare("New" + selfName).Name
-		snakeName = file.Declare("new_" + SnakeName(*selfType.Name)).Name
+		name = file.Declare("New" + selfName)
+		snakeName = file.Declare("new_" + SnakeName(*selfType.Name))
 
 	case *wit.Static:
 		selfType = f.Type().(*wit.TypeDef)
 		selfScope = g.scopes[selfType]
 		selfName = g.typeDefNames[selfType]
 		base := strings.TrimPrefix(f.Name, "[static]")
-		name = file.Declare(selfName + GoName(base, true)).Name
-		snakeName = file.Declare(SnakeName(*selfType.Name + "-" + base)).Name
+		name = file.Declare(selfName + GoName(base, true))
+		snakeName = file.Declare(SnakeName(*selfType.Name + "-" + base))
 
 	case *wit.Method:
 		selfType = f.Type().(*wit.TypeDef)
@@ -699,7 +698,7 @@ func (g *generator) defineImportedFunction(f *wit.Function, ownerID wit.Ident) e
 		name = selfScope.UniqueName(selfName + GoName(base, true))
 		if flattened {
 			// func typename_methodname(params...)
-			snakeName = file.Declare(SnakeName(*selfType.Name + "-" + base)).Name
+			snakeName = file.Declare(SnakeName(*selfType.Name + "-" + base))
 		} else {
 			// func (self *T) methodname(params...)
 			snakeName = selfScope.UniqueName(SnakeName(base))
