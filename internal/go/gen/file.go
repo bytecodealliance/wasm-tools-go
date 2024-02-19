@@ -122,18 +122,17 @@ func (f *File) Import(path string) string {
 	return f.Imports[path]
 }
 
-// Ident returns a file and package-relative string representation of id.
-// It ensures that the file imports id's package, if different.
-// If id and f are in the same package, it returns the local name.
-// If id is in a different package than f, then f first imports id's package,
+// RelativeName returns a file and package-relative string for a [Package] and name.
+// If f belongs to pkg, it returns the local name.
+// If f belongs to a different package, it first imports the package,
 // then returns a name prefixed with the imported package name.
-func (f *File) Ident(id Ident) string {
+func (f *File) RelativeName(pkg *Package, name string) string {
 	// FIXME: is this redundant, but safer?
-	if id.Package == f.Package || id.Package.Path == f.Package.Path {
-		return id.Name
+	if pkg == f.Package || pkg.Path == f.Package.Path {
+		return name
 	}
-	pkgName := f.Import(id.Package.Path + "#" + id.Package.Name)
-	return pkgName + "." + id.Name
+	pkgName := f.Import(pkg.Path + "#" + pkg.Name)
+	return pkgName + "." + name
 }
 
 // Imports returns Go import syntax for imports.
