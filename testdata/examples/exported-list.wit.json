@@ -1,0 +1,53 @@
+{
+  "worlds": [
+    {
+      "name": "exports",
+      "imports": {},
+      "exports": {
+        "interface-0": {
+          "interface": 0
+        }
+      },
+      "package": 0
+    }
+  ],
+  "interfaces": [
+    {
+      "name": "command",
+      "types": {},
+      "functions": {
+        "bytes": {
+          "name": "bytes",
+          "kind": "freestanding",
+          "params": [],
+          "results": [
+            {
+              "type": 0
+            }
+          ]
+        }
+      },
+      "package": 0
+    }
+  ],
+  "types": [
+    {
+      "name": null,
+      "kind": {
+        "list": "u8"
+      },
+      "owner": null
+    }
+  ],
+  "packages": [
+    {
+      "name": "examples:exported-list",
+      "interfaces": {
+        "command": 0
+      },
+      "worlds": {
+        "exports": 0
+      }
+    }
+  ]
+}
