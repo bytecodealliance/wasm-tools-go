@@ -200,6 +200,13 @@ type TypeDef struct {
 	Docs  Docs
 }
 
+func (t *TypeDef) TypeName() string {
+	if t.Name != nil {
+		return *t.Name
+	}
+	return t.Kind.TypeName()
+}
+
 // Root returns the root [TypeDef] of [type alias] t.
 // If t is not a type alias, Root returns t.
 //
@@ -224,30 +231,6 @@ func (t *TypeDef) Package() *Package {
 		return owner.Package
 	}
 	return nil
-}
-
-// Size returns the byte size for values of type t.
-func (t *TypeDef) Size() uintptr {
-	return t.Kind.Size()
-}
-
-// Align returns the byte alignment for values of type t.
-func (t *TypeDef) Align() uintptr {
-	return t.Kind.Align()
-}
-
-// HasPointer returns whether the [ABI] representation of [TypeDef] t contains a pointer.
-//
-// [ABI]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md
-func (t *TypeDef) HasPointer() bool {
-	return t.Kind.HasPointer()
-}
-
-// Flat returns the [flattened] ABI representation of [TypeDef] t.
-//
-// [flattened]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
-func (t *TypeDef) Flat() []Type {
-	return t.Kind.Flat()
 }
 
 // Constructor returns the constructor for [TypeDef] t, or nil if none.
@@ -290,6 +273,30 @@ func (t *TypeDef) StaticFunctions() []*Function {
 	return statics
 }
 
+// Size returns the byte size for values of type t.
+func (t *TypeDef) Size() uintptr {
+	return t.Kind.Size()
+}
+
+// Align returns the byte alignment for values of type t.
+func (t *TypeDef) Align() uintptr {
+	return t.Kind.Align()
+}
+
+// HasPointer returns whether the [ABI] representation of [TypeDef] t contains a pointer.
+//
+// [ABI]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md
+func (t *TypeDef) HasPointer() bool {
+	return t.Kind.HasPointer()
+}
+
+// Flat returns the [flattened] ABI representation of [TypeDef] t.
+//
+// [flattened]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
+func (t *TypeDef) Flat() []Type {
+	return t.Kind.Flat()
+}
+
 // TypeDefKind represents the underlying type in a [TypeDef], which can be one of
 // [Record], [Resource], [Handle], [Flags], [Tuple], [Variant], [Enum],
 // [Option], [Result], [List], [Future], [Stream], or [Type].
@@ -297,13 +304,15 @@ func (t *TypeDef) StaticFunctions() []*Function {
 type TypeDefKind interface {
 	Node
 	ABI
+	TypeName() string
 	isTypeDefKind()
 }
 
 // _typeDefKind is an embeddable type that conforms to the [TypeDefKind] interface.
 type _typeDefKind struct{}
 
-func (_typeDefKind) isTypeDefKind() {}
+func (_typeDefKind) TypeName() string { return "" }
+func (_typeDefKind) isTypeDefKind()   {}
 
 // Pointer represents a pointer to a WIT type.
 // It is only used for ABI representation, e.g. pointers to function parameters or return values.
@@ -549,9 +558,9 @@ type Tuple struct {
 	Types []Type
 }
 
-// MonoType returns a non-nil [Type] if all types in t
+// Type returns a non-nil [Type] if all types in t
 // are the same. Returns nil if t contains more than one type.
-func (t *Tuple) MonoType() Type {
+func (t *Tuple) Type() Type {
 	if len(t.Types) == 0 {
 		return nil
 	}
@@ -688,11 +697,11 @@ func (v *Variant) HasPointer() bool {
 // [flattened]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
 func (v *Variant) Flat() []Type {
 	var flat []Type
-	for i, t := range v.Types() {
-		for j, f := range t.Flat() {
-			if j > len(flat) {
+	for _, t := range v.Types() {
+		for i, f := range t.Flat() {
+			if i >= len(flat) {
 				flat = append(flat, t)
-			} else if f.Size() > t.Size() {
+			} else if f.Size() > flat[i].Size() {
 				flat[i] = f
 			}
 		}
@@ -1015,8 +1024,7 @@ type TypeOwner interface {
 
 type _typeOwner struct{}
 
-func (_typeOwner) AllFunctions(yield func(*Function) bool) bool { return false }
-func (_typeOwner) isTypeOwner()                                 {}
+func (_typeOwner) isTypeOwner() {}
 
 // Type is the interface implemented by any type definition. This can be a
 // [primitive type] or a user-defined type in a [TypeDef].
@@ -1157,11 +1165,11 @@ func (_primitive[T]) Flat() []Type {
 	}
 }
 
-// String returns the canonical [primitive type] name in [WIT] text format.
+// TypeName returns the canonical [primitive type] name in [WIT] text format.
 //
 // [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
 // [primitive type]: https://component-model.bytecodealliance.org/design/wit.html#primitive-types
-func (_primitive[T]) String() string {
+func (_primitive[T]) TypeName() string {
 	var v T
 	switch any(v).(type) {
 	case bool:
@@ -1312,6 +1320,21 @@ type Function struct {
 	Params  []Param // arguments to the function
 	Results []Param // a function can have a single anonymous result, or > 1 named results
 	Docs    Docs
+}
+
+// Type returns the associated (self) [Type] for [Function] f, if f is a constructor, method, or static function.
+// If f is a freestanding function, this returns nil.
+func (f *Function) Type() Type {
+	switch kind := f.Kind.(type) {
+	case Constructor:
+		return kind.Type
+	case Static:
+		return kind.Type
+	case Method:
+		return kind.Type
+	default:
+		return nil
+	}
 }
 
 // IsFreestanding returns true if [Function] f is a freestanding function,
