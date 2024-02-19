@@ -728,7 +728,6 @@ func (g *generator) defineImportedFunction(f *wit.Function, ownerID wit.Ident) e
 			snakeName = selfScope.UniqueName(SnakeName(shortName))
 		}
 	}
-	_ = selfType
 	_ = selfScope
 
 	// Blow up if attempt to add methods or functions to a type in another package.
@@ -755,6 +754,9 @@ func (g *generator) defineImportedFunction(f *wit.Function, ownerID wit.Ident) e
 		b.WriteString("//\n")
 		b.WriteString(gen.FormatDocComments(f.Docs.Contents, false))
 	}
+
+	// Emit compiler directives
+	b.WriteString("//go:nosplit\n")
 
 	// Emit function name
 	b.WriteString("func ")
@@ -806,6 +808,7 @@ func (g *generator) defineImportedFunction(f *wit.Function, ownerID wit.Ident) e
 
 	// Emit wasmimport func
 	stringio.Write(&b, "//go:wasmimport ", ownerID.String(), " ", f.Name, "\n")
+	b.WriteString("//go:noescape\n")
 	b.WriteString("func ")
 	b.WriteString(snakeName)
 	b.WriteString("(/* TODO: wasmimport params */)\n")
