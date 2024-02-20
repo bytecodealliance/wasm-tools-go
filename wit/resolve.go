@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"sort"
 	"strconv"
+	"strings"
 	"unsafe"
 )
 
@@ -22,6 +23,32 @@ type Resolve struct {
 	Interfaces []*Interface
 	TypeDefs   []*TypeDef
 	Packages   []*Package
+}
+
+// AllFunctions [iterates] through functions in a [Resolve],
+// calling yield for each. Iteration will stop if yield returns false.
+//
+// [iterates]: https://github.com/golang/go/issues/61897
+func (r *Resolve) AllFunctions(yield func(*Function) bool) bool {
+	seen := make(map[*Function]bool)
+	yieldNew := func(f *Function) bool {
+		if seen[f] {
+			return true
+		}
+		seen[f] = true
+		return yield(f)
+	}
+	for _, w := range r.Worlds {
+		if !w.AllFunctions(yieldNew) {
+			return false
+		}
+	}
+	for _, i := range r.Interfaces {
+		if !i.AllFunctions(yieldNew) {
+			return false
+		}
+	}
+	return true
 }
 
 // A World represents all of the imports and exports of a [WebAssembly component].
@@ -1320,6 +1347,16 @@ type Function struct {
 	Params  []Param // arguments to the function
 	Results []Param // a function can have a single anonymous result, or > 1 named results
 	Docs    Docs
+}
+
+// ShortName returns the truncated name for [Function] f.
+// For instance, this function trims the "[method]type." prefix.
+// If f is a standalone function (e.g. not a method, constructor, or static function) this will return the function name unchanged.
+func (f *Function) ShortName() string {
+	if _, after, found := strings.Cut(f.Name, "."); found {
+		return after
+	}
+	return f.Name
 }
 
 // Type returns the associated (self) [Type] for [Function] f, if f is a constructor, method, or static function.
