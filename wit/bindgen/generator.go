@@ -806,7 +806,22 @@ func (g *generator) defineImportedFunction(f *wit.Function, ownerID wit.Ident) e
 		}
 		b.WriteRune(')')
 	}
-	b.WriteString("\n\n")
+
+	// Emit function body
+	b.WriteString(" {\n")
+	for _, r := range results {
+		stringio.Write(&b, "var ", r.name, " ", r.rep, "\n")
+	}
+	b.WriteString("// TODO: call the wasmimport function\n")
+	b.WriteString("return ")
+	for i, r := range results {
+		if i > 0 {
+			b.WriteString(", ")
+		}
+		b.WriteString(r.name)
+	}
+	b.WriteRune('\n')
+	b.WriteString("}\n\n")
 
 	// Emit wasmimport function
 	stringio.Write(&b, "//go:wasmimport ", ownerID.String(), " ", f.Name, "\n")
