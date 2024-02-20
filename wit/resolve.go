@@ -1349,10 +1349,10 @@ type Function struct {
 	Docs    Docs
 }
 
-// ShortName returns the truncated name for [Function] f.
+// BaseName returns the base name of [Function] f.
 // For instance, this function trims the "[method]type." prefix.
 // If f is a standalone function (e.g. not a method, constructor, or static function) this will return the function name unchanged.
-func (f *Function) ShortName() string {
+func (f *Function) BaseName() string {
 	if _, after, found := strings.Cut(f.Name, "."); found {
 		return after
 	}

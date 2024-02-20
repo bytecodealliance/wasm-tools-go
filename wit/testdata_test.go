@@ -179,8 +179,8 @@ func TestSizeAndAlign(t *testing.T) {
 	}
 }
 
-// TestFunctionShortName tests the [Function] ShortName method.
-func TestFunctionShortName(t *testing.T) {
+// TestFunctionBaseName tests the [Function] BaseName method.
+func TestFunctionBaseName(t *testing.T) {
 	err := loadTestdata(func(path string, res *Resolve) error {
 		t.Run(strings.TrimPrefix(path, testdataDir), func(t *testing.T) {
 			res.AllFunctions(func(f *Function) bool {
@@ -189,12 +189,12 @@ func TestFunctionShortName(t *testing.T) {
 					if found {
 						want = after
 					}
-					got := f.ShortName()
+					got := f.BaseName()
 					if got != want {
-						t.Errorf("(*Function).ShortName(): got %s, expected %s", got, want)
+						t.Errorf("(*Function).BaseName(): got %s, expected %s", got, want)
 					}
 					if strings.Contains(got, ".") {
-						t.Errorf("(*Function).ShortName(): %s contains \".\"", got)
+						t.Errorf("(*Function).BaseName(): %s contains \".\"", got)
 					}
 				})
 				return true
