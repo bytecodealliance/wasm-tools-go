@@ -375,6 +375,8 @@ func (g *generator) defineTypeDef(t *wit.TypeDef, name string) error {
 
 func (g *generator) typeDefRep(file *gen.File, name string, t *wit.TypeDef) string {
 	switch kind := t.Kind.(type) {
+	case *wit.Pointer:
+		return g.pointerRep(file, kind)
 	case wit.Type:
 		return g.typeRep(file, kind)
 	case *wit.Record:
@@ -406,6 +408,10 @@ func (g *generator) typeDefRep(file *gen.File, name string, t *wit.TypeDef) stri
 	default:
 		panic(fmt.Sprintf("BUG: unknown wit.TypeDef %T", t)) // should never reach here
 	}
+}
+
+func (g *generator) pointerRep(file *gen.File, p *wit.Pointer) string {
+	return "*" + g.typeRep(file, p.Type)
 }
 
 func (g *generator) typeRep(file *gen.File, t wit.Type) string {
@@ -684,18 +690,19 @@ func (g *generator) defineImportedFunction(f *wit.Function, ownerID wit.Ident) e
 
 	// TODO: handle exported functions
 	core := f.CoreFunction(false)
+	coreIsMethod := f.IsMethod() && core.Params[0] == f.Params[0]
 
 	var selfType *wit.TypeDef
 	var selfName string
 	var selfScope gen.Scope
 	var shortName string
 	var name string
-	var snakeName string
+	var coreName string
 	switch f.Kind.(type) {
 	case *wit.Freestanding:
 		shortName = f.Name
 		name = file.Declare(GoName(f.Name, true))
-		snakeName = file.Declare(SnakeName(f.Name))
+		coreName = file.Declare(SnakeName(f.Name))
 
 	case *wit.Constructor:
 		selfType = f.Type().(*wit.TypeDef)
@@ -703,7 +710,7 @@ func (g *generator) defineImportedFunction(f *wit.Function, ownerID wit.Ident) e
 		selfName = g.typeDefNames[selfType]
 		name = file.Declare("New" + selfName)
 		// func new_typename(params...)
-		snakeName = file.Declare("new_" + SnakeName(*selfType.Name))
+		coreName = file.Declare("new_" + SnakeName(*selfType.Name))
 
 	case *wit.Static:
 		selfType = f.Type().(*wit.TypeDef)
@@ -712,7 +719,7 @@ func (g *generator) defineImportedFunction(f *wit.Function, ownerID wit.Ident) e
 		shortName = strings.TrimPrefix(f.Name, "[static]"+*selfType.Name+".")
 		name = file.Declare(selfName + GoName(shortName, true))
 		// func typename_name(params...)
-		snakeName = file.Declare(SnakeName(*selfType.Name + "-" + shortName))
+		coreName = file.Declare(SnakeName(*selfType.Name + "-" + shortName))
 
 	case *wit.Method:
 		selfType = f.Type().(*wit.TypeDef)
@@ -720,12 +727,13 @@ func (g *generator) defineImportedFunction(f *wit.Function, ownerID wit.Ident) e
 		shortName = strings.TrimPrefix(f.Name, "[method]"+*selfType.Name+".")
 		// TODO: the snake (wasmimport) function is not a method if flattened
 		name = selfScope.UniqueName(GoName(shortName, true))
-		if core.Params[0] != f.Params[0] {
-			// func typename_name(params...)
-			snakeName = file.Declare(SnakeName(*selfType.Name + "-" + shortName))
-		} else {
+		if coreIsMethod {
 			// func (self *T) name(params...)
-			snakeName = selfScope.UniqueName(SnakeName(shortName))
+			coreName = selfScope.UniqueName(SnakeName(shortName))
+		} else {
+			// Flattened, so it doesn't have a self param
+			// func typename_name(params...)
+			coreName = file.Declare(SnakeName(*selfType.Name + "-" + shortName))
 		}
 	}
 	_ = selfScope
@@ -735,11 +743,18 @@ func (g *generator) defineImportedFunction(f *wit.Function, ownerID wit.Ident) e
 		return fmt.Errorf("cannot emit functions in package %s to type %s", ownerID.Package, selfType.Package().Name.String())
 	}
 
-	// Func and import func can share a scope
-	scope := gen.NewScope(pkg)
+	// Map WIT to Go
+	funcScope := gen.NewScope(file)
+	params := g.goParams(file, funcScope, f.Params)
+	results := g.goParams(file, funcScope, f.Results)
+
+	coreScope := gen.NewScope(file)
+	coreParams := g.goParams(file, coreScope, core.Params)
+	coreResults := g.goParams(file, coreScope, core.Results)
 
 	var b bytes.Buffer
 
+	// Emit documentation
 	stringio.Write(&b, "// ", name, " represents the ", f.WITKind(), " \"")
 	if f.IsFreestanding() {
 		stringio.Write(&b, ownerID.String(), "#", shortName)
@@ -755,10 +770,8 @@ func (g *generator) defineImportedFunction(f *wit.Function, ownerID wit.Ident) e
 		b.WriteString(gen.FormatDocComments(f.Docs.Contents, false))
 	}
 
-	// Emit compiler directives
+	// Emit exported Go function
 	b.WriteString("//go:nosplit\n")
-
-	// Emit function name
 	b.WriteString("func ")
 	if f.IsMethod() {
 		stringio.Write(&b, "(self ", g.typeRep(file, selfType), ") ", name)
@@ -767,60 +780,98 @@ func (g *generator) defineImportedFunction(f *wit.Function, ownerID wit.Ident) e
 	}
 	b.WriteRune('(')
 
-	// Emit paramNames
-	params := f.Params
+	// Emit params
+	ps := params
 	if f.IsMethod() {
-		params = params[1:]
+		ps = params[1:]
 	}
-	paramNames := make(map[string]string, len(params))
-	for i, p := range params {
+	for i, p := range ps {
 		if i > 0 {
 			b.WriteString(", ")
 		}
-		paramNames[p.Name] = scope.UniqueName(GoName(p.Name, false))
-		b.WriteString(paramNames[p.Name])
-		b.WriteRune(' ')
-		b.WriteString(g.typeRep(file, p.Type))
+		stringio.Write(&b, p.name, " ", p.rep)
 	}
 	b.WriteString(") ")
 
-	// Emit resultNames
-	resultNames := make(map[string]string, len(f.Results))
-	if len(f.Results) == 1 {
-		r := f.Results[0]
-		if r.Name == "" {
-			r.Name = scope.UniqueName("result")
-		}
-		resultNames[r.Name] = scope.UniqueName(GoName(r.Name, false))
-		b.WriteString(g.typeRep(file, r.Type))
-	} else if len(f.Results) > 0 {
+	// Emit results
+	if len(results) == 1 {
+		b.WriteString(results[0].rep)
+	} else if len(results) > 0 {
 		b.WriteRune('(')
-		for i, r := range f.Results {
+		for i, r := range results {
 			if i > 0 {
 				b.WriteString(", ")
 			}
-			resultNames[r.Name] = scope.UniqueName(GoName(r.Name, false))
-			stringio.Write(&b, resultNames[r.Name], " ", g.typeRep(file, r.Type))
+			stringio.Write(&b, r.name, " ", r.rep)
 		}
 		b.WriteRune(')')
 	}
 	b.WriteString("\n\n")
 
-	// Emit wasmimport func
+	// Emit wasmimport function
 	stringio.Write(&b, "//go:wasmimport ", ownerID.String(), " ", f.Name, "\n")
 	b.WriteString("//go:noescape\n")
 	b.WriteString("func ")
-	b.WriteString(snakeName)
-	b.WriteString("(/* TODO: wasmimport params */)\n")
-
-	_, err := file.Write(b.Bytes())
-	if err != nil {
-		return err
+	if coreIsMethod {
+		stringio.Write(&b, "(self ", g.typeRep(file, selfType), ") ", coreName)
+	} else {
+		b.WriteString(coreName)
 	}
+	b.WriteRune('(')
+
+	// Emit params
+	ps = coreParams
+	if coreIsMethod {
+		ps = coreParams[1:]
+	}
+	for i, p := range ps {
+		if i > 0 {
+			b.WriteString(", ")
+		}
+		stringio.Write(&b, p.name, " ", p.rep)
+	}
+	b.WriteString(") ")
+
+	// Emit results
+	if len(coreResults) == 1 {
+		b.WriteString(coreResults[0].rep)
+	} else if len(coreResults) > 0 {
+		b.WriteRune('(')
+		for i, r := range coreResults {
+			if i > 0 {
+				b.WriteString(", ")
+			}
+			stringio.Write(&b, r.name, " ", r.rep)
+		}
+		b.WriteRune(')')
+	}
+	b.WriteString("\n\n")
+
+	// Write to file
+	file.Write(b.Bytes())
 
 	g.defined[f] = true
 
 	return g.ensureEmptyAsm(pkg)
+}
+
+type goParam struct {
+	name string
+	rep  string
+}
+
+func (g *generator) goParams(file *gen.File, scope gen.Scope, params []wit.Param) []goParam {
+	out := make([]goParam, len(params))
+	for i, p := range params {
+		if len(params) == 1 && p.Name == "" {
+			p.Name = "result"
+		}
+		out[i] = goParam{
+			name: scope.UniqueName(GoName(p.Name, false)),
+			rep:  g.typeRep(file, p.Type),
+		}
+	}
+	return out
 }
 
 func (g *generator) ensureEmptyAsm(pkg *gen.Package) error {
