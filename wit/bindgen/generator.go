@@ -692,55 +692,36 @@ func (g *generator) defineImportedFunction(f *wit.Function, ownerID wit.Ident) e
 	core := f.CoreFunction(false)
 	coreIsMethod := f.IsMethod() && core.Params[0] == f.Params[0]
 
-	var selfType *wit.TypeDef
-	var selfName string
-	var selfScope gen.Scope
-	var shortName string
+	var receiver *wit.TypeDef
 	var name string
 	var coreName string
 	switch f.Kind.(type) {
 	case *wit.Freestanding:
-		shortName = f.Name
 		name = file.Declare(GoName(f.Name, true))
 		coreName = file.Declare(SnakeName(f.Name))
 
 	case *wit.Constructor:
-		selfType = f.Type().(*wit.TypeDef)
-		selfScope = g.scopes[selfType]
-		selfName = g.typeDefNames[selfType]
-		name = file.Declare("New" + selfName)
-		// func new_typename(params...)
-		coreName = file.Declare("new_" + SnakeName(*selfType.Name))
+		t := f.Type().(*wit.TypeDef)
+		name = file.Declare("New" + g.typeDefNames[t])
+		coreName = file.Declare("new_" + SnakeName(*t.Name))
 
 	case *wit.Static:
-		selfType = f.Type().(*wit.TypeDef)
-		selfScope = g.scopes[selfType]
-		selfName = g.typeDefNames[selfType]
-		shortName = strings.TrimPrefix(f.Name, "[static]"+*selfType.Name+".")
-		name = file.Declare(selfName + GoName(shortName, true))
-		// func typename_name(params...)
-		coreName = file.Declare(SnakeName(*selfType.Name + "-" + shortName))
+		t := f.Type().(*wit.TypeDef)
+		name = file.Declare(g.typeDefNames[t] + GoName(f.BaseName(), true))
+		coreName = file.Declare(SnakeName(*t.Name + "-" + f.BaseName()))
 
 	case *wit.Method:
-		selfType = f.Type().(*wit.TypeDef)
-		selfScope = g.scopes[selfType]
-		shortName = strings.TrimPrefix(f.Name, "[method]"+*selfType.Name+".")
-		// TODO: the snake (wasmimport) function is not a method if flattened
-		name = selfScope.UniqueName(GoName(shortName, true))
-		if coreIsMethod {
-			// func (self *T) name(params...)
-			coreName = selfScope.UniqueName(SnakeName(shortName))
-		} else {
-			// Flattened, so it doesn't have a self param
-			// func typename_name(params...)
-			coreName = file.Declare(SnakeName(*selfType.Name + "-" + shortName))
+		receiver = f.Type().(*wit.TypeDef)
+		if receiver.Package().Name.Package != ownerID.Package {
+			return fmt.Errorf("cannot emit functions in package %s to type %s", ownerID.Package, receiver.Package().Name.String())
 		}
-	}
-	_ = selfScope
-
-	// Blow up if attempt to add methods or functions to a type in another package.
-	if selfType != nil && selfType.Package().Name.Package != ownerID.Package {
-		return fmt.Errorf("cannot emit functions in package %s to type %s", ownerID.Package, selfType.Package().Name.String())
+		scope := g.scopes[receiver]
+		name = scope.UniqueName(GoName(f.BaseName(), true))
+		if coreIsMethod {
+			coreName = scope.UniqueName(SnakeName(f.BaseName()))
+		} else {
+			coreName = file.Declare(SnakeName(*receiver.Name + "-" + f.BaseName()))
+		}
 	}
 
 	// Map WIT to Go
@@ -757,13 +738,13 @@ func (g *generator) defineImportedFunction(f *wit.Function, ownerID wit.Ident) e
 	// Emit documentation
 	stringio.Write(&b, "// ", name, " represents the ", f.WITKind(), " \"")
 	if f.IsFreestanding() {
-		stringio.Write(&b, ownerID.String(), "#", shortName)
+		stringio.Write(&b, ownerID.String(), "#", f.Name)
 	} else {
-		stringio.Write(&b, shortName)
+		stringio.Write(&b, f.BaseName())
 	}
 	b.WriteString("\".\n")
 	b.WriteString("//\n")
-	b.WriteString(gen.FormatDocComments(f.WIT(nil, shortName), true))
+	b.WriteString(gen.FormatDocComments(f.WIT(nil, f.BaseName()), true))
 	b.WriteString("//\n")
 	if f.Docs.Contents != "" {
 		b.WriteString("//\n")
@@ -774,7 +755,7 @@ func (g *generator) defineImportedFunction(f *wit.Function, ownerID wit.Ident) e
 	b.WriteString("//go:nosplit\n")
 	b.WriteString("func ")
 	if f.IsMethod() {
-		stringio.Write(&b, "(self ", g.typeRep(file, selfType), ") ", name)
+		stringio.Write(&b, "(self ", g.typeRep(file, receiver), ") ", name)
 	} else {
 		b.WriteString(name)
 	}
@@ -828,7 +809,7 @@ func (g *generator) defineImportedFunction(f *wit.Function, ownerID wit.Ident) e
 	b.WriteString("//go:noescape\n")
 	b.WriteString("func ")
 	if coreIsMethod {
-		stringio.Write(&b, "(self ", g.typeRep(file, selfType), ") ", coreName)
+		stringio.Write(&b, "(self ", g.typeRep(file, receiver), ") ", coreName)
 	} else {
 		b.WriteString(coreName)
 	}
