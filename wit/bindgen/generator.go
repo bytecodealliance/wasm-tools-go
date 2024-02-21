@@ -726,18 +726,14 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 	names := make(map[string]string)
 	funcParams := g.goParams(scope, names, f.Params)
 	funcResults := g.goParams(scope, names, f.Results)
-
 	var receiver wit.Param
 	if f.IsMethod() {
 		receiver = funcParams[0]
 		funcParams = funcParams[1:]
 	}
-
 	combined := append(funcParams, funcResults...)
-
 	coreParams := g.goParams(scope, names, core.Params)
 	coreResults := g.goParams(scope, names, core.Results)
-
 	if coreIsMethod {
 		coreParams = coreParams[1:]
 	}
