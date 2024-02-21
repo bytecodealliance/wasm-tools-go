@@ -227,6 +227,10 @@ type TypeDef struct {
 	Docs  Docs
 }
 
+// TypeName returns the [WIT] type name for t.
+// Returns an empty string if t is anonymous.
+//
+// [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
 func (t *TypeDef) TypeName() string {
 	if t.Name != nil {
 		return *t.Name
@@ -274,19 +278,6 @@ func (t *TypeDef) Constructor() *Function {
 	return constructor
 }
 
-// Methods returns all methods for [TypeDef] t.
-// Currently t must be a [Resource] to have methods.
-func (t *TypeDef) Methods() []*Function {
-	var methods []*Function
-	t.Owner.AllFunctions(func(f *Function) bool {
-		if m, ok := f.Kind.(*Method); ok && m.Type == t {
-			methods = append(methods, f)
-		}
-		return true
-	})
-	return methods
-}
-
 // StaticFunctions returns all static functions for [TypeDef] t.
 // Currently t must be a [Resource] to have static functions.
 func (t *TypeDef) StaticFunctions() []*Function {
@@ -298,6 +289,19 @@ func (t *TypeDef) StaticFunctions() []*Function {
 		return true
 	})
 	return statics
+}
+
+// Methods returns all methods for [TypeDef] t.
+// Currently t must be a [Resource] to have methods.
+func (t *TypeDef) Methods() []*Function {
+	var methods []*Function
+	t.Owner.AllFunctions(func(f *Function) bool {
+		if m, ok := f.Kind.(*Method); ok && m.Type == t {
+			methods = append(methods, f)
+		}
+		return true
+	})
+	return methods
 }
 
 // Size returns the byte size for values of type t.
@@ -1342,17 +1346,24 @@ type String struct{ _primitive[string] }
 // [function]: https://component-model.bytecodealliance.org/design/wit.html#functions
 type Function struct {
 	_worldItem
-	Name    string
-	Kind    FunctionKind
-	Params  []Param // arguments to the function
-	Results []Param // a function can have a single anonymous result, or > 1 named results
-	Docs    Docs
+	Name         string
+	Kind         FunctionKind
+	Params       []Param // arguments to the function
+	Results      []Param // a function can have a single anonymous result, or > 1 named results
+	Docs         Docs
+	CanonicalABI bool // implied in the Canonical ABI, like [resource-drop]
 }
 
 // BaseName returns the base name of [Function] f.
-// For instance, this function trims the "[method]type." prefix.
-// If f is a standalone function (e.g. not a method, constructor, or static function) this will return the function name unchanged.
+// For static functions, this returns the function name unchanged.
+// For constructors, this removes the [constructor] and type prefix.
+// For static functions, this removes the [static] and type prefix.
+// For methods, this removes the [method] and type prefix.
+// For special functions like [resource-drop], it will return a well-known value.
 func (f *Function) BaseName() string {
+	if strings.HasPrefix(f.Name, "[resource-drop]") {
+		return "resource-drop"
+	}
 	if _, after, found := strings.Cut(f.Name, "."); found {
 		return after
 	}

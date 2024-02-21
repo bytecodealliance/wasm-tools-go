@@ -71,6 +71,24 @@ const (
 	MaxFlatResults = 1
 )
 
+// ResourceDrop returns the implied [resource-drop] method for t.
+// If t is not a [Resource], this returns nil.
+//
+// [resource-drop]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#canon-resourcedrop
+func (t *TypeDef) ResourceDrop() *Function {
+	if _, ok := t.Kind.(*Resource); !ok {
+		return nil
+	}
+	f := &Function{
+		Name:         "[resource-drop]" + t.TypeName(),
+		Kind:         &Method{Type: t},
+		Params:       []Param{{Name: "self", Type: t}},
+		Docs:         Docs{Contents: "Drops a resource handle."},
+		CanonicalABI: true,
+	}
+	return f
+}
+
 // CoreFunction returns a [Core WebAssembly function] of [Function] f.
 // Its params and results may be [flattened] according to the Canonical ABI specification.
 // The flattening rules vary based on whether the returned function is imported or exported,
