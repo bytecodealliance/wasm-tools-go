@@ -97,7 +97,11 @@ func (f *File) Bytes() ([]byte, error) {
 
 	b.Write(f.Content)
 
-	return format.Source(b.Bytes())
+	formatted, err := format.Source(b.Bytes())
+	if err != nil {
+		return nil, fmt.Errorf("gofmt error in %s/%s: %w", f.Package.Path, f.Name, err)
+	}
+	return formatted, nil
 }
 
 // Declare adds a package-scoped identifier to [File] f.
