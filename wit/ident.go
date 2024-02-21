@@ -52,14 +52,12 @@ func ParseIdent(s string) (Ident, error) {
 }
 
 // Validate validates id, returning any errors.
-// TODO: finish this.
 func (id *Ident) Validate() error {
 	switch {
 	case id.Namespace == "":
 		return errors.New("missing package namespace")
 	case id.Package == "":
 		return errors.New("missing package name")
-		// TODO: other validations
 	}
 	return nil
 }

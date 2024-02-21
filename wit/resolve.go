@@ -1346,12 +1346,11 @@ type String struct{ _primitive[string] }
 // [function]: https://component-model.bytecodealliance.org/design/wit.html#functions
 type Function struct {
 	_worldItem
-	Name         string
-	Kind         FunctionKind
-	Params       []Param // arguments to the function
-	Results      []Param // a function can have a single anonymous result, or > 1 named results
-	Docs         Docs
-	CanonicalABI bool // implied in the Canonical ABI, like [resource-drop]
+	Name    string
+	Kind    FunctionKind
+	Params  []Param // arguments to the function
+	Results []Param // a function can have a single anonymous result, or > 1 named results
+	Docs    Docs
 }
 
 // BaseName returns the base name of [Function] f.
@@ -1383,6 +1382,15 @@ func (f *Function) Type() Type {
 	default:
 		return nil
 	}
+}
+
+// IsAdmin returns true if [Function] f is an administrative function in the Canonical ABI.
+func (f *Function) IsAdmin() bool {
+	if f.IsMethod() && strings.HasPrefix(f.Name, "[resource-drop]") {
+		return true
+	}
+	// TODO: add other administrative functions, like resource-rep, dtor, etc.
+	return false
 }
 
 // IsFreestanding returns true if [Function] f is a freestanding function,

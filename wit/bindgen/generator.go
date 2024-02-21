@@ -727,16 +727,16 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 	// Organize function parameters and results
 	scope := gen.NewScope(file)
 	names := make(map[string]string)
-	funcParams := g.goParams(scope, names, f.Params)
-	funcResults := g.goParams(scope, names, f.Results)
+	funcParams := goParams(scope, names, f.Params)
+	funcResults := goParams(scope, names, f.Results)
 	var receiver wit.Param
 	if f.IsMethod() {
 		receiver = funcParams[0]
 		funcParams = funcParams[1:]
 	}
 	combined := append(funcParams, funcResults...)
-	coreParams := g.goParams(scope, names, core.Params)
-	coreResults := g.goParams(scope, names, core.Results)
+	coreParams := goParams(scope, names, core.Params)
+	coreResults := goParams(scope, names, core.Results)
 	if coreIsMethod {
 		coreParams = coreParams[1:]
 	}
@@ -868,7 +868,7 @@ func isPointer(t wit.Type) bool {
 // goParams adapts WIT params to Go params, with a special case for the unnamed single result.
 // It accepts a scope and string map to map WIT names to Go names.
 // The resulting slice of [wit.Param] replaces the WIT names with valid, scoped Go names.
-func (g *generator) goParams(scope gen.Scope, names map[string]string, params []wit.Param) []wit.Param {
+func goParams(scope gen.Scope, names map[string]string, params []wit.Param) []wit.Param {
 	params = slices.Clone(params)
 	if len(params) == 1 && params[0].Name == "" {
 		params[0].Name = "result"
@@ -886,7 +886,7 @@ func (g *generator) goParams(scope gen.Scope, names map[string]string, params []
 func (g *generator) functionDocs(owner wit.Ident, f *wit.Function, name string) string {
 	var b strings.Builder
 	kind := f.WITKind()
-	if f.CanonicalABI {
+	if f.IsAdmin() {
 		kind = "the Canonical ABI function"
 	}
 	stringio.Write(&b, "// ", name, " represents ", kind, " \"")
@@ -901,7 +901,7 @@ func (g *generator) functionDocs(owner wit.Ident, f *wit.Function, name string) 
 		b.WriteString(formatDocComments(f.Docs.Contents, false))
 	}
 	b.WriteString("//\n")
-	if !f.CanonicalABI {
+	if !f.IsAdmin() {
 		w := strings.TrimSuffix(f.WIT(nil, f.BaseName()), ";")
 		b.WriteString(formatDocComments(w, true))
 	}

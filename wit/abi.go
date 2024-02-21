@@ -80,11 +80,10 @@ func (t *TypeDef) ResourceDrop() *Function {
 		return nil
 	}
 	f := &Function{
-		Name:         "[resource-drop]" + t.TypeName(),
-		Kind:         &Method{Type: t},
-		Params:       []Param{{Name: "self", Type: t}},
-		Docs:         Docs{Contents: "Drops a resource handle."},
-		CanonicalABI: true,
+		Name:   "[resource-drop]" + t.TypeName(),
+		Kind:   &Method{Type: t},
+		Params: []Param{{Name: "self", Type: t}},
+		Docs:   Docs{Contents: "Drops a resource handle."},
 	}
 	return f
 }
