@@ -695,17 +695,17 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 	switch f.Kind.(type) {
 	case *wit.Freestanding:
 		funcName = file.Declare(GoName(f.BaseName(), true))
-		coreName = file.Declare(GoName(f.BaseName(), false))
+		coreName = file.Declare("wasmimport" + funcName)
 
 	case *wit.Constructor:
 		t := f.Type().(*wit.TypeDef)
 		funcName = file.Declare("New" + g.typeDefNames[t])
-		coreName = file.Declare("new" + g.typeDefNames[t])
+		coreName = file.Declare("wasmimport" + funcName)
 
 	case *wit.Static:
 		t := f.Type().(*wit.TypeDef)
 		funcName = file.Declare(g.typeDefNames[t] + GoName(f.BaseName(), true))
-		coreName = file.Declare(GoName(*t.Name+"-"+f.BaseName(), false))
+		coreName = file.Declare("wasmimport" + funcName)
 
 	case *wit.Method:
 		t := f.Type().(*wit.TypeDef)
@@ -715,9 +715,9 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 		scope := g.scopes[t]
 		funcName = scope.UniqueName(GoName(f.BaseName(), true))
 		if coreIsMethod {
-			coreName = scope.UniqueName(GoName(f.BaseName(), false))
+			coreName = scope.UniqueName("wasmimport" + funcName)
 		} else {
-			coreName = file.Declare(GoName(*t.Name+"-"+f.BaseName(), false))
+			coreName = file.Declare("wasmimport" + g.typeDefNames[t] + funcName)
 		}
 	}
 
