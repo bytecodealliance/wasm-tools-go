@@ -722,22 +722,21 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 	}
 
 	// Organize function parameters and results
-	funcScope := gen.NewScope(file)
-	funcParams := g.goParams(file, funcScope, f.Params)
-	funcResults := g.goParams(file, funcScope, f.Results)
+	scope := gen.NewScope(file)
+	names := make(map[string]string)
+	funcParams := g.goParams(scope, names, f.Params)
+	funcResults := g.goParams(scope, names, f.Results)
 
-	var receiverName, receiverRep string
+	var receiver wit.Param
 	if f.IsMethod() {
-		receiverName = funcParams[0].name
-		receiverRep = funcParams[0].rep
+		receiver = funcParams[0]
 		funcParams = funcParams[1:]
 	}
 
 	combined := append(funcParams, funcResults...)
 
-	coreScope := gen.NewScope(file)
-	coreParams := g.goParams(file, coreScope, core.Params)
-	coreResults := g.goParams(file, coreScope, core.Results)
+	coreParams := g.goParams(scope, names, core.Params)
+	coreResults := g.goParams(scope, names, core.Results)
 
 	if coreIsMethod {
 		coreParams = coreParams[1:]
@@ -750,7 +749,7 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 	b.WriteString("//go:nosplit\n")
 	b.WriteString("func ")
 	if f.IsMethod() {
-		stringio.Write(&b, "(", receiverName, " ", receiverRep, ") ", funcName)
+		stringio.Write(&b, "(", receiver.Name, " ", g.typeRep(file, receiver.Type), ") ", funcName)
 	} else {
 		b.WriteString(funcName)
 	}
@@ -761,20 +760,20 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 		if i > 0 {
 			b.WriteString(", ")
 		}
-		stringio.Write(&b, p.name, " ", p.rep)
+		stringio.Write(&b, p.Name, " ", g.typeRep(file, p.Type))
 	}
 	b.WriteString(") ")
 
 	// Emit results
 	if len(funcResults) == 1 {
-		b.WriteString(funcResults[0].rep)
+		b.WriteString(g.typeRep(file, funcResults[0].Type))
 	} else if len(funcResults) > 0 {
 		b.WriteRune('(')
 		for i, r := range funcResults {
 			if i > 0 {
 				b.WriteString(", ")
 			}
-			stringio.Write(&b, r.name, " ", r.rep)
+			stringio.Write(&b, r.Name, " ", g.typeRep(file, r.Type))
 		}
 		b.WriteRune(')')
 	}
@@ -784,23 +783,23 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 	sameResults := slices.Equal(funcResults, coreResults)
 	if !sameResults {
 		for _, r := range funcResults {
-			stringio.Write(&b, "var ", r.name, " ", r.rep, "\n")
+			stringio.Write(&b, "var ", r.Name, " ", g.typeRep(file, r.Type), "\n")
 		}
 	} else if len(coreResults) > 0 {
 		b.WriteString("return ")
 	}
 	if coreIsMethod {
-		stringio.Write(&b, receiverName, ".")
+		stringio.Write(&b, receiver.Name, ".")
 	}
 	stringio.Write(&b, coreName, "(")
 	for i, p := range coreParams {
 		if i > 0 {
 			b.WriteString(", ")
 		}
-		if p.rep[0] == '*' {
+		if isPointer(p.Type) {
 			b.WriteRune('&')
 		}
-		b.WriteString(combined[i].name)
+		b.WriteString(combined[i].Name)
 	}
 	b.WriteString(")\n")
 	if !sameResults {
@@ -809,7 +808,7 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 			if i > 0 {
 				b.WriteString(", ")
 			}
-			b.WriteString(r.name)
+			b.WriteString(r.Name)
 		}
 		b.WriteRune('\n')
 	}
@@ -820,7 +819,7 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 	b.WriteString("//go:noescape\n")
 	b.WriteString("func ")
 	if coreIsMethod {
-		stringio.Write(&b, "(", receiverName, " ", receiverRep, ") ", coreName)
+		stringio.Write(&b, "(", receiver.Name, " ", g.typeRep(file, receiver.Type), ") ", coreName)
 	} else {
 		b.WriteString(coreName)
 	}
@@ -831,20 +830,20 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 		if i > 0 {
 			b.WriteString(", ")
 		}
-		stringio.Write(&b, p.name, " ", p.rep)
+		stringio.Write(&b, p.Name, " ", g.typeRep(file, p.Type))
 	}
 	b.WriteString(") ")
 
 	// Emit results
 	if len(coreResults) == 1 {
-		b.WriteString(coreResults[0].rep)
+		b.WriteString(g.typeRep(file, coreResults[0].Type))
 	} else if len(coreResults) > 0 {
 		b.WriteRune('(')
 		for i, r := range coreResults {
 			if i > 0 {
 				b.WriteString(", ")
 			}
-			stringio.Write(&b, r.name, " ", r.rep)
+			stringio.Write(&b, r.Name, " ", g.typeRep(file, r.Type))
 		}
 		b.WriteRune(')')
 	}
@@ -858,23 +857,33 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 	return g.ensureEmptyAsm(file.Package)
 }
 
+func isPointer(t wit.Type) bool {
+	if td, ok := t.(*wit.TypeDef); ok {
+		if _, ok := td.Kind.(*wit.Pointer); ok {
+			return true
+		}
+	}
+	return false
+}
+
 type goParam struct {
 	name string
 	rep  string
 }
 
-func (g *generator) goParams(file *gen.File, scope gen.Scope, params []wit.Param) []goParam {
-	out := make([]goParam, len(params))
-	for i, p := range params {
-		if len(params) == 1 && p.Name == "" {
-			p.Name = "result"
-		}
-		out[i] = goParam{
-			name: scope.UniqueName(GoName(p.Name, false)),
-			rep:  g.typeRep(file, p.Type),
-		}
+func (g *generator) goParams(scope gen.Scope, names map[string]string, params []wit.Param) []wit.Param {
+	params = slices.Clone(params)
+	if len(params) == 1 && params[0].Name == "" {
+		params[0].Name = "result"
 	}
-	return out
+	for i := range params {
+		p := &params[i]
+		if names[p.Name] == "" {
+			names[p.Name] = scope.UniqueName(GoName(p.Name, false))
+		}
+		p.Name = names[p.Name]
+	}
+	return params
 }
 
 func (g *generator) functionDocs(owner wit.Ident, f *wit.Function, name string) string {
