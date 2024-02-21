@@ -786,7 +786,7 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 		for _, r := range funcResults {
 			stringio.Write(&b, "var ", r.name, " ", r.rep, "\n")
 		}
-	} else {
+	} else if len(coreResults) > 0 {
 		b.WriteString("return ")
 	}
 	if coreIsMethod {
