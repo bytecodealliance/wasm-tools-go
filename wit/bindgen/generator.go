@@ -329,16 +329,18 @@ func (g *generator) defineTypeDef(t *wit.TypeDef, name string) error {
 	file := g.fileFor(owner)
 
 	// Define the type
-	fmt.Fprintf(file, "// %s represents the %s \"%s#%s\".\n", goName, t.WITKind(), owner.String(), name)
-	fmt.Fprintf(file, "//\n")
-	fmt.Fprint(file, gen.FormatDocComments(t.WIT(nil, ""), true))
-	fmt.Fprintf(file, "//\n")
-	if t.Docs.Contents != "" {
-		fmt.Fprintf(file, "//\n%s", gen.FormatDocComments(t.Docs.Contents, false))
+	var b bytes.Buffer
+	stringio.Write(&b, "// ", goName, " represents the ", t.WITKind(), "\"", owner.String(), "#", name, "\".\n")
+	b.WriteString("//\n")
+	b.WriteString(gen.FormatDocComments(t.Docs.Contents, false))
+	b.WriteString("//\n")
+	b.WriteString(gen.FormatDocComments(t.WIT(nil, ""), true))
+	stringio.Write(&b, "type ", goName, " ", g.typeDefRep(file, goName, t), "\n\n")
+
+	_, err := file.Write(b.Bytes())
+	if err != nil {
+		return err
 	}
-	fmt.Fprintf(file, "type %s ", goName)
-	fmt.Fprint(file, g.typeDefRep(file, goName, t))
-	fmt.Fprint(file, "\n\n")
 
 	g.defined[t] = true
 
@@ -854,13 +856,14 @@ func (g *generator) functionDocs(owner wit.Ident, f *wit.Function, name string) 
 		stringio.Write(&b, f.BaseName())
 	}
 	b.WriteString("\".\n")
-	b.WriteString("//\n")
-	b.WriteString(gen.FormatDocComments(f.WIT(nil, f.BaseName()), true))
-	b.WriteString("//\n")
 	if f.Docs.Contents != "" {
 		b.WriteString("//\n")
 		b.WriteString(gen.FormatDocComments(f.Docs.Contents, false))
 	}
+	b.WriteString("//\n")
+	w := strings.TrimSuffix(f.WIT(nil, f.BaseName()), ";")
+	b.WriteString(gen.FormatDocComments(w, true))
+
 	return b.String()
 }
 
