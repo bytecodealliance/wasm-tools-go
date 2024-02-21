@@ -99,7 +99,7 @@ func (f *File) Bytes() ([]byte, error) {
 
 	formatted, err := format.Source(b.Bytes())
 	if err != nil {
-		return nil, fmt.Errorf("gofmt error in %s/%s: %w", f.Package.Path, f.Name, err)
+		return b.Bytes(), err // Return unformatted Go for debugging
 	}
 	return formatted, nil
 }

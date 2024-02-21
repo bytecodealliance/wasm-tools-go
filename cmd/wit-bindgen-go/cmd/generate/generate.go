@@ -97,13 +97,17 @@ func action(ctx context.Context, cmd *cli.Command) error {
 				return err
 			}
 
+			path := filepath.Join(dir, file.Name)
+
 			b, err := file.Bytes()
 			if err != nil {
-				return err
+				if b == nil {
+					return err
+				}
+				fmt.Fprintf(os.Stderr, "Error formatting file %s: %v\n", path, err)
+			} else {
+				fmt.Fprintf(os.Stderr, "Generated file: %s\n", path)
 			}
-
-			path := filepath.Join(dir, file.Name)
-			fmt.Fprintf(os.Stderr, "Generated file: %s\n", path)
 
 			if dryRun {
 				fmt.Println(string(b))
