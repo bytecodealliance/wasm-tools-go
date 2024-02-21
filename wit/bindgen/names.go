@@ -62,6 +62,7 @@ func notLetterDigit(c rune) bool {
 var Segments = map[string]string{
 	"datetime": "dateTime",
 	"filesize": "fileSize",
+	"readlink": "readLink",
 }
 
 // ExportedSegments maps common WASI identifier segments to opinionated exported Go equivalents.
@@ -70,4 +71,5 @@ var ExportedSegments = map[string]string{
 	"filesize": "FileSize",
 	"ipv4":     "IPv4",
 	"ipv6":     "IPv6",
+	"readlink": "ReadLink",
 }
