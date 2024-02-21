@@ -771,7 +771,7 @@ func (self Descriptor) OpenAt(
 //go:wasmimport wasi:filesystem/types@0.2.0 [method]descriptor.open-at
 func (self Descriptor) open_at(pathFlags PathFlags, path string, openFlags OpenFlags, flags DescriptorFlags, result *cm.OKSizedResult[Descriptor, ErrorCode])
 
-// ReadLinkAt represents the resource method "read-link-at".
+// ReadLinkAt represents the resource method "readlink-at".
 //
 // Read the contents of a symbolic link.
 //
@@ -787,7 +787,7 @@ func (self Descriptor) ReadLinkAt(
 	return
 }
 
-//go:wasmimport wasi:filesystem/types@0.2.0 [method]descriptor.read-link-at
+//go:wasmimport wasi:filesystem/types@0.2.0 [method]descriptor.readlink-at
 func (self Descriptor) read_link_at(path string, result *cm.OKSizedResult[string, ErrorCode])
 
 // RemoveDirectoryAt represents the resource method "remove-directory-at".
