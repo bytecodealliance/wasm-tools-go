@@ -1,16 +1,11 @@
 package gen
 
-import (
-	"go/ast"
-)
-
 // UniqueName tests name against filters and modifies name until all filters return false.
 // Use IsReserved to filter out Go keywords and predeclared identifiers.
 //
 // Exported names that start with a capital letter will be appended with an underscore.
 // Non-exported names are prefixed with an underscore.
 func UniqueName(name string, filters ...func(string) bool) string {
-	isExported := ast.IsExported(name)
 	filter := func(name string) bool {
 		for _, f := range filters {
 			if f(name) {
@@ -20,11 +15,7 @@ func UniqueName(name string, filters ...func(string) bool) string {
 		return false
 	}
 	for filter(name) {
-		if isExported {
-			name += "_"
-		} else {
-			name = "_" + name
-		}
+		name += "_"
 	}
 	return name
 }
