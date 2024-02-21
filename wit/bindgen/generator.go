@@ -682,16 +682,21 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 
 	file := g.fileFor(owner)
 
-	// Setup
+	// Get the Core WebAssembly function
 	core := f.CoreFunction(false)
-	coreIsMethod := f.IsMethod() && core.Params[0] == f.Params[0]
+
+	// It may have been flattened, and no longer a method
+	if f.IsMethod() && core.Params[0] != f.Params[0] {
+		core.Kind = &wit.Freestanding{}
+		core.Name = core.BaseName()
+	}
 
 	var funcName string
 	var coreName string
 	switch f.Kind.(type) {
 	case *wit.Freestanding:
-		funcName = file.Declare(GoName(f.Name, true))
-		coreName = file.Declare(SnakeName(f.Name))
+		funcName = file.Declare(GoName(f.BaseName(), true))
+		coreName = file.Declare(SnakeName(f.BaseName()))
 
 	case *wit.Constructor:
 		t := f.Type().(*wit.TypeDef)
@@ -710,7 +715,7 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 		}
 		scope := g.scopes[t]
 		funcName = scope.UniqueName(GoName(f.BaseName(), true))
-		if coreIsMethod {
+		if core.IsMethod() {
 			coreName = scope.UniqueName(SnakeName(f.BaseName()))
 		} else {
 			coreName = file.Declare(SnakeName(*t.Name + "-" + f.BaseName()))
@@ -785,7 +790,7 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 	stringio.Write(&b, "//go:wasmimport ", owner.String(), " ", f.Name, "\n")
 	b.WriteString("//go:noescape\n")
 	b.WriteString("func ")
-	if coreIsMethod {
+	if core.IsMethod() {
 		stringio.Write(&b, "(", coreParams[0].name, " ", coreParams[0].rep, ") ", coreName)
 	} else {
 		b.WriteString(coreName)
@@ -794,7 +799,7 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 
 	// Emit params
 	params = coreParams
-	if coreIsMethod {
+	if core.IsMethod() {
 		params = coreParams[1:]
 	}
 	for i, p := range params {
