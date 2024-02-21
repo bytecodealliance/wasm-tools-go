@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -717,13 +718,27 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 		}
 	}
 
+	// Organize function parameters and results
 	funcScope := gen.NewScope(file)
 	funcParams := g.goParams(file, funcScope, f.Params)
 	funcResults := g.goParams(file, funcScope, f.Results)
 
+	var receiverName, receiverRep string
+	if f.IsMethod() {
+		receiverName = funcParams[0].name
+		receiverRep = funcParams[0].rep
+		funcParams = funcParams[1:]
+	}
+
+	combined := append(funcParams, funcResults...)
+
 	coreScope := gen.NewScope(file)
 	coreParams := g.goParams(file, coreScope, core.Params)
 	coreResults := g.goParams(file, coreScope, core.Results)
+
+	if coreIsMethod {
+		coreParams = coreParams[1:]
+	}
 
 	var b bytes.Buffer
 
@@ -732,18 +747,14 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 	b.WriteString("//go:nosplit\n")
 	b.WriteString("func ")
 	if f.IsMethod() {
-		stringio.Write(&b, "(", funcParams[0].name, " ", funcParams[0].rep, ") ", funcName)
+		stringio.Write(&b, "(", receiverName, " ", receiverRep, ") ", funcName)
 	} else {
 		b.WriteString(funcName)
 	}
 	b.WriteRune('(')
 
 	// Emit params
-	params := funcParams
-	if f.IsMethod() {
-		params = funcParams[1:]
-	}
-	for i, p := range params {
+	for i, p := range funcParams {
 		if i > 0 {
 			b.WriteString(", ")
 		}
@@ -767,18 +778,38 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 
 	// Emit function body
 	b.WriteString(" {\n")
-	for _, r := range funcResults {
-		stringio.Write(&b, "var ", r.name, " ", r.rep, "\n")
+	sameResults := slices.Equal(funcResults, coreResults)
+	if !sameResults {
+		for _, r := range funcResults {
+			stringio.Write(&b, "var ", r.name, " ", r.rep, "\n")
+		}
+	} else {
+		b.WriteString("return ")
 	}
-	b.WriteString("// TODO: call the wasmimport function\n")
-	b.WriteString("return ")
-	for i, r := range funcResults {
+	if coreIsMethod {
+		stringio.Write(&b, receiverName, ".")
+	}
+	stringio.Write(&b, coreName, "(")
+	for i, p := range coreParams {
 		if i > 0 {
 			b.WriteString(", ")
 		}
-		b.WriteString(r.name)
+		if p.rep[0] == '*' {
+			b.WriteRune('&')
+		}
+		b.WriteString(combined[i].name)
 	}
-	b.WriteRune('\n')
+	b.WriteString(")\n")
+	if !sameResults {
+		b.WriteString("return ")
+		for i, r := range funcResults {
+			if i > 0 {
+				b.WriteString(", ")
+			}
+			b.WriteString(r.name)
+		}
+		b.WriteRune('\n')
+	}
 	b.WriteString("}\n\n")
 
 	// Emit wasmimport function
@@ -786,18 +817,14 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 	b.WriteString("//go:noescape\n")
 	b.WriteString("func ")
 	if coreIsMethod {
-		stringio.Write(&b, "(", coreParams[0].name, " ", coreParams[0].rep, ") ", coreName)
+		stringio.Write(&b, "(", receiverName, " ", receiverRep, ") ", coreName)
 	} else {
 		b.WriteString(coreName)
 	}
 	b.WriteRune('(')
 
 	// Emit params
-	params = coreParams
-	if coreIsMethod {
-		params = coreParams[1:]
-	}
-	for i, p := range params {
+	for i, p := range coreParams {
 		if i > 0 {
 			b.WriteString(", ")
 		}
