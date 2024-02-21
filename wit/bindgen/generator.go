@@ -684,41 +684,40 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 	core := f.CoreFunction(false)
 	coreIsMethod := f.IsMethod() && core.Params[0] == f.Params[0]
 
-	var receiver *wit.TypeDef
-	var name string
+	var funcName string
 	var coreName string
 	switch f.Kind.(type) {
 	case *wit.Freestanding:
-		name = file.Declare(GoName(f.Name, true))
+		funcName = file.Declare(GoName(f.Name, true))
 		coreName = file.Declare(SnakeName(f.Name))
 
 	case *wit.Constructor:
 		t := f.Type().(*wit.TypeDef)
-		name = file.Declare("New" + g.typeDefNames[t])
+		funcName = file.Declare("New" + g.typeDefNames[t])
 		coreName = file.Declare("new_" + SnakeName(*t.Name))
 
 	case *wit.Static:
 		t := f.Type().(*wit.TypeDef)
-		name = file.Declare(g.typeDefNames[t] + GoName(f.BaseName(), true))
+		funcName = file.Declare(g.typeDefNames[t] + GoName(f.BaseName(), true))
 		coreName = file.Declare(SnakeName(*t.Name + "-" + f.BaseName()))
 
 	case *wit.Method:
-		receiver = f.Type().(*wit.TypeDef)
-		if receiver.Package().Name.Package != owner.Package {
-			return fmt.Errorf("cannot emit functions in package %s to type %s", owner.Package, receiver.Package().Name.String())
+		t := f.Type().(*wit.TypeDef)
+		if t.Package().Name.Package != owner.Package {
+			return fmt.Errorf("cannot emit functions in package %s to type %s", owner.Package, t.Package().Name.String())
 		}
-		scope := g.scopes[receiver]
-		name = scope.UniqueName(GoName(f.BaseName(), true))
+		scope := g.scopes[t]
+		funcName = scope.UniqueName(GoName(f.BaseName(), true))
 		if coreIsMethod {
 			coreName = scope.UniqueName(SnakeName(f.BaseName()))
 		} else {
-			coreName = file.Declare(SnakeName(*receiver.Name + "-" + f.BaseName()))
+			coreName = file.Declare(SnakeName(*t.Name + "-" + f.BaseName()))
 		}
 	}
 
 	funcScope := gen.NewScope(file)
-	params := g.goParams(file, funcScope, f.Params)
-	results := g.goParams(file, funcScope, f.Results)
+	funcParams := g.goParams(file, funcScope, f.Params)
+	funcResults := g.goParams(file, funcScope, f.Results)
 
 	coreScope := gen.NewScope(file)
 	coreParams := g.goParams(file, coreScope, core.Params)
@@ -726,38 +725,23 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 
 	var b bytes.Buffer
 
-	// Emit documentation
-	stringio.Write(&b, "// ", name, " represents the ", f.WITKind(), " \"")
-	if f.IsFreestanding() {
-		stringio.Write(&b, owner.String(), "#", f.Name)
-	} else {
-		stringio.Write(&b, f.BaseName())
-	}
-	b.WriteString("\".\n")
-	b.WriteString("//\n")
-	b.WriteString(gen.FormatDocComments(f.WIT(nil, f.BaseName()), true))
-	b.WriteString("//\n")
-	if f.Docs.Contents != "" {
-		b.WriteString("//\n")
-		b.WriteString(gen.FormatDocComments(f.Docs.Contents, false))
-	}
-
-	// Emit exported Go function
+	// Emit Go function
+	b.WriteString(g.functionDocs(owner, f, funcName))
 	b.WriteString("//go:nosplit\n")
 	b.WriteString("func ")
 	if f.IsMethod() {
-		stringio.Write(&b, "(self ", g.typeRep(file, receiver), ") ", name)
+		stringio.Write(&b, "(", funcParams[0].name, " ", funcParams[0].rep, ") ", funcName)
 	} else {
-		b.WriteString(name)
+		b.WriteString(funcName)
 	}
 	b.WriteRune('(')
 
 	// Emit params
-	ps := params
+	params := funcParams
 	if f.IsMethod() {
-		ps = params[1:]
+		params = funcParams[1:]
 	}
-	for i, p := range ps {
+	for i, p := range params {
 		if i > 0 {
 			b.WriteString(", ")
 		}
@@ -766,11 +750,11 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 	b.WriteString(") ")
 
 	// Emit results
-	if len(results) == 1 {
-		b.WriteString(results[0].rep)
-	} else if len(results) > 0 {
+	if len(funcResults) == 1 {
+		b.WriteString(funcResults[0].rep)
+	} else if len(funcResults) > 0 {
 		b.WriteRune('(')
-		for i, r := range results {
+		for i, r := range funcResults {
 			if i > 0 {
 				b.WriteString(", ")
 			}
@@ -781,12 +765,12 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 
 	// Emit function body
 	b.WriteString(" {\n")
-	for _, r := range results {
+	for _, r := range funcResults {
 		stringio.Write(&b, "var ", r.name, " ", r.rep, "\n")
 	}
 	b.WriteString("// TODO: call the wasmimport function\n")
 	b.WriteString("return ")
-	for i, r := range results {
+	for i, r := range funcResults {
 		if i > 0 {
 			b.WriteString(", ")
 		}
@@ -800,18 +784,18 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 	b.WriteString("//go:noescape\n")
 	b.WriteString("func ")
 	if coreIsMethod {
-		stringio.Write(&b, "(self ", g.typeRep(file, receiver), ") ", coreName)
+		stringio.Write(&b, "(", coreParams[0].name, " ", coreParams[0].rep, ") ", coreName)
 	} else {
 		b.WriteString(coreName)
 	}
 	b.WriteRune('(')
 
 	// Emit params
-	ps = coreParams
+	params = coreParams
 	if coreIsMethod {
-		ps = coreParams[1:]
+		params = coreParams[1:]
 	}
-	for i, p := range ps {
+	for i, p := range params {
 		if i > 0 {
 			b.WriteString(", ")
 		}
@@ -859,6 +843,25 @@ func (g *generator) goParams(file *gen.File, scope gen.Scope, params []wit.Param
 		}
 	}
 	return out
+}
+
+func (g *generator) functionDocs(owner wit.Ident, f *wit.Function, name string) string {
+	var b strings.Builder
+	stringio.Write(&b, "// ", name, " represents the ", f.WITKind(), " \"")
+	if f.IsFreestanding() {
+		stringio.Write(&b, owner.String(), "#", f.Name)
+	} else {
+		stringio.Write(&b, f.BaseName())
+	}
+	b.WriteString("\".\n")
+	b.WriteString("//\n")
+	b.WriteString(gen.FormatDocComments(f.WIT(nil, f.BaseName()), true))
+	b.WriteString("//\n")
+	if f.Docs.Contents != "" {
+		b.WriteString("//\n")
+		b.WriteString(gen.FormatDocComments(f.Docs.Contents, false))
+	}
+	return b.String()
 }
 
 func (g *generator) ensureEmptyAsm(pkg *gen.Package) error {
