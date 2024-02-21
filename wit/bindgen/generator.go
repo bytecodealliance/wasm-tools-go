@@ -234,9 +234,7 @@ func (g *generator) defineWorld(w *wit.World) error {
 	id.Extension = w.Name
 	pkg := g.packageFor(id)
 	g.worldPackages[w] = pkg
-
-	file := pkg.File(id.Extension + GoSuffix)
-	file.GeneratedBy = g.opts.generatedBy
+	file := g.fileFor(id)
 
 	var b strings.Builder
 	fmt.Fprintf(&b, "Package %s represents the %s \"%s\".\n", pkg.Name, w.WITKind(), id.String())
@@ -283,9 +281,7 @@ func (g *generator) defineInterface(i *wit.Interface, name string) error {
 	id.Extension = name
 	pkg := g.packageFor(id)
 	g.interfacePackages[i] = pkg
-
-	file := pkg.File(id.Extension + GoSuffix)
-	file.GeneratedBy = g.opts.generatedBy
+	file := g.fileFor(id)
 
 	var b strings.Builder
 	fmt.Fprintf(&b, "Package %s represents the %s \"%s\".\n", pkg.Name, i.WITKind(), id.String())
@@ -329,10 +325,8 @@ func (g *generator) defineTypeDef(t *wit.TypeDef, name string) error {
 	if pkg == nil || goName == "" {
 		return fmt.Errorf("typedef %s not declared", name)
 	}
-
 	ownerID := typeDefOwnerID(t)
-	file := pkg.File(ownerID.Extension + GoSuffix)
-	file.GeneratedBy = g.opts.generatedBy
+	file := g.fileFor(ownerID)
 
 	// Define the type
 	fmt.Fprintf(file, "// %s represents the %s \"%s#%s\".\n", goName, t.WITKind(), ownerID.String(), name)
@@ -684,13 +678,19 @@ func (g *generator) defineImportedFunction(f *wit.Function, ownerID wit.Ident) e
 		return nil
 	}
 
-	pkg := g.packageFor(ownerID)
-	file := pkg.File(ownerID.Extension + GoSuffix)
-	file.GeneratedBy = g.opts.generatedBy
+	file := g.fileFor(ownerID)
 
-	// TODO: handle exported functions
+	// Setup
 	core := f.CoreFunction(false)
 	coreIsMethod := f.IsMethod() && core.Params[0] == f.Params[0]
+
+	funcScope := gen.NewScope(file)
+	params := g.goParams(file, funcScope, f.Params)
+	results := g.goParams(file, funcScope, f.Results)
+
+	coreScope := gen.NewScope(file)
+	coreParams := g.goParams(file, coreScope, core.Params)
+	coreResults := g.goParams(file, coreScope, core.Results)
 
 	var receiver *wit.TypeDef
 	var name string
@@ -723,15 +723,6 @@ func (g *generator) defineImportedFunction(f *wit.Function, ownerID wit.Ident) e
 			coreName = file.Declare(SnakeName(*receiver.Name + "-" + f.BaseName()))
 		}
 	}
-
-	// Map WIT to Go
-	funcScope := gen.NewScope(file)
-	params := g.goParams(file, funcScope, f.Params)
-	results := g.goParams(file, funcScope, f.Results)
-
-	coreScope := gen.NewScope(file)
-	coreParams := g.goParams(file, coreScope, core.Params)
-	coreResults := g.goParams(file, coreScope, core.Results)
 
 	var b bytes.Buffer
 
@@ -848,7 +839,7 @@ func (g *generator) defineImportedFunction(f *wit.Function, ownerID wit.Ident) e
 
 	g.defined[f] = true
 
-	return g.ensureEmptyAsm(pkg)
+	return g.ensureEmptyAsm(file.Package)
 }
 
 type goParam struct {
@@ -877,6 +868,13 @@ func (g *generator) ensureEmptyAsm(pkg *gen.Package) error {
 	}
 	_, err := f.Write([]byte(emptyAsm))
 	return err
+}
+
+func (g *generator) fileFor(id wit.Ident) *gen.File {
+	pkg := g.packageFor(id)
+	file := pkg.File(id.Extension + GoSuffix)
+	file.GeneratedBy = g.opts.generatedBy
+	return file
 }
 
 func (g *generator) packageFor(id wit.Ident) *gen.Package {
