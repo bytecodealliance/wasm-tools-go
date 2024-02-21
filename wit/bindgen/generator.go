@@ -330,11 +330,11 @@ func (g *generator) defineTypeDef(t *wit.TypeDef, name string) error {
 
 	// Define the type
 	var b bytes.Buffer
-	stringio.Write(&b, "// ", goName, " represents the ", t.WITKind(), "\"", owner.String(), "#", name, "\".\n")
+	stringio.Write(&b, "// ", goName, " represents the ", t.WITKind(), " \"", owner.String(), "#", name, "\".\n")
 	b.WriteString("//\n")
-	b.WriteString(gen.FormatDocComments(t.Docs.Contents, false))
+	b.WriteString(formatDocComments(t.Docs.Contents, false))
 	b.WriteString("//\n")
-	b.WriteString(gen.FormatDocComments(t.WIT(nil, ""), true))
+	b.WriteString(formatDocComments(t.WIT(nil, ""), true))
 	stringio.Write(&b, "type ", goName, " ", g.typeDefRep(file, goName, t), "\n\n")
 
 	_, err := file.Write(b.Bytes())
@@ -471,7 +471,7 @@ func (g *generator) recordRep(file *gen.File, r *wit.Record) string {
 	var b strings.Builder
 	b.WriteString("struct {\n")
 	for _, f := range r.Fields {
-		b.WriteString(gen.FormatDocComments(f.Docs.Contents, false))
+		b.WriteString(formatDocComments(f.Docs.Contents, false))
 		b.WriteString(GoName(f.Name, true))
 		b.WriteRune(' ')
 		b.WriteString(g.typeRep(file, f.Type))
@@ -529,7 +529,7 @@ func (g *generator) flagsRep(file *gen.File, name string, flags *wit.Flags) stri
 	b.WriteString("\n\n")
 	b.WriteString("const (\n")
 	for i, flag := range flags.Flags {
-		b.WriteString(gen.FormatDocComments(flag.Docs.Contents, false))
+		b.WriteString(formatDocComments(flag.Docs.Contents, false))
 		flagName := file.Declare(name + GoName(flag.Name, true))
 		b.WriteString(flagName)
 		if i == 0 {
@@ -551,7 +551,7 @@ func (g *generator) enumRep(file *gen.File, name string, e *wit.Enum) string {
 	b.WriteString("const (\n")
 	for i, c := range e.Cases {
 		caseName := file.Declare(name + GoName(c.Name, true))
-		b.WriteString(gen.FormatDocComments(c.Docs.Contents, false))
+		b.WriteString(formatDocComments(c.Docs.Contents, false))
 		b.WriteString(caseName)
 		if i == 0 {
 			b.WriteRune(' ')
@@ -589,7 +589,7 @@ func (g *generator) variantRep(file *gen.File, name string, v *wit.Variant) stri
 		// Emit constructor
 		stringio.Write(&b, "// ", constructorName, " returns a [", name, "] of case \"", c.Name, "\".\n")
 		b.WriteString("//\n")
-		b.WriteString(gen.FormatDocComments(c.Docs.Contents, false))
+		b.WriteString(formatDocComments(c.Docs.Contents, false))
 		stringio.Write(&b, "func ", constructorName, "(")
 		dataName := "data"
 		if c.Type != nil {
@@ -858,11 +858,11 @@ func (g *generator) functionDocs(owner wit.Ident, f *wit.Function, name string) 
 	b.WriteString("\".\n")
 	if f.Docs.Contents != "" {
 		b.WriteString("//\n")
-		b.WriteString(gen.FormatDocComments(f.Docs.Contents, false))
+		b.WriteString(formatDocComments(f.Docs.Contents, false))
 	}
 	b.WriteString("//\n")
 	w := strings.TrimSuffix(f.WIT(nil, f.BaseName()), ";")
-	b.WriteString(gen.FormatDocComments(w, true))
+	b.WriteString(formatDocComments(w, true))
 
 	return b.String()
 }
