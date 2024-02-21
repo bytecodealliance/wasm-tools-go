@@ -866,6 +866,9 @@ func isPointer(t wit.Type) bool {
 	return false
 }
 
+// goParams adapts WIT params to Go params, with a special case for the unnamed single result.
+// It accepts a scope and string map to map WIT names to Go names.
+// The resulting slice of [wit.Param] replaces the WIT names with valid, scoped Go names.
 func (g *generator) goParams(scope gen.Scope, names map[string]string, params []wit.Param) []wit.Param {
 	params = slices.Clone(params)
 	if len(params) == 1 && params[0].Name == "" {
