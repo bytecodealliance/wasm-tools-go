@@ -684,14 +684,6 @@ func (g *generator) defineImportedFunction(f *wit.Function, ownerID wit.Ident) e
 	core := f.CoreFunction(false)
 	coreIsMethod := f.IsMethod() && core.Params[0] == f.Params[0]
 
-	funcScope := gen.NewScope(file)
-	params := g.goParams(file, funcScope, f.Params)
-	results := g.goParams(file, funcScope, f.Results)
-
-	coreScope := gen.NewScope(file)
-	coreParams := g.goParams(file, coreScope, core.Params)
-	coreResults := g.goParams(file, coreScope, core.Results)
-
 	var receiver *wit.TypeDef
 	var name string
 	var coreName string
@@ -723,6 +715,14 @@ func (g *generator) defineImportedFunction(f *wit.Function, ownerID wit.Ident) e
 			coreName = file.Declare(SnakeName(*receiver.Name + "-" + f.BaseName()))
 		}
 	}
+
+	funcScope := gen.NewScope(file)
+	params := g.goParams(file, funcScope, f.Params)
+	results := g.goParams(file, funcScope, f.Results)
+
+	coreScope := gen.NewScope(file)
+	coreParams := g.goParams(file, coreScope, core.Params)
+	coreResults := g.goParams(file, coreScope, core.Results)
 
 	var b bytes.Buffer
 
