@@ -346,6 +346,13 @@ func (g *generator) defineTypeDef(t *wit.TypeDef, name string) error {
 	g.defined[t] = true
 
 	// Define any associated functions
+	if f := t.ResourceDrop(); f != nil {
+		err := g.defineImportedFunction(f, owner)
+		if err != nil {
+			return nil
+		}
+	}
+
 	if f := t.Constructor(); f != nil {
 		err := g.defineImportedFunction(f, owner)
 		if err != nil {
@@ -878,7 +885,11 @@ func (g *generator) goParams(scope gen.Scope, names map[string]string, params []
 
 func (g *generator) functionDocs(owner wit.Ident, f *wit.Function, name string) string {
 	var b strings.Builder
-	stringio.Write(&b, "// ", name, " represents the ", f.WITKind(), " \"")
+	kind := f.WITKind()
+	if f.CanonicalABI {
+		kind = "the Canonical ABI function"
+	}
+	stringio.Write(&b, "// ", name, " represents ", kind, " \"")
 	if f.IsFreestanding() {
 		stringio.Write(&b, owner.String(), "#", f.Name)
 	} else {
@@ -890,9 +901,10 @@ func (g *generator) functionDocs(owner wit.Ident, f *wit.Function, name string) 
 		b.WriteString(formatDocComments(f.Docs.Contents, false))
 	}
 	b.WriteString("//\n")
-	w := strings.TrimSuffix(f.WIT(nil, f.BaseName()), ";")
-	b.WriteString(formatDocComments(w, true))
-
+	if !f.CanonicalABI {
+		w := strings.TrimSuffix(f.WIT(nil, f.BaseName()), ";")
+		b.WriteString(formatDocComments(w, true))
+	}
 	return b.String()
 }
 
