@@ -700,7 +700,7 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 	case *wit.Constructor:
 		t := f.Type().(*wit.TypeDef)
 		funcName = file.Declare("New" + g.typeDefNames[t])
-		coreName = file.Declare("new_" + GoName(*t.Name, false))
+		coreName = file.Declare("new" + g.typeDefNames[t])
 
 	case *wit.Static:
 		t := f.Type().(*wit.TypeDef)
