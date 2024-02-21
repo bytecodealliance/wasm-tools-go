@@ -179,6 +179,34 @@ func TestSizeAndAlign(t *testing.T) {
 	}
 }
 
+// TestFunctionBaseName tests the [Function] BaseName method.
+func TestFunctionBaseName(t *testing.T) {
+	err := loadTestdata(func(path string, res *Resolve) error {
+		t.Run(strings.TrimPrefix(path, testdataDir), func(t *testing.T) {
+			res.AllFunctions(func(f *Function) bool {
+				t.Run(f.Name, func(t *testing.T) {
+					want, after, found := strings.Cut(f.Name, ".")
+					if found {
+						want = after
+					}
+					got := f.BaseName()
+					if got != want {
+						t.Errorf("(*Function).BaseName(): got %s, expected %s", got, want)
+					}
+					if strings.Contains(got, ".") {
+						t.Errorf("(*Function).BaseName(): %s contains \".\"", got)
+					}
+				})
+				return true
+			})
+		})
+		return nil
+	})
+	if err != nil {
+		t.Error(err)
+	}
+}
+
 // TestFunctionNameConsistency tests to see if the names in the map[string]*Function in
 // each [Interface] in a [Resolve] is identical to its Name field.
 func TestFunctionNameConsistency(t *testing.T) {
@@ -236,6 +264,43 @@ func TestFunctionNameConsistency(t *testing.T) {
 					}
 				})
 			}
+		})
+		return nil
+	})
+	if err != nil {
+		t.Error(err)
+	}
+}
+
+// TestConstructorResult validates that constructors return own<t>.
+func TestConstructorResult(t *testing.T) {
+	err := loadTestdata(func(path string, res *Resolve) error {
+		t.Run(strings.TrimPrefix(path, testdataDir), func(t *testing.T) {
+			res.AllFunctions(func(f *Function) bool {
+				if !f.IsConstructor() {
+					return true
+				}
+				t.Run(f.Name, func(t *testing.T) {
+					want := f.Kind.(*Constructor).Type
+					switch typ := f.Results[0].Type.(type) {
+					default:
+						t.Errorf("result[0].Type is not a *TypeDef")
+
+					case *TypeDef:
+						switch kind := typ.Kind.(type) {
+						default:
+							t.Errorf("result[0].Type.Kind is not a *Own")
+
+						case *Own:
+							got := kind.Type
+							if want != got {
+								t.Errorf("constructor result type own<%T> != %T", got, want)
+							}
+						}
+					}
+				})
+				return true
+			})
 		})
 		return nil
 	})

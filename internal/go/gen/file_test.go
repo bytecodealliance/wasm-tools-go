@@ -33,12 +33,12 @@ func TestFileAddImport(t *testing.T) {
 	}{
 		{"encoding/json", "json"},
 		{"encoding/xml", "xml"},
-		{"example/error", "_error"},
-		{"example/error", "_error"},
+		{"example/error", "error_"},
+		{"example/error", "error_"},
 		{"example/foo#example_foo", "example_foo"},
 		{"example/foo#example_foo2", "example_foo"},
-		{"example/chan", "_chan"},
-		{"example/chan", "_chan"},
+		{"example/chan", "chan_"},
+		{"example/chan", "chan_"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.path, func(t *testing.T) {

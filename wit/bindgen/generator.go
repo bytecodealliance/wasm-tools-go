@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -57,14 +58,20 @@ type generator struct {
 	// interfacePackages map [wit.Interface] to Go packages.
 	interfacePackages map[*wit.Interface]*gen.Package
 
-	// typeDefs map [wit.TypeDef] to their equivalent Go identifier.
-	typeDefs map[*wit.TypeDef]gen.Ident
+	// typeDefPackages map [wit.TypeDef] to Go packages.
+	typeDefPackages map[*wit.TypeDef]*gen.Package
 
-	// funcs map [wit.Function] to their equivalent Go identifier.
-	funcs map[*wit.Function]gen.Ident
+	// typeDefNames map [wit.TypeDef] to a defined Go name.
+	typeDefNames map[*wit.TypeDef]string
+
+	// scopes map a [wit.TypeDEf] to a [gen.Scope]. Used for method lists.
+	scopes map[*wit.TypeDef]gen.Scope
+
+	// functions map [wit.Function] to their equivalent Go identifier.
+	functions map[*wit.Function]gen.Ident
 
 	// defined represent whether a type or function has been defined.
-	defined map[gen.Ident]bool
+	defined map[any]bool
 }
 
 func newGenerator(res *wit.Resolve, opts ...Option) (*generator, error) {
@@ -73,9 +80,11 @@ func newGenerator(res *wit.Resolve, opts ...Option) (*generator, error) {
 		witPackages:       make(map[string]*gen.Package),
 		worldPackages:     make(map[*wit.World]*gen.Package),
 		interfacePackages: make(map[*wit.Interface]*gen.Package),
-		typeDefs:          make(map[*wit.TypeDef]gen.Ident),
-		funcs:             make(map[*wit.Function]gen.Ident),
-		defined:           make(map[gen.Ident]bool),
+		typeDefPackages:   make(map[*wit.TypeDef]*gen.Package),
+		typeDefNames:      make(map[*wit.TypeDef]string),
+		scopes:            make(map[*wit.TypeDef]gen.Scope),
+		functions:         make(map[*wit.Function]gen.Ident),
+		defined:           make(map[any]bool),
 	}
 	err := g.opts.apply(opts...)
 	if err != nil {
@@ -159,20 +168,21 @@ func (g *generator) declareTypeDef(t *wit.TypeDef) error {
 	}
 	name := *t.Name
 
-	ownerID := typeDefOwnerID(t)
-	pkg := g.packageFor(ownerID)
-	file := pkg.File(ownerID.Extension + GoSuffix)
+	owner := typeDefOwner(t)
+	pkg := g.packageFor(owner)
+	file := pkg.File(owner.Extension + GoSuffix)
 	file.GeneratedBy = g.opts.generatedBy
 
-	id := file.Declare(GoName(name, true))
-	g.typeDefs[t] = id
+	g.typeDefPackages[t] = pkg
+	g.typeDefNames[t] = file.Declare(GoName(name, true))
+	g.scopes[t] = gen.NewScope(nil)
 
-	// fmt.Fprintf(os.Stderr, "Type:\t%s.%s\n\t%s.%s\n", ownerID.String(), name, decl.Package.Path, decl.Name)
+	// fmt.Fprintf(os.Stderr, "Type:\t%s.%s\n\t%s.%s\n", owner.String(), name, decl.Package.Path, decl.Name)
 
 	return nil
 }
 
-func typeDefOwnerID(t *wit.TypeDef) wit.Ident {
+func typeDefOwner(t *wit.TypeDef) wit.Ident {
 	var id wit.Ident
 	switch owner := t.Owner.(type) {
 	case *wit.World:
@@ -215,6 +225,9 @@ func (g *generator) defineWorlds() error {
 }
 
 func (g *generator) defineWorld(w *wit.World) error {
+	if g.defined[w] {
+		return nil
+	}
 	if g.worldPackages[w] != nil {
 		return nil
 	}
@@ -222,9 +235,7 @@ func (g *generator) defineWorld(w *wit.World) error {
 	id.Extension = w.Name
 	pkg := g.packageFor(id)
 	g.worldPackages[w] = pkg
-
-	file := pkg.File(id.Extension + GoSuffix)
-	file.GeneratedBy = g.opts.generatedBy
+	file := g.fileFor(id)
 
 	var b strings.Builder
 	fmt.Fprintf(&b, "Package %s represents the %s \"%s\".\n", pkg.Name, w.WITKind(), id.String())
@@ -243,16 +254,24 @@ func (g *generator) defineWorld(w *wit.World) error {
 		case *wit.TypeDef:
 			err = g.defineTypeDef(v, name)
 		case *wit.Function:
-			err = g.defineImportedFunction(v, id)
+			if v.IsFreestanding() {
+				err = g.defineImportedFunction(v, id)
+			}
 		}
 		if err != nil {
 			return err
 		}
 	}
+
+	g.defined[w] = true
+
 	return nil
 }
 
 func (g *generator) defineInterface(i *wit.Interface, name string) error {
+	if g.defined[i] {
+		return nil
+	}
 	if g.interfacePackages[i] != nil {
 		return nil
 	}
@@ -263,9 +282,7 @@ func (g *generator) defineInterface(i *wit.Interface, name string) error {
 	id.Extension = name
 	pkg := g.packageFor(id)
 	g.interfacePackages[i] = pkg
-
-	file := pkg.File(id.Extension + GoSuffix)
-	file.GeneratedBy = g.opts.generatedBy
+	file := g.fileFor(id)
 
 	var b strings.Builder
 	fmt.Fprintf(&b, "Package %s represents the %s \"%s\".\n", pkg.Name, i.WITKind(), id.String())
@@ -280,22 +297,19 @@ func (g *generator) defineInterface(i *wit.Interface, name string) error {
 	}
 
 	for _, name := range codec.SortedKeys(i.Functions) {
-		g.defineImportedFunction(i.Functions[name], id)
+		f := i.Functions[name]
+		if f.IsFreestanding() {
+			g.defineImportedFunction(f, id)
+		}
 	}
+
+	g.defined[i] = true
 
 	return nil
 }
 
 func (g *generator) defineTypeDef(t *wit.TypeDef, name string) error {
-	if t.Name != nil {
-		name = *t.Name
-	}
-
-	id := g.typeDefs[t]
-	if id == (gen.Ident{}) {
-		return fmt.Errorf("typedef %s not declared", name)
-	}
-	if g.defined[id] {
+	if g.defined[t] {
 		return nil
 	}
 	// TODO: should we emit data for aliases?
@@ -303,26 +317,70 @@ func (g *generator) defineTypeDef(t *wit.TypeDef, name string) error {
 		return nil
 	}
 
-	ownerID := typeDefOwnerID(t)
-	file := id.Package.File(ownerID.Extension + GoSuffix)
-	file.GeneratedBy = g.opts.generatedBy
-
-	fmt.Fprintf(file, "// %s represents the %s \"%s#%s\".\n", id.Name, t.WITKind(), ownerID.String(), name)
-	fmt.Fprintf(file, "//\n")
-	fmt.Fprint(file, gen.FormatDocComments(t.WIT(nil, ""), true))
-	fmt.Fprintf(file, "//\n")
-	if t.Docs.Contents != "" {
-		fmt.Fprintf(file, "//\n%s", gen.FormatDocComments(t.Docs.Contents, false))
+	if t.Name != nil {
+		name = *t.Name
 	}
-	fmt.Fprintf(file, "type %s ", id.Name)
-	fmt.Fprint(file, g.typeDefRep(file, id, t))
-	fmt.Fprint(file, "\n\n")
+
+	pkg := g.typeDefPackages[t]
+	goName := g.typeDefNames[t]
+	if pkg == nil || goName == "" {
+		return fmt.Errorf("typedef %s not declared", name)
+	}
+	owner := typeDefOwner(t)
+	file := g.fileFor(owner)
+
+	// Define the type
+	var b bytes.Buffer
+	stringio.Write(&b, "// ", goName, " represents the ", t.WITKind(), " \"", owner.String(), "#", name, "\".\n")
+	b.WriteString("//\n")
+	b.WriteString(formatDocComments(t.Docs.Contents, false))
+	b.WriteString("//\n")
+	b.WriteString(formatDocComments(t.WIT(nil, ""), true))
+	stringio.Write(&b, "type ", goName, " ", g.typeDefRep(file, goName, t), "\n\n")
+
+	_, err := file.Write(b.Bytes())
+	if err != nil {
+		return err
+	}
+
+	g.defined[t] = true
+
+	// Define any associated functions
+	if f := t.ResourceDrop(); f != nil {
+		err := g.defineImportedFunction(f, owner)
+		if err != nil {
+			return nil
+		}
+	}
+
+	if f := t.Constructor(); f != nil {
+		err := g.defineImportedFunction(f, owner)
+		if err != nil {
+			return nil
+		}
+	}
+
+	for _, f := range t.StaticFunctions() {
+		err := g.defineImportedFunction(f, owner)
+		if err != nil {
+			return nil
+		}
+	}
+
+	for _, f := range t.Methods() {
+		err := g.defineImportedFunction(f, owner)
+		if err != nil {
+			return nil
+		}
+	}
 
 	return nil
 }
 
-func (g *generator) typeDefRep(file *gen.File, typeName gen.Ident, t *wit.TypeDef) string {
+func (g *generator) typeDefRep(file *gen.File, name string, t *wit.TypeDef) string {
 	switch kind := t.Kind.(type) {
+	case *wit.Pointer:
+		return g.pointerRep(file, kind)
 	case wit.Type:
 		return g.typeRep(file, kind)
 	case *wit.Record:
@@ -330,11 +388,11 @@ func (g *generator) typeDefRep(file *gen.File, typeName gen.Ident, t *wit.TypeDe
 	case *wit.Tuple:
 		return g.tupleRep(file, kind)
 	case *wit.Flags:
-		return g.flagsRep(file, typeName, kind)
+		return g.flagsRep(file, name, kind)
 	case *wit.Enum:
-		return g.enumRep(file, typeName, kind)
+		return g.enumRep(file, name, kind)
 	case *wit.Variant:
-		return g.variantRep(file, typeName, kind)
+		return g.variantRep(file, name, kind)
 	case *wit.Result:
 		return g.resultRep(file, kind)
 	case *wit.Option:
@@ -356,6 +414,10 @@ func (g *generator) typeDefRep(file *gen.File, typeName gen.Ident, t *wit.TypeDe
 	}
 }
 
+func (g *generator) pointerRep(file *gen.File, p *wit.Pointer) string {
+	return "*" + g.typeRep(file, p.Type)
+}
+
 func (g *generator) typeRep(file *gen.File, t wit.Type) string {
 	switch t := t.(type) {
 	// Special-case nil for the _ in result<T, _>
@@ -364,15 +426,15 @@ func (g *generator) typeRep(file *gen.File, t wit.Type) string {
 
 	case *wit.TypeDef:
 		t = t.Root()
-		if id, ok := g.typeDefs[t]; ok {
-			return file.Ident(id)
+		if name, ok := g.typeDefNames[t]; ok {
+			return file.RelativeName(g.typeDefPackages[t], name)
 		}
 		// FIXME: this is only valid for built-in WIT types.
 		// User-defined types must be named, so the Ident check above must have succeeded.
 		// See https://component-model.bytecodealliance.org/design/wit.html#built-in-types
 		// and https://component-model.bytecodealliance.org/design/wit.html#user-defined-types.
 		// TODO: add wit.Type.BuiltIn() method?
-		return g.typeDefRep(file, gen.Ident{}, t)
+		return g.typeDefRep(file, "", t)
 	case wit.Primitive:
 		return g.primitiveRep(file, t)
 	default:
@@ -416,27 +478,23 @@ func (g *generator) primitiveRep(file *gen.File, p wit.Primitive) string {
 func (g *generator) recordRep(file *gen.File, r *wit.Record) string {
 	var b strings.Builder
 	b.WriteString("struct {\n")
-	for _, f := range r.Fields {
-		b.WriteString(gen.FormatDocComments(f.Docs.Contents, false))
-		b.WriteString(GoName(f.Name, true))
-		b.WriteRune(' ')
-		b.WriteString(g.typeRep(file, f.Type))
-		b.WriteString("\n\n")
+	for i, f := range r.Fields {
+		if i > 0 && f.Docs.Contents != "" {
+			b.WriteRune('\n')
+		}
+		b.WriteString(formatDocComments(f.Docs.Contents, false))
+		stringio.Write(&b, GoName(f.Name, true), " ", g.typeRep(file, f.Type), "\n")
 	}
-	b.WriteString("}")
+	b.WriteRune('}')
 	return b.String()
 }
 
 func (g *generator) tupleRep(file *gen.File, t *wit.Tuple) string {
 	var b strings.Builder
-	if mono := t.MonoType(); mono != nil {
-		b.WriteRune('[')
-		b.WriteString(strconv.Itoa(len(t.Types)))
-		b.WriteRune(']')
-		b.WriteString(g.typeRep(file, mono))
+	if typ := t.Type(); typ != nil {
+		stringio.Write(&b, "[", strconv.Itoa(len(t.Types)), "]", g.typeRep(file, typ))
 	} else {
-		b.WriteString(file.Import(g.opts.cmPackage))
-		b.WriteString(".Tuple")
+		stringio.Write(&b, file.Import(g.opts.cmPackage), ".Tuple")
 		if len(t.Types) > 2 {
 			b.WriteString(strconv.Itoa(len(t.Types)))
 		}
@@ -452,7 +510,7 @@ func (g *generator) tupleRep(file *gen.File, t *wit.Tuple) string {
 	return b.String()
 }
 
-func (g *generator) flagsRep(file *gen.File, typeName gen.Ident, flags *wit.Flags) string {
+func (g *generator) flagsRep(file *gen.File, name string, flags *wit.Flags) string {
 	var b strings.Builder
 
 	// FIXME: this isn't ideal
@@ -475,45 +533,48 @@ func (g *generator) flagsRep(file *gen.File, typeName gen.Ident, flags *wit.Flag
 	b.WriteString("\n\n")
 	b.WriteString("const (\n")
 	for i, flag := range flags.Flags {
-		b.WriteString(gen.FormatDocComments(flag.Docs.Contents, false))
-		flagName := file.Declare(typeName.Name + GoName(flag.Name, true))
-		b.WriteString(flagName.Name)
-		if i == 0 {
-			b.WriteRune(' ')
-			b.WriteString(typeName.Name)
-			b.WriteString(" = 1 << iota")
+		if i > 0 && flag.Docs.Contents != "" {
+			b.WriteRune('\n')
 		}
-		b.WriteString("\n\n")
+		b.WriteString(formatDocComments(flag.Docs.Contents, false))
+		flagName := file.Declare(name + GoName(flag.Name, true))
+		b.WriteString(flagName)
+		if i == 0 {
+			stringio.Write(&b, " ", name, " = 1 << iota")
+		}
+		b.WriteRune('\n')
 	}
 	b.WriteString(")\n")
 	return b.String()
 }
 
-func (g *generator) enumRep(file *gen.File, typeName gen.Ident, e *wit.Enum) string {
+func (g *generator) enumRep(file *gen.File, name string, e *wit.Enum) string {
 	var b strings.Builder
 	disc := wit.Discriminant(len(e.Cases))
 	b.WriteString(g.typeRep(file, disc))
 	b.WriteString("\n\n")
 	b.WriteString("const (\n")
 	for i, c := range e.Cases {
-		caseName := file.Declare(typeName.Name + GoName(c.Name, true))
-		b.WriteString(gen.FormatDocComments(c.Docs.Contents, false))
-		b.WriteString(caseName.Name)
+		if i > 0 && c.Docs.Contents != "" {
+			b.WriteRune('\n')
+		}
+		b.WriteString(formatDocComments(c.Docs.Contents, false))
+		b.WriteString(file.Declare(name + GoName(c.Name, true)))
 		if i == 0 {
 			b.WriteRune(' ')
-			b.WriteString(typeName.Name)
+			b.WriteString(name)
 			b.WriteString(" = iota")
 		}
-		b.WriteString("\n\n")
+		b.WriteRune('\n')
 	}
 	b.WriteString(")\n")
 	return b.String()
 }
 
-func (g *generator) variantRep(file *gen.File, typeName gen.Ident, v *wit.Variant) string {
+func (g *generator) variantRep(file *gen.File, name string, v *wit.Variant) string {
 	// If the variant has no associated types, represent the variant as an enum.
 	if e := v.Enum(); e != nil {
-		return g.enumRep(file, typeName, e)
+		return g.enumRep(file, name, e)
 	}
 
 	disc := wit.Discriminant(len(v.Cases))
@@ -529,36 +590,36 @@ func (g *generator) variantRep(file *gen.File, typeName gen.Ident, v *wit.Varian
 	for i, c := range v.Cases {
 		caseNum := strconv.Itoa(i)
 		caseName := GoName(c.Name, true)
-		constructorName := file.Declare(typeName.Name + caseName)
+		constructorName := file.Declare(name + caseName)
 		typeRep := g.typeRep(file, c.Type)
 
 		// Emit constructor
-		stringio.Write(&b, "// ", constructorName.Name, " returns a [", typeName.Name, "] of case \"", c.Name, "\".\n")
+		stringio.Write(&b, "// ", constructorName, " returns a [", name, "] of case \"", c.Name, "\".\n")
 		b.WriteString("//\n")
-		b.WriteString(gen.FormatDocComments(c.Docs.Contents, false))
-		stringio.Write(&b, "func ", constructorName.Name, "(")
+		b.WriteString(formatDocComments(c.Docs.Contents, false))
+		stringio.Write(&b, "func ", constructorName, "(")
 		dataName := "data"
 		if c.Type != nil {
 			stringio.Write(&b, dataName, " ", typeRep)
 		}
-		stringio.Write(&b, ") ", typeName.Name, " {")
+		stringio.Write(&b, ") ", name, " {")
 		if c.Type == nil {
 			stringio.Write(&b, "var ", dataName, " ", typeRep, "\n")
 		}
-		stringio.Write(&b, "return ", cm, ".New[", typeName.Name, "](", caseNum, ", ", dataName, ")\n")
+		stringio.Write(&b, "return ", cm, ".New[", name, "](", caseNum, ", ", dataName, ")\n")
 		b.WriteString("}\n\n")
 
 		// Emit getter
 		if c.Type == nil {
 			// Case without an associated type returns bool
-			stringio.Write(&b, "// ", caseName, " returns true if [", typeName.Name, "] represents the variant case \"", c.Name, "\".\n")
-			stringio.Write(&b, "func (self *", typeName.Name, ") ", caseName, "() bool {\n")
+			stringio.Write(&b, "// ", caseName, " returns true if [", name, "] represents the variant case \"", c.Name, "\".\n")
+			stringio.Write(&b, "func (self *", name, ") ", caseName, "() bool {\n")
 			stringio.Write(&b, "return ", cm, ".Tag(self) == ", caseNum)
 			b.WriteString("}\n\n")
 		} else {
 			// Case with associated type T returns *T
-			stringio.Write(&b, "// ", caseName, " returns a non-nil *[", typeRep, "] if [", typeName.Name, "] represents the variant case \"", c.Name, "\".\n")
-			stringio.Write(&b, "func (self *", typeName.Name, ") ", caseName, "() *", typeRep, " {\n")
+			stringio.Write(&b, "// ", caseName, " returns a non-nil *[", typeRep, "] if [", name, "] represents the variant case \"", c.Name, "\".\n")
+			stringio.Write(&b, "func (self *", name, ") ", caseName, "() *", typeRep, " {\n")
 			stringio.Write(&b, "return ", cm, ".Case[", typeRep, "](self, ", caseNum, ")")
 			b.WriteString("}\n\n")
 		}
@@ -610,7 +671,6 @@ func (g *generator) resourceRep(file *gen.File, r *wit.Resource) string {
 	var b strings.Builder
 	b.WriteString(file.Import(g.opts.cmPackage))
 	b.WriteString(".Resource")
-	b.WriteString("\n\n// TODO: resource methods")
 	return b.String()
 }
 
@@ -622,92 +682,230 @@ func (g *generator) borrowRep(file *gen.File, b *wit.Borrow) string {
 	return g.typeRep(file, b.Type)
 }
 
-func (g *generator) defineImportedFunction(f *wit.Function, ownerID wit.Ident) error {
-	if !f.IsFreestanding() {
-		return nil
-	}
-	if _, ok := g.funcs[f]; ok {
+func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) error {
+	if g.defined[f] {
 		return nil
 	}
 
-	pkg := g.packageFor(ownerID)
-	file := pkg.File(ownerID.Extension + GoSuffix)
-	file.GeneratedBy = g.opts.generatedBy
+	file := g.fileFor(owner)
 
-	funcID := file.Declare(GoName(f.Name, true))
-	g.funcs[f] = funcID
-	snakeID := file.Declare(SnakeName(f.Name))
+	// Setup
+	core := f.CoreFunction(false)
+	coreIsMethod := f.IsMethod() && core.Params[0] == f.Params[0]
+
+	var funcName string
+	var coreName string
+	switch f.Kind.(type) {
+	case *wit.Freestanding:
+		funcName = file.Declare(GoName(f.BaseName(), true))
+		coreName = file.Declare("wasmimport" + funcName)
+
+	case *wit.Constructor:
+		t := f.Type().(*wit.TypeDef)
+		funcName = file.Declare("New" + g.typeDefNames[t])
+		coreName = file.Declare("wasmimport" + funcName)
+
+	case *wit.Static:
+		t := f.Type().(*wit.TypeDef)
+		funcName = file.Declare(g.typeDefNames[t] + GoName(f.BaseName(), true))
+		coreName = file.Declare("wasmimport" + funcName)
+
+	case *wit.Method:
+		t := f.Type().(*wit.TypeDef)
+		if t.Package().Name.Package != owner.Package {
+			return fmt.Errorf("cannot emit functions in package %s to type %s", owner.Package, t.Package().Name.String())
+		}
+		scope := g.scopes[t]
+		funcName = scope.UniqueName(GoName(f.BaseName(), true))
+		if coreIsMethod {
+			coreName = scope.UniqueName("wasmimport" + funcName)
+		} else {
+			coreName = file.Declare("wasmimport" + g.typeDefNames[t] + funcName)
+		}
+	}
+
+	// Organize function parameters and results
+	scope := gen.NewScope(file)
+	names := make(map[string]string)
+	funcParams := goParams(scope, names, f.Params)
+	funcResults := goParams(scope, names, f.Results)
+	var receiver wit.Param
+	if f.IsMethod() {
+		receiver = funcParams[0]
+		funcParams = funcParams[1:]
+	}
+	combined := append(funcParams, funcResults...)
+	coreParams := goParams(scope, names, core.Params)
+	coreResults := goParams(scope, names, core.Results)
+	if coreIsMethod {
+		coreParams = coreParams[1:]
+	}
 
 	var b bytes.Buffer
 
-	fmt.Fprintf(&b, "// %s represents the imported Component Model %s \"%s#%s\".\n", funcID.Name, f.WITKind(), ownerID.String(), f.Name)
-	b.WriteString("//\n")
-	b.WriteString(gen.FormatDocComments(f.WIT(nil, f.Name), true))
-	b.WriteString("//\n")
-	if f.Docs.Contents != "" {
-		b.WriteString("//\n")
-		b.WriteString(gen.FormatDocComments(f.Docs.Contents, false))
-	}
-
-	// Emit function name
+	// Emit Go function
+	b.WriteString(g.functionDocs(owner, f, funcName))
+	b.WriteString("//go:nosplit\n")
 	b.WriteString("func ")
-	b.WriteString(funcID.Name)
+	if f.IsMethod() {
+		stringio.Write(&b, "(", receiver.Name, " ", g.typeRep(file, receiver.Type), ") ", funcName)
+	} else {
+		b.WriteString(funcName)
+	}
 	b.WriteRune('(')
 
 	// Emit params
-	params := make(map[string]string, len(f.Params))
-	for i, p := range f.Params {
+	for i, p := range funcParams {
 		if i > 0 {
 			b.WriteString(", ")
 		}
-		params[p.Name] = GoName(p.Name, false)
-		b.WriteString(params[p.Name])
-		b.WriteRune(' ')
-		b.WriteString(g.typeRep(file, p.Type))
+		stringio.Write(&b, p.Name, " ", g.typeRep(file, p.Type))
 	}
-	b.WriteString(")")
+	b.WriteString(") ")
 
 	// Emit results
-	results := make(map[string]string, len(f.Results))
-	if len(f.Results) == 1 {
-		r := f.Results[0]
-		if r.Name == "" {
-			results[r.Name] = "result"
-		} else {
-			results[r.Name] = GoName(r.Name, false)
-		}
-		b.WriteString(g.typeRep(file, r.Type))
-	} else if len(f.Results) > 0 {
+	if len(funcResults) == 1 {
+		b.WriteString(g.typeRep(file, funcResults[0].Type))
+	} else if len(funcResults) > 0 {
 		b.WriteRune('(')
-		for i, r := range f.Results {
+		for i, r := range funcResults {
 			if i > 0 {
 				b.WriteString(", ")
 			}
-			results[r.Name] = GoName(r.Name, false)
-			b.WriteString(results[r.Name])
-			b.WriteRune(' ')
-			b.WriteString(g.typeRep(file, r.Type))
+			stringio.Write(&b, r.Name, " ", g.typeRep(file, r.Type))
+		}
+		b.WriteRune(')')
+	}
+
+	// Emit function body
+	b.WriteString(" {\n")
+	sameResults := slices.Equal(funcResults, coreResults)
+	if !sameResults {
+		for _, r := range funcResults {
+			stringio.Write(&b, "var ", r.Name, " ", g.typeRep(file, r.Type), "\n")
+		}
+	} else if len(coreResults) > 0 {
+		b.WriteString("return ")
+	}
+	if coreIsMethod {
+		stringio.Write(&b, receiver.Name, ".")
+	}
+	stringio.Write(&b, coreName, "(")
+	for i, p := range coreParams {
+		if i > 0 {
+			b.WriteString(", ")
+		}
+		if isPointer(p.Type) {
+			b.WriteRune('&')
+		}
+		b.WriteString(combined[i].Name)
+	}
+	b.WriteString(")\n")
+	if !sameResults {
+		b.WriteString("return ")
+		for i, r := range funcResults {
+			if i > 0 {
+				b.WriteString(", ")
+			}
+			b.WriteString(r.Name)
+		}
+		b.WriteRune('\n')
+	}
+	b.WriteString("}\n\n")
+
+	// Emit wasmimport function
+	stringio.Write(&b, "//go:wasmimport ", owner.String(), " ", f.Name, "\n")
+	b.WriteString("//go:noescape\n")
+	b.WriteString("func ")
+	if coreIsMethod {
+		stringio.Write(&b, "(", receiver.Name, " ", g.typeRep(file, receiver.Type), ") ", coreName)
+	} else {
+		b.WriteString(coreName)
+	}
+	b.WriteRune('(')
+
+	// Emit params
+	for i, p := range coreParams {
+		if i > 0 {
+			b.WriteString(", ")
+		}
+		stringio.Write(&b, p.Name, " ", g.typeRep(file, p.Type))
+	}
+	b.WriteString(") ")
+
+	// Emit results
+	if len(coreResults) == 1 {
+		b.WriteString(g.typeRep(file, coreResults[0].Type))
+	} else if len(coreResults) > 0 {
+		b.WriteRune('(')
+		for i, r := range coreResults {
+			if i > 0 {
+				b.WriteString(", ")
+			}
+			stringio.Write(&b, r.Name, " ", g.typeRep(file, r.Type))
 		}
 		b.WriteRune(')')
 	}
 	b.WriteString("\n\n")
 
-	// Emit wasmimport func
-	b.WriteString("//go:wasmimport ")
-	b.WriteString(ownerID.String())
-	b.WriteRune(' ')
-	b.WriteString(f.Name)
-	b.WriteRune('\n')
-	b.WriteString("func ")
-	b.WriteString(snakeID.Name)
-	b.WriteString("(/* TODO: wasmimport params */)\n")
+	// Write to file
+	file.Write(b.Bytes())
 
-	_, err := file.Write(b.Bytes())
-	if err != nil {
-		return err
+	g.defined[f] = true
+
+	return g.ensureEmptyAsm(file.Package)
+}
+
+func isPointer(t wit.Type) bool {
+	if td, ok := t.(*wit.TypeDef); ok {
+		if _, ok := td.Kind.(*wit.Pointer); ok {
+			return true
+		}
 	}
+	return false
+}
 
-	return g.ensureEmptyAsm(pkg)
+// goParams adapts WIT params to Go params, with a special case for the unnamed single result.
+// It accepts a scope and string map to map WIT names to Go names.
+// The resulting slice of [wit.Param] replaces the WIT names with valid, scoped Go names.
+func goParams(scope gen.Scope, names map[string]string, params []wit.Param) []wit.Param {
+	params = slices.Clone(params)
+	if len(params) == 1 && params[0].Name == "" {
+		params[0].Name = "result"
+	}
+	for i := range params {
+		p := &params[i]
+		if names[p.Name] == "" {
+			names[p.Name] = scope.UniqueName(GoName(p.Name, false))
+		}
+		p.Name = names[p.Name]
+	}
+	return params
+}
+
+func (g *generator) functionDocs(owner wit.Ident, f *wit.Function, name string) string {
+	var b strings.Builder
+	kind := f.WITKind()
+	if f.IsAdmin() {
+		kind = "the Canonical ABI function"
+	}
+	stringio.Write(&b, "// ", name, " represents ", kind, " \"")
+	if f.IsFreestanding() {
+		stringio.Write(&b, owner.String(), "#", f.Name)
+	} else {
+		stringio.Write(&b, f.BaseName())
+	}
+	b.WriteString("\".\n")
+	if f.Docs.Contents != "" {
+		b.WriteString("//\n")
+		b.WriteString(formatDocComments(f.Docs.Contents, false))
+	}
+	b.WriteString("//\n")
+	if !f.IsAdmin() {
+		w := strings.TrimSuffix(f.WIT(nil, f.BaseName()), ";")
+		b.WriteString(formatDocComments(w, true))
+	}
+	return b.String()
 }
 
 func (g *generator) ensureEmptyAsm(pkg *gen.Package) error {
@@ -717,6 +915,13 @@ func (g *generator) ensureEmptyAsm(pkg *gen.Package) error {
 	}
 	_, err := f.Write([]byte(emptyAsm))
 	return err
+}
+
+func (g *generator) fileFor(id wit.Ident) *gen.File {
+	pkg := g.packageFor(id)
+	file := pkg.File(id.Extension + GoSuffix)
+	file.GeneratedBy = g.opts.generatedBy
+	return file
 }
 
 func (g *generator) packageFor(id wit.Ident) *gen.Package {
@@ -738,12 +943,12 @@ func (g *generator) packageFor(id wit.Ident) *gen.Package {
 
 	name = GoPackageName(name)
 	// Ensure local name doesn’t conflict with Go keywords or predeclared identifiers
-	if gen.Unique(name, gen.IsReserved) != name {
+	if gen.UniqueName(name, gen.IsReserved) != name {
 		// Try with package prefix, like error -> ioerror
 		name = id.Package + name
-		if gen.Unique(name, gen.IsReserved) != name {
+		if gen.UniqueName(name, gen.IsReserved) != name {
 			// Try with namespace prefix, like ioerror -> wasiioerror
-			name = gen.Unique(id.Namespace+name, gen.IsReserved)
+			name = gen.UniqueName(id.Namespace+name, gen.IsReserved)
 		}
 	}
 

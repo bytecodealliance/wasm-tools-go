@@ -14,18 +14,24 @@ type Package struct {
 
 	// Declared tracks declared package-scoped identifiers,
 	// including constants, variables, and functions.
-	Declared map[string]bool
+	Scope
 }
 
 // NewPackage returns a newly instantiated Package for path.
 // The local name may optionally be specified with a "#name" suffix.
 func NewPackage(path string) *Package {
 	p := &Package{
-		Files:    make(map[string]*File),
-		Declared: make(map[string]bool),
+		Files: make(map[string]*File),
+		Scope: NewScope(Reserved()),
 	}
 	p.Path, p.Name = ParseSelector(path)
 	return p
+}
+
+// Declare adds a package-scoped identifier to [Package] pkg.
+// It returns the package-unique name (which may be different than name).
+func (pkg *Package) Declare(name string) string {
+	return pkg.UniqueName(name)
 }
 
 // File finds or adds a new file named name to pkg.
@@ -34,11 +40,7 @@ func (pkg *Package) File(name string) *File {
 	if file != nil {
 		return file
 	}
-	file = &File{
-		Name:    name,
-		Package: pkg,
-		Imports: make(map[string]string),
-	}
+	file = NewFile(pkg, name)
 	pkg.Files[name] = file
 	return file
 }

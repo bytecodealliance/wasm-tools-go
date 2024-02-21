@@ -379,6 +379,26 @@ func relativeName(o TypeOwner, p *Package) string {
 }
 
 // WITKind returns the WIT kind.
+func (*Pointer) WITKind() string { return "pointer" }
+
+// WIT returns the [WIT] text format for [Pointer] p.
+// Note: there is no canonical WIT representation of a pointer.
+// This method exists solely to implement the [Node] interface.
+//
+// [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
+func (p *Pointer) WIT(_ Node, name string) string {
+	var b strings.Builder
+	if name != "" {
+		b.WriteString("type ")
+		b.WriteString(escape(name))
+		b.WriteString(" = ")
+	}
+	b.WriteRune('*')
+	b.WriteString(p.Type.WIT(p, ""))
+	return b.String()
+}
+
+// WITKind returns the WIT kind.
 func (*Record) WITKind() string { return "record" }
 
 // WIT returns the [WIT] text format for [Record] r.
@@ -744,13 +764,26 @@ func (_primitive[T]) WITKind() string { return "type" }
 // [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
 func (p _primitive[T]) WIT(_ Node, name string) string {
 	if name != "" {
-		return "type " + name + " = " + p.String()
+		return "type " + name + " = " + p.TypeName()
 	}
-	return p.String()
+	return p.TypeName()
 }
 
-// WITKind returns the WIT kind.
-func (*Function) WITKind() string { return "function" }
+// WITKind returns the WIT kind for [Function] f.
+func (f *Function) WITKind() string {
+	switch f.Kind.(type) {
+	case *Freestanding:
+		return "function"
+	case *Constructor:
+		return "constructor"
+	case *Static:
+		return "static function"
+	case *Method:
+		return "method"
+	default:
+		panic("unknown function type for func " + f.Name)
+	}
+}
 
 // WIT returns the [WIT] text format for [Function] f.
 //

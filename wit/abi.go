@@ -20,15 +20,17 @@ func Discriminant(n int) Type {
 }
 
 // ABI is the interface implemented by any type that reports its [Canonical ABI] [size], [alignment],
-// and whether the type contains a pointer (e.g. [List] or [String]).
+// whether the type contains a pointer (e.g. [List] or [String]), and its [flat] ABI representation.
 //
 // [Canonical ABI]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md
 // [size]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#size
 // [alignment]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#alignment
+// [flat]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
 type ABI interface {
 	Size() uintptr
 	Align() uintptr
 	HasPointer() bool
+	Flat() []Type
 }
 
 // Despecializer is the interface implemented by any [TypeDefKind] that can
@@ -53,4 +55,111 @@ func Despecialize(k TypeDefKind) TypeDefKind {
 		return d.Despecialize()
 	}
 	return k
+}
+
+const (
+	// MaxFlatParams is the maximum number of flattened parameters a function can have
+	// as defined in the Component Model [Canonical ABI].
+	//
+	// [Canonical ABI]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
+	MaxFlatParams = 16
+
+	// MaxFlatResults is the maximum number of flattened results a function can have
+	// as defined in the Component Model [Canonical ABI].
+	//
+	// [Canonical ABI]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
+	MaxFlatResults = 1
+)
+
+// ResourceDrop returns the implied [resource-drop] method for t.
+// If t is not a [Resource], this returns nil.
+//
+// [resource-drop]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#canon-resourcedrop
+func (t *TypeDef) ResourceDrop() *Function {
+	if _, ok := t.Kind.(*Resource); !ok {
+		return nil
+	}
+	f := &Function{
+		Name:   "[resource-drop]" + t.TypeName(),
+		Kind:   &Method{Type: t},
+		Params: []Param{{Name: "self", Type: t}},
+		Docs:   Docs{Contents: "Drops a resource handle."},
+	}
+	return f
+}
+
+// CoreFunction returns a [Core WebAssembly function] of [Function] f.
+// Its params and results may be [flattened] according to the Canonical ABI specification.
+// The flattening rules vary based on whether the returned function is imported or exported,
+// e.g. using go:wasmimport or go:wasmexport.
+//
+// [Core WebAssembly function]: https://webassembly.github.io/spec/core/syntax/modules.html#syntax-func
+// [flattened]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
+func (f *Function) CoreFunction(export bool) *Function {
+	if len(f.Params) == 0 && len(f.Results) == 0 {
+		return f
+	}
+
+	// Clone the function
+	cf := *f
+
+	// Max 16 params
+	if len(flatParams(f.Params)) > MaxFlatParams {
+		cf.Params = []Param{compoundParam("param", "params", f.Params)}
+	}
+
+	// Max 1 result
+	if len(flatParams(f.Results)) > MaxFlatResults {
+		p := compoundParam("result", "results", f.Results)
+		if export {
+			cf.Results = []Param{p}
+		} else {
+			cf.Params = append(cf.Params, p)
+			cf.Results = nil
+		}
+	}
+
+	return &cf
+}
+
+func flatParams(params []Param) []Type {
+	flat := make([]Type, 0, len(params))
+	for _, p := range params {
+		flat = append(flat, p.Type.Flat()...)
+	}
+	return flat
+}
+
+// compoundParam returns a single param that represents
+// the combined param(s), using a [Pointer].
+func compoundParam(singular, plural string, params []Param) Param {
+	if len(params) == 0 {
+		panic("BUG: compoundParam: len(params) == 0")
+	}
+
+	name := params[0].Name
+	var t Type
+
+	if len(params) == 1 {
+		if name == "" {
+			name = singular
+		}
+		t = params[0].Type
+	} else {
+		name = plural
+		r := &Record{}
+		t = &TypeDef{Kind: r}
+		for _, p := range params {
+			r.Fields = append(r.Fields,
+				Field{
+					Name: p.Name,
+					Type: p.Type,
+				})
+		}
+	}
+
+	return Param{
+		Name: name,
+		Type: &TypeDef{Kind: &Pointer{Type: t}},
+	}
 }

@@ -1,0 +1,9 @@
+package examples:exported-list;
+
+interface command {
+	bytes: func() -> list<u8>;
+}
+
+world exports {
+	export command;
+}

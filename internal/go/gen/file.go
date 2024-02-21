@@ -31,11 +31,24 @@ type File struct {
 	// Package this file belongs to.
 	Package *Package
 
+	// Scope is the naming scope of this file, used for package import names.
+	Scope
+
 	// Imports maps Go package imports from package path to local name, e.g. {"encoding/json": "json"}.
 	Imports map[string]string
 
 	// Content is the file contents.
 	Content []byte
+}
+
+// NewFile returns a newly initialized file.
+func NewFile(pkg *Package, name string) *File {
+	return &File{
+		Name:    name,
+		Package: pkg,
+		Scope:   NewScope(pkg),
+		Imports: make(map[string]string),
+	}
 }
 
 // IsGo returns true if f represents a Go file.
@@ -84,19 +97,18 @@ func (f *File) Bytes() ([]byte, error) {
 
 	b.Write(f.Content)
 
-	return format.Source(b.Bytes())
+	formatted, err := format.Source(b.Bytes())
+	if err != nil {
+		return b.Bytes(), err // Return unformatted Go for debugging
+	}
+	return formatted, nil
 }
 
 // Declare adds a package-scoped identifier to [File] f.
 // It additionally checks the file-scoped declarations (local package names).
 // It returns the package-unique name (which may be different than name).
-func (f *File) Declare(name string) Ident {
-	name = Unique(name, IsReserved, HasKey(f.Imports), HasKey(f.Package.Declared))
-	f.Package.Declared[name] = true
-	return Ident{
-		Package: f.Package,
-		Name:    name,
-	}
+func (f *File) Declare(name string) string {
+	return f.Package.Declare(f.UniqueName(name))
 }
 
 // Import imports the Go package specified by path, returning the local name for the imported package.
@@ -108,26 +120,23 @@ func (f *File) Import(path string) string {
 		// Can't import self
 		return ""
 	}
-	if f.Imports[path] != "" {
-		return f.Imports[path]
+	if f.Imports[path] == "" {
+		f.Imports[path] = f.UniqueName(name)
 	}
-	name = Unique(name, IsReserved, HasKey(f.Imports), HasKey(f.Package.Declared))
-	f.Imports[path] = name
-	return name
+	return f.Imports[path]
 }
 
-// Ident returns a file and package-relative string representation of id.
-// It ensures that the file imports id's package, if different.
-// If id and f are in the same package, it returns the local name.
-// If id is in a different package than f, then f first imports id's package,
+// RelativeName returns a file and package-relative string for a [Package] and name.
+// If f belongs to pkg, it returns the local name.
+// If f belongs to a different package, it first imports the package,
 // then returns a name prefixed with the imported package name.
-func (f *File) Ident(id Ident) string {
+func (f *File) RelativeName(pkg *Package, name string) string {
 	// FIXME: is this redundant, but safer?
-	if id.Package == f.Package || id.Package.Path == f.Package.Path {
-		return id.Name
+	if pkg == f.Package || pkg.Path == f.Package.Path {
+		return name
 	}
-	pkgName := f.Import(id.Package.Path + "#" + id.Package.Name)
-	return pkgName + "." + id.Name
+	pkgName := f.Import(pkg.Path + "#" + pkg.Name)
+	return pkgName + "." + name
 }
 
 // Imports returns Go import syntax for imports.
