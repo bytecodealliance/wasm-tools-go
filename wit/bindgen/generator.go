@@ -476,10 +476,7 @@ func (g *generator) recordRep(file *gen.File, r *wit.Record) string {
 			b.WriteRune('\n')
 		}
 		b.WriteString(formatDocComments(f.Docs.Contents, false))
-		b.WriteString(GoName(f.Name, true))
-		b.WriteRune(' ')
-		b.WriteString(g.typeRep(file, f.Type))
-		b.WriteString("\n")
+		stringio.Write(&b, GoName(f.Name, true), " ", g.typeRep(file, f.Type), "\n")
 	}
 	b.WriteRune('}')
 	return b.String()
@@ -488,13 +485,9 @@ func (g *generator) recordRep(file *gen.File, r *wit.Record) string {
 func (g *generator) tupleRep(file *gen.File, t *wit.Tuple) string {
 	var b strings.Builder
 	if typ := t.Type(); typ != nil {
-		b.WriteRune('[')
-		b.WriteString(strconv.Itoa(len(t.Types)))
-		b.WriteRune(']')
-		b.WriteString(g.typeRep(file, typ))
+		stringio.Write(&b, "[", strconv.Itoa(len(t.Types)), "]", g.typeRep(file, typ))
 	} else {
-		b.WriteString(file.Import(g.opts.cmPackage))
-		b.WriteString(".Tuple")
+		stringio.Write(&b, file.Import(g.opts.cmPackage), ".Tuple")
 		if len(t.Types) > 2 {
 			b.WriteString(strconv.Itoa(len(t.Types)))
 		}
@@ -533,15 +526,16 @@ func (g *generator) flagsRep(file *gen.File, name string, flags *wit.Flags) stri
 	b.WriteString("\n\n")
 	b.WriteString("const (\n")
 	for i, flag := range flags.Flags {
+		if i > 0 && flag.Docs.Contents != "" {
+			b.WriteRune('\n')
+		}
 		b.WriteString(formatDocComments(flag.Docs.Contents, false))
 		flagName := file.Declare(name + GoName(flag.Name, true))
 		b.WriteString(flagName)
 		if i == 0 {
-			b.WriteRune(' ')
-			b.WriteString(name)
-			b.WriteString(" = 1 << iota")
+			stringio.Write(&b, " ", name, " = 1 << iota")
 		}
-		b.WriteString("\n\n")
+		b.WriteRune('\n')
 	}
 	b.WriteString(")\n")
 	return b.String()
@@ -554,15 +548,17 @@ func (g *generator) enumRep(file *gen.File, name string, e *wit.Enum) string {
 	b.WriteString("\n\n")
 	b.WriteString("const (\n")
 	for i, c := range e.Cases {
-		caseName := file.Declare(name + GoName(c.Name, true))
+		if i > 0 && c.Docs.Contents != "" {
+			b.WriteRune('\n')
+		}
 		b.WriteString(formatDocComments(c.Docs.Contents, false))
-		b.WriteString(caseName)
+		b.WriteString(file.Declare(name + GoName(c.Name, true)))
 		if i == 0 {
 			b.WriteRune(' ')
 			b.WriteString(name)
 			b.WriteString(" = iota")
 		}
-		b.WriteString("\n\n")
+		b.WriteRune('\n')
 	}
 	b.WriteString(")\n")
 	return b.String()
