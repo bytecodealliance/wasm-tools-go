@@ -1,0 +1,229 @@
+&wit.Resolve{
+    Worlds: {
+        &wit.World{
+            _typeOwner: wit._typeOwner{},
+            Name:       "earth",
+            Imports:    {},
+            Exports:    {
+                "interface-0": &wit.Interface{
+                    _typeOwner: wit._typeOwner{},
+                    _worldItem: wit._worldItem{},
+                    Name:       &"ocean",
+                    TypeDefs:   {
+                        "water": &wit.TypeDef{
+                            _type:      wit._type{},
+                            _worldItem: wit._worldItem{},
+                            Name:       &"water",
+                            Kind:       &wit.Resource{},
+                            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                            Docs:       wit.Docs{},
+                        },
+                    },
+                    Functions: {
+                        "[method]water.drink": &wit.Function{
+                            _worldItem: wit._worldItem{},
+                            Name:       "[method]water.drink",
+                            Kind:       &wit.Method{
+                                _functionKind: wit._functionKind{},
+                                Type:          &wit.TypeDef{(CYCLIC REFERENCE)},
+                            },
+                            Params: {
+                                {
+                                    Name: "self",
+                                    Type: &wit.TypeDef{
+                                        _type:      wit._type{},
+                                        _worldItem: wit._worldItem{},
+                                        Name:       (*string)(nil),
+                                        Kind:       &wit.Borrow{
+                                            _handle: wit._handle{},
+                                            Type:    &wit.TypeDef{(CYCLIC REFERENCE)},
+                                        },
+                                        Owner: nil,
+                                        Docs:  wit.Docs{},
+                                    },
+                                },
+                            },
+                            Results: nil,
+                            Docs:    wit.Docs{},
+                        },
+                    },
+                    Package: &wit.Package{
+                        Name: wit.Ident{
+                            Namespace: "examples",
+                            Package:   "aqua",
+                            Extension: "",
+                            Version:   (*semver.Version)(nil),
+                        },
+                        Interfaces: {
+                            "ocean": &wit.Interface{(CYCLIC REFERENCE)},
+                        },
+                        Worlds: {
+                            "earth": &wit.World{(CYCLIC REFERENCE)},
+                        },
+                        Docs: wit.Docs{},
+                    },
+                    Docs: wit.Docs{},
+                },
+            },
+            Package: &wit.Package{
+                Name: wit.Ident{
+                    Namespace: "examples",
+                    Package:   "aqua",
+                    Extension: "",
+                    Version:   (*semver.Version)(nil),
+                },
+                Interfaces: {
+                    "ocean": &wit.Interface{
+                        _typeOwner: wit._typeOwner{},
+                        _worldItem: wit._worldItem{},
+                        Name:       &"ocean",
+                        TypeDefs:   {
+                            "water": &wit.TypeDef{
+                                _type:      wit._type{},
+                                _worldItem: wit._worldItem{},
+                                Name:       &"water",
+                                Kind:       &wit.Resource{},
+                                Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                                Docs:       wit.Docs{},
+                            },
+                        },
+                        Functions: {
+                            "[method]water.drink": &wit.Function{
+                                _worldItem: wit._worldItem{},
+                                Name:       "[method]water.drink",
+                                Kind:       &wit.Method{
+                                    _functionKind: wit._functionKind{},
+                                    Type:          &wit.TypeDef{(CYCLIC REFERENCE)},
+                                },
+                                Params: {
+                                    {
+                                        Name: "self",
+                                        Type: &wit.TypeDef{
+                                            _type:      wit._type{},
+                                            _worldItem: wit._worldItem{},
+                                            Name:       (*string)(nil),
+                                            Kind:       &wit.Borrow{
+                                                _handle: wit._handle{},
+                                                Type:    &wit.TypeDef{(CYCLIC REFERENCE)},
+                                            },
+                                            Owner: nil,
+                                            Docs:  wit.Docs{},
+                                        },
+                                    },
+                                },
+                                Results: nil,
+                                Docs:    wit.Docs{},
+                            },
+                        },
+                        Package: &wit.Package{(CYCLIC REFERENCE)},
+                        Docs:    wit.Docs{},
+                    },
+                },
+                Worlds: {
+                    "earth": &wit.World{(CYCLIC REFERENCE)},
+                },
+                Docs: wit.Docs{},
+            },
+            Docs: wit.Docs{},
+        },
+    },
+    Interfaces: {
+        &wit.Interface{
+            _typeOwner: wit._typeOwner{},
+            _worldItem: wit._worldItem{},
+            Name:       &"ocean",
+            TypeDefs:   {
+                "water": &wit.TypeDef{
+                    _type:      wit._type{},
+                    _worldItem: wit._worldItem{},
+                    Name:       &"water",
+                    Kind:       &wit.Resource{},
+                    Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+                    Docs:       wit.Docs{},
+                },
+            },
+            Functions: {
+                "[method]water.drink": &wit.Function{
+                    _worldItem: wit._worldItem{},
+                    Name:       "[method]water.drink",
+                    Kind:       &wit.Method{
+                        _functionKind: wit._functionKind{},
+                        Type:          &wit.TypeDef{(CYCLIC REFERENCE)},
+                    },
+                    Params: {
+                        {
+                            Name: "self",
+                            Type: &wit.TypeDef{
+                                _type:      wit._type{},
+                                _worldItem: wit._worldItem{},
+                                Name:       (*string)(nil),
+                                Kind:       &wit.Borrow{
+                                    _handle: wit._handle{},
+                                    Type:    &wit.TypeDef{(CYCLIC REFERENCE)},
+                                },
+                                Owner: nil,
+                                Docs:  wit.Docs{},
+                            },
+                        },
+                    },
+                    Results: nil,
+                    Docs:    wit.Docs{},
+                },
+            },
+            Package: &wit.Package{
+                Name: wit.Ident{
+                    Namespace: "examples",
+                    Package:   "aqua",
+                    Extension: "",
+                    Version:   (*semver.Version)(nil),
+                },
+                Interfaces: {
+                    "ocean": &wit.Interface{(CYCLIC REFERENCE)},
+                },
+                Worlds: {
+                    "earth": &wit.World{(CYCLIC REFERENCE)},
+                },
+                Docs: wit.Docs{},
+            },
+            Docs: wit.Docs{},
+        },
+    },
+    TypeDefs: {
+        &wit.TypeDef{
+            _type:      wit._type{},
+            _worldItem: wit._worldItem{},
+            Name:       &"water",
+            Kind:       &wit.Resource{},
+            Owner:      &wit.Interface{(CYCLIC REFERENCE)},
+            Docs:       wit.Docs{},
+        },
+        &wit.TypeDef{
+            _type:      wit._type{},
+            _worldItem: wit._worldItem{},
+            Name:       (*string)(nil),
+            Kind:       &wit.Borrow{
+                _handle: wit._handle{},
+                Type:    &wit.TypeDef{(CYCLIC REFERENCE)},
+            },
+            Owner: nil,
+            Docs:  wit.Docs{},
+        },
+    },
+    Packages: {
+        &wit.Package{
+            Name: wit.Ident{
+                Namespace: "examples",
+                Package:   "aqua",
+                Extension: "",
+                Version:   (*semver.Version)(nil),
+            },
+            Interfaces: {
+                "ocean": &wit.Interface{(CYCLIC REFERENCE)},
+            },
+            Worlds: {
+                "earth": &wit.World{(CYCLIC REFERENCE)},
+            },
+            Docs: wit.Docs{},
+        },
+    },
+}
