@@ -272,6 +272,43 @@ func TestFunctionNameConsistency(t *testing.T) {
 	}
 }
 
+// TestConstructorResult validates that constructors return own<t>.
+func TestConstructorResult(t *testing.T) {
+	err := loadTestdata(func(path string, res *Resolve) error {
+		t.Run(strings.TrimPrefix(path, testdataDir), func(t *testing.T) {
+			res.AllFunctions(func(f *Function) bool {
+				if !f.IsConstructor() {
+					return true
+				}
+				t.Run(f.Name, func(t *testing.T) {
+					want := f.Kind.(*Constructor).Type
+					switch typ := f.Results[0].Type.(type) {
+					default:
+						t.Errorf("result[0].Type is not a *TypeDef")
+
+					case *TypeDef:
+						switch kind := typ.Kind.(type) {
+						default:
+							t.Errorf("result[0].Type.Kind is not a *Own")
+
+						case *Own:
+							got := kind.Type
+							if want != got {
+								t.Errorf("constructor result type own<%T> != %T", got, want)
+							}
+						}
+					}
+				})
+				return true
+			})
+		})
+		return nil
+	})
+	if err != nil {
+		t.Error(err)
+	}
+}
+
 // TestPackageFieldIsNotNil tests to ensure the Package field of all [World] and [Interface]
 // values in a [Resolve] are non-nil.
 func TestPackageFieldIsNotNil(t *testing.T) {
