@@ -866,11 +866,6 @@ func isPointer(t wit.Type) bool {
 	return false
 }
 
-type goParam struct {
-	name string
-	rep  string
-}
-
 func (g *generator) goParams(scope gen.Scope, names map[string]string, params []wit.Param) []wit.Param {
 	params = slices.Clone(params)
 	if len(params) == 1 && params[0].Name == "" {
