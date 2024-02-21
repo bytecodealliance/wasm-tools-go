@@ -167,21 +167,21 @@ func (g *generator) declareTypeDef(t *wit.TypeDef) error {
 	}
 	name := *t.Name
 
-	ownerID := typeDefOwnerID(t)
-	pkg := g.packageFor(ownerID)
-	file := pkg.File(ownerID.Extension + GoSuffix)
+	owner := typeDefOwner(t)
+	pkg := g.packageFor(owner)
+	file := pkg.File(owner.Extension + GoSuffix)
 	file.GeneratedBy = g.opts.generatedBy
 
 	g.typeDefPackages[t] = pkg
 	g.typeDefNames[t] = file.Declare(GoName(name, true))
 	g.scopes[t] = gen.NewScope(nil)
 
-	// fmt.Fprintf(os.Stderr, "Type:\t%s.%s\n\t%s.%s\n", ownerID.String(), name, decl.Package.Path, decl.Name)
+	// fmt.Fprintf(os.Stderr, "Type:\t%s.%s\n\t%s.%s\n", owner.String(), name, decl.Package.Path, decl.Name)
 
 	return nil
 }
 
-func typeDefOwnerID(t *wit.TypeDef) wit.Ident {
+func typeDefOwner(t *wit.TypeDef) wit.Ident {
 	var id wit.Ident
 	switch owner := t.Owner.(type) {
 	case *wit.World:
@@ -325,11 +325,11 @@ func (g *generator) defineTypeDef(t *wit.TypeDef, name string) error {
 	if pkg == nil || goName == "" {
 		return fmt.Errorf("typedef %s not declared", name)
 	}
-	ownerID := typeDefOwnerID(t)
-	file := g.fileFor(ownerID)
+	owner := typeDefOwner(t)
+	file := g.fileFor(owner)
 
 	// Define the type
-	fmt.Fprintf(file, "// %s represents the %s \"%s#%s\".\n", goName, t.WITKind(), ownerID.String(), name)
+	fmt.Fprintf(file, "// %s represents the %s \"%s#%s\".\n", goName, t.WITKind(), owner.String(), name)
 	fmt.Fprintf(file, "//\n")
 	fmt.Fprint(file, gen.FormatDocComments(t.WIT(nil, ""), true))
 	fmt.Fprintf(file, "//\n")
@@ -344,21 +344,21 @@ func (g *generator) defineTypeDef(t *wit.TypeDef, name string) error {
 
 	// Define any associated functions
 	if f := t.Constructor(); f != nil {
-		err := g.defineImportedFunction(f, ownerID)
+		err := g.defineImportedFunction(f, owner)
 		if err != nil {
 			return nil
 		}
 	}
 
 	for _, f := range t.StaticFunctions() {
-		err := g.defineImportedFunction(f, ownerID)
+		err := g.defineImportedFunction(f, owner)
 		if err != nil {
 			return nil
 		}
 	}
 
 	for _, f := range t.Methods() {
-		err := g.defineImportedFunction(f, ownerID)
+		err := g.defineImportedFunction(f, owner)
 		if err != nil {
 			return nil
 		}
@@ -673,12 +673,12 @@ func (g *generator) borrowRep(file *gen.File, b *wit.Borrow) string {
 	return g.typeRep(file, b.Type)
 }
 
-func (g *generator) defineImportedFunction(f *wit.Function, ownerID wit.Ident) error {
+func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) error {
 	if g.defined[f] {
 		return nil
 	}
 
-	file := g.fileFor(ownerID)
+	file := g.fileFor(owner)
 
 	// Setup
 	core := f.CoreFunction(false)
@@ -704,8 +704,8 @@ func (g *generator) defineImportedFunction(f *wit.Function, ownerID wit.Ident) e
 
 	case *wit.Method:
 		receiver = f.Type().(*wit.TypeDef)
-		if receiver.Package().Name.Package != ownerID.Package {
-			return fmt.Errorf("cannot emit functions in package %s to type %s", ownerID.Package, receiver.Package().Name.String())
+		if receiver.Package().Name.Package != owner.Package {
+			return fmt.Errorf("cannot emit functions in package %s to type %s", owner.Package, receiver.Package().Name.String())
 		}
 		scope := g.scopes[receiver]
 		name = scope.UniqueName(GoName(f.BaseName(), true))
@@ -729,7 +729,7 @@ func (g *generator) defineImportedFunction(f *wit.Function, ownerID wit.Ident) e
 	// Emit documentation
 	stringio.Write(&b, "// ", name, " represents the ", f.WITKind(), " \"")
 	if f.IsFreestanding() {
-		stringio.Write(&b, ownerID.String(), "#", f.Name)
+		stringio.Write(&b, owner.String(), "#", f.Name)
 	} else {
 		stringio.Write(&b, f.BaseName())
 	}
@@ -796,7 +796,7 @@ func (g *generator) defineImportedFunction(f *wit.Function, ownerID wit.Ident) e
 	b.WriteString("}\n\n")
 
 	// Emit wasmimport function
-	stringio.Write(&b, "//go:wasmimport ", ownerID.String(), " ", f.Name, "\n")
+	stringio.Write(&b, "//go:wasmimport ", owner.String(), " ", f.Name, "\n")
 	b.WriteString("//go:noescape\n")
 	b.WriteString("func ")
 	if coreIsMethod {
