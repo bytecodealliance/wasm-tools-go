@@ -1,8 +1,9 @@
 package wit
 
 import (
+	"cmp"
 	"fmt"
-	"sort"
+	"slices"
 	"strconv"
 	"strings"
 	"unsafe"
@@ -133,20 +134,19 @@ func iterateWorldItems(m map[string]WorldItem, yield func(name string, i WorldIt
 	}
 
 	// Sort slice
-	sort.Slice(items, func(i, j int) bool {
-		a, b := items[i], items[j]
+	slices.SortFunc(items, func(a, b named) int {
 		as, bs := worldItemTypeSort(a.item), worldItemTypeSort(b.item)
 		switch {
 		case as < bs:
-			return true
+			return -1
 		case as > bs:
-			return false
+			return 1
 		case a.sortName < b.sortName:
-			return true
+			return -1
 		case a.sortName > b.sortName:
-			return false
+			return 1
 		}
-		return a.name < b.name
+		return cmp.Compare(a.name, b.name)
 	})
 
 	// Iterate
@@ -288,6 +288,9 @@ func (t *TypeDef) StaticFunctions() []*Function {
 		}
 		return true
 	})
+	slices.SortFunc(statics, func(a, b *Function) int {
+		return cmp.Compare(a.Name, b.Name)
+	})
 	return statics
 }
 
@@ -300,6 +303,9 @@ func (t *TypeDef) Methods() []*Function {
 			methods = append(methods, f)
 		}
 		return true
+	})
+	slices.SortFunc(methods, func(a, b *Function) int {
+		return cmp.Compare(a.Name, b.Name)
 	})
 	return methods
 }
