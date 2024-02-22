@@ -40,6 +40,9 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Set up wasm-tools
+        uses: bytecodealliance/actions/wasm-tools/setup@v1.0.2
+
       - name: Set up Go
         uses: actions/setup-go@v5.0.0
         with:
@@ -74,6 +77,9 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Set up wasm-tools
+        uses: bytecodealliance/actions/wasm-tools/setup@v1.0.2
+
       - name: Set up Go
         uses: actions/setup-go@v5.0.0
         with:
@@ -106,6 +112,14 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Set up wasm-tools
+        uses: bytecodealliance/actions/wasm-tools/setup@v1.0.2
+
+      - name: Set up Wasmtime
+        uses: bytecodealliance/actions/wasmtime/setup@v1.0.2
+        with:
+          version: ${{ matrix.wasmtime-version }}
+
       - name: Set up Go
         uses: actions/setup-go@v5.0.0
         with:
@@ -115,11 +129,6 @@ jobs:
         uses: acifani/setup-tinygo@v2.0.0
         with:
           tinygo-version: ${{ matrix.tinygo-version }}
-
-      - name: Set up Wasmtime
-        uses: bytecodealliance/actions/wasmtime/setup@v1.0.2
-        with:
-          version: ${{ matrix.wasmtime-version }}
 
       - name: Add Go wasm exec to $PATH
         run: echo "$(go env GOROOT)/misc/wasm" >> $GITHUB_PATH
