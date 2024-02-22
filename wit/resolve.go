@@ -1,7 +1,9 @@
 package wit
 
 import (
+	"cmp"
 	"fmt"
+	"slices"
 	"sort"
 	"strconv"
 	"strings"
@@ -288,6 +290,9 @@ func (t *TypeDef) StaticFunctions() []*Function {
 		}
 		return true
 	})
+	slices.SortFunc(statics, func(a, b *Function) int {
+		return cmp.Compare(a.Name, b.Name)
+	})
 	return statics
 }
 
@@ -300,6 +305,9 @@ func (t *TypeDef) Methods() []*Function {
 			methods = append(methods, f)
 		}
 		return true
+	})
+	slices.SortFunc(methods, func(a, b *Function) int {
+		return cmp.Compare(a.Name, b.Name)
 	})
 	return methods
 }
