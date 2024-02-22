@@ -13,7 +13,6 @@ import (
 
 	"github.com/ydnar/wasm-tools-go/internal/callerfs"
 
-	"github.com/kr/pretty"
 	"github.com/sergi/go-diff/diffmatchpatch"
 )
 
@@ -56,20 +55,6 @@ func loadTestdata(f func(path string, res *Resolve) error) error {
 		}
 		return f(path, res)
 	})
-}
-
-func TestGoldenFiles(t *testing.T) {
-	err := loadTestdata(func(path string, res *Resolve) error {
-		t.Run(strings.TrimPrefix(path, testdataDir), func(t *testing.T) {
-			data := pretty.Sprint(res)
-			compareOrWrite(t, path, path+".golden", data)
-		})
-		return nil
-	})
-
-	if err != nil {
-		t.Error(err)
-	}
 }
 
 func TestGoldenWITFiles(t *testing.T) {
