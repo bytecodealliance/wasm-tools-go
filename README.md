@@ -49,7 +49,7 @@ wasm-tools component wit -j example.wit > example.wit.json
 
 ### WASI
 
-The [wasi](./wasi) directory contains a machine-generated bindings for the [`wasi:cli/command`](https://github.com/WebAssembly/wasi-cli) world from [WASI Preview 2](https://github.com/WebAssembly/WASI/blob/main/preview2/README.md). The generated bindings currently target [TinyGo](https://tinygo.org).
+The [wasi](./wasi) directory contains generated bindings for the [`wasi:cli/command`](https://github.com/WebAssembly/wasi-cli) world from [WASI Preview 2](https://github.com/WebAssembly/WASI/blob/main/preview2/README.md). The generated bindings currently target [TinyGo](https://tinygo.org).
 
 ### Component Model
 
