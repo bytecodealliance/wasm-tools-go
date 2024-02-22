@@ -4,7 +4,6 @@ import (
 	"cmp"
 	"fmt"
 	"slices"
-	"sort"
 	"strconv"
 	"strings"
 	"unsafe"
@@ -135,20 +134,19 @@ func iterateWorldItems(m map[string]WorldItem, yield func(name string, i WorldIt
 	}
 
 	// Sort slice
-	sort.Slice(items, func(i, j int) bool {
-		a, b := items[i], items[j]
+	slices.SortFunc(items, func(a, b named) int {
 		as, bs := worldItemTypeSort(a.item), worldItemTypeSort(b.item)
 		switch {
 		case as < bs:
-			return true
+			return -1
 		case as > bs:
-			return false
+			return 1
 		case a.sortName < b.sortName:
-			return true
+			return -1
 		case a.sortName > b.sortName:
-			return false
+			return 1
 		}
-		return a.name < b.name
+		return cmp.Compare(a.name, b.name)
 	})
 
 	// Iterate
