@@ -41,7 +41,7 @@ jobs:
           submodules: recursive
 
       - name: Set up wasm-tools
-        uses: ydnar/ba-actions/wasm-tools/setup@v1.0.2
+        uses: ydnar/ba-actions/wasm-tools/setup
         with:
           version: 1.200.0
 
@@ -80,7 +80,7 @@ jobs:
           submodules: recursive
 
       - name: Set up wasm-tools
-        uses: ydnar/ba-actions/wasm-tools/setup@v1.0.2
+        uses: ydnar/ba-actions/wasm-tools/setup
         with:
           version: 1.200.0
 
@@ -117,7 +117,7 @@ jobs:
           submodules: recursive
 
       - name: Set up wasm-tools
-        uses: ydnar/ba-actions/wasm-tools/setup@v1.0.2
+        uses: ydnar/ba-actions/wasm-tools/setup
         with:
           version: 1.200.0
 
