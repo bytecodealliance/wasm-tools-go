@@ -7,31 +7,51 @@
 
 ## About
 
-This repository contains code to adapt [WIT](https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md) (WebAssembly Interface Type) files into Go, with the goal of accelerating the Go implementation of [WASI Preview 2](https://bytecodealliance.org/articles/webassembly-the-updated-roadmap-for-developers).
+This repository contains code to generate Go bindings for [Component Model](https://component-model.bytecodealliance.org/) interfaces as defined in [WIT](https://component-model.bytecodealliance.org/design/wit.html) (WebAssembly Interface Type) files. The goal of this project is to accelerate adoption of the Component Model and development of [WASI Preview 2](https://bytecodealliance.org/articles/WASI-0.2) in Go.
 
-## WIT → Go
+### WASI
 
-The `wit-bindgen-go` tool can generate Go bindings for WIT interfaces and worlds. To use, pass the JSON representation of a fully-resolved WIT package:
+The [wasi](./wasi) directory contains generated bindings for the [`wasi:cli/command@0.2.0`](https://github.com/WebAssembly/wasi-cli) world from [WASI Preview 2](https://github.com/WebAssembly/WASI/blob/main/preview2/README.md). The generated bindings currently target [TinyGo](https://tinygo.org).
+
+### Component Model
+
+Package [cm](./cm) contains low-level types used by the `wasi` packages, such as `option<t>`, `result<ok, err>`, `variant`, `list`, and `resource`. These are intended for use by generated [Component Model](https://github.com/WebAssembly/component-model/blob/main/design/mvp/Explainer.md#type-definitions) bindings, where the caller converts to a Go equivalent. It attempts to map WIT semantics to their equivalent in Go where possible.
+
+#### Note on Memory Safety
+
+Package `cm` and generated bindings from `wit-bindgen-go` may have compatibility issues with the Go garbage collector, as they directly represent `variant` and `result` types as tagged unions where a pointer shape may be occupied by a non-pointer value. The GC may detect and throw an error if it detects a non-pointer value in an area it expects to see a pointer. This is an area of active development.
+
+## `wit-bindgen-go`
+
+### WIT → Go
+
+The `wit-bindgen-go` tool can generate Go bindings for WIT interfaces and worlds. If [`wasm-tools`](https://crates.io/crates/wasm-tools) is installed and in `$PATH`, then `wit-bindgen-go` can load WIT directly.
 
 ```sh
-wasm-tools component wit -j ./wasi-cli/wit | wit-bindgen-go generate
+wit-bindgen-go generate ../wasi-cli/wit
 ```
 
-Or:
+Otherwise, pass the JSON representation of a fully-resolved WIT package:
 
 ```sh
 wit-bindgen-go generate wasi-cli.wit.json
 ```
 
-## JSON → WIT
+Or pipe via `stdin`:
 
-For debugging purposes, the `wit-bindgen-go` tool can also convert a JSON representation back into WIT. This is useful for validating that the intermediate representation faithfully represents the original WIT source.
+```sh
+wasm-tools component wit -j ../wasi-cli/wit | wit-bindgen-go generate
+```
+
+### JSON → WIT
+
+For debugging purposes, `wit-bindgen-go` can also convert a JSON representation back into WIT. This is useful for validating that the intermediate representation faithfully represents the original WIT source.
 
 ```sh
 wit-bindgen-go wit example.wit.json
 ```
 
-## WIT → JSON
+### WIT → JSON
 
 The [wit](./wit) package can decode a JSON representation of a fully-resolved WIT file. Serializing WIT into JSON requires [wasm-tools](https://crates.io/crates/wasm-tools) v1.0.42 or higher. To convert a WIT file into JSON, run `wasm-tools` with the `-j` argument:
 
@@ -45,20 +65,12 @@ This will emit JSON on `stdout`, which can be piped to a file or another program
 wasm-tools component wit -j example.wit > example.wit.json
 ```
 
-## Go Packages
-
-### WASI
-
-The [wasi](./wasi) directory contains generated bindings for the [`wasi:cli/command`](https://github.com/WebAssembly/wasi-cli) world from [WASI Preview 2](https://github.com/WebAssembly/WASI/blob/main/preview2/README.md). The generated bindings currently target [TinyGo](https://tinygo.org).
-
-### Component Model
-
-Package [cm](./cm) contains low-level types used by the `wasi` packages, such as `option<t>`, `result<ok, err>`, `variant`, `list`, and `resource`. These are intended for use by generated [Component Model](https://github.com/WebAssembly/component-model/blob/main/design/mvp/Explainer.md#type-definitions) bindings, where the caller converts to a Go equivalent.
-
 ## License
 
 This project is licensed under the Apache 2.0 license with the LLVM exception. See [LICENSE](LICENSE) for more details.
 
-### Contribution
+### Contributing
+
+Developing and testing `wit-bindgen-go` requires an up-to-date installation of [Go](https://go.dev), [TinyGo](https://tinygo.org), and [`wasm-tools`](https://crates.io/crates/wasm-tools).
 
 Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in this project by you, as defined in the Apache-2.0 license, shall be licensed as above, without any additional terms or conditions.

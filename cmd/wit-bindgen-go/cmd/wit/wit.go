@@ -16,7 +16,7 @@ var Command = &cli.Command{
 }
 
 func action(ctx context.Context, cmd *cli.Command) error {
-	res, err := witcli.LoadOne(cmd.Args().Slice()...)
+	res, err := witcli.LoadOne(cmd.Bool("force-wit"), cmd.Args().Slice()...)
 	if err != nil {
 		return err
 	}

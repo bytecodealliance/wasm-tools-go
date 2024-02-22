@@ -2,15 +2,18 @@ package witcli
 
 import (
 	"fmt"
-	"os"
+	"strings"
 
 	"github.com/ydnar/wasm-tools-go/wit"
 )
 
-// LoadOne loads one WIT JSON file from paths.
+// LoadOne loads a single [wit.Resolve].
 // An error is returned if len(paths) > 1.
 // If paths is empty, or paths[0] == "" or "-", then it reads from stdin.
-func LoadOne(paths ...string) (*wit.Resolve, error) {
+// If the resolved path doesn’t end in ".json", it will attempt to load
+// WIT indirectly by processing the input through wasm-tools.
+// If forceWIT is true, it will always process input through wasm-tools.
+func LoadOne(forceWIT bool, paths ...string) (*wit.Resolve, error) {
 	var path string
 	switch len(paths) {
 	case 0:
@@ -20,19 +23,8 @@ func LoadOne(paths ...string) (*wit.Resolve, error) {
 	default:
 		return nil, fmt.Errorf("found %d path arguments, expecting 0 or 1", len(paths))
 	}
-	return LoadJSON(path)
-}
-
-// LoadJSON loads a WIT JSON file from path.
-// If path is "" or "-", it reads from os.Stdin.
-func LoadJSON(path string) (*wit.Resolve, error) {
-	if path == "" || path == "-" {
-		return wit.DecodeJSON(os.Stdin)
+	if forceWIT || !strings.HasSuffix(path, ".json") {
+		return wit.LoadWIT(path)
 	}
-	f, err := os.Open(path)
-	if err != nil {
-		return nil, err
-	}
-	defer f.Close()
-	return wit.DecodeJSON(f)
+	return wit.LoadJSON(path)
 }

@@ -21,6 +21,12 @@ func main() {
 			print.Command,
 			wit.Command,
 		},
+		Flags: []cli.Flag{
+			&cli.BoolFlag{
+				Name:  "force-wit",
+				Usage: "force loading WIT via wasm-tools",
+			},
+		},
 	}
 
 	err := cmd.Run(context.Background(), os.Args)

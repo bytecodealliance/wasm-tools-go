@@ -64,7 +64,7 @@ func action(ctx context.Context, cmd *cli.Command) error {
 	}
 	fmt.Fprintf(os.Stderr, "Package root: %s\n", pkgPath)
 
-	res, err := witcli.LoadOne(cmd.Args().Slice()...)
+	res, err := witcli.LoadOne(cmd.Bool("force-wit"), cmd.Args().Slice()...)
 	if err != nil {
 		return err
 	}
