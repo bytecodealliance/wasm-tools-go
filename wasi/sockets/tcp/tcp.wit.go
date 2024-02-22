@@ -72,251 +72,6 @@ func (self TCPSocket) ResourceDrop() {
 //go:noescape
 func (self TCPSocket) wasmimportResourceDrop()
 
-// SetReceiveBufferSize represents method "set-receive-buffer-size".
-//
-//	set-receive-buffer-size: func(value: u64) -> result<_, error-code>
-//
-//go:nosplit
-func (self TCPSocket) SetReceiveBufferSize(value uint64) cm.ErrResult[network.ErrorCode] {
-	var result cm.ErrResult[network.ErrorCode]
-	self.wasmimportSetReceiveBufferSize(value, &result)
-	return result
-}
-
-//go:wasmimport wasi:sockets/tcp@0.2.0 [method]tcp-socket.set-receive-buffer-size
-//go:noescape
-func (self TCPSocket) wasmimportSetReceiveBufferSize(value uint64, result *cm.ErrResult[network.ErrorCode])
-
-// Subscribe represents method "subscribe".
-//
-// Create a `pollable` which can be used to poll for, or block on,
-// completion of any of the asynchronous operations of this socket.
-//
-// When `finish-bind`, `finish-listen`, `finish-connect` or `accept`
-// return `error(would-block)`, this pollable can be used to wait for
-// their success or failure, after which the method can be retried.
-//
-// The pollable is not limited to the async operation that happens to be
-// in progress at the time of calling `subscribe` (if any). Theoretically,
-// `subscribe` only has to be called once per socket and can then be
-// (re)used for the remainder of the socket's lifetime.
-//
-// See <https://github.com/WebAssembly/wasi-sockets/TcpSocketOperationalSemantics.md#Pollable-readiness>
-// for a more information.
-//
-// Note: this function is here for WASI Preview2 only.
-// It's planned to be removed when `future` is natively supported in Preview3.
-//
-//	subscribe: func() -> own<pollable>
-//
-//go:nosplit
-func (self TCPSocket) Subscribe() poll.Pollable {
-	return self.wasmimportSubscribe()
-}
-
-//go:wasmimport wasi:sockets/tcp@0.2.0 [method]tcp-socket.subscribe
-//go:noescape
-func (self TCPSocket) wasmimportSubscribe() poll.Pollable
-
-// FinishListen represents method "finish-listen".
-//
-//	finish-listen: func() -> result<_, error-code>
-//
-//go:nosplit
-func (self TCPSocket) FinishListen() cm.ErrResult[network.ErrorCode] {
-	var result cm.ErrResult[network.ErrorCode]
-	self.wasmimportFinishListen(&result)
-	return result
-}
-
-//go:wasmimport wasi:sockets/tcp@0.2.0 [method]tcp-socket.finish-listen
-//go:noescape
-func (self TCPSocket) wasmimportFinishListen(result *cm.ErrResult[network.ErrorCode])
-
-// IsListening represents method "is-listening".
-//
-// Whether the socket is in the `listening` state.
-//
-// Equivalent to the SO_ACCEPTCONN socket option.
-//
-//	is-listening: func() -> bool
-//
-//go:nosplit
-func (self TCPSocket) IsListening() bool {
-	return self.wasmimportIsListening()
-}
-
-//go:wasmimport wasi:sockets/tcp@0.2.0 [method]tcp-socket.is-listening
-//go:noescape
-func (self TCPSocket) wasmimportIsListening() bool
-
-// SetListenBacklogSize represents method "set-listen-backlog-size".
-//
-// Hints the desired listen queue size. Implementations are free to ignore this.
-//
-// If the provided value is 0, an `invalid-argument` error is returned.
-// Any other value will never cause an error, but it might be silently clamped and/or
-// rounded.
-//
-// # Typical errors
-// - `not-supported`:        (set) The platform does not support changing the backlog
-// size after the initial listen.
-// - `invalid-argument`:     (set) The provided value was 0.
-// - `invalid-state`:        (set) The socket is in the `connect-in-progress` or `connected`
-// state.
-//
-//	set-listen-backlog-size: func(value: u64) -> result<_, error-code>
-//
-//go:nosplit
-func (self TCPSocket) SetListenBacklogSize(value uint64) cm.ErrResult[network.ErrorCode] {
-	var result cm.ErrResult[network.ErrorCode]
-	self.wasmimportSetListenBacklogSize(value, &result)
-	return result
-}
-
-//go:wasmimport wasi:sockets/tcp@0.2.0 [method]tcp-socket.set-listen-backlog-size
-//go:noescape
-func (self TCPSocket) wasmimportSetListenBacklogSize(value uint64, result *cm.ErrResult[network.ErrorCode])
-
-// ReceiveBufferSize represents method "receive-buffer-size".
-//
-// The kernel buffer space reserved for sends/receives on this socket.
-//
-// If the provided value is 0, an `invalid-argument` error is returned.
-// Any other value will never cause an error, but it might be silently clamped and/or
-// rounded.
-// I.e. after setting a value, reading the same setting back may return a different
-// value.
-//
-// Equivalent to the SO_RCVBUF and SO_SNDBUF socket options.
-//
-// # Typical errors
-// - `invalid-argument`:     (set) The provided value was 0.
-//
-//	receive-buffer-size: func() -> result<u64, error-code>
-//
-//go:nosplit
-func (self TCPSocket) ReceiveBufferSize() cm.Result[uint64, uint64, network.ErrorCode] {
-	var result cm.Result[uint64, uint64, network.ErrorCode]
-	self.wasmimportReceiveBufferSize(&result)
-	return result
-}
-
-//go:wasmimport wasi:sockets/tcp@0.2.0 [method]tcp-socket.receive-buffer-size
-//go:noescape
-func (self TCPSocket) wasmimportReceiveBufferSize(result *cm.Result[uint64, uint64, network.ErrorCode])
-
-// KeepAliveIdleTime represents method "keep-alive-idle-time".
-//
-// Amount of time the connection has to be idle before TCP starts sending keepalive
-// packets.
-//
-// If the provided value is 0, an `invalid-argument` error is returned.
-// Any other value will never cause an error, but it might be silently clamped and/or
-// rounded.
-// I.e. after setting a value, reading the same setting back may return a different
-// value.
-//
-// Equivalent to the TCP_KEEPIDLE socket option. (TCP_KEEPALIVE on MacOS)
-//
-// # Typical errors
-// - `invalid-argument`:     (set) The provided value was 0.
-//
-//	keep-alive-idle-time: func() -> result<duration, error-code>
-//
-//go:nosplit
-func (self TCPSocket) KeepAliveIdleTime() cm.Result[monotonicclock.Duration, monotonicclock.Duration, network.ErrorCode] {
-	var result cm.Result[monotonicclock.Duration, monotonicclock.Duration, network.ErrorCode]
-	self.wasmimportKeepAliveIdleTime(&result)
-	return result
-}
-
-//go:wasmimport wasi:sockets/tcp@0.2.0 [method]tcp-socket.keep-alive-idle-time
-//go:noescape
-func (self TCPSocket) wasmimportKeepAliveIdleTime(result *cm.Result[monotonicclock.Duration, monotonicclock.Duration, network.ErrorCode])
-
-// HopLimit represents method "hop-limit".
-//
-// Equivalent to the IP_TTL & IPV6_UNICAST_HOPS socket options.
-//
-// If the provided value is 0, an `invalid-argument` error is returned.
-//
-// # Typical errors
-// - `invalid-argument`:     (set) The TTL value must be 1 or higher.
-//
-//	hop-limit: func() -> result<u8, error-code>
-//
-//go:nosplit
-func (self TCPSocket) HopLimit() cm.Result[uint8, uint8, network.ErrorCode] {
-	var result cm.Result[uint8, uint8, network.ErrorCode]
-	self.wasmimportHopLimit(&result)
-	return result
-}
-
-//go:wasmimport wasi:sockets/tcp@0.2.0 [method]tcp-socket.hop-limit
-//go:noescape
-func (self TCPSocket) wasmimportHopLimit(result *cm.Result[uint8, uint8, network.ErrorCode])
-
-// FinishConnect represents method "finish-connect".
-//
-//	finish-connect: func() -> result<tuple<own<input-stream>, own<output-stream>>,
-//	error-code>
-//
-//go:nosplit
-func (self TCPSocket) FinishConnect() cm.Result[cm.Tuple[streams.InputStream, streams.OutputStream], cm.Tuple[streams.InputStream, streams.OutputStream], network.ErrorCode] {
-	var result cm.Result[cm.Tuple[streams.InputStream, streams.OutputStream], cm.Tuple[streams.InputStream, streams.OutputStream], network.ErrorCode]
-	self.wasmimportFinishConnect(&result)
-	return result
-}
-
-//go:wasmimport wasi:sockets/tcp@0.2.0 [method]tcp-socket.finish-connect
-//go:noescape
-func (self TCPSocket) wasmimportFinishConnect(result *cm.Result[cm.Tuple[streams.InputStream, streams.OutputStream], cm.Tuple[streams.InputStream, streams.OutputStream], network.ErrorCode])
-
-// StartListen represents method "start-listen".
-//
-// Start listening for new connections.
-//
-// Transitions the socket into the `listening` state.
-//
-// Unlike POSIX, the socket must already be explicitly bound.
-//
-// # Typical errors
-// - `invalid-state`:             The socket is not bound to any local address. (EDESTADDRREQ)
-// - `invalid-state`:             The socket is already in the `connected` state.
-// (EISCONN, EINVAL on BSD)
-// - `invalid-state`:             The socket is already in the `listening` state.
-// - `address-in-use`:            Tried to perform an implicit bind, but there were
-// no ephemeral ports available. (EADDRINUSE)
-// - `not-in-progress`:           A listen operation is not in progress.
-// - `would-block`:               Can't finish the operation, it is still in progress.
-// (EWOULDBLOCK, EAGAIN)
-//
-// # Implementors note
-// Unlike in POSIX, in WASI the listen operation is async. This enables
-// interactive WASI hosts to inject permission prompts. Runtimes that
-// don't want to make use of this ability can simply call the native
-// `listen` as part of either `start-listen` or `finish-listen`.
-//
-// # References
-// - <https://pubs.opengroup.org/onlinepubs/9699919799/functions/listen.html>
-// - <https://man7.org/linux/man-pages/man2/listen.2.html>
-// - <https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-listen>
-// - <https://man.freebsd.org/cgi/man.cgi?query=listen&sektion=2>
-//
-//	start-listen: func() -> result<_, error-code>
-//
-//go:nosplit
-func (self TCPSocket) StartListen() cm.ErrResult[network.ErrorCode] {
-	var result cm.ErrResult[network.ErrorCode]
-	self.wasmimportStartListen(&result)
-	return result
-}
-
-//go:wasmimport wasi:sockets/tcp@0.2.0 [method]tcp-socket.start-listen
-//go:noescape
-func (self TCPSocket) wasmimportStartListen(result *cm.ErrResult[network.ErrorCode])
-
 // Accept represents method "accept".
 //
 // Accept a new client socket.
@@ -363,6 +118,381 @@ func (self TCPSocket) Accept() cm.Result[cm.Tuple3[TCPSocket, streams.InputStrea
 //go:noescape
 func (self TCPSocket) wasmimportAccept(result *cm.Result[cm.Tuple3[TCPSocket, streams.InputStream, streams.OutputStream], cm.Tuple3[TCPSocket, streams.InputStream, streams.OutputStream], network.ErrorCode])
 
+// AddressFamily represents method "address-family".
+//
+// Whether this is a IPv4 or IPv6 socket.
+//
+// Equivalent to the SO_DOMAIN socket option.
+//
+//	address-family: func() -> ip-address-family
+//
+//go:nosplit
+func (self TCPSocket) AddressFamily() network.IPAddressFamily {
+	return self.wasmimportAddressFamily()
+}
+
+//go:wasmimport wasi:sockets/tcp@0.2.0 [method]tcp-socket.address-family
+//go:noescape
+func (self TCPSocket) wasmimportAddressFamily() network.IPAddressFamily
+
+// FinishBind represents method "finish-bind".
+//
+//	finish-bind: func() -> result<_, error-code>
+//
+//go:nosplit
+func (self TCPSocket) FinishBind() cm.ErrResult[network.ErrorCode] {
+	var result cm.ErrResult[network.ErrorCode]
+	self.wasmimportFinishBind(&result)
+	return result
+}
+
+//go:wasmimport wasi:sockets/tcp@0.2.0 [method]tcp-socket.finish-bind
+//go:noescape
+func (self TCPSocket) wasmimportFinishBind(result *cm.ErrResult[network.ErrorCode])
+
+// FinishConnect represents method "finish-connect".
+//
+//	finish-connect: func() -> result<tuple<own<input-stream>, own<output-stream>>,
+//	error-code>
+//
+//go:nosplit
+func (self TCPSocket) FinishConnect() cm.Result[cm.Tuple[streams.InputStream, streams.OutputStream], cm.Tuple[streams.InputStream, streams.OutputStream], network.ErrorCode] {
+	var result cm.Result[cm.Tuple[streams.InputStream, streams.OutputStream], cm.Tuple[streams.InputStream, streams.OutputStream], network.ErrorCode]
+	self.wasmimportFinishConnect(&result)
+	return result
+}
+
+//go:wasmimport wasi:sockets/tcp@0.2.0 [method]tcp-socket.finish-connect
+//go:noescape
+func (self TCPSocket) wasmimportFinishConnect(result *cm.Result[cm.Tuple[streams.InputStream, streams.OutputStream], cm.Tuple[streams.InputStream, streams.OutputStream], network.ErrorCode])
+
+// FinishListen represents method "finish-listen".
+//
+//	finish-listen: func() -> result<_, error-code>
+//
+//go:nosplit
+func (self TCPSocket) FinishListen() cm.ErrResult[network.ErrorCode] {
+	var result cm.ErrResult[network.ErrorCode]
+	self.wasmimportFinishListen(&result)
+	return result
+}
+
+//go:wasmimport wasi:sockets/tcp@0.2.0 [method]tcp-socket.finish-listen
+//go:noescape
+func (self TCPSocket) wasmimportFinishListen(result *cm.ErrResult[network.ErrorCode])
+
+// HopLimit represents method "hop-limit".
+//
+// Equivalent to the IP_TTL & IPV6_UNICAST_HOPS socket options.
+//
+// If the provided value is 0, an `invalid-argument` error is returned.
+//
+// # Typical errors
+// - `invalid-argument`:     (set) The TTL value must be 1 or higher.
+//
+//	hop-limit: func() -> result<u8, error-code>
+//
+//go:nosplit
+func (self TCPSocket) HopLimit() cm.Result[uint8, uint8, network.ErrorCode] {
+	var result cm.Result[uint8, uint8, network.ErrorCode]
+	self.wasmimportHopLimit(&result)
+	return result
+}
+
+//go:wasmimport wasi:sockets/tcp@0.2.0 [method]tcp-socket.hop-limit
+//go:noescape
+func (self TCPSocket) wasmimportHopLimit(result *cm.Result[uint8, uint8, network.ErrorCode])
+
+// IsListening represents method "is-listening".
+//
+// Whether the socket is in the `listening` state.
+//
+// Equivalent to the SO_ACCEPTCONN socket option.
+//
+//	is-listening: func() -> bool
+//
+//go:nosplit
+func (self TCPSocket) IsListening() bool {
+	return self.wasmimportIsListening()
+}
+
+//go:wasmimport wasi:sockets/tcp@0.2.0 [method]tcp-socket.is-listening
+//go:noescape
+func (self TCPSocket) wasmimportIsListening() bool
+
+// KeepAliveCount represents method "keep-alive-count".
+//
+// The maximum amount of keepalive packets TCP should send before aborting the connection.
+//
+// If the provided value is 0, an `invalid-argument` error is returned.
+// Any other value will never cause an error, but it might be silently clamped and/or
+// rounded.
+// I.e. after setting a value, reading the same setting back may return a different
+// value.
+//
+// Equivalent to the TCP_KEEPCNT socket option.
+//
+// # Typical errors
+// - `invalid-argument`:     (set) The provided value was 0.
+//
+//	keep-alive-count: func() -> result<u32, error-code>
+//
+//go:nosplit
+func (self TCPSocket) KeepAliveCount() cm.Result[uint32, uint32, network.ErrorCode] {
+	var result cm.Result[uint32, uint32, network.ErrorCode]
+	self.wasmimportKeepAliveCount(&result)
+	return result
+}
+
+//go:wasmimport wasi:sockets/tcp@0.2.0 [method]tcp-socket.keep-alive-count
+//go:noescape
+func (self TCPSocket) wasmimportKeepAliveCount(result *cm.Result[uint32, uint32, network.ErrorCode])
+
+// KeepAliveEnabled represents method "keep-alive-enabled".
+//
+// Enables or disables keepalive.
+//
+// The keepalive behavior can be adjusted using:
+// - `keep-alive-idle-time`
+// - `keep-alive-interval`
+// - `keep-alive-count`
+// These properties can be configured while `keep-alive-enabled` is false, but only
+// come into effect when `keep-alive-enabled` is true.
+//
+// Equivalent to the SO_KEEPALIVE socket option.
+//
+//	keep-alive-enabled: func() -> result<bool, error-code>
+//
+//go:nosplit
+func (self TCPSocket) KeepAliveEnabled() cm.Result[bool, bool, network.ErrorCode] {
+	var result cm.Result[bool, bool, network.ErrorCode]
+	self.wasmimportKeepAliveEnabled(&result)
+	return result
+}
+
+//go:wasmimport wasi:sockets/tcp@0.2.0 [method]tcp-socket.keep-alive-enabled
+//go:noescape
+func (self TCPSocket) wasmimportKeepAliveEnabled(result *cm.Result[bool, bool, network.ErrorCode])
+
+// KeepAliveIdleTime represents method "keep-alive-idle-time".
+//
+// Amount of time the connection has to be idle before TCP starts sending keepalive
+// packets.
+//
+// If the provided value is 0, an `invalid-argument` error is returned.
+// Any other value will never cause an error, but it might be silently clamped and/or
+// rounded.
+// I.e. after setting a value, reading the same setting back may return a different
+// value.
+//
+// Equivalent to the TCP_KEEPIDLE socket option. (TCP_KEEPALIVE on MacOS)
+//
+// # Typical errors
+// - `invalid-argument`:     (set) The provided value was 0.
+//
+//	keep-alive-idle-time: func() -> result<duration, error-code>
+//
+//go:nosplit
+func (self TCPSocket) KeepAliveIdleTime() cm.Result[monotonicclock.Duration, monotonicclock.Duration, network.ErrorCode] {
+	var result cm.Result[monotonicclock.Duration, monotonicclock.Duration, network.ErrorCode]
+	self.wasmimportKeepAliveIdleTime(&result)
+	return result
+}
+
+//go:wasmimport wasi:sockets/tcp@0.2.0 [method]tcp-socket.keep-alive-idle-time
+//go:noescape
+func (self TCPSocket) wasmimportKeepAliveIdleTime(result *cm.Result[monotonicclock.Duration, monotonicclock.Duration, network.ErrorCode])
+
+// KeepAliveInterval represents method "keep-alive-interval".
+//
+// The time between keepalive packets.
+//
+// If the provided value is 0, an `invalid-argument` error is returned.
+// Any other value will never cause an error, but it might be silently clamped and/or
+// rounded.
+// I.e. after setting a value, reading the same setting back may return a different
+// value.
+//
+// Equivalent to the TCP_KEEPINTVL socket option.
+//
+// # Typical errors
+// - `invalid-argument`:     (set) The provided value was 0.
+//
+//	keep-alive-interval: func() -> result<duration, error-code>
+//
+//go:nosplit
+func (self TCPSocket) KeepAliveInterval() cm.Result[monotonicclock.Duration, monotonicclock.Duration, network.ErrorCode] {
+	var result cm.Result[monotonicclock.Duration, monotonicclock.Duration, network.ErrorCode]
+	self.wasmimportKeepAliveInterval(&result)
+	return result
+}
+
+//go:wasmimport wasi:sockets/tcp@0.2.0 [method]tcp-socket.keep-alive-interval
+//go:noescape
+func (self TCPSocket) wasmimportKeepAliveInterval(result *cm.Result[monotonicclock.Duration, monotonicclock.Duration, network.ErrorCode])
+
+// LocalAddress represents method "local-address".
+//
+// Get the bound local address.
+//
+// POSIX mentions:
+// > If the socket has not been bound to a local name, the value
+// > stored in the object pointed to by `address` is unspecified.
+//
+// WASI is stricter and requires `local-address` to return `invalid-state` when the
+// socket hasn't been bound yet.
+//
+// # Typical errors
+// - `invalid-state`: The socket is not bound to any local address.
+//
+// # References
+// - <https://pubs.opengroup.org/onlinepubs/9699919799/functions/getsockname.html>
+// - <https://man7.org/linux/man-pages/man2/getsockname.2.html>
+// - <https://learn.microsoft.com/en-us/windows/win32/api/winsock/nf-winsock-getsockname>
+// - <https://man.freebsd.org/cgi/man.cgi?getsockname>
+//
+//	local-address: func() -> result<ip-socket-address, error-code>
+//
+//go:nosplit
+func (self TCPSocket) LocalAddress() cm.Result[network.IPSocketAddress, network.IPSocketAddress, network.ErrorCode] {
+	var result cm.Result[network.IPSocketAddress, network.IPSocketAddress, network.ErrorCode]
+	self.wasmimportLocalAddress(&result)
+	return result
+}
+
+//go:wasmimport wasi:sockets/tcp@0.2.0 [method]tcp-socket.local-address
+//go:noescape
+func (self TCPSocket) wasmimportLocalAddress(result *cm.Result[network.IPSocketAddress, network.IPSocketAddress, network.ErrorCode])
+
+// ReceiveBufferSize represents method "receive-buffer-size".
+//
+// The kernel buffer space reserved for sends/receives on this socket.
+//
+// If the provided value is 0, an `invalid-argument` error is returned.
+// Any other value will never cause an error, but it might be silently clamped and/or
+// rounded.
+// I.e. after setting a value, reading the same setting back may return a different
+// value.
+//
+// Equivalent to the SO_RCVBUF and SO_SNDBUF socket options.
+//
+// # Typical errors
+// - `invalid-argument`:     (set) The provided value was 0.
+//
+//	receive-buffer-size: func() -> result<u64, error-code>
+//
+//go:nosplit
+func (self TCPSocket) ReceiveBufferSize() cm.Result[uint64, uint64, network.ErrorCode] {
+	var result cm.Result[uint64, uint64, network.ErrorCode]
+	self.wasmimportReceiveBufferSize(&result)
+	return result
+}
+
+//go:wasmimport wasi:sockets/tcp@0.2.0 [method]tcp-socket.receive-buffer-size
+//go:noescape
+func (self TCPSocket) wasmimportReceiveBufferSize(result *cm.Result[uint64, uint64, network.ErrorCode])
+
+// RemoteAddress represents method "remote-address".
+//
+// Get the remote address.
+//
+// # Typical errors
+// - `invalid-state`: The socket is not connected to a remote address. (ENOTCONN)
+//
+// # References
+// - <https://pubs.opengroup.org/onlinepubs/9699919799/functions/getpeername.html>
+// - <https://man7.org/linux/man-pages/man2/getpeername.2.html>
+// - <https://learn.microsoft.com/en-us/windows/win32/api/winsock/nf-winsock-getpeername>
+// - <https://man.freebsd.org/cgi/man.cgi?query=getpeername&sektion=2&n=1>
+//
+//	remote-address: func() -> result<ip-socket-address, error-code>
+//
+//go:nosplit
+func (self TCPSocket) RemoteAddress() cm.Result[network.IPSocketAddress, network.IPSocketAddress, network.ErrorCode] {
+	var result cm.Result[network.IPSocketAddress, network.IPSocketAddress, network.ErrorCode]
+	self.wasmimportRemoteAddress(&result)
+	return result
+}
+
+//go:wasmimport wasi:sockets/tcp@0.2.0 [method]tcp-socket.remote-address
+//go:noescape
+func (self TCPSocket) wasmimportRemoteAddress(result *cm.Result[network.IPSocketAddress, network.IPSocketAddress, network.ErrorCode])
+
+// SendBufferSize represents method "send-buffer-size".
+//
+//	send-buffer-size: func() -> result<u64, error-code>
+//
+//go:nosplit
+func (self TCPSocket) SendBufferSize() cm.Result[uint64, uint64, network.ErrorCode] {
+	var result cm.Result[uint64, uint64, network.ErrorCode]
+	self.wasmimportSendBufferSize(&result)
+	return result
+}
+
+//go:wasmimport wasi:sockets/tcp@0.2.0 [method]tcp-socket.send-buffer-size
+//go:noescape
+func (self TCPSocket) wasmimportSendBufferSize(result *cm.Result[uint64, uint64, network.ErrorCode])
+
+// SetHopLimit represents method "set-hop-limit".
+//
+//	set-hop-limit: func(value: u8) -> result<_, error-code>
+//
+//go:nosplit
+func (self TCPSocket) SetHopLimit(value uint8) cm.ErrResult[network.ErrorCode] {
+	var result cm.ErrResult[network.ErrorCode]
+	self.wasmimportSetHopLimit(value, &result)
+	return result
+}
+
+//go:wasmimport wasi:sockets/tcp@0.2.0 [method]tcp-socket.set-hop-limit
+//go:noescape
+func (self TCPSocket) wasmimportSetHopLimit(value uint8, result *cm.ErrResult[network.ErrorCode])
+
+// SetKeepAliveCount represents method "set-keep-alive-count".
+//
+//	set-keep-alive-count: func(value: u32) -> result<_, error-code>
+//
+//go:nosplit
+func (self TCPSocket) SetKeepAliveCount(value uint32) cm.ErrResult[network.ErrorCode] {
+	var result cm.ErrResult[network.ErrorCode]
+	self.wasmimportSetKeepAliveCount(value, &result)
+	return result
+}
+
+//go:wasmimport wasi:sockets/tcp@0.2.0 [method]tcp-socket.set-keep-alive-count
+//go:noescape
+func (self TCPSocket) wasmimportSetKeepAliveCount(value uint32, result *cm.ErrResult[network.ErrorCode])
+
+// SetKeepAliveEnabled represents method "set-keep-alive-enabled".
+//
+//	set-keep-alive-enabled: func(value: bool) -> result<_, error-code>
+//
+//go:nosplit
+func (self TCPSocket) SetKeepAliveEnabled(value bool) cm.ErrResult[network.ErrorCode] {
+	var result cm.ErrResult[network.ErrorCode]
+	self.wasmimportSetKeepAliveEnabled(value, &result)
+	return result
+}
+
+//go:wasmimport wasi:sockets/tcp@0.2.0 [method]tcp-socket.set-keep-alive-enabled
+//go:noescape
+func (self TCPSocket) wasmimportSetKeepAliveEnabled(value bool, result *cm.ErrResult[network.ErrorCode])
+
+// SetKeepAliveIdleTime represents method "set-keep-alive-idle-time".
+//
+//	set-keep-alive-idle-time: func(value: duration) -> result<_, error-code>
+//
+//go:nosplit
+func (self TCPSocket) SetKeepAliveIdleTime(value monotonicclock.Duration) cm.ErrResult[network.ErrorCode] {
+	var result cm.ErrResult[network.ErrorCode]
+	self.wasmimportSetKeepAliveIdleTime(value, &result)
+	return result
+}
+
+//go:wasmimport wasi:sockets/tcp@0.2.0 [method]tcp-socket.set-keep-alive-idle-time
+//go:noescape
+func (self TCPSocket) wasmimportSetKeepAliveIdleTime(value monotonicclock.Duration, result *cm.ErrResult[network.ErrorCode])
+
 // SetKeepAliveInterval represents method "set-keep-alive-interval".
 //
 //	set-keep-alive-interval: func(value: duration) -> result<_, error-code>
@@ -377,6 +507,103 @@ func (self TCPSocket) SetKeepAliveInterval(value monotonicclock.Duration) cm.Err
 //go:wasmimport wasi:sockets/tcp@0.2.0 [method]tcp-socket.set-keep-alive-interval
 //go:noescape
 func (self TCPSocket) wasmimportSetKeepAliveInterval(value monotonicclock.Duration, result *cm.ErrResult[network.ErrorCode])
+
+// SetListenBacklogSize represents method "set-listen-backlog-size".
+//
+// Hints the desired listen queue size. Implementations are free to ignore this.
+//
+// If the provided value is 0, an `invalid-argument` error is returned.
+// Any other value will never cause an error, but it might be silently clamped and/or
+// rounded.
+//
+// # Typical errors
+// - `not-supported`:        (set) The platform does not support changing the backlog
+// size after the initial listen.
+// - `invalid-argument`:     (set) The provided value was 0.
+// - `invalid-state`:        (set) The socket is in the `connect-in-progress` or `connected`
+// state.
+//
+//	set-listen-backlog-size: func(value: u64) -> result<_, error-code>
+//
+//go:nosplit
+func (self TCPSocket) SetListenBacklogSize(value uint64) cm.ErrResult[network.ErrorCode] {
+	var result cm.ErrResult[network.ErrorCode]
+	self.wasmimportSetListenBacklogSize(value, &result)
+	return result
+}
+
+//go:wasmimport wasi:sockets/tcp@0.2.0 [method]tcp-socket.set-listen-backlog-size
+//go:noescape
+func (self TCPSocket) wasmimportSetListenBacklogSize(value uint64, result *cm.ErrResult[network.ErrorCode])
+
+// SetReceiveBufferSize represents method "set-receive-buffer-size".
+//
+//	set-receive-buffer-size: func(value: u64) -> result<_, error-code>
+//
+//go:nosplit
+func (self TCPSocket) SetReceiveBufferSize(value uint64) cm.ErrResult[network.ErrorCode] {
+	var result cm.ErrResult[network.ErrorCode]
+	self.wasmimportSetReceiveBufferSize(value, &result)
+	return result
+}
+
+//go:wasmimport wasi:sockets/tcp@0.2.0 [method]tcp-socket.set-receive-buffer-size
+//go:noescape
+func (self TCPSocket) wasmimportSetReceiveBufferSize(value uint64, result *cm.ErrResult[network.ErrorCode])
+
+// SetSendBufferSize represents method "set-send-buffer-size".
+//
+//	set-send-buffer-size: func(value: u64) -> result<_, error-code>
+//
+//go:nosplit
+func (self TCPSocket) SetSendBufferSize(value uint64) cm.ErrResult[network.ErrorCode] {
+	var result cm.ErrResult[network.ErrorCode]
+	self.wasmimportSetSendBufferSize(value, &result)
+	return result
+}
+
+//go:wasmimport wasi:sockets/tcp@0.2.0 [method]tcp-socket.set-send-buffer-size
+//go:noescape
+func (self TCPSocket) wasmimportSetSendBufferSize(value uint64, result *cm.ErrResult[network.ErrorCode])
+
+// Shutdown represents method "shutdown".
+//
+// Initiate a graceful shutdown.
+//
+// - `receive`: The socket is not expecting to receive any data from
+// the peer. The `input-stream` associated with this socket will be
+// closed. Any data still in the receive queue at time of calling
+// this method will be discarded.
+// - `send`: The socket has no more data to send to the peer. The `output-stream`
+// associated with this socket will be closed and a FIN packet will be sent.
+// - `both`: Same effect as `receive` & `send` combined.
+//
+// This function is idempotent. Shutting a down a direction more than once
+// has no effect and returns `ok`.
+//
+// The shutdown function does not close (drop) the socket.
+//
+// # Typical errors
+// - `invalid-state`: The socket is not in the `connected` state. (ENOTCONN)
+//
+// # References
+// - <https://pubs.opengroup.org/onlinepubs/9699919799/functions/shutdown.html>
+// - <https://man7.org/linux/man-pages/man2/shutdown.2.html>
+// - <https://learn.microsoft.com/en-us/windows/win32/api/winsock/nf-winsock-shutdown>
+// - <https://man.freebsd.org/cgi/man.cgi?query=shutdown&sektion=2>
+//
+//	shutdown: func(shutdown-type: shutdown-type) -> result<_, error-code>
+//
+//go:nosplit
+func (self TCPSocket) Shutdown(shutdownType ShutdownType) cm.ErrResult[network.ErrorCode] {
+	var result cm.ErrResult[network.ErrorCode]
+	self.wasmimportShutdown(shutdownType, &result)
+	return result
+}
+
+//go:wasmimport wasi:sockets/tcp@0.2.0 [method]tcp-socket.shutdown
+//go:noescape
+func (self TCPSocket) wasmimportShutdown(shutdownType ShutdownType, result *cm.ErrResult[network.ErrorCode])
 
 // StartBind represents method "start-bind".
 //
@@ -441,75 +668,6 @@ func (self TCPSocket) StartBind(network_ network.Network, localAddress network.I
 //go:wasmimport wasi:sockets/tcp@0.2.0 [method]tcp-socket.start-bind
 //go:noescape
 func (self TCPSocket) wasmimportStartBind(network_ network.Network, localAddress network.IPSocketAddress, result *cm.ErrResult[network.ErrorCode])
-
-// FinishBind represents method "finish-bind".
-//
-//	finish-bind: func() -> result<_, error-code>
-//
-//go:nosplit
-func (self TCPSocket) FinishBind() cm.ErrResult[network.ErrorCode] {
-	var result cm.ErrResult[network.ErrorCode]
-	self.wasmimportFinishBind(&result)
-	return result
-}
-
-//go:wasmimport wasi:sockets/tcp@0.2.0 [method]tcp-socket.finish-bind
-//go:noescape
-func (self TCPSocket) wasmimportFinishBind(result *cm.ErrResult[network.ErrorCode])
-
-// SetSendBufferSize represents method "set-send-buffer-size".
-//
-//	set-send-buffer-size: func(value: u64) -> result<_, error-code>
-//
-//go:nosplit
-func (self TCPSocket) SetSendBufferSize(value uint64) cm.ErrResult[network.ErrorCode] {
-	var result cm.ErrResult[network.ErrorCode]
-	self.wasmimportSetSendBufferSize(value, &result)
-	return result
-}
-
-//go:wasmimport wasi:sockets/tcp@0.2.0 [method]tcp-socket.set-send-buffer-size
-//go:noescape
-func (self TCPSocket) wasmimportSetSendBufferSize(value uint64, result *cm.ErrResult[network.ErrorCode])
-
-// Shutdown represents method "shutdown".
-//
-// Initiate a graceful shutdown.
-//
-// - `receive`: The socket is not expecting to receive any data from
-// the peer. The `input-stream` associated with this socket will be
-// closed. Any data still in the receive queue at time of calling
-// this method will be discarded.
-// - `send`: The socket has no more data to send to the peer. The `output-stream`
-// associated with this socket will be closed and a FIN packet will be sent.
-// - `both`: Same effect as `receive` & `send` combined.
-//
-// This function is idempotent. Shutting a down a direction more than once
-// has no effect and returns `ok`.
-//
-// The shutdown function does not close (drop) the socket.
-//
-// # Typical errors
-// - `invalid-state`: The socket is not in the `connected` state. (ENOTCONN)
-//
-// # References
-// - <https://pubs.opengroup.org/onlinepubs/9699919799/functions/shutdown.html>
-// - <https://man7.org/linux/man-pages/man2/shutdown.2.html>
-// - <https://learn.microsoft.com/en-us/windows/win32/api/winsock/nf-winsock-shutdown>
-// - <https://man.freebsd.org/cgi/man.cgi?query=shutdown&sektion=2>
-//
-//	shutdown: func(shutdown-type: shutdown-type) -> result<_, error-code>
-//
-//go:nosplit
-func (self TCPSocket) Shutdown(shutdownType ShutdownType) cm.ErrResult[network.ErrorCode] {
-	var result cm.ErrResult[network.ErrorCode]
-	self.wasmimportShutdown(shutdownType, &result)
-	return result
-}
-
-//go:wasmimport wasi:sockets/tcp@0.2.0 [method]tcp-socket.shutdown
-//go:noescape
-func (self TCPSocket) wasmimportShutdown(shutdownType ShutdownType, result *cm.ErrResult[network.ErrorCode])
 
 // StartConnect represents method "start-connect".
 //
@@ -581,235 +739,77 @@ func (self TCPSocket) StartConnect(network_ network.Network, remoteAddress netwo
 //go:noescape
 func (self TCPSocket) wasmimportStartConnect(network_ network.Network, remoteAddress network.IPSocketAddress, result *cm.ErrResult[network.ErrorCode])
 
-// RemoteAddress represents method "remote-address".
+// StartListen represents method "start-listen".
 //
-// Get the remote address.
+// Start listening for new connections.
+//
+// Transitions the socket into the `listening` state.
+//
+// Unlike POSIX, the socket must already be explicitly bound.
 //
 // # Typical errors
-// - `invalid-state`: The socket is not connected to a remote address. (ENOTCONN)
+// - `invalid-state`:             The socket is not bound to any local address. (EDESTADDRREQ)
+// - `invalid-state`:             The socket is already in the `connected` state.
+// (EISCONN, EINVAL on BSD)
+// - `invalid-state`:             The socket is already in the `listening` state.
+// - `address-in-use`:            Tried to perform an implicit bind, but there were
+// no ephemeral ports available. (EADDRINUSE)
+// - `not-in-progress`:           A listen operation is not in progress.
+// - `would-block`:               Can't finish the operation, it is still in progress.
+// (EWOULDBLOCK, EAGAIN)
+//
+// # Implementors note
+// Unlike in POSIX, in WASI the listen operation is async. This enables
+// interactive WASI hosts to inject permission prompts. Runtimes that
+// don't want to make use of this ability can simply call the native
+// `listen` as part of either `start-listen` or `finish-listen`.
 //
 // # References
-// - <https://pubs.opengroup.org/onlinepubs/9699919799/functions/getpeername.html>
-// - <https://man7.org/linux/man-pages/man2/getpeername.2.html>
-// - <https://learn.microsoft.com/en-us/windows/win32/api/winsock/nf-winsock-getpeername>
-// - <https://man.freebsd.org/cgi/man.cgi?query=getpeername&sektion=2&n=1>
+// - <https://pubs.opengroup.org/onlinepubs/9699919799/functions/listen.html>
+// - <https://man7.org/linux/man-pages/man2/listen.2.html>
+// - <https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-listen>
+// - <https://man.freebsd.org/cgi/man.cgi?query=listen&sektion=2>
 //
-//	remote-address: func() -> result<ip-socket-address, error-code>
-//
-//go:nosplit
-func (self TCPSocket) RemoteAddress() cm.Result[network.IPSocketAddress, network.IPSocketAddress, network.ErrorCode] {
-	var result cm.Result[network.IPSocketAddress, network.IPSocketAddress, network.ErrorCode]
-	self.wasmimportRemoteAddress(&result)
-	return result
-}
-
-//go:wasmimport wasi:sockets/tcp@0.2.0 [method]tcp-socket.remote-address
-//go:noescape
-func (self TCPSocket) wasmimportRemoteAddress(result *cm.Result[network.IPSocketAddress, network.IPSocketAddress, network.ErrorCode])
-
-// SetKeepAliveIdleTime represents method "set-keep-alive-idle-time".
-//
-//	set-keep-alive-idle-time: func(value: duration) -> result<_, error-code>
+//	start-listen: func() -> result<_, error-code>
 //
 //go:nosplit
-func (self TCPSocket) SetKeepAliveIdleTime(value monotonicclock.Duration) cm.ErrResult[network.ErrorCode] {
+func (self TCPSocket) StartListen() cm.ErrResult[network.ErrorCode] {
 	var result cm.ErrResult[network.ErrorCode]
-	self.wasmimportSetKeepAliveIdleTime(value, &result)
+	self.wasmimportStartListen(&result)
 	return result
 }
 
-//go:wasmimport wasi:sockets/tcp@0.2.0 [method]tcp-socket.set-keep-alive-idle-time
+//go:wasmimport wasi:sockets/tcp@0.2.0 [method]tcp-socket.start-listen
 //go:noescape
-func (self TCPSocket) wasmimportSetKeepAliveIdleTime(value monotonicclock.Duration, result *cm.ErrResult[network.ErrorCode])
+func (self TCPSocket) wasmimportStartListen(result *cm.ErrResult[network.ErrorCode])
 
-// SetHopLimit represents method "set-hop-limit".
+// Subscribe represents method "subscribe".
 //
-//	set-hop-limit: func(value: u8) -> result<_, error-code>
+// Create a `pollable` which can be used to poll for, or block on,
+// completion of any of the asynchronous operations of this socket.
+//
+// When `finish-bind`, `finish-listen`, `finish-connect` or `accept`
+// return `error(would-block)`, this pollable can be used to wait for
+// their success or failure, after which the method can be retried.
+//
+// The pollable is not limited to the async operation that happens to be
+// in progress at the time of calling `subscribe` (if any). Theoretically,
+// `subscribe` only has to be called once per socket and can then be
+// (re)used for the remainder of the socket's lifetime.
+//
+// See <https://github.com/WebAssembly/wasi-sockets/TcpSocketOperationalSemantics.md#Pollable-readiness>
+// for a more information.
+//
+// Note: this function is here for WASI Preview2 only.
+// It's planned to be removed when `future` is natively supported in Preview3.
+//
+//	subscribe: func() -> own<pollable>
 //
 //go:nosplit
-func (self TCPSocket) SetHopLimit(value uint8) cm.ErrResult[network.ErrorCode] {
-	var result cm.ErrResult[network.ErrorCode]
-	self.wasmimportSetHopLimit(value, &result)
-	return result
+func (self TCPSocket) Subscribe() poll.Pollable {
+	return self.wasmimportSubscribe()
 }
 
-//go:wasmimport wasi:sockets/tcp@0.2.0 [method]tcp-socket.set-hop-limit
+//go:wasmimport wasi:sockets/tcp@0.2.0 [method]tcp-socket.subscribe
 //go:noescape
-func (self TCPSocket) wasmimportSetHopLimit(value uint8, result *cm.ErrResult[network.ErrorCode])
-
-// KeepAliveInterval represents method "keep-alive-interval".
-//
-// The time between keepalive packets.
-//
-// If the provided value is 0, an `invalid-argument` error is returned.
-// Any other value will never cause an error, but it might be silently clamped and/or
-// rounded.
-// I.e. after setting a value, reading the same setting back may return a different
-// value.
-//
-// Equivalent to the TCP_KEEPINTVL socket option.
-//
-// # Typical errors
-// - `invalid-argument`:     (set) The provided value was 0.
-//
-//	keep-alive-interval: func() -> result<duration, error-code>
-//
-//go:nosplit
-func (self TCPSocket) KeepAliveInterval() cm.Result[monotonicclock.Duration, monotonicclock.Duration, network.ErrorCode] {
-	var result cm.Result[monotonicclock.Duration, monotonicclock.Duration, network.ErrorCode]
-	self.wasmimportKeepAliveInterval(&result)
-	return result
-}
-
-//go:wasmimport wasi:sockets/tcp@0.2.0 [method]tcp-socket.keep-alive-interval
-//go:noescape
-func (self TCPSocket) wasmimportKeepAliveInterval(result *cm.Result[monotonicclock.Duration, monotonicclock.Duration, network.ErrorCode])
-
-// SetKeepAliveCount represents method "set-keep-alive-count".
-//
-//	set-keep-alive-count: func(value: u32) -> result<_, error-code>
-//
-//go:nosplit
-func (self TCPSocket) SetKeepAliveCount(value uint32) cm.ErrResult[network.ErrorCode] {
-	var result cm.ErrResult[network.ErrorCode]
-	self.wasmimportSetKeepAliveCount(value, &result)
-	return result
-}
-
-//go:wasmimport wasi:sockets/tcp@0.2.0 [method]tcp-socket.set-keep-alive-count
-//go:noescape
-func (self TCPSocket) wasmimportSetKeepAliveCount(value uint32, result *cm.ErrResult[network.ErrorCode])
-
-// KeepAliveCount represents method "keep-alive-count".
-//
-// The maximum amount of keepalive packets TCP should send before aborting the connection.
-//
-// If the provided value is 0, an `invalid-argument` error is returned.
-// Any other value will never cause an error, but it might be silently clamped and/or
-// rounded.
-// I.e. after setting a value, reading the same setting back may return a different
-// value.
-//
-// Equivalent to the TCP_KEEPCNT socket option.
-//
-// # Typical errors
-// - `invalid-argument`:     (set) The provided value was 0.
-//
-//	keep-alive-count: func() -> result<u32, error-code>
-//
-//go:nosplit
-func (self TCPSocket) KeepAliveCount() cm.Result[uint32, uint32, network.ErrorCode] {
-	var result cm.Result[uint32, uint32, network.ErrorCode]
-	self.wasmimportKeepAliveCount(&result)
-	return result
-}
-
-//go:wasmimport wasi:sockets/tcp@0.2.0 [method]tcp-socket.keep-alive-count
-//go:noescape
-func (self TCPSocket) wasmimportKeepAliveCount(result *cm.Result[uint32, uint32, network.ErrorCode])
-
-// SendBufferSize represents method "send-buffer-size".
-//
-//	send-buffer-size: func() -> result<u64, error-code>
-//
-//go:nosplit
-func (self TCPSocket) SendBufferSize() cm.Result[uint64, uint64, network.ErrorCode] {
-	var result cm.Result[uint64, uint64, network.ErrorCode]
-	self.wasmimportSendBufferSize(&result)
-	return result
-}
-
-//go:wasmimport wasi:sockets/tcp@0.2.0 [method]tcp-socket.send-buffer-size
-//go:noescape
-func (self TCPSocket) wasmimportSendBufferSize(result *cm.Result[uint64, uint64, network.ErrorCode])
-
-// LocalAddress represents method "local-address".
-//
-// Get the bound local address.
-//
-// POSIX mentions:
-// > If the socket has not been bound to a local name, the value
-// > stored in the object pointed to by `address` is unspecified.
-//
-// WASI is stricter and requires `local-address` to return `invalid-state` when the
-// socket hasn't been bound yet.
-//
-// # Typical errors
-// - `invalid-state`: The socket is not bound to any local address.
-//
-// # References
-// - <https://pubs.opengroup.org/onlinepubs/9699919799/functions/getsockname.html>
-// - <https://man7.org/linux/man-pages/man2/getsockname.2.html>
-// - <https://learn.microsoft.com/en-us/windows/win32/api/winsock/nf-winsock-getsockname>
-// - <https://man.freebsd.org/cgi/man.cgi?getsockname>
-//
-//	local-address: func() -> result<ip-socket-address, error-code>
-//
-//go:nosplit
-func (self TCPSocket) LocalAddress() cm.Result[network.IPSocketAddress, network.IPSocketAddress, network.ErrorCode] {
-	var result cm.Result[network.IPSocketAddress, network.IPSocketAddress, network.ErrorCode]
-	self.wasmimportLocalAddress(&result)
-	return result
-}
-
-//go:wasmimport wasi:sockets/tcp@0.2.0 [method]tcp-socket.local-address
-//go:noescape
-func (self TCPSocket) wasmimportLocalAddress(result *cm.Result[network.IPSocketAddress, network.IPSocketAddress, network.ErrorCode])
-
-// AddressFamily represents method "address-family".
-//
-// Whether this is a IPv4 or IPv6 socket.
-//
-// Equivalent to the SO_DOMAIN socket option.
-//
-//	address-family: func() -> ip-address-family
-//
-//go:nosplit
-func (self TCPSocket) AddressFamily() network.IPAddressFamily {
-	return self.wasmimportAddressFamily()
-}
-
-//go:wasmimport wasi:sockets/tcp@0.2.0 [method]tcp-socket.address-family
-//go:noescape
-func (self TCPSocket) wasmimportAddressFamily() network.IPAddressFamily
-
-// KeepAliveEnabled represents method "keep-alive-enabled".
-//
-// Enables or disables keepalive.
-//
-// The keepalive behavior can be adjusted using:
-// - `keep-alive-idle-time`
-// - `keep-alive-interval`
-// - `keep-alive-count`
-// These properties can be configured while `keep-alive-enabled` is false, but only
-// come into effect when `keep-alive-enabled` is true.
-//
-// Equivalent to the SO_KEEPALIVE socket option.
-//
-//	keep-alive-enabled: func() -> result<bool, error-code>
-//
-//go:nosplit
-func (self TCPSocket) KeepAliveEnabled() cm.Result[bool, bool, network.ErrorCode] {
-	var result cm.Result[bool, bool, network.ErrorCode]
-	self.wasmimportKeepAliveEnabled(&result)
-	return result
-}
-
-//go:wasmimport wasi:sockets/tcp@0.2.0 [method]tcp-socket.keep-alive-enabled
-//go:noescape
-func (self TCPSocket) wasmimportKeepAliveEnabled(result *cm.Result[bool, bool, network.ErrorCode])
-
-// SetKeepAliveEnabled represents method "set-keep-alive-enabled".
-//
-//	set-keep-alive-enabled: func(value: bool) -> result<_, error-code>
-//
-//go:nosplit
-func (self TCPSocket) SetKeepAliveEnabled(value bool) cm.ErrResult[network.ErrorCode] {
-	var result cm.ErrResult[network.ErrorCode]
-	self.wasmimportSetKeepAliveEnabled(value, &result)
-	return result
-}
-
-//go:wasmimport wasi:sockets/tcp@0.2.0 [method]tcp-socket.set-keep-alive-enabled
-//go:noescape
-func (self TCPSocket) wasmimportSetKeepAliveEnabled(value bool, result *cm.ErrResult[network.ErrorCode])
+func (self TCPSocket) wasmimportSubscribe() poll.Pollable

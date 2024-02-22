@@ -50,24 +50,6 @@ func (self IncomingDatagramStream) ResourceDrop() {
 //go:noescape
 func (self IncomingDatagramStream) wasmimportResourceDrop()
 
-// Subscribe represents method "subscribe".
-//
-// Create a `pollable` which will resolve once the stream is ready to receive again.
-//
-// Note: this function is here for WASI Preview2 only.
-// It's planned to be removed when `future` is natively supported in Preview3.
-//
-//	subscribe: func() -> own<pollable>
-//
-//go:nosplit
-func (self IncomingDatagramStream) Subscribe() poll.Pollable {
-	return self.wasmimportSubscribe()
-}
-
-//go:wasmimport wasi:sockets/udp@0.2.0 [method]incoming-datagram-stream.subscribe
-//go:noescape
-func (self IncomingDatagramStream) wasmimportSubscribe() poll.Pollable
-
 // Receive represents method "receive".
 //
 // Receive messages on the socket.
@@ -108,6 +90,24 @@ func (self IncomingDatagramStream) Receive(maxResults uint64) cm.Result[cm.List[
 //go:wasmimport wasi:sockets/udp@0.2.0 [method]incoming-datagram-stream.receive
 //go:noescape
 func (self IncomingDatagramStream) wasmimportReceive(maxResults uint64, result *cm.Result[cm.List[IncomingDatagram], cm.List[IncomingDatagram], network.ErrorCode])
+
+// Subscribe represents method "subscribe".
+//
+// Create a `pollable` which will resolve once the stream is ready to receive again.
+//
+// Note: this function is here for WASI Preview2 only.
+// It's planned to be removed when `future` is natively supported in Preview3.
+//
+//	subscribe: func() -> own<pollable>
+//
+//go:nosplit
+func (self IncomingDatagramStream) Subscribe() poll.Pollable {
+	return self.wasmimportSubscribe()
+}
+
+//go:wasmimport wasi:sockets/udp@0.2.0 [method]incoming-datagram-stream.subscribe
+//go:noescape
+func (self IncomingDatagramStream) wasmimportSubscribe() poll.Pollable
 
 // OutgoingDatagram represents the record "wasi:sockets/udp@0.2.0#outgoing-datagram".
 //
@@ -151,23 +151,32 @@ func (self OutgoingDatagramStream) ResourceDrop() {
 //go:noescape
 func (self OutgoingDatagramStream) wasmimportResourceDrop()
 
-// Subscribe represents method "subscribe".
+// CheckSend represents method "check-send".
 //
-// Create a `pollable` which will resolve once the stream is ready to send again.
+// Check readiness for sending. This function never blocks.
 //
-// Note: this function is here for WASI Preview2 only.
-// It's planned to be removed when `future` is natively supported in Preview3.
+// Returns the number of datagrams permitted for the next call to `send`,
+// or an error. Calling `send` with more datagrams than this function has
+// permitted will trap.
 //
-//	subscribe: func() -> own<pollable>
+// When this function returns ok(0), the `subscribe` pollable will
+// become ready when this function will report at least ok(1), or an
+// error.
+//
+// Never returns `would-block`.
+//
+//	check-send: func() -> result<u64, error-code>
 //
 //go:nosplit
-func (self OutgoingDatagramStream) Subscribe() poll.Pollable {
-	return self.wasmimportSubscribe()
+func (self OutgoingDatagramStream) CheckSend() cm.Result[uint64, uint64, network.ErrorCode] {
+	var result cm.Result[uint64, uint64, network.ErrorCode]
+	self.wasmimportCheckSend(&result)
+	return result
 }
 
-//go:wasmimport wasi:sockets/udp@0.2.0 [method]outgoing-datagram-stream.subscribe
+//go:wasmimport wasi:sockets/udp@0.2.0 [method]outgoing-datagram-stream.check-send
 //go:noescape
-func (self OutgoingDatagramStream) wasmimportSubscribe() poll.Pollable
+func (self OutgoingDatagramStream) wasmimportCheckSend(result *cm.Result[uint64, uint64, network.ErrorCode])
 
 // Send represents method "send".
 //
@@ -233,32 +242,23 @@ func (self OutgoingDatagramStream) Send(datagrams cm.List[OutgoingDatagram]) cm.
 //go:noescape
 func (self OutgoingDatagramStream) wasmimportSend(datagrams cm.List[OutgoingDatagram], result *cm.Result[uint64, uint64, network.ErrorCode])
 
-// CheckSend represents method "check-send".
+// Subscribe represents method "subscribe".
 //
-// Check readiness for sending. This function never blocks.
+// Create a `pollable` which will resolve once the stream is ready to send again.
 //
-// Returns the number of datagrams permitted for the next call to `send`,
-// or an error. Calling `send` with more datagrams than this function has
-// permitted will trap.
+// Note: this function is here for WASI Preview2 only.
+// It's planned to be removed when `future` is natively supported in Preview3.
 //
-// When this function returns ok(0), the `subscribe` pollable will
-// become ready when this function will report at least ok(1), or an
-// error.
-//
-// Never returns `would-block`.
-//
-//	check-send: func() -> result<u64, error-code>
+//	subscribe: func() -> own<pollable>
 //
 //go:nosplit
-func (self OutgoingDatagramStream) CheckSend() cm.Result[uint64, uint64, network.ErrorCode] {
-	var result cm.Result[uint64, uint64, network.ErrorCode]
-	self.wasmimportCheckSend(&result)
-	return result
+func (self OutgoingDatagramStream) Subscribe() poll.Pollable {
+	return self.wasmimportSubscribe()
 }
 
-//go:wasmimport wasi:sockets/udp@0.2.0 [method]outgoing-datagram-stream.check-send
+//go:wasmimport wasi:sockets/udp@0.2.0 [method]outgoing-datagram-stream.subscribe
 //go:noescape
-func (self OutgoingDatagramStream) wasmimportCheckSend(result *cm.Result[uint64, uint64, network.ErrorCode])
+func (self OutgoingDatagramStream) wasmimportSubscribe() poll.Pollable
 
 // UDPSocket represents the resource "wasi:sockets/udp@0.2.0#udp-socket".
 //
@@ -279,6 +279,185 @@ func (self UDPSocket) ResourceDrop() {
 //go:wasmimport wasi:sockets/udp@0.2.0 [resource-drop]udp-socket
 //go:noescape
 func (self UDPSocket) wasmimportResourceDrop()
+
+// AddressFamily represents method "address-family".
+//
+// Whether this is a IPv4 or IPv6 socket.
+//
+// Equivalent to the SO_DOMAIN socket option.
+//
+//	address-family: func() -> ip-address-family
+//
+//go:nosplit
+func (self UDPSocket) AddressFamily() network.IPAddressFamily {
+	return self.wasmimportAddressFamily()
+}
+
+//go:wasmimport wasi:sockets/udp@0.2.0 [method]udp-socket.address-family
+//go:noescape
+func (self UDPSocket) wasmimportAddressFamily() network.IPAddressFamily
+
+// FinishBind represents method "finish-bind".
+//
+//	finish-bind: func() -> result<_, error-code>
+//
+//go:nosplit
+func (self UDPSocket) FinishBind() cm.ErrResult[network.ErrorCode] {
+	var result cm.ErrResult[network.ErrorCode]
+	self.wasmimportFinishBind(&result)
+	return result
+}
+
+//go:wasmimport wasi:sockets/udp@0.2.0 [method]udp-socket.finish-bind
+//go:noescape
+func (self UDPSocket) wasmimportFinishBind(result *cm.ErrResult[network.ErrorCode])
+
+// LocalAddress represents method "local-address".
+//
+// Get the current bound address.
+//
+// POSIX mentions:
+// > If the socket has not been bound to a local name, the value
+// > stored in the object pointed to by `address` is unspecified.
+//
+// WASI is stricter and requires `local-address` to return `invalid-state` when the
+// socket hasn't been bound yet.
+//
+// # Typical errors
+// - `invalid-state`: The socket is not bound to any local address.
+//
+// # References
+// - <https://pubs.opengroup.org/onlinepubs/9699919799/functions/getsockname.html>
+// - <https://man7.org/linux/man-pages/man2/getsockname.2.html>
+// - <https://learn.microsoft.com/en-us/windows/win32/api/winsock/nf-winsock-getsockname>
+// - <https://man.freebsd.org/cgi/man.cgi?getsockname>
+//
+//	local-address: func() -> result<ip-socket-address, error-code>
+//
+//go:nosplit
+func (self UDPSocket) LocalAddress() cm.Result[network.IPSocketAddress, network.IPSocketAddress, network.ErrorCode] {
+	var result cm.Result[network.IPSocketAddress, network.IPSocketAddress, network.ErrorCode]
+	self.wasmimportLocalAddress(&result)
+	return result
+}
+
+//go:wasmimport wasi:sockets/udp@0.2.0 [method]udp-socket.local-address
+//go:noescape
+func (self UDPSocket) wasmimportLocalAddress(result *cm.Result[network.IPSocketAddress, network.IPSocketAddress, network.ErrorCode])
+
+// ReceiveBufferSize represents method "receive-buffer-size".
+//
+// The kernel buffer space reserved for sends/receives on this socket.
+//
+// If the provided value is 0, an `invalid-argument` error is returned.
+// Any other value will never cause an error, but it might be silently clamped and/or
+// rounded.
+// I.e. after setting a value, reading the same setting back may return a different
+// value.
+//
+// Equivalent to the SO_RCVBUF and SO_SNDBUF socket options.
+//
+// # Typical errors
+// - `invalid-argument`:     (set) The provided value was 0.
+//
+//	receive-buffer-size: func() -> result<u64, error-code>
+//
+//go:nosplit
+func (self UDPSocket) ReceiveBufferSize() cm.Result[uint64, uint64, network.ErrorCode] {
+	var result cm.Result[uint64, uint64, network.ErrorCode]
+	self.wasmimportReceiveBufferSize(&result)
+	return result
+}
+
+//go:wasmimport wasi:sockets/udp@0.2.0 [method]udp-socket.receive-buffer-size
+//go:noescape
+func (self UDPSocket) wasmimportReceiveBufferSize(result *cm.Result[uint64, uint64, network.ErrorCode])
+
+// RemoteAddress represents method "remote-address".
+//
+// Get the address the socket is currently streaming to.
+//
+// # Typical errors
+// - `invalid-state`: The socket is not streaming to a specific remote address. (ENOTCONN)
+//
+// # References
+// - <https://pubs.opengroup.org/onlinepubs/9699919799/functions/getpeername.html>
+// - <https://man7.org/linux/man-pages/man2/getpeername.2.html>
+// - <https://learn.microsoft.com/en-us/windows/win32/api/winsock/nf-winsock-getpeername>
+// - <https://man.freebsd.org/cgi/man.cgi?query=getpeername&sektion=2&n=1>
+//
+//	remote-address: func() -> result<ip-socket-address, error-code>
+//
+//go:nosplit
+func (self UDPSocket) RemoteAddress() cm.Result[network.IPSocketAddress, network.IPSocketAddress, network.ErrorCode] {
+	var result cm.Result[network.IPSocketAddress, network.IPSocketAddress, network.ErrorCode]
+	self.wasmimportRemoteAddress(&result)
+	return result
+}
+
+//go:wasmimport wasi:sockets/udp@0.2.0 [method]udp-socket.remote-address
+//go:noescape
+func (self UDPSocket) wasmimportRemoteAddress(result *cm.Result[network.IPSocketAddress, network.IPSocketAddress, network.ErrorCode])
+
+// SendBufferSize represents method "send-buffer-size".
+//
+//	send-buffer-size: func() -> result<u64, error-code>
+//
+//go:nosplit
+func (self UDPSocket) SendBufferSize() cm.Result[uint64, uint64, network.ErrorCode] {
+	var result cm.Result[uint64, uint64, network.ErrorCode]
+	self.wasmimportSendBufferSize(&result)
+	return result
+}
+
+//go:wasmimport wasi:sockets/udp@0.2.0 [method]udp-socket.send-buffer-size
+//go:noescape
+func (self UDPSocket) wasmimportSendBufferSize(result *cm.Result[uint64, uint64, network.ErrorCode])
+
+// SetReceiveBufferSize represents method "set-receive-buffer-size".
+//
+//	set-receive-buffer-size: func(value: u64) -> result<_, error-code>
+//
+//go:nosplit
+func (self UDPSocket) SetReceiveBufferSize(value uint64) cm.ErrResult[network.ErrorCode] {
+	var result cm.ErrResult[network.ErrorCode]
+	self.wasmimportSetReceiveBufferSize(value, &result)
+	return result
+}
+
+//go:wasmimport wasi:sockets/udp@0.2.0 [method]udp-socket.set-receive-buffer-size
+//go:noescape
+func (self UDPSocket) wasmimportSetReceiveBufferSize(value uint64, result *cm.ErrResult[network.ErrorCode])
+
+// SetSendBufferSize represents method "set-send-buffer-size".
+//
+//	set-send-buffer-size: func(value: u64) -> result<_, error-code>
+//
+//go:nosplit
+func (self UDPSocket) SetSendBufferSize(value uint64) cm.ErrResult[network.ErrorCode] {
+	var result cm.ErrResult[network.ErrorCode]
+	self.wasmimportSetSendBufferSize(value, &result)
+	return result
+}
+
+//go:wasmimport wasi:sockets/udp@0.2.0 [method]udp-socket.set-send-buffer-size
+//go:noescape
+func (self UDPSocket) wasmimportSetSendBufferSize(value uint64, result *cm.ErrResult[network.ErrorCode])
+
+// SetUnicastHopLimit represents method "set-unicast-hop-limit".
+//
+//	set-unicast-hop-limit: func(value: u8) -> result<_, error-code>
+//
+//go:nosplit
+func (self UDPSocket) SetUnicastHopLimit(value uint8) cm.ErrResult[network.ErrorCode] {
+	var result cm.ErrResult[network.ErrorCode]
+	self.wasmimportSetUnicastHopLimit(value, &result)
+	return result
+}
+
+//go:wasmimport wasi:sockets/udp@0.2.0 [method]udp-socket.set-unicast-hop-limit
+//go:noescape
+func (self UDPSocket) wasmimportSetUnicastHopLimit(value uint8, result *cm.ErrResult[network.ErrorCode])
 
 // StartBind represents method "start-bind".
 //
@@ -395,20 +574,23 @@ func (self UDPSocket) Stream(remoteAddress cm.Option[network.IPSocketAddress]) c
 //go:noescape
 func (self UDPSocket) wasmimportStream(remoteAddress cm.Option[network.IPSocketAddress], result *cm.Result[cm.Tuple[IncomingDatagramStream, OutgoingDatagramStream], cm.Tuple[IncomingDatagramStream, OutgoingDatagramStream], network.ErrorCode])
 
-// FinishBind represents method "finish-bind".
+// Subscribe represents method "subscribe".
 //
-//	finish-bind: func() -> result<_, error-code>
+// Create a `pollable` which will resolve once the socket is ready for I/O.
+//
+// Note: this function is here for WASI Preview2 only.
+// It's planned to be removed when `future` is natively supported in Preview3.
+//
+//	subscribe: func() -> own<pollable>
 //
 //go:nosplit
-func (self UDPSocket) FinishBind() cm.ErrResult[network.ErrorCode] {
-	var result cm.ErrResult[network.ErrorCode]
-	self.wasmimportFinishBind(&result)
-	return result
+func (self UDPSocket) Subscribe() poll.Pollable {
+	return self.wasmimportSubscribe()
 }
 
-//go:wasmimport wasi:sockets/udp@0.2.0 [method]udp-socket.finish-bind
+//go:wasmimport wasi:sockets/udp@0.2.0 [method]udp-socket.subscribe
 //go:noescape
-func (self UDPSocket) wasmimportFinishBind(result *cm.ErrResult[network.ErrorCode])
+func (self UDPSocket) wasmimportSubscribe() poll.Pollable
 
 // UnicastHopLimit represents method "unicast-hop-limit".
 //
@@ -431,185 +613,3 @@ func (self UDPSocket) UnicastHopLimit() cm.Result[uint8, uint8, network.ErrorCod
 //go:wasmimport wasi:sockets/udp@0.2.0 [method]udp-socket.unicast-hop-limit
 //go:noescape
 func (self UDPSocket) wasmimportUnicastHopLimit(result *cm.Result[uint8, uint8, network.ErrorCode])
-
-// SetUnicastHopLimit represents method "set-unicast-hop-limit".
-//
-//	set-unicast-hop-limit: func(value: u8) -> result<_, error-code>
-//
-//go:nosplit
-func (self UDPSocket) SetUnicastHopLimit(value uint8) cm.ErrResult[network.ErrorCode] {
-	var result cm.ErrResult[network.ErrorCode]
-	self.wasmimportSetUnicastHopLimit(value, &result)
-	return result
-}
-
-//go:wasmimport wasi:sockets/udp@0.2.0 [method]udp-socket.set-unicast-hop-limit
-//go:noescape
-func (self UDPSocket) wasmimportSetUnicastHopLimit(value uint8, result *cm.ErrResult[network.ErrorCode])
-
-// ReceiveBufferSize represents method "receive-buffer-size".
-//
-// The kernel buffer space reserved for sends/receives on this socket.
-//
-// If the provided value is 0, an `invalid-argument` error is returned.
-// Any other value will never cause an error, but it might be silently clamped and/or
-// rounded.
-// I.e. after setting a value, reading the same setting back may return a different
-// value.
-//
-// Equivalent to the SO_RCVBUF and SO_SNDBUF socket options.
-//
-// # Typical errors
-// - `invalid-argument`:     (set) The provided value was 0.
-//
-//	receive-buffer-size: func() -> result<u64, error-code>
-//
-//go:nosplit
-func (self UDPSocket) ReceiveBufferSize() cm.Result[uint64, uint64, network.ErrorCode] {
-	var result cm.Result[uint64, uint64, network.ErrorCode]
-	self.wasmimportReceiveBufferSize(&result)
-	return result
-}
-
-//go:wasmimport wasi:sockets/udp@0.2.0 [method]udp-socket.receive-buffer-size
-//go:noescape
-func (self UDPSocket) wasmimportReceiveBufferSize(result *cm.Result[uint64, uint64, network.ErrorCode])
-
-// SetReceiveBufferSize represents method "set-receive-buffer-size".
-//
-//	set-receive-buffer-size: func(value: u64) -> result<_, error-code>
-//
-//go:nosplit
-func (self UDPSocket) SetReceiveBufferSize(value uint64) cm.ErrResult[network.ErrorCode] {
-	var result cm.ErrResult[network.ErrorCode]
-	self.wasmimportSetReceiveBufferSize(value, &result)
-	return result
-}
-
-//go:wasmimport wasi:sockets/udp@0.2.0 [method]udp-socket.set-receive-buffer-size
-//go:noescape
-func (self UDPSocket) wasmimportSetReceiveBufferSize(value uint64, result *cm.ErrResult[network.ErrorCode])
-
-// LocalAddress represents method "local-address".
-//
-// Get the current bound address.
-//
-// POSIX mentions:
-// > If the socket has not been bound to a local name, the value
-// > stored in the object pointed to by `address` is unspecified.
-//
-// WASI is stricter and requires `local-address` to return `invalid-state` when the
-// socket hasn't been bound yet.
-//
-// # Typical errors
-// - `invalid-state`: The socket is not bound to any local address.
-//
-// # References
-// - <https://pubs.opengroup.org/onlinepubs/9699919799/functions/getsockname.html>
-// - <https://man7.org/linux/man-pages/man2/getsockname.2.html>
-// - <https://learn.microsoft.com/en-us/windows/win32/api/winsock/nf-winsock-getsockname>
-// - <https://man.freebsd.org/cgi/man.cgi?getsockname>
-//
-//	local-address: func() -> result<ip-socket-address, error-code>
-//
-//go:nosplit
-func (self UDPSocket) LocalAddress() cm.Result[network.IPSocketAddress, network.IPSocketAddress, network.ErrorCode] {
-	var result cm.Result[network.IPSocketAddress, network.IPSocketAddress, network.ErrorCode]
-	self.wasmimportLocalAddress(&result)
-	return result
-}
-
-//go:wasmimport wasi:sockets/udp@0.2.0 [method]udp-socket.local-address
-//go:noescape
-func (self UDPSocket) wasmimportLocalAddress(result *cm.Result[network.IPSocketAddress, network.IPSocketAddress, network.ErrorCode])
-
-// AddressFamily represents method "address-family".
-//
-// Whether this is a IPv4 or IPv6 socket.
-//
-// Equivalent to the SO_DOMAIN socket option.
-//
-//	address-family: func() -> ip-address-family
-//
-//go:nosplit
-func (self UDPSocket) AddressFamily() network.IPAddressFamily {
-	return self.wasmimportAddressFamily()
-}
-
-//go:wasmimport wasi:sockets/udp@0.2.0 [method]udp-socket.address-family
-//go:noescape
-func (self UDPSocket) wasmimportAddressFamily() network.IPAddressFamily
-
-// SetSendBufferSize represents method "set-send-buffer-size".
-//
-//	set-send-buffer-size: func(value: u64) -> result<_, error-code>
-//
-//go:nosplit
-func (self UDPSocket) SetSendBufferSize(value uint64) cm.ErrResult[network.ErrorCode] {
-	var result cm.ErrResult[network.ErrorCode]
-	self.wasmimportSetSendBufferSize(value, &result)
-	return result
-}
-
-//go:wasmimport wasi:sockets/udp@0.2.0 [method]udp-socket.set-send-buffer-size
-//go:noescape
-func (self UDPSocket) wasmimportSetSendBufferSize(value uint64, result *cm.ErrResult[network.ErrorCode])
-
-// Subscribe represents method "subscribe".
-//
-// Create a `pollable` which will resolve once the socket is ready for I/O.
-//
-// Note: this function is here for WASI Preview2 only.
-// It's planned to be removed when `future` is natively supported in Preview3.
-//
-//	subscribe: func() -> own<pollable>
-//
-//go:nosplit
-func (self UDPSocket) Subscribe() poll.Pollable {
-	return self.wasmimportSubscribe()
-}
-
-//go:wasmimport wasi:sockets/udp@0.2.0 [method]udp-socket.subscribe
-//go:noescape
-func (self UDPSocket) wasmimportSubscribe() poll.Pollable
-
-// RemoteAddress represents method "remote-address".
-//
-// Get the address the socket is currently streaming to.
-//
-// # Typical errors
-// - `invalid-state`: The socket is not streaming to a specific remote address. (ENOTCONN)
-//
-// # References
-// - <https://pubs.opengroup.org/onlinepubs/9699919799/functions/getpeername.html>
-// - <https://man7.org/linux/man-pages/man2/getpeername.2.html>
-// - <https://learn.microsoft.com/en-us/windows/win32/api/winsock/nf-winsock-getpeername>
-// - <https://man.freebsd.org/cgi/man.cgi?query=getpeername&sektion=2&n=1>
-//
-//	remote-address: func() -> result<ip-socket-address, error-code>
-//
-//go:nosplit
-func (self UDPSocket) RemoteAddress() cm.Result[network.IPSocketAddress, network.IPSocketAddress, network.ErrorCode] {
-	var result cm.Result[network.IPSocketAddress, network.IPSocketAddress, network.ErrorCode]
-	self.wasmimportRemoteAddress(&result)
-	return result
-}
-
-//go:wasmimport wasi:sockets/udp@0.2.0 [method]udp-socket.remote-address
-//go:noescape
-func (self UDPSocket) wasmimportRemoteAddress(result *cm.Result[network.IPSocketAddress, network.IPSocketAddress, network.ErrorCode])
-
-// SendBufferSize represents method "send-buffer-size".
-//
-//	send-buffer-size: func() -> result<u64, error-code>
-//
-//go:nosplit
-func (self UDPSocket) SendBufferSize() cm.Result[uint64, uint64, network.ErrorCode] {
-	var result cm.Result[uint64, uint64, network.ErrorCode]
-	self.wasmimportSendBufferSize(&result)
-	return result
-}
-
-//go:wasmimport wasi:sockets/udp@0.2.0 [method]udp-socket.send-buffer-size
-//go:noescape
-func (self UDPSocket) wasmimportSendBufferSize(result *cm.Result[uint64, uint64, network.ErrorCode])

@@ -60,26 +60,6 @@ func (self InputStream) BlockingRead(len_ uint64) cm.Result[cm.List[uint8], cm.L
 //go:noescape
 func (self InputStream) wasmimportBlockingRead(len_ uint64, result *cm.Result[cm.List[uint8], cm.List[uint8], StreamError])
 
-// Skip represents method "skip".
-//
-// Skip bytes from a stream. Returns number of bytes skipped.
-//
-// Behaves identical to `read`, except instead of returning a list
-// of bytes, returns the number of bytes consumed from the stream.
-//
-//	skip: func(len: u64) -> result<u64, stream-error>
-//
-//go:nosplit
-func (self InputStream) Skip(len_ uint64) cm.Result[uint64, uint64, StreamError] {
-	var result cm.Result[uint64, uint64, StreamError]
-	self.wasmimportSkip(len_, &result)
-	return result
-}
-
-//go:wasmimport wasi:io/streams@0.2.0 [method]input-stream.skip
-//go:noescape
-func (self InputStream) wasmimportSkip(len_ uint64, result *cm.Result[uint64, uint64, StreamError])
-
 // BlockingSkip represents method "blocking-skip".
 //
 // Skip bytes from a stream, after blocking until at least one byte
@@ -140,6 +120,26 @@ func (self InputStream) Read(len_ uint64) cm.Result[cm.List[uint8], cm.List[uint
 //go:noescape
 func (self InputStream) wasmimportRead(len_ uint64, result *cm.Result[cm.List[uint8], cm.List[uint8], StreamError])
 
+// Skip represents method "skip".
+//
+// Skip bytes from a stream. Returns number of bytes skipped.
+//
+// Behaves identical to `read`, except instead of returning a list
+// of bytes, returns the number of bytes consumed from the stream.
+//
+//	skip: func(len: u64) -> result<u64, stream-error>
+//
+//go:nosplit
+func (self InputStream) Skip(len_ uint64) cm.Result[uint64, uint64, StreamError] {
+	var result cm.Result[uint64, uint64, StreamError]
+	self.wasmimportSkip(len_, &result)
+	return result
+}
+
+//go:wasmimport wasi:io/streams@0.2.0 [method]input-stream.skip
+//go:noescape
+func (self InputStream) wasmimportSkip(len_ uint64, result *cm.Result[uint64, uint64, StreamError])
+
 // Subscribe represents method "subscribe".
 //
 // Create a `pollable` which will resolve once either the specified stream
@@ -186,6 +186,201 @@ func (self OutputStream) ResourceDrop() {
 //go:wasmimport wasi:io/streams@0.2.0 [resource-drop]output-stream
 //go:noescape
 func (self OutputStream) wasmimportResourceDrop()
+
+// BlockingFlush represents method "blocking-flush".
+//
+// Request to flush buffered output, and block until flush completes
+// and stream is ready for writing again.
+//
+//	blocking-flush: func() -> result<_, stream-error>
+//
+//go:nosplit
+func (self OutputStream) BlockingFlush() cm.ErrResult[StreamError] {
+	var result cm.ErrResult[StreamError]
+	self.wasmimportBlockingFlush(&result)
+	return result
+}
+
+//go:wasmimport wasi:io/streams@0.2.0 [method]output-stream.blocking-flush
+//go:noescape
+func (self OutputStream) wasmimportBlockingFlush(result *cm.ErrResult[StreamError])
+
+// BlockingSplice represents method "blocking-splice".
+//
+// Read from one stream and write to another, with blocking.
+//
+// This is similar to `splice`, except that it blocks until the
+// `output-stream` is ready for writing, and the `input-stream`
+// is ready for reading, before performing the `splice`.
+//
+//	blocking-splice: func(src: borrow<input-stream>, len: u64) -> result<u64, stream-error>
+//
+//go:nosplit
+func (self OutputStream) BlockingSplice(src InputStream, len_ uint64) cm.Result[uint64, uint64, StreamError] {
+	var result cm.Result[uint64, uint64, StreamError]
+	self.wasmimportBlockingSplice(src, len_, &result)
+	return result
+}
+
+//go:wasmimport wasi:io/streams@0.2.0 [method]output-stream.blocking-splice
+//go:noescape
+func (self OutputStream) wasmimportBlockingSplice(src InputStream, len_ uint64, result *cm.Result[uint64, uint64, StreamError])
+
+// BlockingWriteAndFlush represents method "blocking-write-and-flush".
+//
+// Perform a write of up to 4096 bytes, and then flush the stream. Block
+// until all of these operations are complete, or an error occurs.
+//
+// This is a convenience wrapper around the use of `check-write`,
+// `subscribe`, `write`, and `flush`, and is implemented with the
+// following pseudo-code:
+//
+//	let pollable = this.subscribe();
+//	while !contents.is_empty() {
+//	// Wait for the stream to become writable
+//	pollable.block();
+//	let Ok(n) = this.check-write(); // eliding error handling
+//	let len = min(n, contents.len());
+//	let (chunk, rest) = contents.split_at(len);
+//	this.write(chunk  );            // eliding error handling
+//	contents = rest;
+//	}
+//	this.flush();
+//	// Wait for completion of `flush`
+//	pollable.block();
+//	// Check for any errors that arose during `flush`
+//	let _ = this.check-write();         // eliding error handling
+//
+//	blocking-write-and-flush: func(contents: list<u8>) -> result<_, stream-error>
+//
+//go:nosplit
+func (self OutputStream) BlockingWriteAndFlush(contents cm.List[uint8]) cm.ErrResult[StreamError] {
+	var result cm.ErrResult[StreamError]
+	self.wasmimportBlockingWriteAndFlush(contents, &result)
+	return result
+}
+
+//go:wasmimport wasi:io/streams@0.2.0 [method]output-stream.blocking-write-and-flush
+//go:noescape
+func (self OutputStream) wasmimportBlockingWriteAndFlush(contents cm.List[uint8], result *cm.ErrResult[StreamError])
+
+// BlockingWriteZeroesAndFlush represents method "blocking-write-zeroes-and-flush".
+//
+// Perform a write of up to 4096 zeroes, and then flush the stream.
+// Block until all of these operations are complete, or an error
+// occurs.
+//
+// This is a convenience wrapper around the use of `check-write`,
+// `subscribe`, `write-zeroes`, and `flush`, and is implemented with
+// the following pseudo-code:
+//
+//	let pollable = this.subscribe();
+//	while num_zeroes != 0 {
+//	// Wait for the stream to become writable
+//	pollable.block();
+//	let Ok(n) = this.check-write(); // eliding error handling
+//	let len = min(n, num_zeroes);
+//	this.write-zeroes(len);         // eliding error handling
+//	num_zeroes -= len;
+//	}
+//	this.flush();
+//	// Wait for completion of `flush`
+//	pollable.block();
+//	// Check for any errors that arose during `flush`
+//	let _ = this.check-write();         // eliding error handling
+//
+//	blocking-write-zeroes-and-flush: func(len: u64) -> result<_, stream-error>
+//
+//go:nosplit
+func (self OutputStream) BlockingWriteZeroesAndFlush(len_ uint64) cm.ErrResult[StreamError] {
+	var result cm.ErrResult[StreamError]
+	self.wasmimportBlockingWriteZeroesAndFlush(len_, &result)
+	return result
+}
+
+//go:wasmimport wasi:io/streams@0.2.0 [method]output-stream.blocking-write-zeroes-and-flush
+//go:noescape
+func (self OutputStream) wasmimportBlockingWriteZeroesAndFlush(len_ uint64, result *cm.ErrResult[StreamError])
+
+// CheckWrite represents method "check-write".
+//
+// Check readiness for writing. This function never blocks.
+//
+// Returns the number of bytes permitted for the next call to `write`,
+// or an error. Calling `write` with more bytes than this function has
+// permitted will trap.
+//
+// When this function returns 0 bytes, the `subscribe` pollable will
+// become ready when this function will report at least 1 byte, or an
+// error.
+//
+//	check-write: func() -> result<u64, stream-error>
+//
+//go:nosplit
+func (self OutputStream) CheckWrite() cm.Result[uint64, uint64, StreamError] {
+	var result cm.Result[uint64, uint64, StreamError]
+	self.wasmimportCheckWrite(&result)
+	return result
+}
+
+//go:wasmimport wasi:io/streams@0.2.0 [method]output-stream.check-write
+//go:noescape
+func (self OutputStream) wasmimportCheckWrite(result *cm.Result[uint64, uint64, StreamError])
+
+// Flush represents method "flush".
+//
+// Request to flush buffered output. This function never blocks.
+//
+// This tells the output-stream that the caller intends any buffered
+// output to be flushed. the output which is expected to be flushed
+// is all that has been passed to `write` prior to this call.
+//
+// Upon calling this function, the `output-stream` will not accept any
+// writes (`check-write` will return `ok(0)`) until the flush has
+// completed. The `subscribe` pollable will become ready when the
+// flush has completed and the stream can accept more writes.
+//
+//	flush: func() -> result<_, stream-error>
+//
+//go:nosplit
+func (self OutputStream) Flush() cm.ErrResult[StreamError] {
+	var result cm.ErrResult[StreamError]
+	self.wasmimportFlush(&result)
+	return result
+}
+
+//go:wasmimport wasi:io/streams@0.2.0 [method]output-stream.flush
+//go:noescape
+func (self OutputStream) wasmimportFlush(result *cm.ErrResult[StreamError])
+
+// Splice represents method "splice".
+//
+// Read from one stream and write to another.
+//
+// The behavior of splice is equivelant to:
+// 1. calling `check-write` on the `output-stream`
+// 2. calling `read` on the `input-stream` with the smaller of the
+// `check-write` permitted length and the `len` provided to `splice`
+// 3. calling `write` on the `output-stream` with that read data.
+//
+// Any error reported by the call to `check-write`, `read`, or
+// `write` ends the splice and reports that error.
+//
+// This function returns the number of bytes transferred; it may be less
+// than `len`.
+//
+//	splice: func(src: borrow<input-stream>, len: u64) -> result<u64, stream-error>
+//
+//go:nosplit
+func (self OutputStream) Splice(src InputStream, len_ uint64) cm.Result[uint64, uint64, StreamError] {
+	var result cm.Result[uint64, uint64, StreamError]
+	self.wasmimportSplice(src, len_, &result)
+	return result
+}
+
+//go:wasmimport wasi:io/streams@0.2.0 [method]output-stream.splice
+//go:noescape
+func (self OutputStream) wasmimportSplice(src InputStream, len_ uint64, result *cm.Result[uint64, uint64, StreamError])
 
 // Subscribe represents method "subscribe".
 //
@@ -239,201 +434,6 @@ func (self OutputStream) Write(contents cm.List[uint8]) cm.ErrResult[StreamError
 //go:wasmimport wasi:io/streams@0.2.0 [method]output-stream.write
 //go:noescape
 func (self OutputStream) wasmimportWrite(contents cm.List[uint8], result *cm.ErrResult[StreamError])
-
-// BlockingFlush represents method "blocking-flush".
-//
-// Request to flush buffered output, and block until flush completes
-// and stream is ready for writing again.
-//
-//	blocking-flush: func() -> result<_, stream-error>
-//
-//go:nosplit
-func (self OutputStream) BlockingFlush() cm.ErrResult[StreamError] {
-	var result cm.ErrResult[StreamError]
-	self.wasmimportBlockingFlush(&result)
-	return result
-}
-
-//go:wasmimport wasi:io/streams@0.2.0 [method]output-stream.blocking-flush
-//go:noescape
-func (self OutputStream) wasmimportBlockingFlush(result *cm.ErrResult[StreamError])
-
-// Splice represents method "splice".
-//
-// Read from one stream and write to another.
-//
-// The behavior of splice is equivelant to:
-// 1. calling `check-write` on the `output-stream`
-// 2. calling `read` on the `input-stream` with the smaller of the
-// `check-write` permitted length and the `len` provided to `splice`
-// 3. calling `write` on the `output-stream` with that read data.
-//
-// Any error reported by the call to `check-write`, `read`, or
-// `write` ends the splice and reports that error.
-//
-// This function returns the number of bytes transferred; it may be less
-// than `len`.
-//
-//	splice: func(src: borrow<input-stream>, len: u64) -> result<u64, stream-error>
-//
-//go:nosplit
-func (self OutputStream) Splice(src InputStream, len_ uint64) cm.Result[uint64, uint64, StreamError] {
-	var result cm.Result[uint64, uint64, StreamError]
-	self.wasmimportSplice(src, len_, &result)
-	return result
-}
-
-//go:wasmimport wasi:io/streams@0.2.0 [method]output-stream.splice
-//go:noescape
-func (self OutputStream) wasmimportSplice(src InputStream, len_ uint64, result *cm.Result[uint64, uint64, StreamError])
-
-// BlockingSplice represents method "blocking-splice".
-//
-// Read from one stream and write to another, with blocking.
-//
-// This is similar to `splice`, except that it blocks until the
-// `output-stream` is ready for writing, and the `input-stream`
-// is ready for reading, before performing the `splice`.
-//
-//	blocking-splice: func(src: borrow<input-stream>, len: u64) -> result<u64, stream-error>
-//
-//go:nosplit
-func (self OutputStream) BlockingSplice(src InputStream, len_ uint64) cm.Result[uint64, uint64, StreamError] {
-	var result cm.Result[uint64, uint64, StreamError]
-	self.wasmimportBlockingSplice(src, len_, &result)
-	return result
-}
-
-//go:wasmimport wasi:io/streams@0.2.0 [method]output-stream.blocking-splice
-//go:noescape
-func (self OutputStream) wasmimportBlockingSplice(src InputStream, len_ uint64, result *cm.Result[uint64, uint64, StreamError])
-
-// CheckWrite represents method "check-write".
-//
-// Check readiness for writing. This function never blocks.
-//
-// Returns the number of bytes permitted for the next call to `write`,
-// or an error. Calling `write` with more bytes than this function has
-// permitted will trap.
-//
-// When this function returns 0 bytes, the `subscribe` pollable will
-// become ready when this function will report at least 1 byte, or an
-// error.
-//
-//	check-write: func() -> result<u64, stream-error>
-//
-//go:nosplit
-func (self OutputStream) CheckWrite() cm.Result[uint64, uint64, StreamError] {
-	var result cm.Result[uint64, uint64, StreamError]
-	self.wasmimportCheckWrite(&result)
-	return result
-}
-
-//go:wasmimport wasi:io/streams@0.2.0 [method]output-stream.check-write
-//go:noescape
-func (self OutputStream) wasmimportCheckWrite(result *cm.Result[uint64, uint64, StreamError])
-
-// BlockingWriteZeroesAndFlush represents method "blocking-write-zeroes-and-flush".
-//
-// Perform a write of up to 4096 zeroes, and then flush the stream.
-// Block until all of these operations are complete, or an error
-// occurs.
-//
-// This is a convenience wrapper around the use of `check-write`,
-// `subscribe`, `write-zeroes`, and `flush`, and is implemented with
-// the following pseudo-code:
-//
-//	let pollable = this.subscribe();
-//	while num_zeroes != 0 {
-//	// Wait for the stream to become writable
-//	pollable.block();
-//	let Ok(n) = this.check-write(); // eliding error handling
-//	let len = min(n, num_zeroes);
-//	this.write-zeroes(len);         // eliding error handling
-//	num_zeroes -= len;
-//	}
-//	this.flush();
-//	// Wait for completion of `flush`
-//	pollable.block();
-//	// Check for any errors that arose during `flush`
-//	let _ = this.check-write();         // eliding error handling
-//
-//	blocking-write-zeroes-and-flush: func(len: u64) -> result<_, stream-error>
-//
-//go:nosplit
-func (self OutputStream) BlockingWriteZeroesAndFlush(len_ uint64) cm.ErrResult[StreamError] {
-	var result cm.ErrResult[StreamError]
-	self.wasmimportBlockingWriteZeroesAndFlush(len_, &result)
-	return result
-}
-
-//go:wasmimport wasi:io/streams@0.2.0 [method]output-stream.blocking-write-zeroes-and-flush
-//go:noescape
-func (self OutputStream) wasmimportBlockingWriteZeroesAndFlush(len_ uint64, result *cm.ErrResult[StreamError])
-
-// BlockingWriteAndFlush represents method "blocking-write-and-flush".
-//
-// Perform a write of up to 4096 bytes, and then flush the stream. Block
-// until all of these operations are complete, or an error occurs.
-//
-// This is a convenience wrapper around the use of `check-write`,
-// `subscribe`, `write`, and `flush`, and is implemented with the
-// following pseudo-code:
-//
-//	let pollable = this.subscribe();
-//	while !contents.is_empty() {
-//	// Wait for the stream to become writable
-//	pollable.block();
-//	let Ok(n) = this.check-write(); // eliding error handling
-//	let len = min(n, contents.len());
-//	let (chunk, rest) = contents.split_at(len);
-//	this.write(chunk  );            // eliding error handling
-//	contents = rest;
-//	}
-//	this.flush();
-//	// Wait for completion of `flush`
-//	pollable.block();
-//	// Check for any errors that arose during `flush`
-//	let _ = this.check-write();         // eliding error handling
-//
-//	blocking-write-and-flush: func(contents: list<u8>) -> result<_, stream-error>
-//
-//go:nosplit
-func (self OutputStream) BlockingWriteAndFlush(contents cm.List[uint8]) cm.ErrResult[StreamError] {
-	var result cm.ErrResult[StreamError]
-	self.wasmimportBlockingWriteAndFlush(contents, &result)
-	return result
-}
-
-//go:wasmimport wasi:io/streams@0.2.0 [method]output-stream.blocking-write-and-flush
-//go:noescape
-func (self OutputStream) wasmimportBlockingWriteAndFlush(contents cm.List[uint8], result *cm.ErrResult[StreamError])
-
-// Flush represents method "flush".
-//
-// Request to flush buffered output. This function never blocks.
-//
-// This tells the output-stream that the caller intends any buffered
-// output to be flushed. the output which is expected to be flushed
-// is all that has been passed to `write` prior to this call.
-//
-// Upon calling this function, the `output-stream` will not accept any
-// writes (`check-write` will return `ok(0)`) until the flush has
-// completed. The `subscribe` pollable will become ready when the
-// flush has completed and the stream can accept more writes.
-//
-//	flush: func() -> result<_, stream-error>
-//
-//go:nosplit
-func (self OutputStream) Flush() cm.ErrResult[StreamError] {
-	var result cm.ErrResult[StreamError]
-	self.wasmimportFlush(&result)
-	return result
-}
-
-//go:wasmimport wasi:io/streams@0.2.0 [method]output-stream.flush
-//go:noescape
-func (self OutputStream) wasmimportFlush(result *cm.ErrResult[StreamError])
 
 // WriteZeroes represents method "write-zeroes".
 //

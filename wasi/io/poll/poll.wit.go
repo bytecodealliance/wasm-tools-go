@@ -30,23 +30,6 @@ func (self Pollable) ResourceDrop() {
 //go:noescape
 func (self Pollable) wasmimportResourceDrop()
 
-// Ready represents method "ready".
-//
-// Return the readiness of a pollable. This function never blocks.
-//
-// Returns `true` when the pollable is ready, and `false` otherwise.
-//
-//	ready: func() -> bool
-//
-//go:nosplit
-func (self Pollable) Ready() bool {
-	return self.wasmimportReady()
-}
-
-//go:wasmimport wasi:io/poll@0.2.0 [method]pollable.ready
-//go:noescape
-func (self Pollable) wasmimportReady() bool
-
 // Block represents method "block".
 //
 // `block` returns immediately if the pollable is ready, and otherwise
@@ -65,6 +48,23 @@ func (self Pollable) Block() {
 //go:wasmimport wasi:io/poll@0.2.0 [method]pollable.block
 //go:noescape
 func (self Pollable) wasmimportBlock()
+
+// Ready represents method "ready".
+//
+// Return the readiness of a pollable. This function never blocks.
+//
+// Returns `true` when the pollable is ready, and `false` otherwise.
+//
+//	ready: func() -> bool
+//
+//go:nosplit
+func (self Pollable) Ready() bool {
+	return self.wasmimportReady()
+}
+
+//go:wasmimport wasi:io/poll@0.2.0 [method]pollable.ready
+//go:noescape
+func (self Pollable) wasmimportReady() bool
 
 // Poll represents function "wasi:io/poll@0.2.0#poll".
 //
