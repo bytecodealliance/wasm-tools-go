@@ -7,7 +7,7 @@
 
 ## About
 
-This repository contains code to adapt [WIT](https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md) (Wasm Interface Type) files into Go, with the goal of accelerating the Go implementation of [WASI Preview 2](https://bytecodealliance.org/articles/webassembly-the-updated-roadmap-for-developers).
+This repository contains code to adapt [WIT](https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md) (WebAssembly Interface Type) files into Go, with the goal of accelerating the Go implementation of [WASI Preview 2](https://bytecodealliance.org/articles/webassembly-the-updated-roadmap-for-developers).
 
 ## WIT → Go
 
