@@ -50,12 +50,7 @@ func loadTestdata(f func(path string, res *Resolve) error) error {
 		if !strings.HasSuffix(path, ".wit.json") && !strings.HasSuffix(path, ".wit.md.json") {
 			return nil
 		}
-		file, err := os.Open(path)
-		if err != nil {
-			return err
-		}
-		defer file.Close()
-		res, err := DecodeJSON(file)
+		res, err := LoadJSON(path)
 		if err != nil {
 			return err
 		}
