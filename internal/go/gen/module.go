@@ -37,12 +37,14 @@ func PackagePath(dir string) (string, error) {
 			// Pop up to parent dir
 			var rest string
 			dir, rest = filepath.Split(dir)
-			if rest == "" {
+			if dir == "" {
 				return "", errors.New("unable to locate a go.mod file")
 			}
+			dir = filepath.Clean(dir)
 			subdirs = path.Join(rest, subdirs)
 			continue
-		} else if info.IsDir() {
+		}
+		if info.IsDir() {
 			return "", fmt.Errorf("unexpected directory: %s", file)
 		}
 		break
