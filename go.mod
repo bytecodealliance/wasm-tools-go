@@ -8,6 +8,7 @@ require (
 	github.com/sergi/go-diff v1.3.1
 	github.com/urfave/cli/v3 v3.0.0-alpha9
 	golang.org/x/mod v0.15.0
+	golang.org/x/tools v0.18.0
 )
 
 require (
