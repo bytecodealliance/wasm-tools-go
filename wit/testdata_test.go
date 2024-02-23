@@ -38,7 +38,6 @@ func compareOrWrite(t *testing.T, path, golden, data string) {
 
 func loadTestdata(f func(path string, res *Resolve) error) error {
 	return testdata.Walk(func(path string) error {
-		println(path)
 		res, err := LoadJSON(path)
 		if err != nil {
 			return err
