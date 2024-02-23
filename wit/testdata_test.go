@@ -4,16 +4,13 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
-	"io/fs"
 	"os"
 	"os/exec"
-	"path/filepath"
 	"strings"
 	"testing"
 
-	"github.com/ydnar/wasm-tools-go/internal/callerfs"
-
 	"github.com/sergi/go-diff/diffmatchpatch"
+	"github.com/ydnar/wasm-tools-go/testdata"
 )
 
 var update = flag.Bool("update", false, "update golden files")
@@ -39,27 +36,20 @@ func compareOrWrite(t *testing.T, path, golden, data string) {
 	}
 }
 
-const testdataDir = "../testdata/"
-
 func loadTestdata(f func(path string, res *Resolve) error) error {
-	return filepath.WalkDir(callerfs.Path(testdataDir), func(path string, d fs.DirEntry, err error) error {
-		if err != nil {
-			return fs.SkipDir
-		}
-		if !strings.HasSuffix(path, ".wit.json") && !strings.HasSuffix(path, ".wit.md.json") {
-			return nil
-		}
+	return testdata.Walk(func(path string) error {
+		println(path)
 		res, err := LoadJSON(path)
 		if err != nil {
 			return err
 		}
 		return f(path, res)
-	})
+	}, "*.wit.json", "*.wit.md.json")
 }
 
 func TestGoldenWITFiles(t *testing.T) {
 	err := loadTestdata(func(path string, res *Resolve) error {
-		t.Run(strings.TrimPrefix(path, testdataDir), func(t *testing.T) {
+		t.Run(testdata.Relative(path), func(t *testing.T) {
 			data := res.WIT(nil, "")
 			compareOrWrite(t, path, path+".golden.wit", data)
 		})
@@ -86,7 +76,7 @@ func TestGoldenWITRoundTrip(t *testing.T) {
 		if strings.Count(data, "package ") > 1 {
 			return nil
 		}
-		t.Run(strings.TrimPrefix(path, testdataDir), func(t *testing.T) {
+		t.Run(testdata.Relative(path), func(t *testing.T) {
 			// Run the generated WIT through wasm-tools to generate JSON.
 			cmd := exec.Command("wasm-tools", "component", "wit", "-j")
 			cmd.Stdin = strings.NewReader(data)
@@ -126,7 +116,7 @@ func TestGoldenWITRoundTrip(t *testing.T) {
 
 func TestSizeAndAlign(t *testing.T) {
 	err := loadTestdata(func(path string, res *Resolve) error {
-		t.Run(strings.TrimPrefix(path, testdataDir), func(t *testing.T) {
+		t.Run(testdata.Relative(path), func(t *testing.T) {
 			for i, td := range res.TypeDefs {
 				name := fmt.Sprintf("TypeDefs[%d]", i)
 				if td.Name != nil {
@@ -162,7 +152,7 @@ func TestSizeAndAlign(t *testing.T) {
 // TestFunctionBaseName tests the [Function] BaseName method.
 func TestFunctionBaseName(t *testing.T) {
 	err := loadTestdata(func(path string, res *Resolve) error {
-		t.Run(strings.TrimPrefix(path, testdataDir), func(t *testing.T) {
+		t.Run(testdata.Relative(path), func(t *testing.T) {
 			// TODO: when GOEXPERIMENT=rangefunc lands:
 			// for f := range res.AllFunctions {
 			res.AllFunctions(func(f *Function) bool {
@@ -193,7 +183,7 @@ func TestFunctionBaseName(t *testing.T) {
 // each [Interface] in a [Resolve] is identical to its Name field.
 func TestFunctionNameConsistency(t *testing.T) {
 	err := loadTestdata(func(path string, res *Resolve) error {
-		t.Run(strings.TrimPrefix(path, testdataDir), func(t *testing.T) {
+		t.Run(testdata.Relative(path), func(t *testing.T) {
 			for i, face := range res.Interfaces {
 				if len(face.Functions) == 0 {
 					continue
@@ -257,7 +247,7 @@ func TestFunctionNameConsistency(t *testing.T) {
 // TestConstructorResult validates that constructors return own<t>.
 func TestConstructorResult(t *testing.T) {
 	err := loadTestdata(func(path string, res *Resolve) error {
-		t.Run(strings.TrimPrefix(path, testdataDir), func(t *testing.T) {
+		t.Run(testdata.Relative(path), func(t *testing.T) {
 			res.AllFunctions(func(f *Function) bool {
 				if !f.IsConstructor() {
 					return true
@@ -295,7 +285,7 @@ func TestConstructorResult(t *testing.T) {
 // values in a [Resolve] are non-nil.
 func TestPackageFieldIsNotNil(t *testing.T) {
 	err := loadTestdata(func(path string, res *Resolve) error {
-		t.Run(strings.TrimPrefix(path, testdataDir), func(t *testing.T) {
+		t.Run(testdata.Relative(path), func(t *testing.T) {
 			for i, face := range res.Interfaces {
 				name := fmt.Sprintf("Interfaces[%d]", i)
 				if face.Name != nil {
@@ -327,7 +317,7 @@ func TestPackageFieldIsNotNil(t *testing.T) {
 // values in a [Resolve] are non-nil.
 func TestInterfaceNameIsNotNil(t *testing.T) {
 	err := loadTestdata(func(path string, res *Resolve) error {
-		t.Run(strings.TrimPrefix(path, testdataDir), func(t *testing.T) {
+		t.Run(testdata.Relative(path), func(t *testing.T) {
 			for i, face := range res.Interfaces {
 				name := fmt.Sprintf("Interfaces[%d]", i)
 				if face.Name != nil {
@@ -352,7 +342,7 @@ func TestInterfaceNameIsNotNil(t *testing.T) {
 // types have a non-nil Name.
 func TestTypeDefNamesNotNil(t *testing.T) {
 	err := loadTestdata(func(path string, res *Resolve) error {
-		t.Run(strings.TrimPrefix(path, testdataDir), func(t *testing.T) {
+		t.Run(testdata.Relative(path), func(t *testing.T) {
 			for i, td := range res.TypeDefs {
 				switch td.Kind.(type) {
 				case *Record, *Variant, *Enum, *Flags:
@@ -380,7 +370,7 @@ func TestTypeDefNamesNotNil(t *testing.T) {
 // TestTypeDefRootOwnerNamesNotNil verifies that all root [TypeDef] owners have a non-nil name.
 func TestTypeDefRootOwnerNamesNotNil(t *testing.T) {
 	err := loadTestdata(func(path string, res *Resolve) error {
-		t.Run(strings.TrimPrefix(path, testdataDir), func(t *testing.T) {
+		t.Run(testdata.Relative(path), func(t *testing.T) {
 			for i, td := range res.TypeDefs {
 				name := fmt.Sprintf("TypeDefs[%d]", i)
 				if td.Name != nil {
@@ -412,7 +402,7 @@ func TestTypeDefRootOwnerNamesNotNil(t *testing.T) {
 // referenced in Imports, and not Exports.
 func TestNoExportedTypeDefs(t *testing.T) {
 	err := loadTestdata(func(path string, res *Resolve) error {
-		t.Run(strings.TrimPrefix(path, testdataDir), func(t *testing.T) {
+		t.Run(testdata.Relative(path), func(t *testing.T) {
 			for i, w := range res.Worlds {
 				if len(w.Imports) == 0 && len(w.Exports) == 0 {
 					continue
@@ -437,7 +427,7 @@ func TestNoExportedTypeDefs(t *testing.T) {
 // TestHandlesAreResources verifies that all [Handle] types have an underlying [Resource] type.
 func TestHandlesAreResources(t *testing.T) {
 	err := loadTestdata(func(path string, res *Resolve) error {
-		t.Run(strings.TrimPrefix(path, testdataDir), func(t *testing.T) {
+		t.Run(testdata.Relative(path), func(t *testing.T) {
 			for i, td := range res.TypeDefs {
 				var handleType *TypeDef
 				switch kind := td.Kind.(type) {
