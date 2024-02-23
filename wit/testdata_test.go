@@ -163,6 +163,8 @@ func TestSizeAndAlign(t *testing.T) {
 func TestFunctionBaseName(t *testing.T) {
 	err := loadTestdata(func(path string, res *Resolve) error {
 		t.Run(strings.TrimPrefix(path, testdataDir), func(t *testing.T) {
+			// TODO: when GOEXPERIMENT=rangefunc lands:
+			// for f := range res.AllFunctions {
 			res.AllFunctions(func(f *Function) bool {
 				t.Run(f.Name, func(t *testing.T) {
 					want, after, found := strings.Cut(f.Name, ".")

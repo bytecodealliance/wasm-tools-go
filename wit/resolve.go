@@ -30,26 +30,31 @@ type Resolve struct {
 // calling yield for each. Iteration will stop if yield returns false.
 //
 // [iterates]: https://github.com/golang/go/issues/61897
-func (r *Resolve) AllFunctions(yield func(*Function) bool) bool {
+func (r *Resolve) AllFunctions(yield func(*Function) bool) {
+	var done bool
 	seen := make(map[*Function]bool)
 	yieldNew := func(f *Function) bool {
 		if seen[f] {
-			return true
+			return !done
 		}
 		seen[f] = true
-		return yield(f)
+		if !yield(f) {
+			done = true
+		}
+		return !done
 	}
 	for _, w := range r.Worlds {
-		if !w.AllFunctions(yieldNew) {
-			return false
+		w.AllFunctions(yieldNew)
+		if done {
+			return
 		}
 	}
 	for _, i := range r.Interfaces {
-		if !i.AllFunctions(yieldNew) {
-			return false
+		i.AllFunctions(yieldNew)
+		if done {
+			return
 		}
 	}
-	return true
 }
 
 // A World represents all of the imports and exports of a [WebAssembly component].
@@ -72,15 +77,24 @@ type World struct {
 // calling yield for each. Iteration will stop if yield returns false.
 //
 // [iterates]: https://github.com/golang/go/issues/61897
-func (w *World) AllFunctions(yield func(*Function) bool) bool {
-	return w.AllImports(func(name string, i WorldItem) bool {
+func (w *World) AllFunctions(yield func(*Function) bool) {
+	var done bool
+
+	w.AllImports(func(name string, i WorldItem) bool {
 		if f, ok := i.(*Function); ok {
 			if !yield(f) {
+				done = true
 				return false
 			}
 		}
 		return true
-	}) && w.AllExports(func(name string, i WorldItem) bool {
+	})
+
+	if done {
+		return
+	}
+
+	w.AllExports(func(name string, i WorldItem) bool {
 		if f, ok := i.(*Function); ok {
 			if !yield(f) {
 				return false
@@ -94,21 +108,21 @@ func (w *World) AllFunctions(yield func(*Function) bool) bool {
 // calling yield for each. Iteration will stop if yield returns false.
 //
 // [iterates]: https://github.com/golang/go/issues/61897
-func (w *World) AllImports(yield func(name string, i WorldItem) bool) bool {
-	return iterateWorldItems(w.Imports, yield)
+func (w *World) AllImports(yield func(name string, i WorldItem) bool) {
+	iterateWorldItems(w.Imports, yield)
 }
 
 // AllExports [iterates] through all exports in a [World] in a deterministic order,
 // calling yield for each. Iteration will stop if yield returns false.
 //
 // [iterates]: https://github.com/golang/go/issues/61897
-func (w *World) AllExports(yield func(name string, i WorldItem) bool) bool {
-	return iterateWorldItems(w.Exports, yield)
+func (w *World) AllExports(yield func(name string, i WorldItem) bool) {
+	iterateWorldItems(w.Exports, yield)
 }
 
 // iterateWorldItems sorts a map of [WorldItem] by type, then name,
 // calling yield for each item.
-func iterateWorldItems(m map[string]WorldItem, yield func(name string, i WorldItem) bool) bool {
+func iterateWorldItems(m map[string]WorldItem, yield func(name string, i WorldItem) bool) {
 	type named struct {
 		name     string
 		sortName string
@@ -152,10 +166,9 @@ func iterateWorldItems(m map[string]WorldItem, yield func(name string, i WorldIt
 	// Iterate
 	for _, item := range items {
 		if !yield(item.name, item.item) {
-			return false
+			return
 		}
 	}
-	return true
 }
 
 func worldItemTypeSort(i WorldItem) int {
@@ -206,13 +219,12 @@ type Interface struct {
 // Iteration will stop if yield returns false.
 //
 // [iterates]: https://github.com/golang/go/issues/61897
-func (i *Interface) AllFunctions(yield func(*Function) bool) bool {
+func (i *Interface) AllFunctions(yield func(*Function) bool) {
 	for _, f := range i.Functions {
 		if !yield(f) {
-			return false
+			return
 		}
 	}
-	return true
 }
 
 // TypeDef represents a WIT type definition. A TypeDef may be named or anonymous,
@@ -1055,7 +1067,7 @@ func (*Stream) Flat() []Type { return nil }
 // currently [World] and [Interface].
 type TypeOwner interface {
 	Node
-	AllFunctions(yield func(*Function) bool) bool
+	AllFunctions(yield func(*Function) bool)
 	isTypeOwner()
 }
 
