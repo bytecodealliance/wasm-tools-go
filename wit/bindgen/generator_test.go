@@ -1,3 +1,6 @@
+// TODO: remove this once TinyGo adds runtime.Frame.Entry and reflect.StringHeader.Len is type int
+//go:build !tinygo
+
 package bindgen
 
 import (
