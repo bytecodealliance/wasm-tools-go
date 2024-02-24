@@ -1,7 +1,6 @@
 package gen
 
 import (
-	"fmt"
 	"testing"
 )
 
@@ -13,11 +12,10 @@ func TestFileBytes(t *testing.T) {
 	}
 	f.Import("encoding/json")
 	f.Import("io")
-	b, err := f.Bytes()
+	_, err := f.Bytes()
 	if err != nil {
 		t.Error(err)
 	}
-	fmt.Println(string(b))
 }
 
 func TestFileAddImport(t *testing.T) {
