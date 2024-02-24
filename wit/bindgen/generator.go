@@ -941,14 +941,15 @@ func (g *generator) packageFor(id wit.Ident) *gen.Package {
 		path += "-" + id.Version.String()
 	}
 
+	// TODO: write tests for this
 	name = GoPackageName(name)
 	// Ensure local name doesn’t conflict with Go keywords or predeclared identifiers
 	if gen.UniqueName(name, gen.IsReserved) != name {
 		// Try with package prefix, like error -> ioerror
-		name = id.Package + name
+		name = FlatName(id.Package + name)
 		if gen.UniqueName(name, gen.IsReserved) != name {
 			// Try with namespace prefix, like ioerror -> wasiioerror
-			name = gen.UniqueName(id.Namespace+name, gen.IsReserved)
+			name = gen.UniqueName(FlatName(id.Namespace+name), gen.IsReserved)
 		}
 	}
 

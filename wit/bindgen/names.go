@@ -48,6 +48,12 @@ func SnakeName(name string) string {
 	return strings.Join(segments(strings.ToLower(name)), "_")
 }
 
+// FlatName returns a flat equivalent of a WIT name, where the segments are joined together with no delimiter.
+// It may conflict with a Go keyword or predeclared identifier.
+func FlatName(name string) string {
+	return strings.Join(segments(strings.ToLower(name)), "")
+}
+
 // segments splits a kebab-case WIT name into its constituent segments.
 // For example: "hello-world" splits into "hello", "world".
 func segments(name string) []string {
