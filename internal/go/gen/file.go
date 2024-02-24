@@ -97,9 +97,10 @@ func (f *File) Bytes() ([]byte, error) {
 
 	b.Write(f.Content)
 
-	formatted, err := format.Source(b.Bytes())
+	unformatted := b.Bytes()
+	formatted, err := format.Source(unformatted)
 	if err != nil {
-		return b.Bytes(), err // Return unformatted Go for debugging
+		return unformatted, fmt.Errorf("error in %s: %w", f.Name, err)
 	}
 	return formatted, nil
 }

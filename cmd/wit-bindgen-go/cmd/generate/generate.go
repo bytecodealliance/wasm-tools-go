@@ -104,7 +104,7 @@ func action(ctx context.Context, cmd *cli.Command) error {
 				if b == nil {
 					return err
 				}
-				fmt.Fprintf(os.Stderr, "Error formatting file %s: %v\n", path, err)
+				fmt.Fprintf(os.Stderr, "Error formatting file: %v\n", err)
 			} else {
 				fmt.Fprintf(os.Stderr, "Generated file: %s\n", path)
 			}
