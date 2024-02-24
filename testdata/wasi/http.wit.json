@@ -294,7 +294,7 @@
       "package": 5
     },
     {
-      "name": "proxy",
+      "name": "imports",
       "imports": {
         "interface-16": {
           "interface": 16
@@ -322,6 +322,49 @@
         },
         "interface-28": {
           "interface": 28
+        },
+        "interface-30": {
+          "interface": 30
+        },
+        "interface-4": {
+          "interface": 4
+        }
+      },
+      "exports": {},
+      "package": 6,
+      "docs": {
+        "contents": "The `wasi:http/imports` world imports all the APIs for HTTP proxies.\nIt is intended to be `include`d in other worlds."
+      }
+    },
+    {
+      "name": "proxy",
+      "imports": {
+        "interface-1": {
+          "interface": 1
+        },
+        "interface-3": {
+          "interface": 3
+        },
+        "interface-0": {
+          "interface": 0
+        },
+        "interface-2": {
+          "interface": 2
+        },
+        "interface-28": {
+          "interface": 28
+        },
+        "interface-16": {
+          "interface": 16
+        },
+        "interface-21": {
+          "interface": 21
+        },
+        "interface-22": {
+          "interface": 22
+        },
+        "interface-20": {
+          "interface": 20
         },
         "interface-30": {
           "interface": 30
@@ -3293,7 +3336,7 @@
             }
           ],
           "docs": {
-            "contents": "Construct an HTTP Fields.\n\nThe resulting `fields` is mutable.\n\nThe list represents each key-value pair in the Fields. Keys\nwhich have multiple values are represented by multiple entries in this\nlist with the same key.\n\nThe tuple is a pair of the field key, represented as a string, and\nValue, represented as a list of bytes. In a valid Fields, all keys\nand values are valid UTF-8 strings. However, values are not always\nwell-formed, so they are represented as a raw list of bytes.\n\nAn error result will be returned if any header or value was\nsyntactically invalid, or if a header was forbidden."
+            "contents": "Construct an HTTP Fields.\n\nThe resulting `fields` is mutable.\n\nThe list represents each key-value pair in the Fields. Keys\nwhich have multiple values are represented by multiple entries in this\nlist with the same key.\n\nThe tuple is a pair of the field key, represented as a string, and\nValue, represented as a list of bytes.\n\nAn error result will be returned if any `field-key` or `field-value` is\nsyntactically invalid, or if a field is forbidden."
           }
         },
         "[method]fields.get": {
@@ -3317,7 +3360,7 @@
             }
           ],
           "docs": {
-            "contents": "Get all of the values corresponding to a key. If the key is not present\nin this `fields`, an empty list is returned. However, if the key is\npresent but empty, this is represented by a list with one or more\nempty field-values present."
+            "contents": "Get all of the values corresponding to a key. If the key is not present\nin this `fields` or is syntactically invalid, an empty list is returned.\nHowever, if the key is present but empty, this is represented by a list\nwith one or more empty field-values present."
           }
         },
         "[method]fields.has": {
@@ -3369,7 +3412,7 @@
             }
           ],
           "docs": {
-            "contents": "Set all of the values for a key. Clears any existing values for that\nkey, if they have been set.\n\nFails with `header-error.immutable` if the `fields` are immutable."
+            "contents": "Set all of the values for a key. Clears any existing values for that\nkey, if they have been set.\n\nFails with `header-error.immutable` if the `fields` are immutable.\n\nFails with `header-error.invalid-syntax` if the `field-key` or any of\nthe `field-value`s are syntactically invalid."
           }
         },
         "[method]fields.delete": {
@@ -3393,7 +3436,7 @@
             }
           ],
           "docs": {
-            "contents": "Delete all values for a key. Does nothing if no values for the key\nexist.\n\nFails with `header-error.immutable` if the `fields` are immutable."
+            "contents": "Delete all values for a key. Does nothing if no values for the key\nexist.\n\nFails with `header-error.immutable` if the `fields` are immutable.\n\nFails with `header-error.invalid-syntax` if the `field-key` is\nsyntactically invalid."
           }
         },
         "[method]fields.append": {
@@ -3421,7 +3464,7 @@
             }
           ],
           "docs": {
-            "contents": "Append a value for a key. Does not change or delete any existing\nvalues for that key.\n\nFails with `header-error.immutable` if the `fields` are immutable."
+            "contents": "Append a value for a key. Does not change or delete any existing\nvalues for that key.\n\nFails with `header-error.immutable` if the `fields` are immutable.\n\nFails with `header-error.invalid-syntax` if the `field-key` or\n`field-value` are syntactically invalid."
           }
         },
         "[method]fields.entries": {
@@ -8188,7 +8231,8 @@
         "outgoing-handler": 30
       },
       "worlds": {
-        "proxy": 7
+        "imports": 7,
+        "proxy": 8
       }
     }
   ]

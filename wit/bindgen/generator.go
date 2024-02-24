@@ -206,7 +206,7 @@ func (g *generator) defineInterfaces() error {
 			interfaces = append(interfaces, i)
 		}
 	}
-	fmt.Fprintf(os.Stderr, "Generating Go for %d named interface(s)\n", len(interfaces))
+	// fmt.Fprintf(os.Stderr, "Generating Go for %d named interface(s)\n", len(interfaces))
 	for _, i := range interfaces {
 		g.defineInterface(i, *i.Name)
 	}
@@ -217,7 +217,7 @@ func (g *generator) defineInterfaces() error {
 // Options might override the Go package, including combining multiple
 // WIT interfaces and/or worlds into a single Go package.
 func (g *generator) defineWorlds() error {
-	fmt.Fprintf(os.Stderr, "Generating Go for %d world(s)\n", len(g.res.Worlds))
+	// fmt.Fprintf(os.Stderr, "Generating Go for %d world(s)\n", len(g.res.Worlds))
 	for _, w := range g.res.Worlds {
 		g.defineWorld(w)
 	}
@@ -941,14 +941,15 @@ func (g *generator) packageFor(id wit.Ident) *gen.Package {
 		path += "-" + id.Version.String()
 	}
 
+	// TODO: write tests for this
 	name = GoPackageName(name)
 	// Ensure local name doesn’t conflict with Go keywords or predeclared identifiers
 	if gen.UniqueName(name, gen.IsReserved) != name {
 		// Try with package prefix, like error -> ioerror
-		name = id.Package + name
+		name = FlatName(id.Package + name)
 		if gen.UniqueName(name, gen.IsReserved) != name {
 			// Try with namespace prefix, like ioerror -> wasiioerror
-			name = gen.UniqueName(id.Namespace+name, gen.IsReserved)
+			name = gen.UniqueName(FlatName(id.Namespace+name), gen.IsReserved)
 		}
 	}
 

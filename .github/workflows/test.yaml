@@ -95,7 +95,7 @@ jobs:
           tinygo-version: ${{ matrix.tinygo-version }}
 
       - name: Test with TinyGo
-        run: tinygo test -stack-size=64KB -skip Golden -v ./...
+        run: tinygo test -stack-size=64KB -v ./...
 
       - name: Verify repo is unchanged
         run: git diff --exit-code HEAD
@@ -149,7 +149,7 @@ jobs:
         env:
           GOOS: wasip1
           GOARCH: wasm
-        run: tinygo test -stack-size=64KB -skip Golden -v ./...
+        run: tinygo test -stack-size=64KB -v ./...
 
       - name: Verify repo is unchanged
         run: git diff --exit-code HEAD
