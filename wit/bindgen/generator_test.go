@@ -56,9 +56,8 @@ func validateGeneratedGo(t *testing.T, res *wit.Resolve) {
 			src, err := file.Bytes()
 			if err != nil {
 				t.Error(err)
-				continue
 			}
-			cfg.Overlay[path] = src
+			cfg.Overlay[path] = src // Keep unformatted file for more testing
 		}
 	}
 
