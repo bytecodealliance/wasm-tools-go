@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"sync"
 	"testing"
 
 	"github.com/sergi/go-diff/diffmatchpatch"
@@ -60,17 +61,21 @@ func TestGoldenWITFiles(t *testing.T) {
 	}
 }
 
+var canWasmTools = sync.OnceValue[bool](func() bool {
+	err := exec.Command("wasm-tools", "--version").Run()
+	return err == nil
+})
+
 func TestGoldenWITRoundTrip(t *testing.T) {
 	if testing.Short() {
 		// t.Skip is not available in TinyGo, requires runtime.Goexit()
 		return
 	}
-	err := exec.Command("wasm-tools", "--version").Run()
-	if err != nil {
-		t.Log("skipping test: wasm-tools not installed")
+	if !canWasmTools() {
+		t.Log("skipping test: wasm-tools not installed or cannot fork/exec (TinyGo)")
 		return
 	}
-	err = loadTestdata(func(path string, res *Resolve) error {
+	err := loadTestdata(func(path string, res *Resolve) error {
 		data := res.WIT(nil, "")
 		if strings.Count(data, "package ") > 1 {
 			return nil

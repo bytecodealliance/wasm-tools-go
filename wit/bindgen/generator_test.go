@@ -2,9 +2,10 @@ package bindgen
 
 import (
 	"go/token"
+	"os/exec"
 	"path/filepath"
-	"runtime"
 	"strings"
+	"sync"
 	"testing"
 
 	"github.com/ydnar/wasm-tools-go/internal/callerfs"
@@ -23,10 +24,16 @@ func TestGenerator(t *testing.T) {
 	validateGeneratedGo(t, res)
 }
 
+var canGo = sync.OnceValue[bool](func() bool {
+	err := exec.Command("go", "version").Run()
+	return err == nil
+})
+
 // validateGeneratedGo loads the Go package(s) generated
 func validateGeneratedGo(t *testing.T, res *wit.Resolve) {
-	if runtime.GOOS == "wasip1" {
-		return // TinyGo does not support t.SkipNow
+	if !canGo() {
+		t.Log("skipping test: can't run go (TinyGo without fork?)")
+		return
 	}
 
 	out := callerfs.Path(".")

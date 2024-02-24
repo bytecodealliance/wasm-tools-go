@@ -18,6 +18,10 @@ func loadTestdata(f func(path string, res *wit.Resolve) error) error {
 }
 
 func TestGenerateTestdata(t *testing.T) {
+	if testing.Short() {
+		// t.Skip is not available in TinyGo, requires runtime.Goexit()
+		return
+	}
 	err := loadTestdata(func(path string, res *wit.Resolve) error {
 		t.Run(testdata.Relative(path), func(t *testing.T) {
 			validateGeneratedGo(t, res)
