@@ -3,6 +3,7 @@ package bindgen
 import (
 	"go/token"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 
@@ -24,6 +25,10 @@ func TestGenerator(t *testing.T) {
 
 // validateGeneratedGo loads the Go package(s) generated
 func validateGeneratedGo(t *testing.T, res *wit.Resolve) {
+	if runtime.GOOS == "wasip1" {
+		return // TinyGo does not support t.SkipNow
+	}
+
 	out := callerfs.Path(".")
 	pkgPath, err := gen.PackagePath(out)
 	if err != nil {
