@@ -76,3 +76,7 @@ type Tuple8[T0, T1, T2, T3, T4, T5, T6, T7 any] struct {
 	F6 T6
 	F7 T7
 }
+
+// MaxTuple specifies the maximum number of fields in a Tuple(n) type.
+// currently [Tuple8].
+const MaxTuple = 8
