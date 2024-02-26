@@ -1199,7 +1199,7 @@ func (_primitive[T]) HasPointer() bool {
 func (_primitive[T]) Flat() []Type {
 	var v T
 	switch any(v).(type) {
-	case bool, int8, uint8, int16, uint16, int, uint32, char:
+	case bool, int8, uint8, int16, uint16, int32, uint32, char:
 		return []Type{U32{}}
 	case int64, uint64:
 		return []Type{U64{}}
