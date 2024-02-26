@@ -1,8 +1,8 @@
 package examples:tuples;
 
 interface tuples {
-	type t0 = tuple<u8, u8>;
-	type t1 = tuple<u32, u32>;
+	type t0 = tuple<>;
+	type t1 = tuple<string>;
 	type t10 = tuple<string, bool, u8, u16, u32, u64, float32, float64, s8, s16>;
 	type t2 = tuple<string, bool>;
 	type t3 = tuple<string, bool, u8>;

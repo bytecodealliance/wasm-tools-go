@@ -482,9 +482,9 @@ func (g *generator) primitiveRep(file *gen.File, p wit.Primitive) string {
 
 func (g *generator) recordRep(file *gen.File, r *wit.Record) string {
 	var b strings.Builder
-	b.WriteString("struct {\n")
+	b.WriteString("struct {")
 	for i, f := range r.Fields {
-		if i > 0 && f.Docs.Contents != "" {
+		if i == 0 || i > 0 && f.Docs.Contents != "" {
 			b.WriteRune('\n')
 		}
 		b.WriteString(formatDocComments(f.Docs.Contents, false))
@@ -502,7 +502,8 @@ func (g *generator) tupleRep(file *gen.File, t *wit.Tuple) string {
 	var b strings.Builder
 	if typ := t.Type(); typ != nil {
 		stringio.Write(&b, "[", strconv.Itoa(len(t.Types)), "]", g.typeRep(file, typ))
-	} else if len(t.Types) > cm.MaxTuple {
+	} else if len(t.Types) == 0 || len(t.Types) > cm.MaxTuple {
+		// Force struct representation
 		return g.typeDefKindRep(file, "", t.Despecialize())
 	} else {
 		stringio.Write(&b, file.Import(g.opts.cmPackage), ".Tuple")
