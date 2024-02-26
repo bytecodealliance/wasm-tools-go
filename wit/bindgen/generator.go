@@ -642,47 +642,31 @@ func (g *generator) variantRep(file *gen.File, name string, v *wit.Variant) stri
 func (g *generator) resultRep(file *gen.File, r *wit.Result) string {
 	var b strings.Builder
 	b.WriteString(file.Import(g.opts.cmPackage))
-	switch {
-	case r.OK == nil && r.Err == nil:
-		b.WriteString(".UntypedResult")
-	case r.OK == nil:
-		stringio.Write(&b, ".ErrResult[", g.typeRep(file, r.Err), "]")
-	case r.Err == nil:
-		stringio.Write(&b, ".OKResult[", g.typeRep(file, r.OK), "]")
-	default:
-		shape := r.OK
-		if r.Err.Size() > r.OK.Size() {
-			shape = r.Err
-		}
-		stringio.Write(&b, ".Result[", g.typeRep(file, shape), ", ", g.typeRep(file, r.OK), ", ", g.typeRep(file, r.Err), "]")
+	if r.OK == nil && r.Err == nil {
+		b.WriteString(".Result")
+	} else if r.OK == nil || r.Err.Size() > r.OK.Size() {
+		stringio.Write(&b, ".ErrResult[", g.typeRep(file, r.OK), ", ", g.typeRep(file, r.Err), "]")
+	} else {
+		stringio.Write(&b, ".OKResult[", g.typeRep(file, r.OK), ", ", g.typeRep(file, r.Err), "]")
 	}
 	return b.String()
 }
 
 func (g *generator) optionRep(file *gen.File, o *wit.Option) string {
 	var b strings.Builder
-	b.WriteString(file.Import(g.opts.cmPackage))
-	b.WriteString(".Option")
-	b.WriteRune('[')
-	b.WriteString(g.typeRep(file, o.Type))
-	b.WriteRune(']')
+	stringio.Write(&b, file.Import(g.opts.cmPackage), ".Option[", g.typeRep(file, o.Type), "]")
 	return b.String()
 }
 
 func (g *generator) listRep(file *gen.File, l *wit.List) string {
 	var b strings.Builder
-	b.WriteString(file.Import(g.opts.cmPackage))
-	b.WriteString(".List")
-	b.WriteRune('[')
-	b.WriteString(g.typeRep(file, l.Type))
-	b.WriteRune(']')
+	stringio.Write(&b, file.Import(g.opts.cmPackage), ".List[", g.typeRep(file, l.Type), "]")
 	return b.String()
 }
 
 func (g *generator) resourceRep(file *gen.File, r *wit.Resource) string {
 	var b strings.Builder
-	b.WriteString(file.Import(g.opts.cmPackage))
-	b.WriteString(".Resource")
+	stringio.Write(&b, file.Import(g.opts.cmPackage), ".Resource")
 	return b.String()
 }
 
