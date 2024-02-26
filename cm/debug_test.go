@@ -40,43 +40,23 @@ type VariantDebug interface {
 	DataOffset() uintptr
 }
 
-func (v Variant[Disc, Shape, Align]) Size() uintptr {
-	return unsafe.Sizeof(v)
-}
-
-func (v Variant[Disc, Shape, Align]) DataAlign() uintptr {
-	return unsafe.Alignof(v.data)
-}
-
-func (v Variant[Disc, Shape, Align]) DataOffset() uintptr {
-	return tinyunsafe.OffsetOf(&v, &v.data)
-}
+func (v Variant[Disc, Shape, Align]) Size() uintptr       { return unsafe.Sizeof(v) }
+func (v Variant[Disc, Shape, Align]) DataAlign() uintptr  { return unsafe.Alignof(v.data) }
+func (v Variant[Disc, Shape, Align]) DataOffset() uintptr { return tinyunsafe.OffsetOf(&v, &v.data) }
 
 // ResultDebug is an interface used in tests to validate layout of result types.
 type ResultDebug interface {
 	VariantDebug
 }
 
-func (r Result[S, OK, Err]) Size() uintptr {
-	return unsafe.Sizeof(r)
-}
+func (r Result) Size() uintptr       { return unsafe.Sizeof(r) }
+func (r Result) DataAlign() uintptr  { return 0 }
+func (r Result) DataOffset() uintptr { return 0 }
 
-func (r Result[S, OK, Err]) DataAlign() uintptr {
-	return unsafe.Alignof(r.data)
-}
+func (r OKResult[OK, Err]) Size() uintptr       { return unsafe.Sizeof(r) }
+func (r OKResult[OK, Err]) DataAlign() uintptr  { return unsafe.Alignof(r.data) }
+func (r OKResult[OK, Err]) DataOffset() uintptr { return tinyunsafe.OffsetOf(&r, &r.data) }
 
-func (r Result[S, OK, Err]) DataOffset() uintptr {
-	return tinyunsafe.OffsetOf(&r, &r.data)
-}
-
-func (r UntypedResult) Size() uintptr {
-	return unsafe.Sizeof(r)
-}
-
-func (r UntypedResult) DataAlign() uintptr {
-	return 0
-}
-
-func (r UntypedResult) DataOffset() uintptr {
-	return 0
-}
+func (r ErrResult[OK, Err]) Size() uintptr       { return unsafe.Sizeof(r) }
+func (r ErrResult[OK, Err]) DataAlign() uintptr  { return unsafe.Alignof(r.data) }
+func (r ErrResult[OK, Err]) DataOffset() uintptr { return tinyunsafe.OffsetOf(&r, &r.data) }
