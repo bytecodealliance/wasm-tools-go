@@ -644,7 +644,7 @@ func (g *generator) resultRep(file *gen.File, r *wit.Result) string {
 	b.WriteString(file.Import(g.opts.cmPackage))
 	if r.OK == nil && r.Err == nil {
 		b.WriteString(".Result")
-	} else if r.OK == nil || r.Err.Size() > r.OK.Size() {
+	} else if r.OK == nil || (r.Err != nil && r.Err.Size() > r.OK.Size()) {
 		stringio.Write(&b, ".ErrResult[", g.typeRep(file, r.OK), ", ", g.typeRep(file, r.Err), "]")
 	} else {
 		stringio.Write(&b, ".OKResult[", g.typeRep(file, r.OK), ", ", g.typeRep(file, r.Err), "]")
