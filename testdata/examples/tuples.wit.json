@@ -1,0 +1,224 @@
+{
+  "worlds": [],
+  "interfaces": [
+    {
+      "name": "tuples",
+      "types": {
+        "t0": 0,
+        "t1": 1,
+        "t2": 2,
+        "t3": 3,
+        "t4": 4,
+        "t5": 5,
+        "t6": 6,
+        "t7": 7,
+        "t8": 8,
+        "t9": 9,
+        "t10": 10
+      },
+      "functions": {},
+      "package": 0
+    }
+  ],
+  "types": [
+    {
+      "name": "t0",
+      "kind": {
+        "tuple": {
+          "types": [
+            "u8",
+            "u8"
+          ]
+        }
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": "t1",
+      "kind": {
+        "tuple": {
+          "types": [
+            "u32",
+            "u32"
+          ]
+        }
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": "t2",
+      "kind": {
+        "tuple": {
+          "types": [
+            "string",
+            "bool"
+          ]
+        }
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": "t3",
+      "kind": {
+        "tuple": {
+          "types": [
+            "string",
+            "bool",
+            "u8"
+          ]
+        }
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": "t4",
+      "kind": {
+        "tuple": {
+          "types": [
+            "string",
+            "bool",
+            "u8",
+            "u16"
+          ]
+        }
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": "t5",
+      "kind": {
+        "tuple": {
+          "types": [
+            "string",
+            "bool",
+            "u8",
+            "u16",
+            "u32"
+          ]
+        }
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": "t6",
+      "kind": {
+        "tuple": {
+          "types": [
+            "string",
+            "bool",
+            "u8",
+            "u16",
+            "u32",
+            "u64"
+          ]
+        }
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": "t7",
+      "kind": {
+        "tuple": {
+          "types": [
+            "string",
+            "bool",
+            "u8",
+            "u16",
+            "u32",
+            "u64",
+            "float32"
+          ]
+        }
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": "t8",
+      "kind": {
+        "tuple": {
+          "types": [
+            "string",
+            "bool",
+            "u8",
+            "u16",
+            "u32",
+            "u64",
+            "float32",
+            "float64"
+          ]
+        }
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": "t9",
+      "kind": {
+        "tuple": {
+          "types": [
+            "string",
+            "bool",
+            "u8",
+            "u16",
+            "u32",
+            "u64",
+            "float32",
+            "float64",
+            "s8"
+          ]
+        }
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": "t10",
+      "kind": {
+        "tuple": {
+          "types": [
+            "string",
+            "bool",
+            "u8",
+            "u16",
+            "u32",
+            "u64",
+            "float32",
+            "float64",
+            "s8",
+            "s16"
+          ]
+        }
+      },
+      "owner": {
+        "interface": 0
+      }
+    }
+  ],
+  "packages": [
+    {
+      "name": "examples:tuples",
+      "interfaces": {
+        "tuples": 0
+      },
+      "worlds": {}
+    }
+  ]
+}
