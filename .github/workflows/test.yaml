@@ -33,7 +33,7 @@ jobs:
     timeout-minutes: 5
     strategy:
       matrix:
-        go-version: ["1.21"]
+        go-version: ["1.22"]
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4.1.1
@@ -41,7 +41,7 @@ jobs:
           submodules: recursive
 
       - name: Set up wasm-tools
-        uses: ydnar/ba-actions/wasm-tools/setup@main
+        uses: bytecodealliance/actions/wasm-tools/setup@v1.1.0
         with:
           version: v1.200.0
 
@@ -71,8 +71,8 @@ jobs:
     timeout-minutes: 15
     strategy:
       matrix:
-        tinygo-version: ["0.30.0"]
-        go-version: ["1.21"]
+        tinygo-version: ["0.31.0"]
+        go-version: ["1.22"]
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4.1.1
@@ -80,7 +80,7 @@ jobs:
           submodules: recursive
 
       - name: Set up wasm-tools
-        uses: ydnar/ba-actions/wasm-tools/setup@main
+        uses: bytecodealliance/actions/wasm-tools/setup@v1.1.0
         with:
           version: v1.200.0
 
@@ -107,9 +107,9 @@ jobs:
     timeout-minutes: 15
     strategy:
       matrix:
-        wasmtime-version: ["v17.0.0"]
-        tinygo-version: ["0.30.0"]
-        go-version: ["1.21"] # WASI Preview 1 only available in Go 1.21 or later
+        wasmtime-version: ["18.0.1"]
+        tinygo-version: ["0.31.0"]
+        go-version: ["1.22"] # WASI Preview 1 only available in Go 1.21 or later
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4.1.1
@@ -117,12 +117,12 @@ jobs:
           submodules: recursive
 
       - name: Set up wasm-tools
-        uses: ydnar/ba-actions/wasm-tools/setup@main
+        uses: bytecodealliance/actions/wasm-tools/setup@v1.1.0
         with:
           version: v1.200.0
 
       - name: Set up Wasmtime
-        uses: bytecodealliance/actions/wasmtime/setup@v1.0.2
+        uses: bytecodealliance/actions/wasmtime/setup@v1.1.0
         with:
           version: ${{ matrix.wasmtime-version }}
 
