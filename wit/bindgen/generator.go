@@ -112,10 +112,10 @@ func (g *generator) generate() ([]*gen.Package, error) {
 		return nil, err
 	}
 
-	// err := g.defineInterfaces()
-	// if err != nil {
-	// 	return nil, err
-	// }
+	err = g.defineInterfaces()
+	if err != nil {
+		return nil, err
+	}
 
 	err = g.defineWorlds()
 	if err != nil {
