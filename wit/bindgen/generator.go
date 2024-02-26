@@ -13,6 +13,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/ydnar/wasm-tools-go/cm"
 	"github.com/ydnar/wasm-tools-go/internal/codec"
 	"github.com/ydnar/wasm-tools-go/internal/go/gen"
 	"github.com/ydnar/wasm-tools-go/internal/stringio"
@@ -378,7 +379,11 @@ func (g *generator) defineTypeDef(t *wit.TypeDef, name string) error {
 }
 
 func (g *generator) typeDefRep(file *gen.File, name string, t *wit.TypeDef) string {
-	switch kind := t.Kind.(type) {
+	return g.typeDefKindRep(file, name, t.Kind)
+}
+
+func (g *generator) typeDefKindRep(file *gen.File, name string, kind wit.TypeDefKind) string {
+	switch kind := kind.(type) {
 	case *wit.Pointer:
 		return g.pointerRep(file, kind)
 	case wit.Type:
@@ -410,7 +415,7 @@ func (g *generator) typeDefRep(file *gen.File, name string, t *wit.TypeDef) stri
 	case *wit.Stream:
 		return "any /* TODO: *wit.Stream */"
 	default:
-		panic(fmt.Sprintf("BUG: unknown wit.TypeDef %T", t)) // should never reach here
+		panic(fmt.Sprintf("BUG: unknown wit.TypeDefKind %T", kind)) // should never reach here
 	}
 }
 
@@ -447,19 +452,19 @@ func (g *generator) primitiveRep(file *gen.File, p wit.Primitive) string {
 	case wit.Bool:
 		return "bool"
 	case wit.S8:
-		return "sint8"
+		return "int8"
 	case wit.U8:
 		return "uint8"
 	case wit.S16:
-		return "sint16"
+		return "int16"
 	case wit.U16:
 		return "uint16"
 	case wit.S32:
-		return "sint32"
+		return "int32"
 	case wit.U32:
 		return "uint32"
 	case wit.S64:
-		return "sint64"
+		return "int64"
 	case wit.U64:
 		return "uint64"
 	case wit.Float32:
@@ -483,7 +488,11 @@ func (g *generator) recordRep(file *gen.File, r *wit.Record) string {
 			b.WriteRune('\n')
 		}
 		b.WriteString(formatDocComments(f.Docs.Contents, false))
-		stringio.Write(&b, GoName(f.Name, true), " ", g.typeRep(file, f.Type), "\n")
+		name := f.Name
+		if name[0] >= '0' && name[0] <= '9' {
+			name = "f" + name
+		}
+		stringio.Write(&b, GoName(name, true), " ", g.typeRep(file, f.Type), "\n")
 	}
 	b.WriteRune('}')
 	return b.String()
@@ -493,6 +502,8 @@ func (g *generator) tupleRep(file *gen.File, t *wit.Tuple) string {
 	var b strings.Builder
 	if typ := t.Type(); typ != nil {
 		stringio.Write(&b, "[", strconv.Itoa(len(t.Types)), "]", g.typeRep(file, typ))
+	} else if len(t.Types) > cm.MaxTuple {
+		return g.typeDefKindRep(file, "", t.Despecialize())
 	} else {
 		stringio.Write(&b, file.Import(g.opts.cmPackage), ".Tuple")
 		if len(t.Types) > 2 {
