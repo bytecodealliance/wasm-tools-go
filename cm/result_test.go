@@ -15,7 +15,6 @@ type result[OK, Err any] interface {
 	IsErr() bool
 	OK() *OK
 	Err() *Err
-	Unwrap() (*OK, *Err)
 }
 
 func TestResultLayout(t *testing.T) {
@@ -69,20 +68,20 @@ func TestResultLayout(t *testing.T) {
 	}
 }
 
-func TestResultUnwrap(t *testing.T) {
+func TestResultOKOrErr(t *testing.T) {
 	r1 := OK[string, string, struct{}]("hello")
-	if ok, err := r1.Unwrap(); ok == nil {
-		t.Errorf("Unwrap(): %v %v, expected non-nil OK", ok, err)
+	if ok := r1.OK(); ok == nil {
+		t.Errorf("Err(): %v, expected non-nil OK", ok)
 	}
-	if ok, err := r1.Unwrap(); err != nil {
-		t.Errorf("Unwrap(): %v %v, expected nil Err", ok, err)
+	if err := r1.Err(); err != nil {
+		t.Errorf("Err(): %v, expected nil Err", err)
 	}
 
 	r2 := Err[string, struct{}, bool](true)
-	if ok, err := r2.Unwrap(); ok != nil {
-		t.Errorf("Unwrap(): %v %v, expected nil OK", ok, err)
+	if ok := r2.OK(); ok != nil {
+		t.Errorf("OK(): %v, expected nil OK", ok)
 	}
-	if ok, err := r2.Unwrap(); err == nil {
-		t.Errorf("Unwrap(): %v %v, expected non-nil Err", ok, err)
+	if err := r2.Err(); err == nil {
+		t.Errorf("Err(): %v, expected non-nil Err", err)
 	}
 }
