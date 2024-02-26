@@ -724,7 +724,7 @@
   ],
   "packages": [
     {
-      "name": "examples:non-flat-params",
+      "name": "example:non-flat-params",
       "interfaces": {
         "corner-case": 0
       },

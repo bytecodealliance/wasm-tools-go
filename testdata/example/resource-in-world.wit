@@ -1,4 +1,4 @@
-package examples:resources-in-world
+package example:resources-in-world
 
 interface types {
     resource foo {

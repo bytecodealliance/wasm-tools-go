@@ -1,4 +1,4 @@
-package examples:aqua;
+package example:aqua;
 
 interface ocean {
     resource water {

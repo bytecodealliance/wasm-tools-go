@@ -1,4 +1,4 @@
-package examples:tuples;
+package example:tuples;
 
 interface tuples {
     type t0 = tuple<>;

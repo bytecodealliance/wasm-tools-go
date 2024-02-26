@@ -41,7 +41,7 @@
   ],
   "packages": [
     {
-      "name": "examples:exported-list",
+      "name": "example:exported-list",
       "interfaces": {
         "command": 0
       },
