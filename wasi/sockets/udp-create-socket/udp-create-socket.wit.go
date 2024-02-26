@@ -41,12 +41,12 @@ import (
 //	error-code>
 //
 //go:nosplit
-func CreateUDPSocket(addressFamily network.IPAddressFamily) cm.Result[udp.UDPSocket, udp.UDPSocket, network.ErrorCode] {
-	var result cm.Result[udp.UDPSocket, udp.UDPSocket, network.ErrorCode]
+func CreateUDPSocket(addressFamily network.IPAddressFamily) cm.OKResult[udp.UDPSocket, network.ErrorCode] {
+	var result cm.OKResult[udp.UDPSocket, network.ErrorCode]
 	wasmimportCreateUDPSocket(addressFamily, &result)
 	return result
 }
 
 //go:wasmimport wasi:sockets/udp-create-socket@0.2.0 create-udp-socket
 //go:noescape
-func wasmimportCreateUDPSocket(addressFamily network.IPAddressFamily, result *cm.Result[udp.UDPSocket, udp.UDPSocket, network.ErrorCode])
+func wasmimportCreateUDPSocket(addressFamily network.IPAddressFamily, result *cm.OKResult[udp.UDPSocket, network.ErrorCode])
