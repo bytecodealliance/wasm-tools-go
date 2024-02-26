@@ -72,7 +72,7 @@
   ],
   "packages": [
     {
-      "name": "examples:exported-resource@0.2.0",
+      "name": "example:exported-resource@0.2.0",
       "interfaces": {
         "example": 0
       },

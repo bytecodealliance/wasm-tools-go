@@ -1,4 +1,4 @@
-package examples:exported-resource@0.2.0;
+package example:exported-resource@0.2.0;
 
 interface example {
 	resource example-resource {

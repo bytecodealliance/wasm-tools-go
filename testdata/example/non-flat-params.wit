@@ -1,4 +1,4 @@
-package examples:non-flat-params;
+package example:non-flat-params;
 
 interface corner-case {
     type t4 = tuple<u32, u32, u32, u32>;

@@ -1,25 +1,25 @@
 {
   "worlds": [
     {
-      "name": "imports",
-      "imports": {
+      "name": "earth",
+      "imports": {},
+      "exports": {
         "interface-0": {
           "interface": 0
         }
       },
-      "exports": {},
       "package": 0
     }
   ],
   "interfaces": [
     {
-      "name": "types",
+      "name": "ocean",
       "types": {
-        "foo": 0
+        "water": 0
       },
       "functions": {
-        "[method]foo.foo": {
-          "name": "[method]foo.foo",
+        "[method]water.drink": {
+          "name": "[method]water.drink",
           "kind": {
             "method": 0
           },
@@ -27,23 +27,6 @@
             {
               "name": "self",
               "type": 1
-            }
-          ],
-          "results": []
-        },
-        "[method]foo.bar": {
-          "name": "[method]foo.bar",
-          "kind": {
-            "method": 0
-          },
-          "params": [
-            {
-              "name": "self",
-              "type": 1
-            },
-            {
-              "name": "arg",
-              "type": "u32"
             }
           ],
           "results": []
@@ -54,7 +37,7 @@
   ],
   "types": [
     {
-      "name": "foo",
+      "name": "water",
       "kind": "resource",
       "owner": {
         "interface": 0
@@ -72,12 +55,12 @@
   ],
   "packages": [
     {
-      "name": "examples:resources-in-world",
+      "name": "example:aqua",
       "interfaces": {
-        "types": 0
+        "ocean": 0
       },
       "worlds": {
-        "imports": 0
+        "earth": 0
       }
     }
   ]

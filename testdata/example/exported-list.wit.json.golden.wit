@@ -1,4 +1,4 @@
-package examples:exported-list;
+package example:exported-list;
 
 interface command {
 	bytes: func() -> list<u8>;
