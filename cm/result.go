@@ -69,35 +69,30 @@ type result[Shape, OK, Err any] struct {
 	data  Shape
 }
 
+// This function is sized so it can be inlined and optimized away.
 func (r *result[Shape, OK, Err]) validate() {
+	var shape Shape
+	var ok OK
+	var err Err
+
 	// Check if size of Shape is greater than both OK and Err
-	if unsafe.Sizeof(*(*Shape)(nil)) > unsafe.Sizeof(*(*OK)(nil)) && unsafe.Sizeof(*(*Shape)(nil)) > unsafe.Sizeof(*(*Err)(nil)) {
+	if unsafe.Sizeof(shape) > unsafe.Sizeof(ok) && unsafe.Sizeof(shape) > unsafe.Sizeof(err) {
 		panic("result: size of data type > OK and Err types")
 	}
 
 	// Check if size of OK is greater than Shape
-	if unsafe.Sizeof(*(*OK)(nil)) > unsafe.Sizeof(*(*Shape)(nil)) {
+	if unsafe.Sizeof(ok) > unsafe.Sizeof(shape) {
 		panic("result: size of OK type > data type")
 	}
 
 	// Check if size of Err is greater than Shape
-	if unsafe.Sizeof(*(*Err)(nil)) > unsafe.Sizeof(*(*Shape)(nil)) {
+	if unsafe.Sizeof(err) > unsafe.Sizeof(shape) {
 		panic("result: size of Err type > data type")
 	}
 
-	// Check if Shape is zero-sized, but align of OK is > 1
-	if unsafe.Sizeof(*(*Shape)(nil)) == 0 && unsafe.Alignof(*(*OK)(nil)) != 1 {
-		panic("result: size of data type == 0, but size != 1 (align of OK > 1)")
-	}
-
-	// Check if Shape is zero-sized, but align of Err is > 1
-	if unsafe.Sizeof(*(*Shape)(nil)) == 0 && unsafe.Alignof(*(*Err)(nil)) != 1 {
-		panic("result: size of data type == 0, but size != 1 (align of Err > 1)")
-	}
-
-	// Check if Shape is zero-sized, but size of result is > 1
-	if unsafe.Sizeof(*(*Shape)(nil)) == 0 && unsafe.Sizeof(*r) != 1 {
-		panic("result size != 1 (both OK and Err type struct{}?)")
+	// Check if Shape is zero-sized, but size of result != 1
+	if unsafe.Sizeof(shape) == 0 && unsafe.Sizeof(*r) != 1 {
+		panic("result: size of data type == 0, but result size != 1")
 	}
 }
 
