@@ -84,3 +84,49 @@ func TestResultOKOrErr(t *testing.T) {
 		t.Errorf("Err(): %v, expected non-nil Err", err)
 	}
 }
+
+func TestAltResult1(t *testing.T) {
+	type alt1[Shape, OK, Err any] struct {
+		_     [0]OK
+		_     [0]Err
+		data  Shape
+		isErr bool
+	}
+
+	equalSize(t, result[uint8, struct{}, uint8]{}, alt1[uint8, struct{}, uint8]{})
+	equalSize(t, result[uint16, struct{}, uint16]{}, alt1[uint16, struct{}, uint16]{})
+	equalSize(t, result[uint32, struct{}, uint32]{}, alt1[uint32, struct{}, uint32]{})
+	equalSize(t, result[uint64, struct{}, uint64]{}, alt1[uint64, struct{}, uint64]{})
+	equalSize(t, result[uint64, [5]uint8, uint64]{}, alt1[uint64, [5]uint8, uint64]{})
+	equalSize(t, result[uint64, [6]uint8, uint64]{}, alt1[uint64, [6]uint8, uint64]{})
+
+	// result has extra padding due to ptr to trailing zero-size struct field
+	unequalSize(t, result[struct{}, struct{}, struct{}]{}, alt1[struct{}, struct{}, struct{}]{})
+
+	// zero-length arrays have alignment of their associated type
+	// TODO: document why zero-length arrays are not allowed as result or variant associated types
+	unequalSize(t, result[[0]uint64, [0]uint64, struct{}]{}, alt1[[0]uint64, [0]uint64, struct{}]{})
+}
+
+func equalSize[A, B any](t *testing.T, a A, b B) {
+	if unsafe.Sizeof(a) != unsafe.Sizeof(b) {
+		t.Errorf("unsafe.Sizeof(%T) (%d) != unsafe.Sizeof(%T) (%d)", a, unsafe.Sizeof(a), b, unsafe.Sizeof(b))
+	}
+}
+
+func unequalSize[A, B any](t *testing.T, a A, b B) {
+	if unsafe.Sizeof(a) == unsafe.Sizeof(b) {
+		t.Errorf("unsafe.Sizeof(%T) (%d) == unsafe.Sizeof(%T) (%d)", a, unsafe.Sizeof(a), b, unsafe.Sizeof(b))
+	}
+}
+
+func BenchmarkResultInlines(b *testing.B) {
+	var ok *struct{}
+	var err *string
+	var r1 = Err[ErrResult[struct{}, string]]("hello")
+	for i := 0; i < b.N; i++ {
+		ok = r1.OK()
+	}
+	_ = ok
+	_ = err
+}
