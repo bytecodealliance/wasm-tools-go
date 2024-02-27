@@ -1,6 +1,7 @@
 package cm
 
 import (
+	"runtime"
 	"testing"
 	"unsafe"
 )
@@ -70,7 +71,7 @@ func TestResultLayout(t *testing.T) {
 func TestResultOKOrErr(t *testing.T) {
 	r1 := OK[OKResult[string, struct{}]]("hello")
 	if ok := r1.OK(); ok == nil {
-		t.Errorf("Err(): %v, expected non-nil OK", ok)
+		t.Errorf("OK(): %v, expected non-nil OK", ok)
 	}
 	if err := r1.Err(); err != nil {
 		t.Errorf("Err(): %v, expected nil Err", err)
@@ -100,12 +101,15 @@ func TestAltResult1(t *testing.T) {
 	equalSize(t, result[uint64, [5]uint8, uint64]{}, alt1[uint64, [5]uint8, uint64]{})
 	equalSize(t, result[uint64, [6]uint8, uint64]{}, alt1[uint64, [6]uint8, uint64]{})
 
-	// result has extra padding due to ptr to trailing zero-size struct field
-	unequalSize(t, result[struct{}, struct{}, struct{}]{}, alt1[struct{}, struct{}, struct{}]{})
+	// Go adds padding to structs with zero-length trailing fields.
+	// TinyGo does not.
+	if runtime.Compiler != "tinygo" {
+		unequalSize(t, result[struct{}, struct{}, struct{}]{}, alt1[struct{}, struct{}, struct{}]{})
 
-	// zero-length arrays have alignment of their associated type
-	// TODO: document why zero-length arrays are not allowed as result or variant associated types
-	unequalSize(t, result[[0]uint64, [0]uint64, struct{}]{}, alt1[[0]uint64, [0]uint64, struct{}]{})
+		// zero-length arrays have alignment of their associated type
+		// TODO: document why zero-length arrays are not allowed as result or variant associated types
+		unequalSize(t, result[[0]uint64, [0]uint64, struct{}]{}, alt1[[0]uint64, [0]uint64, struct{}]{})
+	}
 }
 
 func equalSize[A, B any](t *testing.T, a A, b B) {
