@@ -10,7 +10,8 @@ const (
 	ResultErr = true
 )
 
-// Result represents an untyped result, e.g. result.
+// Result represents a result with no OK or error type.
+// False represents the OK case and true represents the error case.
 type Result bool
 
 // OKResult represents a result sized to hold the OK type.
