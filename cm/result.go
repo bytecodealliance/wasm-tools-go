@@ -10,32 +10,8 @@ const (
 	ResultErr = true
 )
 
-// Result represents an untyped result, e.g. result or result<_, _>.
-// Its associated types are implicitly struct{}, and it is represented as a Go bool.
+// Result represents an untyped result, e.g. result.
 type Result bool
-
-// IsErr returns true if r represents the error case.
-func (r Result) IsErr() bool {
-	return bool(r)
-}
-
-// OK returns a non-nil pointer if r represents the OK case.
-// If r represents an error, then it returns nil.
-func (r Result) OK() *struct{} {
-	if r {
-		return nil
-	}
-	return &struct{}{}
-}
-
-// Err returns a non-nil pointer if r represents the error case.
-// If r represents the OK case, then it returns nil.
-func (r Result) Err() *struct{} {
-	if !r {
-		return nil
-	}
-	return &struct{}{}
-}
 
 // OKResult represents a result sized to hold the OK type.
 // The size of the OK type must be greater than or equal to the size of the Err type.

@@ -6,9 +6,8 @@ import (
 )
 
 var (
-	_ resulter[struct{}, struct{}] = Result(false)
-	_ resulter[string, bool]       = &OKResult[string, bool]{}
-	_ resulter[bool, string]       = &ErrResult[bool, string]{}
+	_ resulter[string, bool] = &OKResult[string, bool]{}
+	_ resulter[bool, string] = &ErrResult[bool, string]{}
 )
 
 type resulter[OK, Err any] interface {
