@@ -130,7 +130,7 @@ func Err[R ~struct {
 	data  Shape
 }, Shape, OK, Err any](err Err) R {
 	if BoundsCheck && unsafe.Sizeof(*(*Err)(nil)) > unsafe.Sizeof(*(*Shape)(nil)) {
-		panic("OK: size of requested type greater than size of data type")
+		panic("Err: size of requested type greater than size of data type")
 	}
 	var r result[Shape, OK, Err]
 	r.isErr = ResultErr
