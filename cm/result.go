@@ -10,139 +10,139 @@ const (
 	ResultErr = true
 )
 
-// OKResult represents a result with only an OK type.
-//
-// TODO: change this to an alias when https://github.com/golang/go/issues/46477 is implemented.
-type OKResult[OK any] struct {
-	Result[OK, OK, struct{}]
-}
+// Result represents a result with no OK or error type.
+// False represents the OK case and true represents the error case.
+type Result bool
 
-// ErrResult represents a result with only an error type.
-//
-// TODO: change this to an alias when https://github.com/golang/go/issues/46477 is implemented.
-type ErrResult[Err any] struct {
-	Result[Err, struct{}, Err]
-}
-
-// OKSizedResult represents a result sized to hold the OK type.
+// OKResult represents a result sized to hold the OK type.
 // The size of the OK type must be greater than or equal to the size of the Err type.
-// For results with two zero-length types, use UnsizedResult.
+// For results with two zero-length types, use [Result].
 //
 // TODO: change this to an alias when https://github.com/golang/go/issues/46477 is implemented.
-type OKSizedResult[OK any, Err any] struct {
-	Result[OK, OK, Err]
+type OKResult[OK, Err any] result[OK, OK, Err]
+
+// IsErr returns true if r represents the error case.
+func (r *OKResult[OK, Err]) IsErr() bool {
+	return r.isErr
 }
 
-// ErrSizedResult represents a result sized to hold the Err type.
+// OK returns a non-nil *OK pointer if r represents the OK case.
+// If r represents an error, then it returns nil.
+func (r *OKResult[OK, Err]) OK() *OK {
+	return (*result[OK, OK, Err])(r).OK()
+}
+
+// Err returns a non-nil *Err pointer if r represents the error case.
+// If r represents the OK case, then it returns nil.
+func (r *OKResult[OK, Err]) Err() *Err {
+	return (*result[OK, OK, Err])(r).Err()
+}
+
+// ErrResult represents a result sized to hold the Err type.
 // The size of the Err type must be greater than or equal to the size of the OK type.
-// For results with two zero-length types, use UnsizedResult.
+// For results with two zero-length types, use [Result].
 //
 // TODO: change this to an alias when https://github.com/golang/go/issues/46477 is implemented.
-type ErrSizedResult[OK any, Err any] struct {
-	Result[Err, OK, Err]
+type ErrResult[OK, Err any] result[Err, OK, Err]
+
+// IsErr returns true if r represents the error case.
+func (r *ErrResult[OK, Err]) IsErr() bool {
+	return r.isErr
 }
 
-// Result is a tagged union representing either the OK type or the Err type.
-// Either OK or Err must have non-zero size, e.g. both cannot be struct{} or a zero-length array.
-// For results with zero-sized or no associated types, use [UntypedResult].
-type Result[Shape, OK, Err any] struct {
+// OK returns a non-nil *OK pointer if r represents the OK case.
+// If r represents an error, then it returns nil.
+func (r *ErrResult[OK, Err]) OK() *OK {
+	return (*result[Err, OK, Err])(r).OK()
+}
+
+// Err returns a non-nil *Err pointer if r represents the error case.
+// If r represents the OK case, then it returns nil.
+func (r *ErrResult[OK, Err]) Err() *Err {
+	return (*result[Err, OK, Err])(r).Err()
+}
+
+type result[Shape, OK, Err any] struct {
 	isErr bool
 	_     [0]OK
 	_     [0]Err
 	data  Shape
 }
 
-// OK returns an OK [Result] with GC shape Shape and type OK and Err.
-func OK[Shape, OK, Err any](ok OK) Result[Shape, OK, Err] {
-	var r Result[Shape, OK, Err]
-	if BoundsCheck && unsafe.Sizeof(ok) > unsafe.Sizeof(r.data) {
-		panic("OK: size of requested type greater than size of data type")
+// This function is sized so it can be inlined and optimized away.
+func (r *result[Shape, OK, Err]) validate() {
+	var shape Shape
+	var ok OK
+	var err Err
+
+	// Check if size of Shape is greater than both OK and Err
+	if unsafe.Sizeof(shape) > unsafe.Sizeof(ok) && unsafe.Sizeof(shape) > unsafe.Sizeof(err) {
+		panic("result: size of data type > OK and Err types")
 	}
-	r.isErr = ResultOK
-	*((*OK)(unsafe.Pointer(&r.data))) = ok
-	return r
+
+	// Check if size of OK is greater than Shape
+	if unsafe.Sizeof(ok) > unsafe.Sizeof(shape) {
+		panic("result: size of OK type > data type")
+	}
+
+	// Check if size of Err is greater than Shape
+	if unsafe.Sizeof(err) > unsafe.Sizeof(shape) {
+		panic("result: size of Err type > data type")
+	}
+
+	// Check if Shape is zero-sized, but size of result != 1
+	if unsafe.Sizeof(shape) == 0 && unsafe.Sizeof(*r) != 1 {
+		panic("result: size of data type == 0, but result size != 1")
+	}
 }
 
-// Err returns an error [Result] with GC shape Shape and type OK and Err.
-func Err[Shape, OK, Err any](err Err) Result[Shape, OK, Err] {
-	var r Result[Shape, OK, Err]
-	if BoundsCheck && unsafe.Sizeof(err) > unsafe.Sizeof(r.data) {
-		panic("Err: size of requested type greater than size of data type")
-	}
-	r.isErr = ResultErr
-	*((*Err)(unsafe.Pointer(&r.data))) = err
-	return r
-}
-
-// IsErr returns true if r represents the error case.
-func (r *Result[Shape, OK, Err]) IsErr() bool {
+func (r *result[Shape, OK, Err]) IsErr() bool {
+	r.validate()
 	return r.isErr
 }
 
-// OK returns a non-nil *OK pointer if r represents the OK case.
-// If r represents an error, then it returns nil.
-func (r *Result[Shape, OK, Err]) OK() *OK {
+func (r *result[Shape, OK, Err]) OK() *OK {
+	r.validate()
 	if r.isErr {
 		return nil
 	}
 	return (*OK)(unsafe.Pointer(&r.data))
 }
 
-// Err returns a non-nil *Err pointer if r represents the error case.
-// If r represents the OK case, then it returns nil.
-func (r *Result[Shape, OK, Err]) Err() *Err {
+func (r *result[Shape, OK, Err]) Err() *Err {
+	r.validate()
 	if !r.isErr {
 		return nil
 	}
 	return (*Err)(unsafe.Pointer(&r.data))
 }
 
-// Unwrap returns non-nil *OK pointer and nil *Err pointer if r represents the OK case.
-// It returns a nil *OK pointer and non-nil *Err pointer if r represents the error case.
-//
-// One, and only one, of the return values is guaranteed to be non-nil. It will never return
-// two nil pointers or two non-nil pointers.
-func (r *Result[Shape, OK, Err]) Unwrap() (*OK, *Err) {
-	if r.isErr {
-		return nil, (*Err)(unsafe.Pointer(&r.data))
-	}
-	return (*OK)(unsafe.Pointer(&r.data)), nil
+// OK returns an OK result with shape Shape and type OK and Err.
+// Pass OKResult[OK, Err] or ErrResult[OK, Err] as the first type argument.
+func OK[R ~struct {
+	isErr bool
+	_     [0]OK
+	_     [0]Err
+	data  Shape
+}, Shape, OK, Err any](ok OK) R {
+	var r result[Shape, OK, Err]
+	r.validate()
+	r.isErr = ResultOK
+	*((*OK)(unsafe.Pointer(&r.data))) = ok
+	return R(r)
 }
 
-// UntypedResult represents an untyped result, e.g. result or result<_, _>.
-// Its associated types are implicitly struct{}, and it is represented as a Go bool.
-type UntypedResult bool
-
-// IsErr returns true if r represents the error case.
-func (r UntypedResult) IsErr() bool {
-	return bool(r)
-}
-
-// OK returns a non-nil pointer if r represents the OK case.
-// If r represents an error, then it returns nil.
-func (r UntypedResult) OK() *struct{} {
-	if r {
-		return nil
-	}
-	return &struct{}{}
-}
-
-// Err returns a non-nil pointer if r represents the error case.
-// If r represents the OK case, then it returns nil.
-func (r UntypedResult) Err() *struct{} {
-	if !r {
-		return nil
-	}
-	return &struct{}{}
-}
-
-// Unwrap returns non-nil *OK pointer and nil *Err pointer if r represents the OK case.
-// It returns a nil *OK pointer and non-nil *Err pointer if r represents the error case.
-//
-// See [Result] for more information.
-func (r UntypedResult) Unwrap() (*struct{}, *struct{}) {
-	if r {
-		return nil, &struct{}{}
-	}
-	return &struct{}{}, nil
+// Err returns an error result with shape Shape and type OK and Err.
+// Pass OKResult[OK, Err] or ErrResult[OK, Err] as the first type argument.
+func Err[R ~struct {
+	isErr bool
+	_     [0]OK
+	_     [0]Err
+	data  Shape
+}, Shape, OK, Err any](err Err) R {
+	var r result[Shape, OK, Err]
+	r.validate()
+	r.isErr = ResultErr
+	*((*Err)(unsafe.Pointer(&r.data))) = err
+	return R(r)
 }

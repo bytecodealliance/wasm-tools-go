@@ -1,7 +1,6 @@
 package cm
 
 import (
-	"fmt"
 	"testing"
 )
 
@@ -30,7 +29,7 @@ func TestFlags(t *testing.T) {
 	if flags1.Is(F32) {
 		t.Errorf("expected bit %d to not be set", F32)
 	}
-	fmt.Printf("flags1: %b\n", flags1.data)
+	// fmt.Printf("flags1: %b\n", flags1.data)
 
 	var flags2 struct {
 		Flags[[3]uint32, MyFlag]
@@ -46,5 +45,5 @@ func TestFlags(t *testing.T) {
 	if flags2.Is(0) {
 		t.Errorf("expected bit %d to not be set", F0)
 	}
-	fmt.Printf("flags2: %b\n", flags2.data)
+	// fmt.Printf("flags2: %b\n", flags2.data)
 }

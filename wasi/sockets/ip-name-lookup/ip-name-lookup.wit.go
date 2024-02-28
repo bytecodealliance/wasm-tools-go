@@ -49,15 +49,15 @@ func (self ResolveAddressStream) wasmimportResourceDrop()
 //	resolve-next-address: func() -> result<option<ip-address>, error-code>
 //
 //go:nosplit
-func (self ResolveAddressStream) ResolveNextAddress() cm.Result[cm.Option[network.IPAddress], cm.Option[network.IPAddress], network.ErrorCode] {
-	var result cm.Result[cm.Option[network.IPAddress], cm.Option[network.IPAddress], network.ErrorCode]
+func (self ResolveAddressStream) ResolveNextAddress() cm.OKResult[cm.Option[network.IPAddress], network.ErrorCode] {
+	var result cm.OKResult[cm.Option[network.IPAddress], network.ErrorCode]
 	self.wasmimportResolveNextAddress(&result)
 	return result
 }
 
 //go:wasmimport wasi:sockets/ip-name-lookup@0.2.0 [method]resolve-address-stream.resolve-next-address
 //go:noescape
-func (self ResolveAddressStream) wasmimportResolveNextAddress(result *cm.Result[cm.Option[network.IPAddress], cm.Option[network.IPAddress], network.ErrorCode])
+func (self ResolveAddressStream) wasmimportResolveNextAddress(result *cm.OKResult[cm.Option[network.IPAddress], network.ErrorCode])
 
 // Subscribe represents method "subscribe".
 //
@@ -104,12 +104,12 @@ func (self ResolveAddressStream) wasmimportSubscribe() poll.Pollable
 //	error-code>
 //
 //go:nosplit
-func ResolveAddresses(network_ network.Network, name string) cm.Result[ResolveAddressStream, ResolveAddressStream, network.ErrorCode] {
-	var result cm.Result[ResolveAddressStream, ResolveAddressStream, network.ErrorCode]
+func ResolveAddresses(network_ network.Network, name string) cm.OKResult[ResolveAddressStream, network.ErrorCode] {
+	var result cm.OKResult[ResolveAddressStream, network.ErrorCode]
 	wasmimportResolveAddresses(network_, name, &result)
 	return result
 }
 
 //go:wasmimport wasi:sockets/ip-name-lookup@0.2.0 resolve-addresses
 //go:noescape
-func wasmimportResolveAddresses(network_ network.Network, name string, result *cm.Result[ResolveAddressStream, ResolveAddressStream, network.ErrorCode])
+func wasmimportResolveAddresses(network_ network.Network, name string, result *cm.OKResult[ResolveAddressStream, network.ErrorCode])

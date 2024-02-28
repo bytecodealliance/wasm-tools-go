@@ -41,12 +41,12 @@ import (
 //	error-code>
 //
 //go:nosplit
-func CreateTCPSocket(addressFamily network.IPAddressFamily) cm.Result[tcp.TCPSocket, tcp.TCPSocket, network.ErrorCode] {
-	var result cm.Result[tcp.TCPSocket, tcp.TCPSocket, network.ErrorCode]
+func CreateTCPSocket(addressFamily network.IPAddressFamily) cm.OKResult[tcp.TCPSocket, network.ErrorCode] {
+	var result cm.OKResult[tcp.TCPSocket, network.ErrorCode]
 	wasmimportCreateTCPSocket(addressFamily, &result)
 	return result
 }
 
 //go:wasmimport wasi:sockets/tcp-create-socket@0.2.0 create-tcp-socket
 //go:noescape
-func wasmimportCreateTCPSocket(addressFamily network.IPAddressFamily, result *cm.Result[tcp.TCPSocket, tcp.TCPSocket, network.ErrorCode])
+func wasmimportCreateTCPSocket(addressFamily network.IPAddressFamily, result *cm.OKResult[tcp.TCPSocket, network.ErrorCode])

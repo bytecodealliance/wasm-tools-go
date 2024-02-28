@@ -11,7 +11,7 @@ type Discriminant interface {
 
 // Variant represents a loosely-typed Component Model variant.
 // Shape and Align must be non-zero sized types. To create a variant with no associated
-// types, use UntypedVariant. For variants with zero-width or no associated types, use an enum.
+// types, use an enum.
 type Variant[Disc Discriminant, Shape, Align any] struct {
 	tag  Disc
 	_    [0]Align
