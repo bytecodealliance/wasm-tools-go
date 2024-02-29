@@ -721,18 +721,19 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 	}
 
 	// Organize function parameters and results
-	scope := gen.NewScope(file)
-	names := make(map[string]string)
-	funcParams := goParams(scope, names, f.Params)
-	funcResults := goParams(scope, names, f.Results)
+	funcScope := gen.NewScope(file)
+	funcParams := goParams(funcScope, f.Params)
+	funcResults := goParams(funcScope, f.Results)
 	var receiver wit.Param
 	if f.IsMethod() {
 		receiver = funcParams[0]
 		funcParams = funcParams[1:]
 	}
 	combined := append(funcParams, funcResults...)
-	coreParams := goParams(scope, names, core.Params)
-	coreResults := goParams(scope, names, core.Results)
+
+	coreScope := gen.NewScope(file)
+	coreParams := goParams(coreScope, core.Params)
+	coreResults := goParams(coreScope, core.Results)
 	if coreIsMethod {
 		coreParams = coreParams[1:]
 	}
@@ -864,17 +865,14 @@ func isPointer(t wit.Type) bool {
 // goParams adapts WIT params to Go params, with a special case for the unnamed single result.
 // It accepts a scope and string map to map WIT names to Go names.
 // The resulting slice of [wit.Param] replaces the WIT names with valid, scoped Go names.
-func goParams(scope gen.Scope, names map[string]string, params []wit.Param) []wit.Param {
+func goParams(scope gen.Scope, params []wit.Param) []wit.Param {
 	params = slices.Clone(params)
 	if len(params) == 1 && params[0].Name == "" {
 		params[0].Name = "result"
 	}
 	for i := range params {
 		p := &params[i]
-		if names[p.Name] == "" {
-			names[p.Name] = scope.UniqueName(GoName(p.Name, false))
-		}
-		p.Name = names[p.Name]
+		p.Name = scope.UniqueName(GoName(p.Name, false))
 	}
 	return params
 }
