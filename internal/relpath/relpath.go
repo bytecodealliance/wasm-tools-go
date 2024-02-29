@@ -4,6 +4,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"runtime"
 )
 
 // Abs returns a best-effort absolute representation of path.
@@ -30,6 +31,21 @@ func Rel(base, target string) string {
 		return target
 	}
 	return rel
+}
+
+// CallerRel returns a source-file relative path.
+// Used for testing when PWD is not set, such as running tests under wasm/wasip1.
+// This does not work in TinyGo (missing [runtime.Caller] support).
+func CallerRel(path string) string {
+	if !filepath.IsLocal(path) {
+		return path
+	}
+	_, file, _, ok := runtime.Caller(1)
+	if !ok {
+		return path
+	}
+	dir := filepath.Dir(file)
+	return filepath.Join(dir, path)
 }
 
 // Getwd returns best-effort path to the current working directory, even on WebAssembly.
