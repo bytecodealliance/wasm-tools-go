@@ -14,6 +14,7 @@ import (
 	"github.com/ydnar/wasm-tools-go/internal/callerfs"
 	"github.com/ydnar/wasm-tools-go/internal/codec"
 	"github.com/ydnar/wasm-tools-go/internal/go/gen"
+	"github.com/ydnar/wasm-tools-go/internal/relpath"
 	"github.com/ydnar/wasm-tools-go/wit"
 	"golang.org/x/tools/go/packages"
 )
@@ -39,7 +40,17 @@ func validateGeneratedGo(t *testing.T, res *wit.Resolve) {
 		return
 	}
 
-	out := callerfs.Path(".")
+	// out, err := os.MkdirTemp(os.TempDir(), "wit-bindgen-*")
+	// if err != nil {
+	// 	t.Error(err)
+	// 	return
+	// }
+	out, err := relpath.Abs(".")
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
 	pkgPath, err := gen.PackagePath(out)
 	if err != nil {
 		t.Error(err)
@@ -64,6 +75,9 @@ func validateGeneratedGo(t *testing.T, res *wit.Resolve) {
 	}
 
 	for _, pkg := range pkgs {
+		if !pkg.HasContent() {
+			continue
+		}
 		pkgMap[pkg.Path] = pkg
 		dir := filepath.Join(out, strings.TrimPrefix(pkg.Path, pkgPath))
 		for _, file := range pkg.Files {
@@ -88,6 +102,11 @@ func validateGeneratedGo(t *testing.T, res *wit.Resolve) {
 			t.Logf("Skipped package: %s", goPkg.PkgPath)
 			continue
 		}
+
+		// Check for errors
+		// for _, err := range goPkg.Errors {
+		// 	t.Errorf("%s: %v", goPkg.PkgPath, err)
+		// }
 
 		// Verify number of files
 		count := len(goPkg.OtherFiles)

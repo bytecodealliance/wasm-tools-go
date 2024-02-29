@@ -148,7 +148,7 @@ func (g *generator) detectVersionedPackages() {
 		}
 	}
 	if g.versioned {
-		fmt.Fprintf(os.Stderr, "Multiple versions of package(s) detected\n")
+		// fmt.Fprintf(os.Stderr, "Multiple versions of package(s) detected\n")
 	}
 }
 
