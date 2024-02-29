@@ -20,7 +20,10 @@ import (
 	"golang.org/x/tools/go/packages"
 )
 
-const testdataPath = "../../testdata"
+const (
+	testdataPath  = "../../testdata"
+	generatedPath = "../../generated"
+)
 
 func loadTestdata(f func(path string, res *wit.Resolve) error) error {
 	return relpath.Walk(testdataPath, func(path string) error {
@@ -69,7 +72,7 @@ func validateGeneratedGo(t *testing.T, res *wit.Resolve) {
 		return
 	}
 
-	out, err := relpath.Abs(filepath.Join(testdataPath, "generated"))
+	out, err := relpath.Abs(generatedPath)
 	if err != nil {
 		t.Error(err)
 		return
