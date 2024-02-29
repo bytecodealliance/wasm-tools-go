@@ -11,7 +11,6 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/ydnar/wasm-tools-go/internal/callerfs"
 	"github.com/ydnar/wasm-tools-go/internal/codec"
 	"github.com/ydnar/wasm-tools-go/internal/go/gen"
 	"github.com/ydnar/wasm-tools-go/internal/relpath"
@@ -20,7 +19,7 @@ import (
 )
 
 func TestGenerator(t *testing.T) {
-	res, err := wit.LoadJSON(callerfs.Path("../../testdata/wasi/cli.wit.json"))
+	res, err := wit.LoadJSON("../../testdata/wasi/cli.wit.json")
 	if err != nil {
 		t.Error(err)
 		return

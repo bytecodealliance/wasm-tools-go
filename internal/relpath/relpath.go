@@ -1,6 +1,7 @@
 package relpath
 
 import (
+	"io/fs"
 	"os"
 	"path/filepath"
 )
@@ -19,6 +20,16 @@ func Abs(path string) (string, error) {
 		return "", err
 	}
 	return filepath.Join(wd, path), nil
+}
+
+// Rel returns a best-effort relative path. If an error occurs
+// trying to make target relative to base, target is returned unmodified.
+func Rel(base, target string) string {
+	rel, err := filepath.Rel(base, target)
+	if err != nil {
+		return target
+	}
+	return rel
 }
 
 // Getwd returns best-effort path to the current working directory, even on WebAssembly.
@@ -60,4 +71,27 @@ outer:
 		break
 	}
 	return filepath.Clean(filepath.Join("/", path)), nil
+}
+
+// Walk walks the files in directory dir, passing them to func f.
+// Supply glob patterns (e.g. "*.wit.json") to filter files passed to f.
+func Walk(dir string, f func(path string) error, patterns ...string) error {
+	return filepath.WalkDir(dir, func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return fs.SkipDir
+		}
+		if len(patterns) == 0 {
+			return f(path)
+		}
+		for _, p := range patterns {
+			matched, err := filepath.Match(p, filepath.Base(path))
+			if err != nil {
+				return err
+			}
+			if matched {
+				return f(path)
+			}
+		}
+		return nil
+	})
 }
