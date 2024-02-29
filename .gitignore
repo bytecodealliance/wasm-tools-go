@@ -1,3 +1,2 @@
 .DS_Store
-testdata/**/*.wit.go
-testdata/**/empty.s
+testdata/generated

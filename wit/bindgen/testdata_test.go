@@ -69,7 +69,7 @@ func validateGeneratedGo(t *testing.T, res *wit.Resolve) {
 		return
 	}
 
-	out, err := relpath.Abs(testdataPath)
+	out, err := relpath.Abs(filepath.Join(testdataPath, "generated"))
 	if err != nil {
 		t.Error(err)
 		return
