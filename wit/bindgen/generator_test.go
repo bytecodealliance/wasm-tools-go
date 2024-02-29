@@ -39,11 +39,6 @@ func validateGeneratedGo(t *testing.T, res *wit.Resolve) {
 		return
 	}
 
-	// out, err := os.MkdirTemp(os.TempDir(), "wit-bindgen-*")
-	// if err != nil {
-	// 	t.Error(err)
-	// 	return
-	// }
 	out, err := relpath.Abs(".")
 	if err != nil {
 		t.Error(err)
@@ -79,6 +74,7 @@ func validateGeneratedGo(t *testing.T, res *wit.Resolve) {
 		}
 		pkgMap[pkg.Path] = pkg
 		dir := filepath.Join(out, strings.TrimPrefix(pkg.Path, pkgPath))
+		// cfg.Overlay[dir] = nil
 		for _, file := range pkg.Files {
 			path := filepath.Join(dir, file.Name)
 			src, err := file.Bytes()
@@ -103,9 +99,12 @@ func validateGeneratedGo(t *testing.T, res *wit.Resolve) {
 		}
 
 		// Check for errors
-		// for _, err := range goPkg.Errors {
-		// 	t.Errorf("%s: %v", goPkg.PkgPath, err)
-		// }
+		for _, err := range goPkg.Errors {
+			if err.Kind == 1 && err.Pos == "" {
+				continue
+			}
+			t.Errorf("%s: %v", goPkg.PkgPath, err)
+		}
 
 		// Verify number of files
 		count := len(goPkg.OtherFiles)
@@ -123,6 +122,9 @@ func validateGeneratedGo(t *testing.T, res *wit.Resolve) {
 		}
 
 		// Verify generated names
+		if len(goPkg.TypesInfo.Defs) == 0 {
+			t.Errorf("package %s has no TypesInfo.Defs", pkg.Path)
+		}
 		for id, def := range goPkg.TypesInfo.Defs {
 			if def == nil || def.Parent() != goPkg.Types.Scope() {
 				continue
