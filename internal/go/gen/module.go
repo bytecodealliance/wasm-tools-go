@@ -8,6 +8,7 @@ import (
 	"path"
 	"path/filepath"
 
+	"github.com/ydnar/wasm-tools-go/internal/relpath"
 	"golang.org/x/mod/modfile"
 )
 
@@ -15,7 +16,7 @@ import (
 // for the given directory path dir. Returns an error if dir or its parent directories
 // do not contain a go.mod file.
 func PackagePath(dir string) (string, error) {
-	dir, err := filepath.Abs(dir)
+	dir, err := relpath.Abs(dir)
 	if err != nil {
 		return "", err
 	}
@@ -34,6 +35,9 @@ func PackagePath(dir string) (string, error) {
 		file = filepath.Join(dir, "go.mod")
 		info, err := os.Stat(file)
 		if err != nil {
+			if dir == "/" {
+				return "", errors.New("unable to locate a go.mod file")
+			}
 			// Pop up to parent dir
 			var rest string
 			dir, rest = filepath.Split(dir)
