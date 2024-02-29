@@ -4,18 +4,22 @@ import (
 	"os"
 	"testing"
 
-	"github.com/ydnar/wasm-tools-go/internal/callerfs"
+	"github.com/ydnar/wasm-tools-go/internal/relpath"
 )
 
 func TestPackagePath(t *testing.T) {
-	root := callerfs.Path(".")
-	got, err := PackagePath(root)
+	wd, err := relpath.Getwd()
+	if err != nil {
+		t.Error(err)
+	}
+
+	got, err := PackagePath(wd)
 	if err != nil {
 		t.Error(err)
 	}
 	want := "github.com/ydnar/wasm-tools-go/internal/go/gen"
 	if got != want {
-		t.Errorf("PackagePath(%q): got %s, expected %s", root, got, want)
+		t.Errorf("PackagePath(%q): got %s, expected %s", wd, got, want)
 	}
 
 	tmp := os.TempDir()

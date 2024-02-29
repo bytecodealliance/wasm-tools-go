@@ -8,6 +8,7 @@ import (
 	"path"
 	"path/filepath"
 
+	"github.com/ydnar/wasm-tools-go/internal/relpath"
 	"golang.org/x/mod/modfile"
 )
 
@@ -15,7 +16,7 @@ import (
 // for the given directory path dir. Returns an error if dir or its parent directories
 // do not contain a go.mod file.
 func PackagePath(dir string) (string, error) {
-	dir, err := filepath.Abs(dir)
+	dir, err := relpath.Abs(dir)
 	if err != nil {
 		return "", err
 	}
