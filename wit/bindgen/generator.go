@@ -741,31 +741,40 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 		coreParams = coreParams[1:]
 	}
 
+	// TODO: make this work with compound params/results
+	callerParams := slices.Clone(coreParams)
+	for i := range callerParams {
+		j := i - len(funcParams)
+		if j < 0 {
+			callerParams[i].Name = funcParams[i].Name
+		} else {
+			callerParams[i].Name = funcResults[j].Name
+		}
+	}
+
 	// Bridging between Go and core function
 	var compoundParams wit.Param
-	var paramsRecord *wit.Record
 	if hasCompoundParams {
+		callerParams[0].Type = coreParams[0].Type
 		t := derefAnonRecord(coreParams[0].Type)
 		g.registerTypeDef(file, coreName+"Params", t)
-		compoundParams.Name = funcScope.UniqueName("params")
+		name := funcScope.UniqueName("params")
+		callerParams[0].Name = name
+		compoundParams.Name = name
 		compoundParams.Type = t
-		paramsRecord = t.Kind.(*wit.Record)
 	}
-	_ = paramsRecord
 
 	var compoundResults wit.Param
 	var resultsRecord *wit.Record
 	if hasCompoundResults {
 		t := derefAnonRecord(last(coreParams).Type)
 		g.registerTypeDef(file, coreName+"Results", t)
-		compoundResults.Name = funcScope.UniqueName("results")
+		name := funcScope.UniqueName("results")
+		last(callerParams).Name = name
+		compoundResults.Name = name
 		compoundResults.Type = t
 		resultsRecord = t.Kind.(*wit.Record)
 	}
-	_ = resultsRecord
-
-	// TODO: make this work with compound params/results
-	combined := append(coreParams, funcResults...)
 
 	var b bytes.Buffer
 
@@ -816,7 +825,17 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 
 	// Emit compound types
 	if compoundParams.Type != nil {
-		stringio.Write(&b, "var ", compoundParams.Name, " ", g.typeRep(file, compoundParams.Type), "\n")
+		stringio.Write(&b, compoundParams.Name, " := ", g.typeRep(file, compoundParams.Type), "{ ")
+		if receiver.Name != "" {
+			stringio.Write(&b, receiver.Name, ", ")
+		}
+		for i, p := range funcParams {
+			if i > 0 {
+				b.WriteString(", ")
+			}
+			b.WriteString(p.Name)
+		}
+		b.WriteString(" }\n")
 	}
 	if compoundResults.Type != nil {
 		stringio.Write(&b, "var ", compoundResults.Name, " ", g.typeRep(file, compoundResults.Type), "\n")
@@ -830,14 +849,14 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 		stringio.Write(&b, receiver.Name, ".")
 	}
 	stringio.Write(&b, coreName, "(")
-	for i, p := range coreParams {
+	for i, p := range callerParams {
 		if i > 0 {
 			b.WriteString(", ")
 		}
 		if isPointer(p.Type) {
 			b.WriteRune('&')
 		}
-		b.WriteString(combined[i].Name) // TODO: make this work with compound params/results
+		b.WriteString(callerParams[i].Name)
 	}
 	b.WriteString(")\n")
 	if !sameResults {
