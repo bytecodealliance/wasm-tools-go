@@ -883,11 +883,15 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 	// Emit shared types
 	if t, ok := compoundParams.Type.(*wit.TypeDef); ok {
 		goName := g.typeDefNames[t]
+		stringio.Write(&b, "// ", goName, " represents the flattened function params for [", coreName, "].\n")
+		stringio.Write(&b, "// See the Canonical ABI flattening rules for more information.\n")
 		stringio.Write(&b, "type ", goName, " ", g.typeDefRep(file, goName, t), "\n\n")
 	}
 
 	if t, ok := compoundResults.Type.(*wit.TypeDef); ok {
 		goName := g.typeDefNames[t]
+		stringio.Write(&b, "// ", goName, " represents the flattened function results for [", coreName, "].\n")
+		stringio.Write(&b, "// See the Canonical ABI flattening rules for more information.\n")
 		stringio.Write(&b, "type ", goName, " ", g.typeDefRep(file, goName, t), "\n\n")
 	}
 
