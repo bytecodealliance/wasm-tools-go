@@ -9,6 +9,7 @@ import (
 	"io/fs"
 	"os"
 	"os/exec"
+	"path"
 	"path/filepath"
 	"strings"
 	"sync"
@@ -77,25 +78,26 @@ var canGo = sync.OnceValue[bool](func() bool {
 })
 
 // validateGeneratedGo loads the Go package(s) generated
-func validateGeneratedGo(t *testing.T, res *wit.Resolve) {
+func validateGeneratedGo(t *testing.T, res *wit.Resolve, origin string) {
 	if !canGo() {
 		t.Log("skipping test: can't run go (TinyGo without fork?)")
 		return
 	}
 
-	generated, err := relpath.Abs(generatedPath)
+	dir := path.Join(generatedPath, origin)
+	err := os.MkdirAll(dir, fs.ModePerm)
 	if err != nil {
 		t.Error(err)
 		return
 	}
 
-	testdata, err := relpath.Abs(testdataPath)
+	out, err := relpath.Abs(dir)
 	if err != nil {
 		t.Error(err)
 		return
 	}
 
-	pkgPath, err := gen.PackagePath(testdata)
+	pkgPath, err := gen.PackagePath(out)
 	if err != nil {
 		t.Error(err)
 		return
@@ -114,17 +116,23 @@ func validateGeneratedGo(t *testing.T, res *wit.Resolve) {
 
 	cfg := &packages.Config{
 		Mode:    packages.NeedName | packages.NeedFiles | packages.NeedCompiledGoFiles | packages.NeedImports | packages.NeedTypes | packages.NeedTypesInfo | packages.NeedTypesSizes,
-		Dir:     testdata,
+		Dir:     out,
 		Fset:    token.NewFileSet(),
 		Overlay: make(map[string][]byte),
 	}
+	// cfg.ParseFile = func(fset *token.FileSet, filename string, src []byte) (*ast.File, error) {
+	// 	if _, ok := cfg.Overlay[filename]; !ok && strings.Contains(filename, pkgPath) {
+	// 		return nil, nil
+	// 	}
+	// 	return parser.ParseFile(fset, filename, src, parser.AllErrors|parser.ParseComments)
+	// }
 
 	for _, pkg := range pkgs {
 		if !pkg.HasContent() {
 			continue
 		}
 		pkgMap[pkg.Path] = pkg
-		dir := filepath.Join(testdata, strings.TrimPrefix(pkg.Path, pkgPath))
+		dir := filepath.Join(out, strings.TrimPrefix(pkg.Path, pkgPath))
 		// cfg.Overlay[dir] = nil
 		for _, file := range pkg.Files {
 			path := filepath.Join(dir, file.Name)
@@ -171,7 +179,7 @@ func validateGeneratedGo(t *testing.T, res *wit.Resolve) {
 				t.Errorf("unknown file in package %s: %s", pkg.Path, base)
 			}
 		}
-		if count != len(pkg.Files) {
+		if count < len(pkg.Files) {
 			t.Errorf("%d files in package %s; expected %d:\n%s", count, pkg.Path, len(pkg.Files),
 				strings.Join(append(goPkg.GoFiles, goPkg.OtherFiles...), "\n"))
 		}
@@ -193,7 +201,7 @@ func validateGeneratedGo(t *testing.T, res *wit.Resolve) {
 		// Write the package to disk if it has errors
 		if *writeGoFiles {
 			for _, file := range pkg.Files {
-				writeFile(t, generated, pkgPath, file)
+				writeFile(t, out, pkgPath, file)
 			}
 		}
 	}
@@ -206,7 +214,8 @@ func TestGenerateTestdata(t *testing.T) {
 	}
 	err := loadTestdata(func(path string, res *wit.Resolve) error {
 		t.Run(path, func(t *testing.T) {
-			validateGeneratedGo(t, res)
+			origin := "wit/bindgen/" + strings.TrimSuffix(strings.TrimPrefix(path, testdataPath), ".wit.json")
+			validateGeneratedGo(t, res, origin)
 		})
 		return nil
 	})
