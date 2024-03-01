@@ -757,11 +757,10 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 	// Bridging between Go and core function
 	var compoundParams wit.Param
 	if hasCompoundParams {
-		callerParams[0].Type = coreParams[0].Type
-		t := derefAnonRecord(coreParams[0].Type)
-		g.declareTypeDef(file, coreName+"Params", t)
 		name := funcScope.UniqueName("params")
 		callerParams[0].Name = name
+		t := derefAnonRecord(coreParams[0].Type)
+		g.declareTypeDef(file, coreName+"Params", t)
 		compoundParams.Name = name
 		compoundParams.Type = t
 	}
@@ -769,10 +768,10 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 	var compoundResults wit.Param
 	var resultsRecord *wit.Record
 	if hasCompoundResults {
-		t := derefAnonRecord(last(coreParams).Type)
-		g.declareTypeDef(file, coreName+"Results", t)
 		name := funcScope.UniqueName("results")
 		last(callerParams).Name = name
+		t := derefAnonRecord(last(coreParams).Type)
+		g.declareTypeDef(file, coreName+"Results", t)
 		compoundResults.Name = name
 		compoundResults.Type = t
 		resultsRecord = t.Kind.(*wit.Record)
@@ -882,21 +881,6 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 	}
 	b.WriteString("}\n\n")
 
-	// Emit shared types
-	if t, ok := compoundParams.Type.(*wit.TypeDef); ok {
-		goName := g.typeDefNames[t]
-		stringio.Write(&b, "// ", goName, " represents the flattened function params for [", coreName, "].\n")
-		stringio.Write(&b, "// See the Canonical ABI flattening rules for more information.\n")
-		stringio.Write(&b, "type ", goName, " ", g.typeDefRep(file, goName, t), "\n\n")
-	}
-
-	if t, ok := compoundResults.Type.(*wit.TypeDef); ok {
-		goName := g.typeDefNames[t]
-		stringio.Write(&b, "// ", goName, " represents the flattened function results for [", coreName, "].\n")
-		stringio.Write(&b, "// See the Canonical ABI flattening rules for more information.\n")
-		stringio.Write(&b, "type ", goName, " ", g.typeDefRep(file, goName, t), "\n\n")
-	}
-
 	// Emit wasmimport function
 	stringio.Write(&b, "//go:wasmimport ", owner.String(), " ", f.Name, "\n")
 	b.WriteString("//go:noescape\n")
@@ -931,6 +915,21 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 		b.WriteRune(')')
 	}
 	b.WriteString("\n\n")
+
+	// Emit shared types
+	if t, ok := compoundParams.Type.(*wit.TypeDef); ok {
+		goName := g.typeDefNames[t]
+		stringio.Write(&b, "// ", goName, " represents the flattened function params for [", coreName, "].\n")
+		stringio.Write(&b, "// See the Canonical ABI flattening rules for more information.\n")
+		stringio.Write(&b, "type ", goName, " ", g.typeDefRep(file, goName, t), "\n\n")
+	}
+
+	if t, ok := compoundResults.Type.(*wit.TypeDef); ok {
+		goName := g.typeDefNames[t]
+		stringio.Write(&b, "// ", goName, " represents the flattened function results for [", coreName, "].\n")
+		stringio.Write(&b, "// See the Canonical ABI flattening rules for more information.\n")
+		stringio.Write(&b, "type ", goName, " ", g.typeDefRep(file, goName, t), "\n\n")
+	}
 
 	// Write to file
 	file.Write(b.Bytes())
