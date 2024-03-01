@@ -1042,7 +1042,7 @@ func (g *generator) packageFor(id wit.Ident) *gen.Package {
 	}
 	name := id.Extension
 	if g.versioned && id.Version != nil {
-		path += "-" + id.Version.String()
+		path += "/v" + id.Version.String()
 	}
 
 	// TODO: write tests for this
