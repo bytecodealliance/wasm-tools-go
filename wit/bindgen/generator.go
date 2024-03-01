@@ -21,9 +21,10 @@ import (
 )
 
 const (
-	GoSuffix  = ".wit.go"
-	cmPackage = "github.com/ydnar/wasm-tools-go/cm"
-	emptyAsm  = `// This file exists for testing this package without WebAssembly,
+	GoSuffix     = ".wit.go"
+	BuildDefault = "!wasip1"
+	cmPackage    = "github.com/ydnar/wasm-tools-go/cm"
+	emptyAsm     = `// This file exists for testing this package without WebAssembly,
 // allowing empty function bodies with a //go:wasmimport directive.
 // See https://pkg.go.dev/cmd/compile for more information.
 `
@@ -1023,6 +1024,7 @@ func (g *generator) fileFor(id wit.Ident) *gen.File {
 	pkg := g.packageFor(id)
 	file := pkg.File(id.Extension + GoSuffix)
 	file.GeneratedBy = g.opts.generatedBy
+	file.Build = BuildDefault
 	return file
 }
 
