@@ -38,11 +38,12 @@ func loadTestdata(f func(path string, res *wit.Resolve) error) error {
 	}, "*.wit.json")
 }
 
-func writeFile(out, pkgPath string, file *gen.File) error {
-	dir := filepath.Join(out, strings.TrimPrefix(file.Package.Path, pkgPath))
+func writeFile(t *testing.T, dir, pkgPath string, file *gen.File) {
+	dir = filepath.Join(dir, strings.TrimPrefix(file.Package.Path, pkgPath))
 	err := os.MkdirAll(dir, fs.ModePerm)
 	if err != nil {
-		return err
+		t.Error(err)
+		return
 	}
 
 	path := filepath.Join(dir, file.Name)
@@ -50,17 +51,24 @@ func writeFile(out, pkgPath string, file *gen.File) error {
 	b, err := file.Bytes()
 	if err != nil {
 		if b == nil {
-			return err // Only return error if unformatted bytes are zero-length
+			t.Error(err)
+			return
 		}
 	}
 
 	f, err := os.Create(path)
 	if err != nil {
-		return err
+		t.Error(err)
+		return
 	}
 	_, err = f.Write(b)
 	f.Close()
-	return err
+
+	if err != nil {
+		t.Errorf("error writing %s: %v", path, err)
+	} else {
+		t.Logf("wrote %s", path)
+	}
 }
 
 var canGo = sync.OnceValue[bool](func() bool {
@@ -75,13 +83,19 @@ func validateGeneratedGo(t *testing.T, res *wit.Resolve) {
 		return
 	}
 
-	out, err := relpath.Abs(generatedPath)
+	generated, err := relpath.Abs(generatedPath)
 	if err != nil {
 		t.Error(err)
 		return
 	}
 
-	pkgPath, err := gen.PackagePath(out)
+	testdata, err := relpath.Abs(testdataPath)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	pkgPath, err := gen.PackagePath(testdata)
 	if err != nil {
 		t.Error(err)
 		return
@@ -100,6 +114,7 @@ func validateGeneratedGo(t *testing.T, res *wit.Resolve) {
 
 	cfg := &packages.Config{
 		Mode:    packages.NeedName | packages.NeedFiles | packages.NeedCompiledGoFiles | packages.NeedImports | packages.NeedTypes | packages.NeedTypesInfo | packages.NeedTypesSizes,
+		Dir:     testdata,
 		Fset:    token.NewFileSet(),
 		Overlay: make(map[string][]byte),
 	}
@@ -109,7 +124,7 @@ func validateGeneratedGo(t *testing.T, res *wit.Resolve) {
 			continue
 		}
 		pkgMap[pkg.Path] = pkg
-		dir := filepath.Join(out, strings.TrimPrefix(pkg.Path, pkgPath))
+		dir := filepath.Join(testdata, strings.TrimPrefix(pkg.Path, pkgPath))
 		// cfg.Overlay[dir] = nil
 		for _, file := range pkg.Files {
 			path := filepath.Join(dir, file.Name)
@@ -157,7 +172,8 @@ func validateGeneratedGo(t *testing.T, res *wit.Resolve) {
 			}
 		}
 		if count != len(pkg.Files) {
-			t.Errorf("%d files in package %s; expected %d", count, pkg.Path, len(pkg.Files))
+			t.Errorf("%d files in package %s; expected %d:\n%s", count, pkg.Path, len(pkg.Files),
+				strings.Join(append(goPkg.GoFiles, goPkg.OtherFiles...), "\n"))
 		}
 
 		// Verify generated names
@@ -176,9 +192,8 @@ func validateGeneratedGo(t *testing.T, res *wit.Resolve) {
 
 		// Write the package to disk if it has errors
 		if *writeGoFiles {
-			t.Logf("writing package %s to disk for debugging", pkg.Path)
 			for _, file := range pkg.Files {
-				writeFile(out, pkgPath, file)
+				writeFile(t, generated, pkgPath, file)
 			}
 		}
 	}
