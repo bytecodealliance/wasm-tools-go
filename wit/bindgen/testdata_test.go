@@ -4,6 +4,7 @@
 package bindgen
 
 import (
+	"flag"
 	"go/token"
 	"io/fs"
 	"os"
@@ -19,6 +20,8 @@ import (
 	"github.com/ydnar/wasm-tools-go/wit"
 	"golang.org/x/tools/go/packages"
 )
+
+var writeGoFiles = flag.Bool("write", false, "write generated Go files")
 
 const (
 	testdataPath  = "../../testdata"
@@ -131,15 +134,15 @@ func validateGeneratedGo(t *testing.T, res *wit.Resolve) {
 			continue
 		}
 
-		var hasErrors bool
-
 		// Check for errors
 		for _, err := range goPkg.Errors {
 			if err.Kind == 1 && err.Pos == "" {
 				continue
 			}
 			t.Error(err)
-			hasErrors = true
+		}
+		for _, err := range goPkg.TypeErrors {
+			t.Error(err)
 		}
 
 		// Verify number of files
@@ -172,7 +175,7 @@ func validateGeneratedGo(t *testing.T, res *wit.Resolve) {
 		}
 
 		// Write the package to disk if it has errors
-		if hasErrors {
+		if *writeGoFiles {
 			t.Logf("writing package %s to disk for debugging", pkg.Path)
 			for _, file := range pkg.Files {
 				writeFile(out, pkgPath, file)
