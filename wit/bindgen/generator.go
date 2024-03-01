@@ -95,9 +95,6 @@ func newGenerator(res *wit.Resolve, opts ...Option) (*generator, error) {
 		_, file, _, _ := runtime.Caller(0)
 		_, g.opts.generatedBy = filepath.Split(filepath.Dir(filepath.Dir(file)))
 	}
-	if g.opts.packageName == "" {
-		g.opts.packageName = res.Packages[0].Name.Namespace
-	}
 	if g.opts.cmPackage == "" {
 		g.opts.cmPackage = cmPackage
 	}

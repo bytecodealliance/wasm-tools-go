@@ -18,10 +18,6 @@ type options struct {
 	// packageRoot is the root Go package or module path used in generated code.
 	packageRoot string
 
-	// packageName is the short name of the generated Go package.
-	// TODO: remove this option
-	packageName string
-
 	// cmPackage is the package path to the "cm" or Component Model package with basic types.
 	// Default: github.com/ydnar/wasm-tools-go/cm.
 	cmPackage string
@@ -61,16 +57,6 @@ func GeneratedBy(name string) Option {
 func PackageRoot(path string) Option {
 	return optionFunc(func(opts *options) error {
 		opts.packageRoot = path
-		return nil
-	})
-}
-
-// PackageName returns an [Option] that specifies the short name of the Go package
-// in the generated code.
-// TODO: remove this option
-func PackageName(name string) Option {
-	return optionFunc(func(opts *options) error {
-		opts.packageName = name
 		return nil
 	})
 }
