@@ -741,7 +741,7 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 	var b bytes.Buffer
 
 	// Emit Go function
-	b.WriteString(g.functionDocs(owner, f, funcName))
+	b.WriteString(g.functionDocs(owner, funcName, f))
 	b.WriteString("//go:nosplit\n")
 	b.WriteString("func ")
 	if f.IsMethod() {
@@ -877,7 +877,7 @@ func goParams(scope gen.Scope, params []wit.Param) []wit.Param {
 	return params
 }
 
-func (g *generator) functionDocs(owner wit.Ident, f *wit.Function, goName string) string {
+func (g *generator) functionDocs(owner wit.Ident, goName string, f *wit.Function) string {
 	var b strings.Builder
 	kind := f.WITKind()
 	if f.IsAdmin() {
