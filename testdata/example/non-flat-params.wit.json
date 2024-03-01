@@ -17,7 +17,8 @@
       "types": {
         "t4": 0,
         "t16": 1,
-        "t32": 2
+        "t32": 2,
+        "wind": 3
       },
       "functions": {
         "f": {
@@ -669,6 +670,927 @@
             }
           ],
           "results": []
+        },
+        "u17-u8-u8": {
+          "name": "u17-u8-u8",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "a",
+              "type": "u8"
+            },
+            {
+              "name": "b",
+              "type": "u8"
+            },
+            {
+              "name": "c",
+              "type": "u8"
+            },
+            {
+              "name": "d",
+              "type": "u8"
+            },
+            {
+              "name": "e",
+              "type": "u8"
+            },
+            {
+              "name": "f",
+              "type": "u8"
+            },
+            {
+              "name": "g",
+              "type": "u8"
+            },
+            {
+              "name": "h",
+              "type": "u8"
+            },
+            {
+              "name": "i",
+              "type": "u8"
+            },
+            {
+              "name": "j",
+              "type": "u8"
+            },
+            {
+              "name": "k",
+              "type": "u8"
+            },
+            {
+              "name": "l",
+              "type": "u8"
+            },
+            {
+              "name": "m",
+              "type": "u8"
+            },
+            {
+              "name": "n",
+              "type": "u8"
+            },
+            {
+              "name": "o",
+              "type": "u8"
+            },
+            {
+              "name": "p",
+              "type": "u8"
+            },
+            {
+              "name": "q",
+              "type": "u8"
+            }
+          ],
+          "results": [
+            {
+              "name": "r0",
+              "type": "u8"
+            },
+            {
+              "name": "r1",
+              "type": "u8"
+            }
+          ]
+        },
+        "[method]wind.f": {
+          "name": "[method]wind.f",
+          "kind": {
+            "method": 3
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 4
+            }
+          ],
+          "results": []
+        },
+        "[method]wind.f4-void": {
+          "name": "[method]wind.f4-void",
+          "kind": {
+            "method": 3
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 4
+            },
+            {
+              "name": "t",
+              "type": 0
+            }
+          ],
+          "results": []
+        },
+        "[method]wind.f4-u32": {
+          "name": "[method]wind.f4-u32",
+          "kind": {
+            "method": 3
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 4
+            },
+            {
+              "name": "t",
+              "type": 0
+            }
+          ],
+          "results": [
+            {
+              "type": "u32"
+            }
+          ]
+        },
+        "[method]wind.f4-t4": {
+          "name": "[method]wind.f4-t4",
+          "kind": {
+            "method": 3
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 4
+            },
+            {
+              "name": "t",
+              "type": 0
+            }
+          ],
+          "results": [
+            {
+              "type": 0
+            }
+          ]
+        },
+        "[method]wind.f16-void": {
+          "name": "[method]wind.f16-void",
+          "kind": {
+            "method": 3
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 4
+            },
+            {
+              "name": "t",
+              "type": 1
+            }
+          ],
+          "results": []
+        },
+        "[method]wind.f16-u32": {
+          "name": "[method]wind.f16-u32",
+          "kind": {
+            "method": 3
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 4
+            },
+            {
+              "name": "t",
+              "type": 1
+            }
+          ],
+          "results": [
+            {
+              "type": "u32"
+            }
+          ]
+        },
+        "[method]wind.f16-t16": {
+          "name": "[method]wind.f16-t16",
+          "kind": {
+            "method": 3
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 4
+            },
+            {
+              "name": "t",
+              "type": 1
+            }
+          ],
+          "results": [
+            {
+              "type": 1
+            }
+          ]
+        },
+        "[method]wind.f32-void": {
+          "name": "[method]wind.f32-void",
+          "kind": {
+            "method": 3
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 4
+            },
+            {
+              "name": "t",
+              "type": 2
+            }
+          ],
+          "results": []
+        },
+        "[method]wind.f32-u32": {
+          "name": "[method]wind.f32-u32",
+          "kind": {
+            "method": 3
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 4
+            },
+            {
+              "name": "t",
+              "type": 2
+            }
+          ],
+          "results": [
+            {
+              "type": "u32"
+            }
+          ]
+        },
+        "[method]wind.f32-t32": {
+          "name": "[method]wind.f32-t32",
+          "kind": {
+            "method": 3
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 4
+            },
+            {
+              "name": "t",
+              "type": 2
+            }
+          ],
+          "results": [
+            {
+              "type": 2
+            }
+          ]
+        },
+        "[method]wind.u16-void": {
+          "name": "[method]wind.u16-void",
+          "kind": {
+            "method": 3
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 4
+            },
+            {
+              "name": "a",
+              "type": "u8"
+            },
+            {
+              "name": "b",
+              "type": "u8"
+            },
+            {
+              "name": "c",
+              "type": "u8"
+            },
+            {
+              "name": "d",
+              "type": "u8"
+            },
+            {
+              "name": "e",
+              "type": "u8"
+            },
+            {
+              "name": "f",
+              "type": "u8"
+            },
+            {
+              "name": "g",
+              "type": "u8"
+            },
+            {
+              "name": "h",
+              "type": "u8"
+            },
+            {
+              "name": "i",
+              "type": "u8"
+            },
+            {
+              "name": "j",
+              "type": "u8"
+            },
+            {
+              "name": "k",
+              "type": "u8"
+            },
+            {
+              "name": "l",
+              "type": "u8"
+            },
+            {
+              "name": "m",
+              "type": "u8"
+            },
+            {
+              "name": "n",
+              "type": "u8"
+            },
+            {
+              "name": "o",
+              "type": "u8"
+            },
+            {
+              "name": "p",
+              "type": "u8"
+            }
+          ],
+          "results": []
+        },
+        "[method]wind.u16-u8": {
+          "name": "[method]wind.u16-u8",
+          "kind": {
+            "method": 3
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 4
+            },
+            {
+              "name": "a",
+              "type": "u8"
+            },
+            {
+              "name": "b",
+              "type": "u8"
+            },
+            {
+              "name": "c",
+              "type": "u8"
+            },
+            {
+              "name": "d",
+              "type": "u8"
+            },
+            {
+              "name": "e",
+              "type": "u8"
+            },
+            {
+              "name": "f",
+              "type": "u8"
+            },
+            {
+              "name": "g",
+              "type": "u8"
+            },
+            {
+              "name": "h",
+              "type": "u8"
+            },
+            {
+              "name": "i",
+              "type": "u8"
+            },
+            {
+              "name": "j",
+              "type": "u8"
+            },
+            {
+              "name": "k",
+              "type": "u8"
+            },
+            {
+              "name": "l",
+              "type": "u8"
+            },
+            {
+              "name": "m",
+              "type": "u8"
+            },
+            {
+              "name": "n",
+              "type": "u8"
+            },
+            {
+              "name": "o",
+              "type": "u8"
+            },
+            {
+              "name": "p",
+              "type": "u8"
+            }
+          ],
+          "results": [
+            {
+              "type": "u8"
+            }
+          ]
+        },
+        "[method]wind.u16-u8-u8": {
+          "name": "[method]wind.u16-u8-u8",
+          "kind": {
+            "method": 3
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 4
+            },
+            {
+              "name": "a",
+              "type": "u8"
+            },
+            {
+              "name": "b",
+              "type": "u8"
+            },
+            {
+              "name": "c",
+              "type": "u8"
+            },
+            {
+              "name": "d",
+              "type": "u8"
+            },
+            {
+              "name": "e",
+              "type": "u8"
+            },
+            {
+              "name": "f",
+              "type": "u8"
+            },
+            {
+              "name": "g",
+              "type": "u8"
+            },
+            {
+              "name": "h",
+              "type": "u8"
+            },
+            {
+              "name": "i",
+              "type": "u8"
+            },
+            {
+              "name": "j",
+              "type": "u8"
+            },
+            {
+              "name": "k",
+              "type": "u8"
+            },
+            {
+              "name": "l",
+              "type": "u8"
+            },
+            {
+              "name": "m",
+              "type": "u8"
+            },
+            {
+              "name": "n",
+              "type": "u8"
+            },
+            {
+              "name": "o",
+              "type": "u8"
+            },
+            {
+              "name": "p",
+              "type": "u8"
+            }
+          ],
+          "results": [
+            {
+              "name": "r0",
+              "type": "u8"
+            },
+            {
+              "name": "r1",
+              "type": "u8"
+            }
+          ]
+        },
+        "[method]wind.u16-u32-u64": {
+          "name": "[method]wind.u16-u32-u64",
+          "kind": {
+            "method": 3
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 4
+            },
+            {
+              "name": "a",
+              "type": "u8"
+            },
+            {
+              "name": "b",
+              "type": "u8"
+            },
+            {
+              "name": "c",
+              "type": "u8"
+            },
+            {
+              "name": "d",
+              "type": "u8"
+            },
+            {
+              "name": "e",
+              "type": "u8"
+            },
+            {
+              "name": "f",
+              "type": "u8"
+            },
+            {
+              "name": "g",
+              "type": "u8"
+            },
+            {
+              "name": "h",
+              "type": "u8"
+            },
+            {
+              "name": "i",
+              "type": "u8"
+            },
+            {
+              "name": "j",
+              "type": "u8"
+            },
+            {
+              "name": "k",
+              "type": "u8"
+            },
+            {
+              "name": "l",
+              "type": "u8"
+            },
+            {
+              "name": "m",
+              "type": "u8"
+            },
+            {
+              "name": "n",
+              "type": "u8"
+            },
+            {
+              "name": "o",
+              "type": "u8"
+            },
+            {
+              "name": "p",
+              "type": "u8"
+            }
+          ],
+          "results": [
+            {
+              "name": "r0",
+              "type": "u32"
+            },
+            {
+              "name": "r1",
+              "type": "u64"
+            }
+          ]
+        },
+        "[method]wind.u16-x17-u8": {
+          "name": "[method]wind.u16-x17-u8",
+          "kind": {
+            "method": 3
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 4
+            },
+            {
+              "name": "a",
+              "type": "u8"
+            },
+            {
+              "name": "b",
+              "type": "u8"
+            },
+            {
+              "name": "c",
+              "type": "u8"
+            },
+            {
+              "name": "d",
+              "type": "u8"
+            },
+            {
+              "name": "e",
+              "type": "u8"
+            },
+            {
+              "name": "f",
+              "type": "u8"
+            },
+            {
+              "name": "g",
+              "type": "u8"
+            },
+            {
+              "name": "h",
+              "type": "u8"
+            },
+            {
+              "name": "i",
+              "type": "u8"
+            },
+            {
+              "name": "j",
+              "type": "u8"
+            },
+            {
+              "name": "k",
+              "type": "u8"
+            },
+            {
+              "name": "l",
+              "type": "u8"
+            },
+            {
+              "name": "m",
+              "type": "u8"
+            },
+            {
+              "name": "n",
+              "type": "u8"
+            },
+            {
+              "name": "o",
+              "type": "u8"
+            },
+            {
+              "name": "p",
+              "type": "u8"
+            }
+          ],
+          "results": [
+            {
+              "name": "a",
+              "type": "u8"
+            },
+            {
+              "name": "b",
+              "type": "u8"
+            },
+            {
+              "name": "c",
+              "type": "u8"
+            },
+            {
+              "name": "d",
+              "type": "u8"
+            },
+            {
+              "name": "e",
+              "type": "u8"
+            },
+            {
+              "name": "f",
+              "type": "u8"
+            },
+            {
+              "name": "g",
+              "type": "u8"
+            },
+            {
+              "name": "h",
+              "type": "u8"
+            },
+            {
+              "name": "i",
+              "type": "u8"
+            },
+            {
+              "name": "j",
+              "type": "u8"
+            },
+            {
+              "name": "k",
+              "type": "u8"
+            },
+            {
+              "name": "l",
+              "type": "u8"
+            },
+            {
+              "name": "m",
+              "type": "u8"
+            },
+            {
+              "name": "n",
+              "type": "u8"
+            },
+            {
+              "name": "o",
+              "type": "u8"
+            },
+            {
+              "name": "p",
+              "type": "u8"
+            },
+            {
+              "name": "q",
+              "type": "u8"
+            }
+          ]
+        },
+        "[method]wind.u17-void": {
+          "name": "[method]wind.u17-void",
+          "kind": {
+            "method": 3
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 4
+            },
+            {
+              "name": "a",
+              "type": "u8"
+            },
+            {
+              "name": "b",
+              "type": "u8"
+            },
+            {
+              "name": "c",
+              "type": "u8"
+            },
+            {
+              "name": "d",
+              "type": "u8"
+            },
+            {
+              "name": "e",
+              "type": "u8"
+            },
+            {
+              "name": "f",
+              "type": "u8"
+            },
+            {
+              "name": "g",
+              "type": "u8"
+            },
+            {
+              "name": "h",
+              "type": "u8"
+            },
+            {
+              "name": "i",
+              "type": "u8"
+            },
+            {
+              "name": "j",
+              "type": "u8"
+            },
+            {
+              "name": "k",
+              "type": "u8"
+            },
+            {
+              "name": "l",
+              "type": "u8"
+            },
+            {
+              "name": "m",
+              "type": "u8"
+            },
+            {
+              "name": "n",
+              "type": "u8"
+            },
+            {
+              "name": "o",
+              "type": "u8"
+            },
+            {
+              "name": "p",
+              "type": "u8"
+            },
+            {
+              "name": "q",
+              "type": "u8"
+            }
+          ],
+          "results": []
+        },
+        "[method]wind.u17-u8-u8": {
+          "name": "[method]wind.u17-u8-u8",
+          "kind": {
+            "method": 3
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 4
+            },
+            {
+              "name": "a",
+              "type": "u8"
+            },
+            {
+              "name": "b",
+              "type": "u8"
+            },
+            {
+              "name": "c",
+              "type": "u8"
+            },
+            {
+              "name": "d",
+              "type": "u8"
+            },
+            {
+              "name": "e",
+              "type": "u8"
+            },
+            {
+              "name": "f",
+              "type": "u8"
+            },
+            {
+              "name": "g",
+              "type": "u8"
+            },
+            {
+              "name": "h",
+              "type": "u8"
+            },
+            {
+              "name": "i",
+              "type": "u8"
+            },
+            {
+              "name": "j",
+              "type": "u8"
+            },
+            {
+              "name": "k",
+              "type": "u8"
+            },
+            {
+              "name": "l",
+              "type": "u8"
+            },
+            {
+              "name": "m",
+              "type": "u8"
+            },
+            {
+              "name": "n",
+              "type": "u8"
+            },
+            {
+              "name": "o",
+              "type": "u8"
+            },
+            {
+              "name": "p",
+              "type": "u8"
+            },
+            {
+              "name": "q",
+              "type": "u8"
+            }
+          ],
+          "results": [
+            {
+              "name": "r0",
+              "type": "u8"
+            },
+            {
+              "name": "r1",
+              "type": "u8"
+            }
+          ]
         }
       },
       "package": 0
@@ -720,6 +1642,22 @@
       "owner": {
         "interface": 0
       }
+    },
+    {
+      "name": "wind",
+      "kind": "resource",
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "borrow": 3
+        }
+      },
+      "owner": null
     }
   ],
   "packages": [
