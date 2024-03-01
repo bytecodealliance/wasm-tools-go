@@ -13,9 +13,9 @@ import (
 //
 //go:nosplit
 func GetStdout() streams.OutputStream {
-	return wasmimportGetStdout()
+	return getStdout()
 }
 
 //go:wasmimport wasi:cli/stdout@0.2.0 get-stdout
 //go:noescape
-func wasmimportGetStdout() streams.OutputStream
+func getStdout() streams.OutputStream

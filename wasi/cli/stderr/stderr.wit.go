@@ -13,9 +13,9 @@ import (
 //
 //go:nosplit
 func GetStderr() streams.OutputStream {
-	return wasmimportGetStderr()
+	return getStderr()
 }
 
 //go:wasmimport wasi:cli/stderr@0.2.0 get-stderr
 //go:noescape
-func wasmimportGetStderr() streams.OutputStream
+func getStderr() streams.OutputStream

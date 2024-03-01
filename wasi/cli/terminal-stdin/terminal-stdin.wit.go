@@ -21,10 +21,10 @@ import (
 //go:nosplit
 func GetTerminalStdin() cm.Option[terminalinput.TerminalInput] {
 	var result cm.Option[terminalinput.TerminalInput]
-	wasmimportGetTerminalStdin(&result)
+	getTerminalStdin(&result)
 	return result
 }
 
 //go:wasmimport wasi:cli/terminal-stdin@0.2.0 get-terminal-stdin
 //go:noescape
-func wasmimportGetTerminalStdin(result *cm.Option[terminalinput.TerminalInput])
+func getTerminalStdin(result *cm.Option[terminalinput.TerminalInput])

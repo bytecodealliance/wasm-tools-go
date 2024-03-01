@@ -26,9 +26,9 @@ type TerminalInput cm.Resource
 //
 //go:nosplit
 func (self TerminalInput) ResourceDrop() {
-	self.wasmimportResourceDrop()
+	self.resourceDrop()
 }
 
 //go:wasmimport wasi:cli/terminal-input@0.2.0 [resource-drop]terminal-input
 //go:noescape
-func (self TerminalInput) wasmimportResourceDrop()
+func (self TerminalInput) resourceDrop()

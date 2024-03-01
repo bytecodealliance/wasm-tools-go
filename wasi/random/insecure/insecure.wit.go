@@ -28,13 +28,13 @@ import (
 //go:nosplit
 func GetInsecureRandomBytes(len_ uint64) cm.List[uint8] {
 	var result cm.List[uint8]
-	wasmimportGetInsecureRandomBytes(len_, &result)
+	getInsecureRandomBytes(len_, &result)
 	return result
 }
 
 //go:wasmimport wasi:random/insecure@0.2.0 get-insecure-random-bytes
 //go:noescape
-func wasmimportGetInsecureRandomBytes(len_ uint64, result *cm.List[uint8])
+func getInsecureRandomBytes(len_ uint64, result *cm.List[uint8])
 
 // GetInsecureRandomU64 represents function "wasi:random/insecure@0.2.0#get-insecure-random-u64".
 //
@@ -47,9 +47,9 @@ func wasmimportGetInsecureRandomBytes(len_ uint64, result *cm.List[uint8])
 //
 //go:nosplit
 func GetInsecureRandomU64() uint64 {
-	return wasmimportGetInsecureRandomU64()
+	return getInsecureRandomU64()
 }
 
 //go:wasmimport wasi:random/insecure@0.2.0 get-insecure-random-u64
 //go:noescape
-func wasmimportGetInsecureRandomU64() uint64
+func getInsecureRandomU64() uint64

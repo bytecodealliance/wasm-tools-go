@@ -17,10 +17,10 @@ import (
 //go:nosplit
 func GetDirectories() cm.List[cm.Tuple[types.Descriptor, string]] {
 	var result cm.List[cm.Tuple[types.Descriptor, string]]
-	wasmimportGetDirectories(&result)
+	getDirectories(&result)
 	return result
 }
 
 //go:wasmimport wasi:filesystem/preopens@0.2.0 get-directories
 //go:noescape
-func wasmimportGetDirectories(result *cm.List[cm.Tuple[types.Descriptor, string]])
+func getDirectories(result *cm.List[cm.Tuple[types.Descriptor, string]])

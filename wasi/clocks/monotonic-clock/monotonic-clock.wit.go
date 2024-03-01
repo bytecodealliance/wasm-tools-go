@@ -45,12 +45,12 @@ type Instant uint64
 //
 //go:nosplit
 func Now() Instant {
-	return wasmimportNow()
+	return now()
 }
 
 //go:wasmimport wasi:clocks/monotonic-clock@0.2.0 now
 //go:noescape
-func wasmimportNow() Instant
+func now() Instant
 
 // Resolution represents function "wasi:clocks/monotonic-clock@0.2.0#resolution".
 //
@@ -61,12 +61,12 @@ func wasmimportNow() Instant
 //
 //go:nosplit
 func Resolution() Duration {
-	return wasmimportResolution()
+	return resolution()
 }
 
 //go:wasmimport wasi:clocks/monotonic-clock@0.2.0 resolution
 //go:noescape
-func wasmimportResolution() Duration
+func resolution() Duration
 
 // SubscribeDuration represents function "wasi:clocks/monotonic-clock@0.2.0#subscribe-duration".
 //
@@ -78,12 +78,12 @@ func wasmimportResolution() Duration
 //
 //go:nosplit
 func SubscribeDuration(when Duration) poll.Pollable {
-	return wasmimportSubscribeDuration(when)
+	return subscribeDuration(when)
 }
 
 //go:wasmimport wasi:clocks/monotonic-clock@0.2.0 subscribe-duration
 //go:noescape
-func wasmimportSubscribeDuration(when Duration) poll.Pollable
+func subscribeDuration(when Duration) poll.Pollable
 
 // SubscribeInstant represents function "wasi:clocks/monotonic-clock@0.2.0#subscribe-instant".
 //
@@ -94,9 +94,9 @@ func wasmimportSubscribeDuration(when Duration) poll.Pollable
 //
 //go:nosplit
 func SubscribeInstant(when Instant) poll.Pollable {
-	return wasmimportSubscribeInstant(when)
+	return subscribeInstant(when)
 }
 
 //go:wasmimport wasi:clocks/monotonic-clock@0.2.0 subscribe-instant
 //go:noescape
-func wasmimportSubscribeInstant(when Instant) poll.Pollable
+func subscribeInstant(when Instant) poll.Pollable

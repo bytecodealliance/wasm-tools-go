@@ -21,10 +21,10 @@ import (
 //go:nosplit
 func GetTerminalStderr() cm.Option[terminaloutput.TerminalOutput] {
 	var result cm.Option[terminaloutput.TerminalOutput]
-	wasmimportGetTerminalStderr(&result)
+	getTerminalStderr(&result)
 	return result
 }
 
 //go:wasmimport wasi:cli/terminal-stderr@0.2.0 get-terminal-stderr
 //go:noescape
-func wasmimportGetTerminalStderr(result *cm.Option[terminaloutput.TerminalOutput])
+func getTerminalStderr(result *cm.Option[terminaloutput.TerminalOutput])

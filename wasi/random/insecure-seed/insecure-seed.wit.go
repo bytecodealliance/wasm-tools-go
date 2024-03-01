@@ -33,10 +33,10 @@ package insecureseed
 //go:nosplit
 func InsecureSeed() [2]uint64 {
 	var result [2]uint64
-	wasmimportInsecureSeed(&result)
+	insecureSeed(&result)
 	return result
 }
 
 //go:wasmimport wasi:random/insecure-seed@0.2.0 insecure-seed
 //go:noescape
-func wasmimportInsecureSeed(result *[2]uint64)
+func insecureSeed(result *[2]uint64)

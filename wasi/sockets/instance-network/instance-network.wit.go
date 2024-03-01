@@ -17,9 +17,9 @@ import (
 //
 //go:nosplit
 func InstanceNetwork() network.Network {
-	return wasmimportInstanceNetwork()
+	return instanceNetwork()
 }
 
 //go:wasmimport wasi:sockets/instance-network@0.2.0 instance-network
 //go:noescape
-func wasmimportInstanceNetwork() network.Network
+func instanceNetwork() network.Network

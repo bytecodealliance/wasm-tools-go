@@ -15,9 +15,9 @@ import (
 //
 //go:nosplit
 func Run() cm.Result {
-	return wasmimportRun()
+	return run()
 }
 
 //go:wasmimport wasi:cli/run@0.2.0 run
 //go:noescape
-func wasmimportRun() cm.Result
+func run() cm.Result
