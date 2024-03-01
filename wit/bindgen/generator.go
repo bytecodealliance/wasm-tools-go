@@ -688,8 +688,6 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 	// Setup
 	core := f.CoreFunction(false)
 	coreIsMethod := f.IsMethod() && core.Params[0] == f.Params[0]
-	hasCompoundParams := len(f.Params) > 0 && derefAnonRecord(core.Params[0].Type) != nil
-	hasCompoundResults := len(f.Results) > 1
 
 	var funcName string
 	var coreName string
@@ -753,7 +751,7 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 
 	// Bridging between Go and core function
 	var compoundParams wit.Param
-	if hasCompoundParams {
+	if len(funcParams) > 0 && derefAnonRecord(coreParams[0].Type) != nil {
 		name := funcScope.UniqueName("params")
 		callerParams[0].Name = name
 		t := derefAnonRecord(coreParams[0].Type)
@@ -764,7 +762,7 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 
 	var compoundResults wit.Param
 	var resultsRecord *wit.Record
-	if hasCompoundResults {
+	if len(funcResults) > 1 && derefAnonRecord(last(coreParams).Type) != nil {
 		name := funcScope.UniqueName("results")
 		last(callerParams).Name = name
 		t := derefAnonRecord(last(coreParams).Type)
