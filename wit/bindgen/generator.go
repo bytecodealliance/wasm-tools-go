@@ -155,7 +155,7 @@ func (g *generator) detectVersionedPackages() {
 // declareTypeDefs declares all type definitions in res.
 func (g *generator) declareTypeDefs() error {
 	for _, t := range g.res.TypeDefs {
-		err := g.declareTypeDef(t)
+		err := g.declareTypeDef(nil, "", t)
 		if err != nil {
 			return err
 		}
@@ -163,14 +163,16 @@ func (g *generator) declareTypeDefs() error {
 	return nil
 }
 
-func (g *generator) declareTypeDef(t *wit.TypeDef) error {
-	if t.Name == nil {
-		return nil
+func (g *generator) declareTypeDef(file *gen.File, goName string, t *wit.TypeDef) error {
+	if goName == "" {
+		if t.Name == nil {
+			return nil
+		}
+		goName = GoName(*t.Name, true)
 	}
-	return g.registerTypeDef(g.fileFor(typeDefOwner(t)), GoName(*t.Name, true), t)
-}
-
-func (g *generator) registerTypeDef(file *gen.File, goName string, t *wit.TypeDef) error {
+	if file == nil {
+		file = g.fileFor(typeDefOwner(t))
+	}
 	g.typeDefPackages[t] = file.Package
 	g.typeDefNames[t] = file.Declare(goName)
 	g.scopes[t] = gen.NewScope(nil)
@@ -320,7 +322,7 @@ func (g *generator) defineTypeDef(t *wit.TypeDef, name string) error {
 	pkg := g.typeDefPackages[t]
 	goName := g.typeDefNames[t]
 	if pkg == nil || goName == "" {
-		return fmt.Errorf("typedef %s not declared", name)
+		return fmt.Errorf("TypeDef %s not declared", name)
 	}
 	owner := typeDefOwner(t)
 	file := g.fileFor(owner)
@@ -757,7 +759,7 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 	if hasCompoundParams {
 		callerParams[0].Type = coreParams[0].Type
 		t := derefAnonRecord(coreParams[0].Type)
-		g.registerTypeDef(file, coreName+"Params", t)
+		g.declareTypeDef(file, coreName+"Params", t)
 		name := funcScope.UniqueName("params")
 		callerParams[0].Name = name
 		compoundParams.Name = name
@@ -768,7 +770,7 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 	var resultsRecord *wit.Record
 	if hasCompoundResults {
 		t := derefAnonRecord(last(coreParams).Type)
-		g.registerTypeDef(file, coreName+"Results", t)
+		g.declareTypeDef(file, coreName+"Results", t)
 		name := funcScope.UniqueName("results")
 		last(callerParams).Name = name
 		compoundResults.Name = name
