@@ -483,14 +483,20 @@ func (g *generator) recordRep(file *gen.File, r *wit.Record) string {
 			b.WriteRune('\n')
 		}
 		b.WriteString(formatDocComments(f.Docs.Contents, false))
-		name := f.Name
-		if name[0] >= '0' && name[0] <= '9' {
-			name = "f" + name
-		}
-		stringio.Write(&b, GoName(name, true), " ", g.typeRep(file, f.Type), "\n")
+		stringio.Write(&b, fieldName(f.Name), " ", g.typeRep(file, f.Type), "\n")
 	}
 	b.WriteRune('}')
 	return b.String()
+}
+
+func fieldName(name string) string {
+	if name == "" {
+		return ""
+	}
+	if name[0] >= '0' && name[0] <= '9' {
+		name = "f" + name
+	}
+	return GoName(name, true)
 }
 
 func (g *generator) tupleRep(file *gen.File, t *wit.Tuple) string {
@@ -737,21 +743,26 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 
 	// Bridging between Go and core function
 	var compoundParams wit.Param
+	var paramsRecord *wit.Record
 	if hasCompoundParams {
 		t := derefAnonRecord(coreParams[0].Type)
 		g.registerTypeDef(file, coreName+"Params", t)
 		compoundParams.Name = funcScope.UniqueName("params")
 		compoundParams.Type = t
-
+		paramsRecord = t.Kind.(*wit.Record)
 	}
+	_ = paramsRecord
 
 	var compoundResults wit.Param
+	var resultsRecord *wit.Record
 	if hasCompoundResults {
 		t := derefAnonRecord(last(coreParams).Type)
 		g.registerTypeDef(file, coreName+"Results", t)
 		compoundResults.Name = funcScope.UniqueName("results")
 		compoundResults.Type = t
+		resultsRecord = t.Kind.(*wit.Record)
 	}
+	_ = resultsRecord
 
 	// TODO: make this work with compound params/results
 	combined := append(coreParams, funcResults...)
@@ -831,11 +842,20 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 	b.WriteString(")\n")
 	if !sameResults {
 		b.WriteString("return ")
-		for i, r := range funcResults {
-			if i > 0 {
-				b.WriteString(", ")
+		if resultsRecord != nil {
+			for i, f := range resultsRecord.Fields {
+				if i > 0 {
+					b.WriteString(", ")
+				}
+				stringio.Write(&b, compoundResults.Name, ".", fieldName(f.Name))
 			}
-			b.WriteString(r.Name)
+		} else {
+			for i, r := range funcResults {
+				if i > 0 {
+					b.WriteString(", ")
+				}
+				b.WriteString(r.Name)
+			}
 		}
 		b.WriteRune('\n')
 	}
@@ -909,15 +929,6 @@ func isPointer(t wit.Type) bool {
 		}
 	}
 	return false
-}
-
-func derefType(t wit.Type) wit.Type {
-	if td, ok := t.(*wit.TypeDef); ok {
-		if p, ok := td.Kind.(*wit.Pointer); ok {
-			return p.Type
-		}
-	}
-	return nil
 }
 
 func derefTypeDef(t wit.Type) *wit.TypeDef {
