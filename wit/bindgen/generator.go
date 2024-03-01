@@ -378,11 +378,11 @@ func (g *generator) defineTypeDef(t *wit.TypeDef, name string) error {
 	return nil
 }
 
-func (g *generator) typeDefRep(file *gen.File, name string, t *wit.TypeDef) string {
-	return g.typeDefKindRep(file, name, t.Kind)
+func (g *generator) typeDefRep(file *gen.File, goName string, t *wit.TypeDef) string {
+	return g.typeDefKindRep(file, goName, t.Kind)
 }
 
-func (g *generator) typeDefKindRep(file *gen.File, name string, kind wit.TypeDefKind) string {
+func (g *generator) typeDefKindRep(file *gen.File, goName string, kind wit.TypeDefKind) string {
 	switch kind := kind.(type) {
 	case *wit.Pointer:
 		return g.pointerRep(file, kind)
@@ -393,11 +393,11 @@ func (g *generator) typeDefKindRep(file *gen.File, name string, kind wit.TypeDef
 	case *wit.Tuple:
 		return g.tupleRep(file, kind)
 	case *wit.Flags:
-		return g.flagsRep(file, name, kind)
+		return g.flagsRep(file, goName, kind)
 	case *wit.Enum:
-		return g.enumRep(file, name, kind)
+		return g.enumRep(file, goName, kind)
 	case *wit.Variant:
-		return g.variantRep(file, name, kind)
+		return g.variantRep(file, goName, kind)
 	case *wit.Result:
 		return g.resultRep(file, kind)
 	case *wit.Option:
@@ -522,7 +522,7 @@ func (g *generator) tupleRep(file *gen.File, t *wit.Tuple) string {
 	return b.String()
 }
 
-func (g *generator) flagsRep(file *gen.File, name string, flags *wit.Flags) string {
+func (g *generator) flagsRep(file *gen.File, goName string, flags *wit.Flags) string {
 	var b strings.Builder
 
 	// FIXME: this isn't ideal
@@ -549,10 +549,10 @@ func (g *generator) flagsRep(file *gen.File, name string, flags *wit.Flags) stri
 			b.WriteRune('\n')
 		}
 		b.WriteString(formatDocComments(flag.Docs.Contents, false))
-		flagName := file.Declare(name + GoName(flag.Name, true))
+		flagName := file.Declare(goName + GoName(flag.Name, true))
 		b.WriteString(flagName)
 		if i == 0 {
-			stringio.Write(&b, " ", name, " = 1 << iota")
+			stringio.Write(&b, " ", goName, " = 1 << iota")
 		}
 		b.WriteRune('\n')
 	}
@@ -560,7 +560,7 @@ func (g *generator) flagsRep(file *gen.File, name string, flags *wit.Flags) stri
 	return b.String()
 }
 
-func (g *generator) enumRep(file *gen.File, name string, e *wit.Enum) string {
+func (g *generator) enumRep(file *gen.File, goName string, e *wit.Enum) string {
 	var b strings.Builder
 	disc := wit.Discriminant(len(e.Cases))
 	b.WriteString(g.typeRep(file, disc))
@@ -571,10 +571,10 @@ func (g *generator) enumRep(file *gen.File, name string, e *wit.Enum) string {
 			b.WriteRune('\n')
 		}
 		b.WriteString(formatDocComments(c.Docs.Contents, false))
-		b.WriteString(file.Declare(name + GoName(c.Name, true)))
+		b.WriteString(file.Declare(goName + GoName(c.Name, true)))
 		if i == 0 {
 			b.WriteRune(' ')
-			b.WriteString(name)
+			b.WriteString(goName)
 			b.WriteString(" = iota")
 		}
 		b.WriteRune('\n')
@@ -583,10 +583,10 @@ func (g *generator) enumRep(file *gen.File, name string, e *wit.Enum) string {
 	return b.String()
 }
 
-func (g *generator) variantRep(file *gen.File, name string, v *wit.Variant) string {
+func (g *generator) variantRep(file *gen.File, goName string, v *wit.Variant) string {
 	// If the variant has no associated types, represent the variant as an enum.
 	if e := v.Enum(); e != nil {
-		return g.enumRep(file, name, e)
+		return g.enumRep(file, goName, e)
 	}
 
 	disc := wit.Discriminant(len(v.Cases))
@@ -602,11 +602,11 @@ func (g *generator) variantRep(file *gen.File, name string, v *wit.Variant) stri
 	for i, c := range v.Cases {
 		caseNum := strconv.Itoa(i)
 		caseName := GoName(c.Name, true)
-		constructorName := file.Declare(name + caseName)
+		constructorName := file.Declare(goName + caseName)
 		typeRep := g.typeRep(file, c.Type)
 
 		// Emit constructor
-		stringio.Write(&b, "// ", constructorName, " returns a [", name, "] of case \"", c.Name, "\".\n")
+		stringio.Write(&b, "// ", constructorName, " returns a [", goName, "] of case \"", c.Name, "\".\n")
 		b.WriteString("//\n")
 		b.WriteString(formatDocComments(c.Docs.Contents, false))
 		stringio.Write(&b, "func ", constructorName, "(")
@@ -614,24 +614,24 @@ func (g *generator) variantRep(file *gen.File, name string, v *wit.Variant) stri
 		if c.Type != nil {
 			stringio.Write(&b, dataName, " ", typeRep)
 		}
-		stringio.Write(&b, ") ", name, " {")
+		stringio.Write(&b, ") ", goName, " {")
 		if c.Type == nil {
 			stringio.Write(&b, "var ", dataName, " ", typeRep, "\n")
 		}
-		stringio.Write(&b, "return ", cm, ".New[", name, "](", caseNum, ", ", dataName, ")\n")
+		stringio.Write(&b, "return ", cm, ".New[", goName, "](", caseNum, ", ", dataName, ")\n")
 		b.WriteString("}\n\n")
 
 		// Emit getter
 		if c.Type == nil {
 			// Case without an associated type returns bool
-			stringio.Write(&b, "// ", caseName, " returns true if [", name, "] represents the variant case \"", c.Name, "\".\n")
-			stringio.Write(&b, "func (self *", name, ") ", caseName, "() bool {\n")
+			stringio.Write(&b, "// ", caseName, " returns true if [", goName, "] represents the variant case \"", c.Name, "\".\n")
+			stringio.Write(&b, "func (self *", goName, ") ", caseName, "() bool {\n")
 			stringio.Write(&b, "return ", cm, ".Tag(self) == ", caseNum)
 			b.WriteString("}\n\n")
 		} else {
 			// Case with associated type T returns *T
-			stringio.Write(&b, "// ", caseName, " returns a non-nil *[", typeRep, "] if [", name, "] represents the variant case \"", c.Name, "\".\n")
-			stringio.Write(&b, "func (self *", name, ") ", caseName, "() *", typeRep, " {\n")
+			stringio.Write(&b, "// ", caseName, " returns a non-nil *[", typeRep, "] if [", goName, "] represents the variant case \"", c.Name, "\".\n")
+			stringio.Write(&b, "func (self *", goName, ") ", caseName, "() *", typeRep, " {\n")
 			stringio.Write(&b, "return ", cm, ".Case[", typeRep, "](self, ", caseNum, ")")
 			b.WriteString("}\n\n")
 		}
@@ -877,13 +877,13 @@ func goParams(scope gen.Scope, params []wit.Param) []wit.Param {
 	return params
 }
 
-func (g *generator) functionDocs(owner wit.Ident, f *wit.Function, name string) string {
+func (g *generator) functionDocs(owner wit.Ident, f *wit.Function, goName string) string {
 	var b strings.Builder
 	kind := f.WITKind()
 	if f.IsAdmin() {
 		kind = "the Canonical ABI function"
 	}
-	stringio.Write(&b, "// ", name, " represents ", kind, " \"")
+	stringio.Write(&b, "// ", goName, " represents ", kind, " \"")
 	if f.IsFreestanding() {
 		stringio.Write(&b, owner.String(), "#", f.Name)
 	} else {
