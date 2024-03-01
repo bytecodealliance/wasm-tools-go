@@ -167,19 +167,14 @@ func (g *generator) declareTypeDef(t *wit.TypeDef) error {
 	if t.Name == nil {
 		return nil
 	}
-	name := *t.Name
+	return g.registerTypeDef(g.fileFor(typeDefOwner(t)), GoName(*t.Name, true), t)
+}
 
-	owner := typeDefOwner(t)
-	pkg := g.packageFor(owner)
-	file := pkg.File(owner.Extension + GoSuffix)
-	file.GeneratedBy = g.opts.generatedBy
-
-	g.typeDefPackages[t] = pkg
-	g.typeDefNames[t] = file.Declare(GoName(name, true))
+func (g *generator) registerTypeDef(file *gen.File, goName string, t *wit.TypeDef) error {
+	g.typeDefPackages[t] = file.Package
+	g.typeDefNames[t] = file.Declare(goName)
 	g.scopes[t] = gen.NewScope(nil)
-
 	// fmt.Fprintf(os.Stderr, "Type:\t%s.%s\n\t%s.%s\n", owner.String(), name, decl.Package.Path, decl.Name)
-
 	return nil
 }
 
@@ -688,6 +683,8 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 	// Setup
 	core := f.CoreFunction(false)
 	coreIsMethod := f.IsMethod() && core.Params[0] == f.Params[0]
+	hasCompoundParams := len(f.Params) > 0 && derefAnonRecord(core.Params[0].Type) != nil
+	hasCompoundResults := len(f.Results) > 1
 
 	var funcName string
 	var coreName string
@@ -720,7 +717,7 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 		}
 	}
 
-	// Organize function parameters and results
+	// Go function parameters and results
 	funcScope := gen.NewScope(file)
 	funcParams := goParams(funcScope, f.Params)
 	funcResults := goParams(funcScope, f.Results)
@@ -729,14 +726,33 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 		receiver = funcParams[0]
 		funcParams = funcParams[1:]
 	}
-	combined := append(funcParams, funcResults...)
 
+	// Core function parameters and results
 	coreScope := gen.NewScope(file)
 	coreParams := goParams(coreScope, core.Params)
 	coreResults := goParams(coreScope, core.Results)
 	if coreIsMethod {
 		coreParams = coreParams[1:]
 	}
+
+	// Bridging between Go and core function
+	var compoundParams *wit.TypeDef
+	var compoundParamsName string
+	if hasCompoundParams {
+		compoundParams = derefAnonRecord(coreParams[0].Type)
+		g.registerTypeDef(file, coreName+"Params", compoundParams)
+		compoundParamsName = funcScope.UniqueName("params")
+
+	}
+	var compoundResults *wit.TypeDef
+	var compoundResultsName string
+	if hasCompoundResults {
+		compoundResults = derefAnonRecord(last(coreParams).Type)
+		g.registerTypeDef(file, coreName+"Results", compoundResults)
+		compoundResultsName = funcScope.UniqueName("results")
+	}
+
+	combined := append(coreParams, funcResults...)
 
 	var b bytes.Buffer
 
@@ -761,9 +777,11 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 	b.WriteString(") ")
 
 	// Emit results
+	var namedResults bool
 	if len(funcResults) == 1 {
 		b.WriteString(g.typeRep(file, funcResults[0].Type))
 	} else if len(funcResults) > 0 {
+		namedResults = true
 		b.WriteRune('(')
 		for i, r := range funcResults {
 			if i > 0 {
@@ -777,11 +795,22 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 	// Emit function body
 	b.WriteString(" {\n")
 	sameResults := slices.Equal(funcResults, coreResults)
-	if !sameResults {
+	if !namedResults && !sameResults {
 		for _, r := range funcResults {
 			stringio.Write(&b, "var ", r.Name, " ", g.typeRep(file, r.Type), "\n")
 		}
-	} else if len(coreResults) > 0 {
+	}
+
+	// Emit compound types
+	if compoundParamsName != "" {
+		stringio.Write(&b, "var ", compoundParamsName, " ", g.typeRep(file, compoundParams), "\n")
+	}
+	if compoundResultsName != "" {
+		stringio.Write(&b, "var ", compoundResultsName, " ", g.typeRep(file, compoundResults), "\n")
+	}
+
+	// Emit call to wasmimport function
+	if sameResults && len(coreResults) > 0 {
 		b.WriteString("return ")
 	}
 	if coreIsMethod {
@@ -809,6 +838,17 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 		b.WriteRune('\n')
 	}
 	b.WriteString("}\n\n")
+
+	// Emit shared types
+	if compoundParams != nil {
+		goName := g.typeDefNames[compoundParams]
+		stringio.Write(&b, "type ", goName, " ", g.typeDefRep(file, goName, compoundParams), "\n\n")
+	}
+
+	if compoundResults != nil {
+		goName := g.typeDefNames[compoundResults]
+		stringio.Write(&b, "type ", goName, " ", g.typeDefRep(file, goName, compoundResults), "\n\n")
+	}
 
 	// Emit wasmimport function
 	stringio.Write(&b, "//go:wasmimport ", owner.String(), " ", f.Name, "\n")
@@ -853,6 +893,13 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 	return g.ensureEmptyAsm(file.Package)
 }
 
+func last[S ~[]E, E any](s S) *E {
+	if len(s) == 0 {
+		return nil
+	}
+	return &s[len(s)-1]
+}
+
 func isPointer(t wit.Type) bool {
 	if td, ok := t.(*wit.TypeDef); ok {
 		if _, ok := td.Kind.(*wit.Pointer); ok {
@@ -860,6 +907,35 @@ func isPointer(t wit.Type) bool {
 		}
 	}
 	return false
+}
+
+func derefType(t wit.Type) wit.Type {
+	if td, ok := t.(*wit.TypeDef); ok {
+		if p, ok := td.Kind.(*wit.Pointer); ok {
+			return p.Type
+		}
+	}
+	return nil
+}
+
+func derefTypeDef(t wit.Type) *wit.TypeDef {
+	if td, ok := t.(*wit.TypeDef); ok {
+		if p, ok := td.Kind.(*wit.Pointer); ok {
+			if td, ok := p.Type.(*wit.TypeDef); ok {
+				return td
+			}
+		}
+	}
+	return nil
+}
+
+func derefAnonRecord(t wit.Type) *wit.TypeDef {
+	if td := derefTypeDef(t); td != nil && td.Name == nil && td.Owner == nil {
+		if _, ok := td.Kind.(*wit.Record); ok {
+			return td
+		}
+	}
+	return nil
 }
 
 // goParams adapts WIT params to Go params, with a special case for the unnamed single result.
