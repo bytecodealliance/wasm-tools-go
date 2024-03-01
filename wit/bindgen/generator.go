@@ -21,9 +21,10 @@ import (
 )
 
 const (
-	GoSuffix  = ".wit.go"
-	cmPackage = "github.com/ydnar/wasm-tools-go/cm"
-	emptyAsm  = `// This file exists for testing this package without WebAssembly,
+	GoSuffix     = ".wit.go"
+	BuildDefault = "!wasip1"
+	cmPackage    = "github.com/ydnar/wasm-tools-go/cm"
+	emptyAsm     = `// This file exists for testing this package without WebAssembly,
 // allowing empty function bodies with a //go:wasmimport directive.
 // See https://pkg.go.dev/cmd/compile for more information.
 `
@@ -688,25 +689,23 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 	// Setup
 	core := f.CoreFunction(false)
 	coreIsMethod := f.IsMethod() && core.Params[0] == f.Params[0]
-	hasCompoundParams := len(f.Params) > 0 && derefAnonRecord(core.Params[0].Type) != nil
-	hasCompoundResults := len(f.Results) > 1
 
 	var funcName string
 	var coreName string
 	switch f.Kind.(type) {
 	case *wit.Freestanding:
 		funcName = file.Declare(GoName(f.BaseName(), true))
-		coreName = file.Declare("wasmimport" + funcName)
+		coreName = file.Declare(GoName(f.BaseName(), false))
 
 	case *wit.Constructor:
 		t := f.Type().(*wit.TypeDef)
 		funcName = file.Declare("New" + g.typeDefNames[t])
-		coreName = file.Declare("wasmimport" + funcName)
+		coreName = file.Declare("new" + g.typeDefNames[t])
 
 	case *wit.Static:
 		t := f.Type().(*wit.TypeDef)
 		funcName = file.Declare(g.typeDefNames[t] + GoName(f.BaseName(), true))
-		coreName = file.Declare("wasmimport" + funcName)
+		coreName = file.Declare(GoName(*t.Name, false) + GoName(f.BaseName(), true))
 
 	case *wit.Method:
 		t := f.Type().(*wit.TypeDef)
@@ -716,9 +715,9 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 		scope := g.scopes[t]
 		funcName = scope.UniqueName(GoName(f.BaseName(), true))
 		if coreIsMethod {
-			coreName = scope.UniqueName("wasmimport" + funcName)
+			coreName = scope.UniqueName(GoName(f.BaseName(), false))
 		} else {
-			coreName = file.Declare("wasmimport" + g.typeDefNames[t] + funcName)
+			coreName = file.Declare(GoName(*t.Name, false) + funcName)
 		}
 	}
 
@@ -753,7 +752,7 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 
 	// Bridging between Go and core function
 	var compoundParams wit.Param
-	if hasCompoundParams {
+	if len(funcParams) > 0 && derefAnonRecord(coreParams[0].Type) != nil {
 		name := funcScope.UniqueName("params")
 		callerParams[0].Name = name
 		t := derefAnonRecord(coreParams[0].Type)
@@ -764,7 +763,7 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 
 	var compoundResults wit.Param
 	var resultsRecord *wit.Record
-	if hasCompoundResults {
+	if len(funcResults) > 1 && derefAnonRecord(last(coreParams).Type) != nil {
 		name := funcScope.UniqueName("results")
 		last(callerParams).Name = name
 		t := derefAnonRecord(last(coreParams).Type)
@@ -1025,6 +1024,7 @@ func (g *generator) fileFor(id wit.Ident) *gen.File {
 	pkg := g.packageFor(id)
 	file := pkg.File(id.Extension + GoSuffix)
 	file.GeneratedBy = g.opts.generatedBy
+	file.Build = BuildDefault
 	return file
 }
 
