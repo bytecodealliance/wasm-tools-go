@@ -11,6 +11,11 @@ import (
 	"github.com/ydnar/wasm-tools-go/wasi/sockets/network"
 )
 
+// ErrorCode represents the enum "wasi:sockets/network@0.2.0#error-code".
+//
+// This is a type alias. See [network.ErrorCode] for more information.
+type ErrorCode = network.ErrorCode
+
 // IncomingDatagram represents the record "wasi:sockets/udp@0.2.0#incoming-datagram".
 //
 // A received datagram.
@@ -31,7 +36,7 @@ type IncomingDatagram struct {
 	// with, if any.
 	//
 	// Equivalent to the `src_addr` out parameter of `recvfrom`.
-	RemoteAddress network.IPSocketAddress
+	RemoteAddress IPSocketAddress
 }
 
 // IncomingDatagramStream represents the resource "wasi:sockets/udp@0.2.0#incoming-datagram-stream".
@@ -83,15 +88,15 @@ func (self IncomingDatagramStream) resourceDrop()
 //	receive: func(max-results: u64) -> result<list<incoming-datagram>, error-code>
 //
 //go:nosplit
-func (self IncomingDatagramStream) Receive(maxResults uint64) cm.OKResult[cm.List[IncomingDatagram], network.ErrorCode] {
-	var result cm.OKResult[cm.List[IncomingDatagram], network.ErrorCode]
+func (self IncomingDatagramStream) Receive(maxResults uint64) cm.OKResult[cm.List[IncomingDatagram], ErrorCode] {
+	var result cm.OKResult[cm.List[IncomingDatagram], ErrorCode]
 	self.receive(maxResults, &result)
 	return result
 }
 
 //go:wasmimport wasi:sockets/udp@0.2.0 [method]incoming-datagram-stream.receive
 //go:noescape
-func (self IncomingDatagramStream) receive(maxResults uint64, result *cm.OKResult[cm.List[IncomingDatagram], network.ErrorCode])
+func (self IncomingDatagramStream) receive(maxResults uint64, result *cm.OKResult[cm.List[IncomingDatagram], ErrorCode])
 
 // Subscribe represents method "subscribe".
 //
@@ -103,13 +108,28 @@ func (self IncomingDatagramStream) receive(maxResults uint64, result *cm.OKResul
 //	subscribe: func() -> own<pollable>
 //
 //go:nosplit
-func (self IncomingDatagramStream) Subscribe() poll.Pollable {
+func (self IncomingDatagramStream) Subscribe() Pollable {
 	return self.subscribe()
 }
 
 //go:wasmimport wasi:sockets/udp@0.2.0 [method]incoming-datagram-stream.subscribe
 //go:noescape
-func (self IncomingDatagramStream) subscribe() poll.Pollable
+func (self IncomingDatagramStream) subscribe() Pollable
+
+// IPAddressFamily represents the enum "wasi:sockets/network@0.2.0#ip-address-family".
+//
+// This is a type alias. See [network.IPAddressFamily] for more information.
+type IPAddressFamily = network.IPAddressFamily
+
+// IPSocketAddress represents the variant "wasi:sockets/network@0.2.0#ip-socket-address".
+//
+// This is a type alias. See [network.IPSocketAddress] for more information.
+type IPSocketAddress = network.IPSocketAddress
+
+// Network represents the resource "wasi:sockets/network@0.2.0#network".
+//
+// This is a type alias. See [network.Network] for more information.
+type Network = network.Network
 
 // OutgoingDatagram represents the record "wasi:sockets/udp@0.2.0#outgoing-datagram".
 //
@@ -132,7 +152,7 @@ type OutgoingDatagram struct {
 	//
 	// If this value is None, the send operation is equivalent to `send` in POSIX. Otherwise
 	// it is equivalent to `sendto`.
-	RemoteAddress cm.Option[network.IPSocketAddress]
+	RemoteAddress cm.Option[IPSocketAddress]
 }
 
 // OutgoingDatagramStream represents the resource "wasi:sockets/udp@0.2.0#outgoing-datagram-stream".
@@ -170,15 +190,15 @@ func (self OutgoingDatagramStream) resourceDrop()
 //	check-send: func() -> result<u64, error-code>
 //
 //go:nosplit
-func (self OutgoingDatagramStream) CheckSend() cm.OKResult[uint64, network.ErrorCode] {
-	var result cm.OKResult[uint64, network.ErrorCode]
+func (self OutgoingDatagramStream) CheckSend() cm.OKResult[uint64, ErrorCode] {
+	var result cm.OKResult[uint64, ErrorCode]
 	self.checkSend(&result)
 	return result
 }
 
 //go:wasmimport wasi:sockets/udp@0.2.0 [method]outgoing-datagram-stream.check-send
 //go:noescape
-func (self OutgoingDatagramStream) checkSend(result *cm.OKResult[uint64, network.ErrorCode])
+func (self OutgoingDatagramStream) checkSend(result *cm.OKResult[uint64, ErrorCode])
 
 // Send represents method "send".
 //
@@ -234,15 +254,15 @@ func (self OutgoingDatagramStream) checkSend(result *cm.OKResult[uint64, network
 //	send: func(datagrams: list<outgoing-datagram>) -> result<u64, error-code>
 //
 //go:nosplit
-func (self OutgoingDatagramStream) Send(datagrams cm.List[OutgoingDatagram]) cm.OKResult[uint64, network.ErrorCode] {
-	var result cm.OKResult[uint64, network.ErrorCode]
+func (self OutgoingDatagramStream) Send(datagrams cm.List[OutgoingDatagram]) cm.OKResult[uint64, ErrorCode] {
+	var result cm.OKResult[uint64, ErrorCode]
 	self.send(datagrams, &result)
 	return result
 }
 
 //go:wasmimport wasi:sockets/udp@0.2.0 [method]outgoing-datagram-stream.send
 //go:noescape
-func (self OutgoingDatagramStream) send(datagrams cm.List[OutgoingDatagram], result *cm.OKResult[uint64, network.ErrorCode])
+func (self OutgoingDatagramStream) send(datagrams cm.List[OutgoingDatagram], result *cm.OKResult[uint64, ErrorCode])
 
 // Subscribe represents method "subscribe".
 //
@@ -254,13 +274,18 @@ func (self OutgoingDatagramStream) send(datagrams cm.List[OutgoingDatagram], res
 //	subscribe: func() -> own<pollable>
 //
 //go:nosplit
-func (self OutgoingDatagramStream) Subscribe() poll.Pollable {
+func (self OutgoingDatagramStream) Subscribe() Pollable {
 	return self.subscribe()
 }
 
 //go:wasmimport wasi:sockets/udp@0.2.0 [method]outgoing-datagram-stream.subscribe
 //go:noescape
-func (self OutgoingDatagramStream) subscribe() poll.Pollable
+func (self OutgoingDatagramStream) subscribe() Pollable
+
+// Pollable represents the resource "wasi:io/poll@0.2.0#pollable".
+//
+// This is a type alias. See [poll.Pollable] for more information.
+type Pollable = poll.Pollable
 
 // UDPSocket represents the resource "wasi:sockets/udp@0.2.0#udp-socket".
 //
@@ -291,28 +316,28 @@ func (self UDPSocket) resourceDrop()
 //	address-family: func() -> ip-address-family
 //
 //go:nosplit
-func (self UDPSocket) AddressFamily() network.IPAddressFamily {
+func (self UDPSocket) AddressFamily() IPAddressFamily {
 	return self.addressFamily()
 }
 
 //go:wasmimport wasi:sockets/udp@0.2.0 [method]udp-socket.address-family
 //go:noescape
-func (self UDPSocket) addressFamily() network.IPAddressFamily
+func (self UDPSocket) addressFamily() IPAddressFamily
 
 // FinishBind represents method "finish-bind".
 //
 //	finish-bind: func() -> result<_, error-code>
 //
 //go:nosplit
-func (self UDPSocket) FinishBind() cm.ErrResult[struct{}, network.ErrorCode] {
-	var result cm.ErrResult[struct{}, network.ErrorCode]
+func (self UDPSocket) FinishBind() cm.ErrResult[struct{}, ErrorCode] {
+	var result cm.ErrResult[struct{}, ErrorCode]
 	self.finishBind(&result)
 	return result
 }
 
 //go:wasmimport wasi:sockets/udp@0.2.0 [method]udp-socket.finish-bind
 //go:noescape
-func (self UDPSocket) finishBind(result *cm.ErrResult[struct{}, network.ErrorCode])
+func (self UDPSocket) finishBind(result *cm.ErrResult[struct{}, ErrorCode])
 
 // LocalAddress represents method "local-address".
 //
@@ -337,15 +362,15 @@ func (self UDPSocket) finishBind(result *cm.ErrResult[struct{}, network.ErrorCod
 //	local-address: func() -> result<ip-socket-address, error-code>
 //
 //go:nosplit
-func (self UDPSocket) LocalAddress() cm.OKResult[network.IPSocketAddress, network.ErrorCode] {
-	var result cm.OKResult[network.IPSocketAddress, network.ErrorCode]
+func (self UDPSocket) LocalAddress() cm.OKResult[IPSocketAddress, ErrorCode] {
+	var result cm.OKResult[IPSocketAddress, ErrorCode]
 	self.localAddress(&result)
 	return result
 }
 
 //go:wasmimport wasi:sockets/udp@0.2.0 [method]udp-socket.local-address
 //go:noescape
-func (self UDPSocket) localAddress(result *cm.OKResult[network.IPSocketAddress, network.ErrorCode])
+func (self UDPSocket) localAddress(result *cm.OKResult[IPSocketAddress, ErrorCode])
 
 // ReceiveBufferSize represents method "receive-buffer-size".
 //
@@ -365,15 +390,15 @@ func (self UDPSocket) localAddress(result *cm.OKResult[network.IPSocketAddress, 
 //	receive-buffer-size: func() -> result<u64, error-code>
 //
 //go:nosplit
-func (self UDPSocket) ReceiveBufferSize() cm.OKResult[uint64, network.ErrorCode] {
-	var result cm.OKResult[uint64, network.ErrorCode]
+func (self UDPSocket) ReceiveBufferSize() cm.OKResult[uint64, ErrorCode] {
+	var result cm.OKResult[uint64, ErrorCode]
 	self.receiveBufferSize(&result)
 	return result
 }
 
 //go:wasmimport wasi:sockets/udp@0.2.0 [method]udp-socket.receive-buffer-size
 //go:noescape
-func (self UDPSocket) receiveBufferSize(result *cm.OKResult[uint64, network.ErrorCode])
+func (self UDPSocket) receiveBufferSize(result *cm.OKResult[uint64, ErrorCode])
 
 // RemoteAddress represents method "remote-address".
 //
@@ -391,75 +416,75 @@ func (self UDPSocket) receiveBufferSize(result *cm.OKResult[uint64, network.Erro
 //	remote-address: func() -> result<ip-socket-address, error-code>
 //
 //go:nosplit
-func (self UDPSocket) RemoteAddress() cm.OKResult[network.IPSocketAddress, network.ErrorCode] {
-	var result cm.OKResult[network.IPSocketAddress, network.ErrorCode]
+func (self UDPSocket) RemoteAddress() cm.OKResult[IPSocketAddress, ErrorCode] {
+	var result cm.OKResult[IPSocketAddress, ErrorCode]
 	self.remoteAddress(&result)
 	return result
 }
 
 //go:wasmimport wasi:sockets/udp@0.2.0 [method]udp-socket.remote-address
 //go:noescape
-func (self UDPSocket) remoteAddress(result *cm.OKResult[network.IPSocketAddress, network.ErrorCode])
+func (self UDPSocket) remoteAddress(result *cm.OKResult[IPSocketAddress, ErrorCode])
 
 // SendBufferSize represents method "send-buffer-size".
 //
 //	send-buffer-size: func() -> result<u64, error-code>
 //
 //go:nosplit
-func (self UDPSocket) SendBufferSize() cm.OKResult[uint64, network.ErrorCode] {
-	var result cm.OKResult[uint64, network.ErrorCode]
+func (self UDPSocket) SendBufferSize() cm.OKResult[uint64, ErrorCode] {
+	var result cm.OKResult[uint64, ErrorCode]
 	self.sendBufferSize(&result)
 	return result
 }
 
 //go:wasmimport wasi:sockets/udp@0.2.0 [method]udp-socket.send-buffer-size
 //go:noescape
-func (self UDPSocket) sendBufferSize(result *cm.OKResult[uint64, network.ErrorCode])
+func (self UDPSocket) sendBufferSize(result *cm.OKResult[uint64, ErrorCode])
 
 // SetReceiveBufferSize represents method "set-receive-buffer-size".
 //
 //	set-receive-buffer-size: func(value: u64) -> result<_, error-code>
 //
 //go:nosplit
-func (self UDPSocket) SetReceiveBufferSize(value uint64) cm.ErrResult[struct{}, network.ErrorCode] {
-	var result cm.ErrResult[struct{}, network.ErrorCode]
+func (self UDPSocket) SetReceiveBufferSize(value uint64) cm.ErrResult[struct{}, ErrorCode] {
+	var result cm.ErrResult[struct{}, ErrorCode]
 	self.setReceiveBufferSize(value, &result)
 	return result
 }
 
 //go:wasmimport wasi:sockets/udp@0.2.0 [method]udp-socket.set-receive-buffer-size
 //go:noescape
-func (self UDPSocket) setReceiveBufferSize(value uint64, result *cm.ErrResult[struct{}, network.ErrorCode])
+func (self UDPSocket) setReceiveBufferSize(value uint64, result *cm.ErrResult[struct{}, ErrorCode])
 
 // SetSendBufferSize represents method "set-send-buffer-size".
 //
 //	set-send-buffer-size: func(value: u64) -> result<_, error-code>
 //
 //go:nosplit
-func (self UDPSocket) SetSendBufferSize(value uint64) cm.ErrResult[struct{}, network.ErrorCode] {
-	var result cm.ErrResult[struct{}, network.ErrorCode]
+func (self UDPSocket) SetSendBufferSize(value uint64) cm.ErrResult[struct{}, ErrorCode] {
+	var result cm.ErrResult[struct{}, ErrorCode]
 	self.setSendBufferSize(value, &result)
 	return result
 }
 
 //go:wasmimport wasi:sockets/udp@0.2.0 [method]udp-socket.set-send-buffer-size
 //go:noescape
-func (self UDPSocket) setSendBufferSize(value uint64, result *cm.ErrResult[struct{}, network.ErrorCode])
+func (self UDPSocket) setSendBufferSize(value uint64, result *cm.ErrResult[struct{}, ErrorCode])
 
 // SetUnicastHopLimit represents method "set-unicast-hop-limit".
 //
 //	set-unicast-hop-limit: func(value: u8) -> result<_, error-code>
 //
 //go:nosplit
-func (self UDPSocket) SetUnicastHopLimit(value uint8) cm.ErrResult[struct{}, network.ErrorCode] {
-	var result cm.ErrResult[struct{}, network.ErrorCode]
+func (self UDPSocket) SetUnicastHopLimit(value uint8) cm.ErrResult[struct{}, ErrorCode] {
+	var result cm.ErrResult[struct{}, ErrorCode]
 	self.setUnicastHopLimit(value, &result)
 	return result
 }
 
 //go:wasmimport wasi:sockets/udp@0.2.0 [method]udp-socket.set-unicast-hop-limit
 //go:noescape
-func (self UDPSocket) setUnicastHopLimit(value uint8, result *cm.ErrResult[struct{}, network.ErrorCode])
+func (self UDPSocket) setUnicastHopLimit(value uint8, result *cm.ErrResult[struct{}, ErrorCode])
 
 // StartBind represents method "start-bind".
 //
@@ -499,15 +524,15 @@ func (self UDPSocket) setUnicastHopLimit(value uint8, result *cm.ErrResult[struc
 //	result<_, error-code>
 //
 //go:nosplit
-func (self UDPSocket) StartBind(network_ network.Network, localAddress network.IPSocketAddress) cm.ErrResult[struct{}, network.ErrorCode] {
-	var result cm.ErrResult[struct{}, network.ErrorCode]
+func (self UDPSocket) StartBind(network_ Network, localAddress IPSocketAddress) cm.ErrResult[struct{}, ErrorCode] {
+	var result cm.ErrResult[struct{}, ErrorCode]
 	self.startBind(network_, localAddress, &result)
 	return result
 }
 
 //go:wasmimport wasi:sockets/udp@0.2.0 [method]udp-socket.start-bind
 //go:noescape
-func (self UDPSocket) startBind(network_ network.Network, localAddress network.IPSocketAddress, result *cm.ErrResult[struct{}, network.ErrorCode])
+func (self UDPSocket) startBind(network_ Network, localAddress IPSocketAddress, result *cm.ErrResult[struct{}, ErrorCode])
 
 // Stream represents method "stream".
 //
@@ -566,15 +591,15 @@ func (self UDPSocket) startBind(network_ network.Network, localAddress network.I
 //	own<outgoing-datagram-stream>>, error-code>
 //
 //go:nosplit
-func (self UDPSocket) Stream(remoteAddress cm.Option[network.IPSocketAddress]) cm.OKResult[cm.Tuple[IncomingDatagramStream, OutgoingDatagramStream], network.ErrorCode] {
-	var result cm.OKResult[cm.Tuple[IncomingDatagramStream, OutgoingDatagramStream], network.ErrorCode]
+func (self UDPSocket) Stream(remoteAddress cm.Option[IPSocketAddress]) cm.OKResult[cm.Tuple[IncomingDatagramStream, OutgoingDatagramStream], ErrorCode] {
+	var result cm.OKResult[cm.Tuple[IncomingDatagramStream, OutgoingDatagramStream], ErrorCode]
 	self.stream(remoteAddress, &result)
 	return result
 }
 
 //go:wasmimport wasi:sockets/udp@0.2.0 [method]udp-socket.stream
 //go:noescape
-func (self UDPSocket) stream(remoteAddress cm.Option[network.IPSocketAddress], result *cm.OKResult[cm.Tuple[IncomingDatagramStream, OutgoingDatagramStream], network.ErrorCode])
+func (self UDPSocket) stream(remoteAddress cm.Option[IPSocketAddress], result *cm.OKResult[cm.Tuple[IncomingDatagramStream, OutgoingDatagramStream], ErrorCode])
 
 // Subscribe represents method "subscribe".
 //
@@ -586,13 +611,13 @@ func (self UDPSocket) stream(remoteAddress cm.Option[network.IPSocketAddress], r
 //	subscribe: func() -> own<pollable>
 //
 //go:nosplit
-func (self UDPSocket) Subscribe() poll.Pollable {
+func (self UDPSocket) Subscribe() Pollable {
 	return self.subscribe()
 }
 
 //go:wasmimport wasi:sockets/udp@0.2.0 [method]udp-socket.subscribe
 //go:noescape
-func (self UDPSocket) subscribe() poll.Pollable
+func (self UDPSocket) subscribe() Pollable
 
 // UnicastHopLimit represents method "unicast-hop-limit".
 //
@@ -606,12 +631,12 @@ func (self UDPSocket) subscribe() poll.Pollable
 //	unicast-hop-limit: func() -> result<u8, error-code>
 //
 //go:nosplit
-func (self UDPSocket) UnicastHopLimit() cm.OKResult[uint8, network.ErrorCode] {
-	var result cm.OKResult[uint8, network.ErrorCode]
+func (self UDPSocket) UnicastHopLimit() cm.OKResult[uint8, ErrorCode] {
+	var result cm.OKResult[uint8, ErrorCode]
 	self.unicastHopLimit(&result)
 	return result
 }
 
 //go:wasmimport wasi:sockets/udp@0.2.0 [method]udp-socket.unicast-hop-limit
 //go:noescape
-func (self UDPSocket) unicastHopLimit(result *cm.OKResult[uint8, network.ErrorCode])
+func (self UDPSocket) unicastHopLimit(result *cm.OKResult[uint8, ErrorCode])

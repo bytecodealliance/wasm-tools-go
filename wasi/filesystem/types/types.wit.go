@@ -77,6 +77,11 @@ const (
 	AdviceNoReuse
 )
 
+// DateTime represents the record "wasi:clocks/wall-clock@0.2.0#datetime".
+//
+// This is a type alias. See [wallclock.DateTime] for more information.
+type DateTime = wallclock.DateTime
+
 // Descriptor represents the resource "wasi:filesystem/types@0.2.0#descriptor".
 //
 // A descriptor is a reference to a filesystem object, which may be a file,
@@ -130,15 +135,15 @@ func (self Descriptor) advise(offset FileSize, length FileSize, advice Advice, r
 //	append-via-stream: func() -> result<own<output-stream>, error-code>
 //
 //go:nosplit
-func (self Descriptor) AppendViaStream() cm.OKResult[streams.OutputStream, ErrorCode] {
-	var result cm.OKResult[streams.OutputStream, ErrorCode]
+func (self Descriptor) AppendViaStream() cm.OKResult[OutputStream, ErrorCode] {
+	var result cm.OKResult[OutputStream, ErrorCode]
 	self.appendViaStream(&result)
 	return result
 }
 
 //go:wasmimport wasi:filesystem/types@0.2.0 [method]descriptor.append-via-stream
 //go:noescape
-func (self Descriptor) appendViaStream(result *cm.OKResult[streams.OutputStream, ErrorCode])
+func (self Descriptor) appendViaStream(result *cm.OKResult[OutputStream, ErrorCode])
 
 // CreateDirectoryAt represents method "create-directory-at".
 //
@@ -405,15 +410,15 @@ func (self Descriptor) readDirectory(result *cm.OKResult[DirectoryEntryStream, E
 //	read-via-stream: func(offset: filesize) -> result<own<input-stream>, error-code>
 //
 //go:nosplit
-func (self Descriptor) ReadViaStream(offset FileSize) cm.OKResult[streams.InputStream, ErrorCode] {
-	var result cm.OKResult[streams.InputStream, ErrorCode]
+func (self Descriptor) ReadViaStream(offset FileSize) cm.OKResult[InputStream, ErrorCode] {
+	var result cm.OKResult[InputStream, ErrorCode]
 	self.readViaStream(offset, &result)
 	return result
 }
 
 //go:wasmimport wasi:filesystem/types@0.2.0 [method]descriptor.read-via-stream
 //go:noescape
-func (self Descriptor) readViaStream(offset FileSize, result *cm.OKResult[streams.InputStream, ErrorCode])
+func (self Descriptor) readViaStream(offset FileSize, result *cm.OKResult[InputStream, ErrorCode])
 
 // ReadLinkAt represents method "readlink-at".
 //
@@ -715,15 +720,15 @@ func (self Descriptor) write(buffer cm.List[uint8], offset FileSize, result *cm.
 //	write-via-stream: func(offset: filesize) -> result<own<output-stream>, error-code>
 //
 //go:nosplit
-func (self Descriptor) WriteViaStream(offset FileSize) cm.OKResult[streams.OutputStream, ErrorCode] {
-	var result cm.OKResult[streams.OutputStream, ErrorCode]
+func (self Descriptor) WriteViaStream(offset FileSize) cm.OKResult[OutputStream, ErrorCode] {
+	var result cm.OKResult[OutputStream, ErrorCode]
 	self.writeViaStream(offset, &result)
 	return result
 }
 
 //go:wasmimport wasi:filesystem/types@0.2.0 [method]descriptor.write-via-stream
 //go:noescape
-func (self Descriptor) writeViaStream(offset FileSize, result *cm.OKResult[streams.OutputStream, ErrorCode])
+func (self Descriptor) writeViaStream(offset FileSize, result *cm.OKResult[OutputStream, ErrorCode])
 
 // DescriptorFlags represents the flags "wasi:filesystem/types@0.2.0#descriptor-flags".
 //
@@ -815,19 +820,19 @@ type DescriptorStat struct {
 	//
 	// If the `option` is none, the platform doesn't maintain an access
 	// timestamp for this file.
-	DataAccessTimestamp cm.Option[wallclock.DateTime]
+	DataAccessTimestamp cm.Option[DateTime]
 
 	// Last data modification timestamp.
 	//
 	// If the `option` is none, the platform doesn't maintain a
 	// modification timestamp for this file.
-	DataModificationTimestamp cm.Option[wallclock.DateTime]
+	DataModificationTimestamp cm.Option[DateTime]
 
 	// Last file status-change timestamp.
 	//
 	// If the `option` is none, the platform doesn't maintain a
 	// status-change timestamp for this file.
-	StatusChangeTimestamp cm.Option[wallclock.DateTime]
+	StatusChangeTimestamp cm.Option[DateTime]
 }
 
 // DescriptorType represents the enum "wasi:filesystem/types@0.2.0#descriptor-type".
@@ -927,6 +932,11 @@ func (self DirectoryEntryStream) ReadDirectoryEntry() cm.OKResult[cm.Option[Dire
 //go:wasmimport wasi:filesystem/types@0.2.0 [method]directory-entry-stream.read-directory-entry
 //go:noescape
 func (self DirectoryEntryStream) readDirectoryEntry(result *cm.OKResult[cm.Option[DirectoryEntry], ErrorCode])
+
+// Error represents the resource "wasi:io/error@0.2.0#error".
+//
+// This is a type alias. See [ioerror.Error] for more information.
+type Error = ioerror.Error
 
 // ErrorCode represents the enum "wasi:filesystem/types@0.2.0#error-code".
 //
@@ -1097,6 +1107,11 @@ const (
 //	type filesize = u64
 type FileSize uint64
 
+// InputStream represents the resource "wasi:io/streams@0.2.0#input-stream".
+//
+// This is a type alias. See [streams.InputStream] for more information.
+type InputStream = streams.InputStream
+
 // LinkCount represents the type "wasi:filesystem/types@0.2.0#link-count".
 //
 // Number of hard links to an inode.
@@ -1130,7 +1145,7 @@ type MetadataHashValue struct {
 //		now,
 //		timestamp(datetime),
 //	}
-type NewTimestamp cm.Variant[uint8, wallclock.DateTime, wallclock.DateTime]
+type NewTimestamp cm.Variant[uint8, DateTime, DateTime]
 
 // NewTimestampNoChange returns a [NewTimestamp] of case "no-change".
 //
@@ -1162,13 +1177,13 @@ func (self *NewTimestamp) Now() bool {
 // NewTimestampTimestamp returns a [NewTimestamp] of case "timestamp".
 //
 // Set the timestamp to the given value.
-func NewTimestampTimestamp(data wallclock.DateTime) NewTimestamp {
+func NewTimestampTimestamp(data DateTime) NewTimestamp {
 	return cm.New[NewTimestamp](2, data)
 }
 
-// Timestamp returns a non-nil *[wallclock.DateTime] if [NewTimestamp] represents the variant case "timestamp".
-func (self *NewTimestamp) Timestamp() *wallclock.DateTime {
-	return cm.Case[wallclock.DateTime](self, 2)
+// Timestamp returns a non-nil *[DateTime] if [NewTimestamp] represents the variant case "timestamp".
+func (self *NewTimestamp) Timestamp() *DateTime {
+	return cm.Case[DateTime](self, 2)
 }
 
 // OpenFlags represents the flags "wasi:filesystem/types@0.2.0#open-flags".
@@ -1196,6 +1211,11 @@ const (
 	// Truncate file to size 0, similar to `O_TRUNC` in POSIX.
 	OpenFlagsTruncate
 )
+
+// OutputStream represents the resource "wasi:io/streams@0.2.0#output-stream".
+//
+// This is a type alias. See [streams.OutputStream] for more information.
+type OutputStream = streams.OutputStream
 
 // PathFlags represents the flags "wasi:filesystem/types@0.2.0#path-flags".
 //
@@ -1228,7 +1248,7 @@ const (
 //	filesystem-error-code: func(err: borrow<error>) -> option<error-code>
 //
 //go:nosplit
-func FilesystemErrorCode(err ioerror.Error) cm.Option[ErrorCode] {
+func FilesystemErrorCode(err Error) cm.Option[ErrorCode] {
 	var result cm.Option[ErrorCode]
 	filesystemErrorCode(err, &result)
 	return result
@@ -1236,4 +1256,4 @@ func FilesystemErrorCode(err ioerror.Error) cm.Option[ErrorCode] {
 
 //go:wasmimport wasi:filesystem/types@0.2.0 filesystem-error-code
 //go:noescape
-func filesystemErrorCode(err ioerror.Error, result *cm.Option[ErrorCode])
+func filesystemErrorCode(err Error, result *cm.Option[ErrorCode])

@@ -9,15 +9,20 @@ import (
 	"github.com/ydnar/wasm-tools-go/wasi/io/streams"
 )
 
+// OutputStream represents the resource "wasi:io/streams@0.2.0#output-stream".
+//
+// This is a type alias. See [streams.OutputStream] for more information.
+type OutputStream = streams.OutputStream
+
 // GetStderr represents function "wasi:cli/stderr@0.2.0#get-stderr".
 //
 //	get-stderr: func() -> own<output-stream>
 //
 //go:nosplit
-func GetStderr() streams.OutputStream {
+func GetStderr() OutputStream {
 	return getStderr()
 }
 
 //go:wasmimport wasi:cli/stderr@0.2.0 get-stderr
 //go:noescape
-func getStderr() streams.OutputStream
+func getStderr() OutputStream

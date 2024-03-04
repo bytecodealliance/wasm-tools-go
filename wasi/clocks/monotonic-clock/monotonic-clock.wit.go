@@ -36,6 +36,11 @@ type Duration uint64
 //	type instant = u64
 type Instant uint64
 
+// Pollable represents the resource "wasi:io/poll@0.2.0#pollable".
+//
+// This is a type alias. See [poll.Pollable] for more information.
+type Pollable = poll.Pollable
+
 // Now represents function "wasi:clocks/monotonic-clock@0.2.0#now".
 //
 // Read the current value of the clock.
@@ -79,13 +84,13 @@ func resolution() Duration
 //	subscribe-duration: func(when: duration) -> own<pollable>
 //
 //go:nosplit
-func SubscribeDuration(when Duration) poll.Pollable {
+func SubscribeDuration(when Duration) Pollable {
 	return subscribeDuration(when)
 }
 
 //go:wasmimport wasi:clocks/monotonic-clock@0.2.0 subscribe-duration
 //go:noescape
-func subscribeDuration(when Duration) poll.Pollable
+func subscribeDuration(when Duration) Pollable
 
 // SubscribeInstant represents function "wasi:clocks/monotonic-clock@0.2.0#subscribe-instant".
 //
@@ -95,10 +100,10 @@ func subscribeDuration(when Duration) poll.Pollable
 //	subscribe-instant: func(when: instant) -> own<pollable>
 //
 //go:nosplit
-func SubscribeInstant(when Instant) poll.Pollable {
+func SubscribeInstant(when Instant) Pollable {
 	return subscribeInstant(when)
 }
 
 //go:wasmimport wasi:clocks/monotonic-clock@0.2.0 subscribe-instant
 //go:noescape
-func subscribeInstant(when Instant) poll.Pollable
+func subscribeInstant(when Instant) Pollable

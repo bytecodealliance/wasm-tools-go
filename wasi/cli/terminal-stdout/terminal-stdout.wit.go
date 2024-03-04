@@ -13,6 +13,11 @@ import (
 	terminaloutput "github.com/ydnar/wasm-tools-go/wasi/cli/terminal-output"
 )
 
+// TerminalOutput represents the resource "wasi:cli/terminal-output@0.2.0#terminal-output".
+//
+// This is a type alias. See [terminaloutput.TerminalOutput] for more information.
+type TerminalOutput = terminaloutput.TerminalOutput
+
 // GetTerminalStdout represents function "wasi:cli/terminal-stdout@0.2.0#get-terminal-stdout".
 //
 // If stdout is connected to a terminal, return a `terminal-output` handle
@@ -21,12 +26,12 @@ import (
 //	get-terminal-stdout: func() -> option<own<terminal-output>>
 //
 //go:nosplit
-func GetTerminalStdout() cm.Option[terminaloutput.TerminalOutput] {
-	var result cm.Option[terminaloutput.TerminalOutput]
+func GetTerminalStdout() cm.Option[TerminalOutput] {
+	var result cm.Option[TerminalOutput]
 	getTerminalStdout(&result)
 	return result
 }
 
 //go:wasmimport wasi:cli/terminal-stdout@0.2.0 get-terminal-stdout
 //go:noescape
-func getTerminalStdout(result *cm.Option[terminaloutput.TerminalOutput])
+func getTerminalStdout(result *cm.Option[TerminalOutput])

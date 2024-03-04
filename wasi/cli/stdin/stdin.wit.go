@@ -9,15 +9,20 @@ import (
 	"github.com/ydnar/wasm-tools-go/wasi/io/streams"
 )
 
+// InputStream represents the resource "wasi:io/streams@0.2.0#input-stream".
+//
+// This is a type alias. See [streams.InputStream] for more information.
+type InputStream = streams.InputStream
+
 // GetStdin represents function "wasi:cli/stdin@0.2.0#get-stdin".
 //
 //	get-stdin: func() -> own<input-stream>
 //
 //go:nosplit
-func GetStdin() streams.InputStream {
+func GetStdin() InputStream {
 	return getStdin()
 }
 
 //go:wasmimport wasi:cli/stdin@0.2.0 get-stdin
 //go:noescape
-func getStdin() streams.InputStream
+func getStdin() InputStream

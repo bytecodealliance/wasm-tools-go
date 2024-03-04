@@ -10,6 +10,11 @@ import (
 	"github.com/ydnar/wasm-tools-go/wasi/filesystem/types"
 )
 
+// Descriptor represents the resource "wasi:filesystem/types@0.2.0#descriptor".
+//
+// This is a type alias. See [types.Descriptor] for more information.
+type Descriptor = types.Descriptor
+
 // GetDirectories represents function "wasi:filesystem/preopens@0.2.0#get-directories".
 //
 // Return the set of preopened directories, and their path.
@@ -17,12 +22,12 @@ import (
 //	get-directories: func() -> list<tuple<own<descriptor>, string>>
 //
 //go:nosplit
-func GetDirectories() cm.List[cm.Tuple[types.Descriptor, string]] {
-	var result cm.List[cm.Tuple[types.Descriptor, string]]
+func GetDirectories() cm.List[cm.Tuple[Descriptor, string]] {
+	var result cm.List[cm.Tuple[Descriptor, string]]
 	getDirectories(&result)
 	return result
 }
 
 //go:wasmimport wasi:filesystem/preopens@0.2.0 get-directories
 //go:noescape
-func getDirectories(result *cm.List[cm.Tuple[types.Descriptor, string]])
+func getDirectories(result *cm.List[cm.Tuple[Descriptor, string]])

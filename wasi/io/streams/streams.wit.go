@@ -17,6 +17,11 @@ import (
 	"github.com/ydnar/wasm-tools-go/wasi/io/poll"
 )
 
+// Error represents the resource "wasi:io/error@0.2.0#error".
+//
+// This is a type alias. See [ioerror.Error] for more information.
+type Error = ioerror.Error
+
 // InputStream represents the resource "wasi:io/streams@0.2.0#input-stream".
 //
 // An input bytestream.
@@ -154,13 +159,13 @@ func (self InputStream) skip(len_ uint64, result *cm.OKResult[uint64, StreamErro
 //	subscribe: func() -> own<pollable>
 //
 //go:nosplit
-func (self InputStream) Subscribe() poll.Pollable {
+func (self InputStream) Subscribe() Pollable {
 	return self.subscribe()
 }
 
 //go:wasmimport wasi:io/streams@0.2.0 [method]input-stream.subscribe
 //go:noescape
-func (self InputStream) subscribe() poll.Pollable
+func (self InputStream) subscribe() Pollable
 
 // OutputStream represents the resource "wasi:io/streams@0.2.0#output-stream".
 //
@@ -400,13 +405,13 @@ func (self OutputStream) splice(src InputStream, len_ uint64, result *cm.OKResul
 //	subscribe: func() -> own<pollable>
 //
 //go:nosplit
-func (self OutputStream) Subscribe() poll.Pollable {
+func (self OutputStream) Subscribe() Pollable {
 	return self.subscribe()
 }
 
 //go:wasmimport wasi:io/streams@0.2.0 [method]output-stream.subscribe
 //go:noescape
-func (self OutputStream) subscribe() poll.Pollable
+func (self OutputStream) subscribe() Pollable
 
 // Write represents method "write".
 //
@@ -459,6 +464,11 @@ func (self OutputStream) WriteZeroes(len_ uint64) cm.ErrResult[struct{}, StreamE
 //go:noescape
 func (self OutputStream) writeZeroes(len_ uint64, result *cm.ErrResult[struct{}, StreamError])
 
+// Pollable represents the resource "wasi:io/poll@0.2.0#pollable".
+//
+// This is a type alias. See [poll.Pollable] for more information.
+type Pollable = poll.Pollable
+
 // StreamError represents the variant "wasi:io/streams@0.2.0#stream-error".
 //
 // An error for input-stream and output-stream operations.
@@ -467,20 +477,20 @@ func (self OutputStream) writeZeroes(len_ uint64, result *cm.ErrResult[struct{},
 //		last-operation-failed(own<error>),
 //		closed,
 //	}
-type StreamError cm.Variant[uint8, ioerror.Error, ioerror.Error]
+type StreamError cm.Variant[uint8, Error, Error]
 
 // StreamErrorLastOperationFailed returns a [StreamError] of case "last-operation-failed".
 //
 // The last operation (a write or flush) failed before completion.
 //
 // More information is available in the `error` payload.
-func StreamErrorLastOperationFailed(data ioerror.Error) StreamError {
+func StreamErrorLastOperationFailed(data Error) StreamError {
 	return cm.New[StreamError](0, data)
 }
 
-// LastOperationFailed returns a non-nil *[ioerror.Error] if [StreamError] represents the variant case "last-operation-failed".
-func (self *StreamError) LastOperationFailed() *ioerror.Error {
-	return cm.Case[ioerror.Error](self, 0)
+// LastOperationFailed returns a non-nil *[Error] if [StreamError] represents the variant case "last-operation-failed".
+func (self *StreamError) LastOperationFailed() *Error {
+	return cm.Case[Error](self, 0)
 }
 
 // StreamErrorClosed returns a [StreamError] of case "closed".

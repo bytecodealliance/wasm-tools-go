@@ -11,6 +11,11 @@ import (
 	"github.com/ydnar/wasm-tools-go/wasi/sockets/network"
 )
 
+// Network represents the resource "wasi:sockets/network@0.2.0#network".
+//
+// This is a type alias. See [network.Network] for more information.
+type Network = network.Network
+
 // InstanceNetwork represents function "wasi:sockets/instance-network@0.2.0#instance-network".
 //
 // Get a handle to the default network.
@@ -18,10 +23,10 @@ import (
 //	instance-network: func() -> own<network>
 //
 //go:nosplit
-func InstanceNetwork() network.Network {
+func InstanceNetwork() Network {
 	return instanceNetwork()
 }
 
 //go:wasmimport wasi:sockets/instance-network@0.2.0 instance-network
 //go:noescape
-func instanceNetwork() network.Network
+func instanceNetwork() Network

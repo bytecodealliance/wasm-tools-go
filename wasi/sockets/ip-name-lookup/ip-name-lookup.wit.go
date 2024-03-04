@@ -11,6 +11,26 @@ import (
 	"github.com/ydnar/wasm-tools-go/wasi/sockets/network"
 )
 
+// ErrorCode represents the enum "wasi:sockets/network@0.2.0#error-code".
+//
+// This is a type alias. See [network.ErrorCode] for more information.
+type ErrorCode = network.ErrorCode
+
+// IPAddress represents the variant "wasi:sockets/network@0.2.0#ip-address".
+//
+// This is a type alias. See [network.IPAddress] for more information.
+type IPAddress = network.IPAddress
+
+// Network represents the resource "wasi:sockets/network@0.2.0#network".
+//
+// This is a type alias. See [network.Network] for more information.
+type Network = network.Network
+
+// Pollable represents the resource "wasi:io/poll@0.2.0#pollable".
+//
+// This is a type alias. See [poll.Pollable] for more information.
+type Pollable = poll.Pollable
+
 // ResolveAddressStream represents the resource "wasi:sockets/ip-name-lookup@0.2.0#resolve-address-stream".
 //
 //	resource resolve-address-stream
@@ -51,15 +71,15 @@ func (self ResolveAddressStream) resourceDrop()
 //	resolve-next-address: func() -> result<option<ip-address>, error-code>
 //
 //go:nosplit
-func (self ResolveAddressStream) ResolveNextAddress() cm.OKResult[cm.Option[network.IPAddress], network.ErrorCode] {
-	var result cm.OKResult[cm.Option[network.IPAddress], network.ErrorCode]
+func (self ResolveAddressStream) ResolveNextAddress() cm.OKResult[cm.Option[IPAddress], ErrorCode] {
+	var result cm.OKResult[cm.Option[IPAddress], ErrorCode]
 	self.resolveNextAddress(&result)
 	return result
 }
 
 //go:wasmimport wasi:sockets/ip-name-lookup@0.2.0 [method]resolve-address-stream.resolve-next-address
 //go:noescape
-func (self ResolveAddressStream) resolveNextAddress(result *cm.OKResult[cm.Option[network.IPAddress], network.ErrorCode])
+func (self ResolveAddressStream) resolveNextAddress(result *cm.OKResult[cm.Option[IPAddress], ErrorCode])
 
 // Subscribe represents method "subscribe".
 //
@@ -71,13 +91,13 @@ func (self ResolveAddressStream) resolveNextAddress(result *cm.OKResult[cm.Optio
 //	subscribe: func() -> own<pollable>
 //
 //go:nosplit
-func (self ResolveAddressStream) Subscribe() poll.Pollable {
+func (self ResolveAddressStream) Subscribe() Pollable {
 	return self.subscribe()
 }
 
 //go:wasmimport wasi:sockets/ip-name-lookup@0.2.0 [method]resolve-address-stream.subscribe
 //go:noescape
-func (self ResolveAddressStream) subscribe() poll.Pollable
+func (self ResolveAddressStream) subscribe() Pollable
 
 // ResolveAddresses represents function "wasi:sockets/ip-name-lookup@0.2.0#resolve-addresses".
 //
@@ -106,12 +126,12 @@ func (self ResolveAddressStream) subscribe() poll.Pollable
 //	error-code>
 //
 //go:nosplit
-func ResolveAddresses(network_ network.Network, name string) cm.OKResult[ResolveAddressStream, network.ErrorCode] {
-	var result cm.OKResult[ResolveAddressStream, network.ErrorCode]
+func ResolveAddresses(network_ Network, name string) cm.OKResult[ResolveAddressStream, ErrorCode] {
+	var result cm.OKResult[ResolveAddressStream, ErrorCode]
 	resolveAddresses(network_, name, &result)
 	return result
 }
 
 //go:wasmimport wasi:sockets/ip-name-lookup@0.2.0 resolve-addresses
 //go:noescape
-func resolveAddresses(network_ network.Network, name string, result *cm.OKResult[ResolveAddressStream, network.ErrorCode])
+func resolveAddresses(network_ Network, name string, result *cm.OKResult[ResolveAddressStream, ErrorCode])
