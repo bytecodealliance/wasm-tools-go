@@ -18,12 +18,26 @@ type Variant[Disc Discriminant, Shape, Align any] struct {
 	data Shape
 }
 
+// This function is sized so it can be inlined and optimized away.
+func validate[Disc Discriminant, Shape, Align any, T any]() {
+	var v Variant[Disc, Shape, Align]
+	var t T
+
+	// Check if size of T is greater than Shape
+	if unsafe.Sizeof(t) > unsafe.Sizeof(v.data) {
+		panic("result: size of requested type > data type")
+	}
+
+	// Check if Shape is zero-sized, but size of result != 1
+	if unsafe.Sizeof(v.data) == 0 && unsafe.Sizeof(v) != 1 {
+		panic("result: size of data type == 0, but result size != 1")
+	}
+}
+
 // NewVariant returns a [Variant] with tag of type Disc, storage and GC shape of type Shape,
 // aligned to type Align, with a value of type T.
 func NewVariant[Disc Discriminant, Shape, Align any, T any](tag Disc, data T) Variant[Disc, Shape, Align] {
-	if BoundsCheck && unsafe.Sizeof(*(*T)(nil)) > unsafe.Sizeof(*(*Shape)(nil)) {
-		panic("NewVariant: size of requested type greater than size of data type")
-	}
+	validate[Disc, Shape, Align, T]()
 	var v Variant[Disc, Shape, Align]
 	v.tag = tag
 	v.data = *(*Shape)(unsafe.Pointer(&data))
@@ -37,9 +51,7 @@ func New[V ~struct {
 	_    [0]Align
 	data Shape
 }, Disc Discriminant, Shape, Align any, T any](tag Disc, data T) V {
-	if BoundsCheck && unsafe.Sizeof(*(*T)(nil)) > unsafe.Sizeof(*(*Shape)(nil)) {
-		panic("New: size of requested type greater than size of data type")
-	}
+	validate[Disc, Shape, Align, T]()
 	var v Variant[Disc, Shape, Align]
 	v.tag = tag
 	v.data = *(*Shape)(unsafe.Pointer(&data))
@@ -52,6 +64,7 @@ func Tag[V ~struct {
 	_    [0]Align
 	data Shape
 }, Disc Discriminant, Shape, Align any](v *V) Disc {
+	validate[Disc, Shape, Align, struct{}]()
 	v2 := (*Variant[Disc, Shape, Align])(unsafe.Pointer(v))
 	return v2.tag
 }
@@ -62,6 +75,7 @@ func Is[V ~struct {
 	_    [0]Align
 	data Shape
 }, Disc Discriminant, Shape, Align any](v *V, tag Disc) bool {
+	validate[Disc, Shape, Align, struct{}]()
 	return (*Variant[Disc, Shape, Align])(unsafe.Pointer(v)).tag == tag
 }
 
@@ -71,9 +85,7 @@ func Case[T any, V ~struct {
 	_    [0]Align
 	data Shape
 }, Disc Discriminant, Shape, Align any](v *V, tag Disc) *T {
-	if BoundsCheck && unsafe.Sizeof(*(*T)(nil)) > unsafe.Sizeof(*(*Shape)(nil)) {
-		panic("Case: size of requested type greater than size of data type")
-	}
+	validate[Disc, Shape, Align, T]()
 	v2 := (*Variant[Disc, Shape, Align])(unsafe.Pointer(v))
 	if v2.tag == tag {
 		return (*T)(unsafe.Pointer(&v2.data))

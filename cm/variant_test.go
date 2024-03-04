@@ -1,6 +1,8 @@
 package cm
 
 import (
+	"runtime"
+	"strings"
 	"testing"
 	"unsafe"
 )
@@ -42,9 +44,9 @@ func TestVariantLayout(t *testing.T) {
 	}
 }
 
-func TestGetBoundsCheck(t *testing.T) {
-	if !BoundsCheck {
-		return // TinyGo does not support t.SkipNow
+func TestGetValidates(t *testing.T) {
+	if runtime.Compiler == "tinygo" && strings.Contains(runtime.GOARCH, "wasm") {
+		return
 	}
 	defer func() {
 		if recover() == nil {
@@ -55,9 +57,9 @@ func TestGetBoundsCheck(t *testing.T) {
 	_ = Case[string](&v, 0)
 }
 
-func TestNewVariantBoundsCheck(t *testing.T) {
-	if !BoundsCheck {
-		return // TinyGo does not support t.SkipNow
+func TestNewVariantValidates(t *testing.T) {
+	if runtime.Compiler == "tinygo" && strings.Contains(runtime.GOARCH, "wasm") {
+		return
 	}
 	defer func() {
 		if recover() == nil {
