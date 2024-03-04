@@ -1,3 +1,5 @@
+//go:build cmflagsexperiment
+
 package cm
 
 import (
