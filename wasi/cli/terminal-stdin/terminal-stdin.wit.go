@@ -15,7 +15,7 @@ import (
 
 // TerminalInput represents the resource "wasi:cli/terminal-input@0.2.0#terminal-input".
 //
-// This is a type alias. See [terminalinput.TerminalInput] for more information.
+// See [terminalinput.TerminalInput] for more information.
 type TerminalInput = terminalinput.TerminalInput
 
 // GetTerminalStdin represents function "wasi:cli/terminal-stdin@0.2.0#get-terminal-stdin".

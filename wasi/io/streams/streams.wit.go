@@ -19,7 +19,7 @@ import (
 
 // Error represents the resource "wasi:io/error@0.2.0#error".
 //
-// This is a type alias. See [ioerror.Error] for more information.
+// See [ioerror.Error] for more information.
 type Error = ioerror.Error
 
 // InputStream represents the resource "wasi:io/streams@0.2.0#input-stream".
@@ -466,7 +466,7 @@ func (self OutputStream) writeZeroes(len_ uint64, result *cm.ErrResult[struct{},
 
 // Pollable represents the resource "wasi:io/poll@0.2.0#pollable".
 //
-// This is a type alias. See [poll.Pollable] for more information.
+// See [poll.Pollable] for more information.
 type Pollable = poll.Pollable
 
 // StreamError represents the variant "wasi:io/streams@0.2.0#stream-error".

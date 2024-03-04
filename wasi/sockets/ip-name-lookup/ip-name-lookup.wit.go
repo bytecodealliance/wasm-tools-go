@@ -13,22 +13,22 @@ import (
 
 // ErrorCode represents the enum "wasi:sockets/network@0.2.0#error-code".
 //
-// This is a type alias. See [network.ErrorCode] for more information.
+// See [network.ErrorCode] for more information.
 type ErrorCode = network.ErrorCode
 
 // IPAddress represents the variant "wasi:sockets/network@0.2.0#ip-address".
 //
-// This is a type alias. See [network.IPAddress] for more information.
+// See [network.IPAddress] for more information.
 type IPAddress = network.IPAddress
 
 // Network represents the resource "wasi:sockets/network@0.2.0#network".
 //
-// This is a type alias. See [network.Network] for more information.
+// See [network.Network] for more information.
 type Network = network.Network
 
 // Pollable represents the resource "wasi:io/poll@0.2.0#pollable".
 //
-// This is a type alias. See [poll.Pollable] for more information.
+// See [poll.Pollable] for more information.
 type Pollable = poll.Pollable
 
 // ResolveAddressStream represents the resource "wasi:sockets/ip-name-lookup@0.2.0#resolve-address-stream".

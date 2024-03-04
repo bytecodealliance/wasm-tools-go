@@ -13,22 +13,22 @@ import (
 
 // ErrorCode represents the enum "wasi:sockets/network@0.2.0#error-code".
 //
-// This is a type alias. See [network.ErrorCode] for more information.
+// See [network.ErrorCode] for more information.
 type ErrorCode = network.ErrorCode
 
 // IPAddressFamily represents the enum "wasi:sockets/network@0.2.0#ip-address-family".
 //
-// This is a type alias. See [network.IPAddressFamily] for more information.
+// See [network.IPAddressFamily] for more information.
 type IPAddressFamily = network.IPAddressFamily
 
 // Network represents the resource "wasi:sockets/network@0.2.0#network".
 //
-// This is a type alias. See [network.Network] for more information.
+// See [network.Network] for more information.
 type Network = network.Network
 
 // TCPSocket represents the resource "wasi:sockets/tcp@0.2.0#tcp-socket".
 //
-// This is a type alias. See [tcp.TCPSocket] for more information.
+// See [tcp.TCPSocket] for more information.
 type TCPSocket = tcp.TCPSocket
 
 // CreateTCPSocket represents function "wasi:sockets/tcp-create-socket@0.2.0#create-tcp-socket".

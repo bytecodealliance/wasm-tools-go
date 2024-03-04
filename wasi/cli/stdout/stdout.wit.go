@@ -11,7 +11,7 @@ import (
 
 // OutputStream represents the resource "wasi:io/streams@0.2.0#output-stream".
 //
-// This is a type alias. See [streams.OutputStream] for more information.
+// See [streams.OutputStream] for more information.
 type OutputStream = streams.OutputStream
 
 // GetStdout represents function "wasi:cli/stdout@0.2.0#get-stdout".

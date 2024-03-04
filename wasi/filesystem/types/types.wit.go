@@ -79,7 +79,7 @@ const (
 
 // DateTime represents the record "wasi:clocks/wall-clock@0.2.0#datetime".
 //
-// This is a type alias. See [wallclock.DateTime] for more information.
+// See [wallclock.DateTime] for more information.
 type DateTime = wallclock.DateTime
 
 // Descriptor represents the resource "wasi:filesystem/types@0.2.0#descriptor".
@@ -935,7 +935,7 @@ func (self DirectoryEntryStream) readDirectoryEntry(result *cm.OKResult[cm.Optio
 
 // Error represents the resource "wasi:io/error@0.2.0#error".
 //
-// This is a type alias. See [ioerror.Error] for more information.
+// See [ioerror.Error] for more information.
 type Error = ioerror.Error
 
 // ErrorCode represents the enum "wasi:filesystem/types@0.2.0#error-code".
@@ -1109,7 +1109,7 @@ type FileSize uint64
 
 // InputStream represents the resource "wasi:io/streams@0.2.0#input-stream".
 //
-// This is a type alias. See [streams.InputStream] for more information.
+// See [streams.InputStream] for more information.
 type InputStream = streams.InputStream
 
 // LinkCount represents the type "wasi:filesystem/types@0.2.0#link-count".
@@ -1214,7 +1214,7 @@ const (
 
 // OutputStream represents the resource "wasi:io/streams@0.2.0#output-stream".
 //
-// This is a type alias. See [streams.OutputStream] for more information.
+// See [streams.OutputStream] for more information.
 type OutputStream = streams.OutputStream
 
 // PathFlags represents the flags "wasi:filesystem/types@0.2.0#path-flags".

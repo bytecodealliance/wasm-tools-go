@@ -38,7 +38,7 @@ type Instant uint64
 
 // Pollable represents the resource "wasi:io/poll@0.2.0#pollable".
 //
-// This is a type alias. See [poll.Pollable] for more information.
+// See [poll.Pollable] for more information.
 type Pollable = poll.Pollable
 
 // Now represents function "wasi:clocks/monotonic-clock@0.2.0#now".

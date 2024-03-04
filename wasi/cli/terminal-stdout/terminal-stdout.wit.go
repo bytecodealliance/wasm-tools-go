@@ -15,7 +15,7 @@ import (
 
 // TerminalOutput represents the resource "wasi:cli/terminal-output@0.2.0#terminal-output".
 //
-// This is a type alias. See [terminaloutput.TerminalOutput] for more information.
+// See [terminaloutput.TerminalOutput] for more information.
 type TerminalOutput = terminaloutput.TerminalOutput
 
 // GetTerminalStdout represents function "wasi:cli/terminal-stdout@0.2.0#get-terminal-stdout".

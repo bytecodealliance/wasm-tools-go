@@ -13,7 +13,7 @@ import (
 
 // Network represents the resource "wasi:sockets/network@0.2.0#network".
 //
-// This is a type alias. See [network.Network] for more information.
+// See [network.Network] for more information.
 type Network = network.Network
 
 // InstanceNetwork represents function "wasi:sockets/instance-network@0.2.0#instance-network".

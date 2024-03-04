@@ -15,42 +15,42 @@ import (
 
 // Duration represents the type "wasi:clocks/monotonic-clock@0.2.0#duration".
 //
-// This is a type alias. See [monotonicclock.Duration] for more information.
+// See [monotonicclock.Duration] for more information.
 type Duration = monotonicclock.Duration
 
 // ErrorCode represents the enum "wasi:sockets/network@0.2.0#error-code".
 //
-// This is a type alias. See [network.ErrorCode] for more information.
+// See [network.ErrorCode] for more information.
 type ErrorCode = network.ErrorCode
 
 // InputStream represents the resource "wasi:io/streams@0.2.0#input-stream".
 //
-// This is a type alias. See [streams.InputStream] for more information.
+// See [streams.InputStream] for more information.
 type InputStream = streams.InputStream
 
 // IPAddressFamily represents the enum "wasi:sockets/network@0.2.0#ip-address-family".
 //
-// This is a type alias. See [network.IPAddressFamily] for more information.
+// See [network.IPAddressFamily] for more information.
 type IPAddressFamily = network.IPAddressFamily
 
 // IPSocketAddress represents the variant "wasi:sockets/network@0.2.0#ip-socket-address".
 //
-// This is a type alias. See [network.IPSocketAddress] for more information.
+// See [network.IPSocketAddress] for more information.
 type IPSocketAddress = network.IPSocketAddress
 
 // Network represents the resource "wasi:sockets/network@0.2.0#network".
 //
-// This is a type alias. See [network.Network] for more information.
+// See [network.Network] for more information.
 type Network = network.Network
 
 // OutputStream represents the resource "wasi:io/streams@0.2.0#output-stream".
 //
-// This is a type alias. See [streams.OutputStream] for more information.
+// See [streams.OutputStream] for more information.
 type OutputStream = streams.OutputStream
 
 // Pollable represents the resource "wasi:io/poll@0.2.0#pollable".
 //
-// This is a type alias. See [poll.Pollable] for more information.
+// See [poll.Pollable] for more information.
 type Pollable = poll.Pollable
 
 // ShutdownType represents the enum "wasi:sockets/tcp@0.2.0#shutdown-type".

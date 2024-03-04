@@ -11,7 +11,7 @@ import (
 
 // InputStream represents the resource "wasi:io/streams@0.2.0#input-stream".
 //
-// This is a type alias. See [streams.InputStream] for more information.
+// See [streams.InputStream] for more information.
 type InputStream = streams.InputStream
 
 // GetStdin represents function "wasi:cli/stdin@0.2.0#get-stdin".

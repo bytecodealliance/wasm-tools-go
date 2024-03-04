@@ -12,7 +12,7 @@ import (
 
 // Descriptor represents the resource "wasi:filesystem/types@0.2.0#descriptor".
 //
-// This is a type alias. See [types.Descriptor] for more information.
+// See [types.Descriptor] for more information.
 type Descriptor = types.Descriptor
 
 // GetDirectories represents function "wasi:filesystem/preopens@0.2.0#get-directories".
