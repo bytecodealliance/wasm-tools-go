@@ -11,6 +11,26 @@ import (
 	"github.com/ydnar/wasm-tools-go/wasi/sockets/udp"
 )
 
+// ErrorCode represents the enum "wasi:sockets/network@0.2.0#error-code".
+//
+// See [network.ErrorCode] for more information.
+type ErrorCode = network.ErrorCode
+
+// IPAddressFamily represents the enum "wasi:sockets/network@0.2.0#ip-address-family".
+//
+// See [network.IPAddressFamily] for more information.
+type IPAddressFamily = network.IPAddressFamily
+
+// Network represents the resource "wasi:sockets/network@0.2.0#network".
+//
+// See [network.Network] for more information.
+type Network = network.Network
+
+// UDPSocket represents the resource "wasi:sockets/udp@0.2.0#udp-socket".
+//
+// See [udp.UDPSocket] for more information.
+type UDPSocket = udp.UDPSocket
+
 // CreateUDPSocket represents function "wasi:sockets/udp-create-socket@0.2.0#create-udp-socket".
 //
 // Create a new UDP socket.
@@ -43,12 +63,12 @@ import (
 //	error-code>
 //
 //go:nosplit
-func CreateUDPSocket(addressFamily network.IPAddressFamily) cm.OKResult[udp.UDPSocket, network.ErrorCode] {
-	var result cm.OKResult[udp.UDPSocket, network.ErrorCode]
+func CreateUDPSocket(addressFamily IPAddressFamily) cm.OKResult[UDPSocket, ErrorCode] {
+	var result cm.OKResult[UDPSocket, ErrorCode]
 	createUDPSocket(addressFamily, &result)
 	return result
 }
 
 //go:wasmimport wasi:sockets/udp-create-socket@0.2.0 create-udp-socket
 //go:noescape
-func createUDPSocket(addressFamily network.IPAddressFamily, result *cm.OKResult[udp.UDPSocket, network.ErrorCode])
+func createUDPSocket(addressFamily IPAddressFamily, result *cm.OKResult[UDPSocket, ErrorCode])

@@ -13,6 +13,11 @@ import (
 	terminalinput "github.com/ydnar/wasm-tools-go/wasi/cli/terminal-input"
 )
 
+// TerminalInput represents the resource "wasi:cli/terminal-input@0.2.0#terminal-input".
+//
+// See [terminalinput.TerminalInput] for more information.
+type TerminalInput = terminalinput.TerminalInput
+
 // GetTerminalStdin represents function "wasi:cli/terminal-stdin@0.2.0#get-terminal-stdin".
 //
 // If stdin is connected to a terminal, return a `terminal-input` handle
@@ -21,12 +26,12 @@ import (
 //	get-terminal-stdin: func() -> option<own<terminal-input>>
 //
 //go:nosplit
-func GetTerminalStdin() cm.Option[terminalinput.TerminalInput] {
-	var result cm.Option[terminalinput.TerminalInput]
+func GetTerminalStdin() cm.Option[TerminalInput] {
+	var result cm.Option[TerminalInput]
 	getTerminalStdin(&result)
 	return result
 }
 
 //go:wasmimport wasi:cli/terminal-stdin@0.2.0 get-terminal-stdin
 //go:noescape
-func getTerminalStdin(result *cm.Option[terminalinput.TerminalInput])
+func getTerminalStdin(result *cm.Option[TerminalInput])
