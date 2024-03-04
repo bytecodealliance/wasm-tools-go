@@ -308,11 +308,6 @@ func (g *generator) defineTypeDef(t *wit.TypeDef, name string) error {
 	if g.defined[t] {
 		return nil
 	}
-	// TODO: should we emit data for aliases?
-	if t.Root() != t {
-		return nil
-	}
-
 	if t.Name != nil {
 		name = *t.Name
 	}
@@ -325,14 +320,28 @@ func (g *generator) defineTypeDef(t *wit.TypeDef, name string) error {
 	owner := typeDefOwner(t)
 	file := g.fileFor(owner)
 
+	// If an alias, get root
+	root := t.Root()
+	var rootOwner = typeDefOwner(root)
+	var rootName = name
+	if root.Name != nil {
+		rootName = *root.Name
+	}
+
 	// Define the type
 	var b bytes.Buffer
-	stringio.Write(&b, "// ", goName, " represents the ", t.WITKind(), " \"", owner.String(), "#", name, "\".\n")
+	stringio.Write(&b, "// ", goName, " represents the ", root.WITKind(), " \"", rootOwner.String(), "#", rootName, "\".\n")
 	b.WriteString("//\n")
-	b.WriteString(formatDocComments(t.Docs.Contents, false))
-	b.WriteString("//\n")
-	b.WriteString(formatDocComments(t.WIT(nil, ""), true))
-	stringio.Write(&b, "type ", goName, " ", g.typeDefRep(file, goName, t), "\n\n")
+	if root != t {
+		// Type alias
+		stringio.Write(&b, "// See [", g.typeRep(file, root), "] for more information.\n")
+		stringio.Write(&b, "type ", goName, " = ", g.typeRep(file, root), "\n\n")
+	} else {
+		b.WriteString(formatDocComments(t.Docs.Contents, false))
+		b.WriteString("//\n")
+		b.WriteString(formatDocComments(t.WIT(nil, ""), true))
+		stringio.Write(&b, "type ", goName, " ", g.typeDefRep(file, goName, t), "\n\n")
+	}
 
 	_, err := file.Write(b.Bytes())
 	if err != nil {
@@ -425,7 +434,6 @@ func (g *generator) typeRep(file *gen.File, t wit.Type) string {
 		return "struct{}"
 
 	case *wit.TypeDef:
-		t = t.Root()
 		if name, ok := g.typeDefNames[t]; ok {
 			return file.RelativeName(g.typeDefPackages[t], name)
 		}
