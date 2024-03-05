@@ -221,14 +221,13 @@ func (g *generator) defineWorld(w *wit.World) error {
 	file := g.fileFor(id)
 
 	var b strings.Builder
-	fmt.Fprintf(&b, "Package %s represents the %s \"%s\".\n", pkg.Name, w.WITKind(), id.String())
+	stringio.Write(&b, "Package ", pkg.Name, " represents the ", w.WITKind(), " \"", id.String(), "\".\n")
 	if w.Docs.Contents != "" {
 		b.WriteString("\n")
 		b.WriteString(w.Docs.Contents)
 	}
 	file.PackageDocs = b.String()
 
-	// fmt.Printf("// World: %s\n\n", id.String())
 	for _, name := range codec.SortedKeys(w.Imports) {
 		var err error
 		switch v := w.Imports[name].(type) {
@@ -264,7 +263,7 @@ func (g *generator) defineInterface(i *wit.Interface, name string) error {
 	file := g.fileFor(id)
 
 	var b strings.Builder
-	fmt.Fprintf(&b, "Package %s represents the %s \"%s\".\n", pkg.Name, i.WITKind(), id.String())
+	stringio.Write(&b, "Package ", pkg.Name, " represents the ", i.WITKind(), " \"", id.String(), "\".\n")
 	if i.Docs.Contents != "" {
 		b.WriteString("\n")
 		b.WriteString(i.Docs.Contents)
