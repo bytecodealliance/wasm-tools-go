@@ -680,7 +680,6 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 
 	// Setup
 	lower := f.CoreFunction(wit.Lower)
-	lowerIsMethod := f.IsMethod() && lower.Params[0] == f.Params[0]
 
 	var funcName string
 	var lowerName string
@@ -706,7 +705,7 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 		}
 		scope := g.typeDefScopes[t]
 		funcName = scope.UniqueName(GoName(f.BaseName(), true))
-		if lowerIsMethod {
+		if lower.IsMethod() {
 			lowerName = scope.UniqueName(GoName(f.BaseName(), false))
 		} else {
 			lowerName = file.Declare(GoName(*t.Name, false) + funcName)
@@ -727,7 +726,7 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 	lowerScope := gen.NewScope(file)
 	lowerParams := goParams(lowerScope, lower.Params)
 	lowerResults := goParams(lowerScope, lower.Results)
-	if lowerIsMethod {
+	if lower.IsMethod() {
 		lowerParams = lowerParams[1:]
 	}
 
@@ -834,7 +833,7 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 	if sameResults && len(lowerResults) > 0 {
 		b.WriteString("return ")
 	}
-	if lowerIsMethod {
+	if lower.IsMethod() {
 		stringio.Write(&b, receiver.Name, ".")
 	}
 	stringio.Write(&b, lowerName, "(")
@@ -873,7 +872,7 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 	stringio.Write(&b, "//go:wasmimport ", owner.String(), " ", f.Name, "\n")
 	b.WriteString("//go:noescape\n")
 	b.WriteString("func ")
-	if lowerIsMethod {
+	if lower.IsMethod() {
 		stringio.Write(&b, "(", receiver.Name, " ", g.typeRep(file, receiver.Type), ") ", lowerName)
 	} else {
 		b.WriteString(lowerName)
