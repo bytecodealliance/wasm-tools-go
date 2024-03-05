@@ -742,25 +742,25 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 	}
 
 	// Bridging between Go and lower function
-	var compoundParams wit.Param
+	var compoundParams param
 	if len(funcParams) > 0 && derefAnonRecord(lowerParams[0].Type) != nil {
 		name := funcScope.UniqueName("params")
 		lowerCallParams[0].Name = name
 		t := derefAnonRecord(lowerParams[0].Type)
 		g.declareTypeDef(file, lowerName+"Params", t)
-		compoundParams.Name = name
-		compoundParams.Type = t
+		compoundParams.name = name
+		compoundParams.typ = t
 	}
 
-	var compoundResults wit.Param
+	var compoundResults param
 	var resultsRecord *wit.Record
 	if len(funcResults) > 1 && derefAnonRecord(last(lowerParams).Type) != nil {
 		name := funcScope.UniqueName("results")
 		last(lowerCallParams).Name = name
 		t := derefAnonRecord(last(lowerParams).Type)
 		g.declareTypeDef(file, lowerName+"Results", t)
-		compoundResults.Name = name
-		compoundResults.Type = t
+		compoundResults.name = name
+		compoundResults.typ = t
 		resultsRecord = t.Kind.(*wit.Record)
 	}
 
@@ -812,8 +812,8 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 	}
 
 	// Emit compound types
-	if compoundParams.Type != nil {
-		stringio.Write(&b, compoundParams.Name, " := ", g.typeRep(file, compoundParams.Type), "{ ")
+	if compoundParams.typ != nil {
+		stringio.Write(&b, compoundParams.name, " := ", g.typeRep(file, compoundParams.typ), "{ ")
 		if receiver.Name != "" {
 			stringio.Write(&b, receiver.Name, ", ")
 		}
@@ -825,8 +825,8 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 		}
 		b.WriteString(" }\n")
 	}
-	if compoundResults.Type != nil {
-		stringio.Write(&b, "var ", compoundResults.Name, " ", g.typeRep(file, compoundResults.Type), "\n")
+	if compoundResults.typ != nil {
+		stringio.Write(&b, "var ", compoundResults.name, " ", g.typeRep(file, compoundResults.typ), "\n")
 	}
 
 	// Emit call to wasmimport function
@@ -854,7 +854,7 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 				if i > 0 {
 					b.WriteString(", ")
 				}
-				stringio.Write(&b, compoundResults.Name, ".", fieldName(f.Name))
+				stringio.Write(&b, compoundResults.name, ".", fieldName(f.Name))
 			}
 		} else {
 			for i, r := range funcResults {
@@ -904,14 +904,14 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 	b.WriteString("\n\n")
 
 	// Emit shared types
-	if t, ok := compoundParams.Type.(*wit.TypeDef); ok {
+	if t, ok := compoundParams.typ.(*wit.TypeDef); ok {
 		goName := g.typeDefNames[t]
 		stringio.Write(&b, "// ", goName, " represents the flattened function params for [", lowerName, "].\n")
 		stringio.Write(&b, "// See the Canonical ABI flattening rules for more information.\n")
 		stringio.Write(&b, "type ", goName, " ", g.typeDefRep(file, goName, t), "\n\n")
 	}
 
-	if t, ok := compoundResults.Type.(*wit.TypeDef); ok {
+	if t, ok := compoundResults.typ.(*wit.TypeDef); ok {
 		goName := g.typeDefNames[t]
 		stringio.Write(&b, "// ", goName, " represents the flattened function results for [", lowerName, "].\n")
 		stringio.Write(&b, "// See the Canonical ABI flattening rules for more information.\n")
