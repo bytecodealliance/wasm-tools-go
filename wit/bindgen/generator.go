@@ -6,7 +6,6 @@ package bindgen
 import (
 	"bytes"
 	"fmt"
-	"os"
 	"path/filepath"
 	"runtime"
 	"slices"
@@ -123,7 +122,7 @@ func (g *generator) generate() ([]*gen.Package, error) {
 func (g *generator) detectVersionedPackages() {
 	if g.opts.versioned {
 		g.versioned = true
-		fmt.Fprintf(os.Stderr, "Generated versions for all package(s)\n")
+		// fmt.Fprintf(os.Stderr, "Generated versions for all package(s)\n")
 		return
 	}
 	packages := make(map[string]string)
@@ -137,9 +136,9 @@ func (g *generator) detectVersionedPackages() {
 			packages[path] = pkg.Name.String()
 		}
 	}
-	if g.versioned {
-		// fmt.Fprintf(os.Stderr, "Multiple versions of package(s) detected\n")
-	}
+	// if g.versioned {
+	// 	fmt.Fprintf(os.Stderr, "Multiple versions of package(s) detected\n")
+	// }
 }
 
 // declareTypeDefs declares all type definitions in res.
