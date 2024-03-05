@@ -938,6 +938,8 @@ func (g *generator) declareFunction(f *wit.Function, owner wit.Ident) (*funcDecl
 		lower: goFunction(file, lower, lowerName),
 	}
 
+	g.functions[f] = d
+
 	return d, nil
 }
 
