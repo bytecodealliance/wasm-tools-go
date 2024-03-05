@@ -54,19 +54,13 @@ type generator struct {
 	// witPackages map WIT identifier paths to Go packages.
 	witPackages map[string]*gen.Package
 
-	// worldPackages map [wit.World] to Go packages.
-	worldPackages map[*wit.World]*gen.Package
-
-	// interfacePackages map [wit.Interface] to Go packages.
-	interfacePackages map[*wit.Interface]*gen.Package
-
 	// typeDefPackages map [wit.TypeDef] to Go packages.
 	typeDefPackages map[*wit.TypeDef]*gen.Package
 
 	// typeDefNames map [wit.TypeDef] to a defined Go name.
 	typeDefNames map[*wit.TypeDef]string
 
-	// scopes map a [wit.TypeDEf] to a [gen.Scope]. Used for method lists.
+	// scopes map a [wit.TypeDef] to a [gen.Scope]. Used for method lists.
 	scopes map[*wit.TypeDef]gen.Scope
 
 	// functions map [wit.Function] to their equivalent Go identifier.
@@ -78,15 +72,13 @@ type generator struct {
 
 func newGenerator(res *wit.Resolve, opts ...Option) (*generator, error) {
 	g := &generator{
-		packages:          make(map[string]*gen.Package),
-		witPackages:       make(map[string]*gen.Package),
-		worldPackages:     make(map[*wit.World]*gen.Package),
-		interfacePackages: make(map[*wit.Interface]*gen.Package),
-		typeDefPackages:   make(map[*wit.TypeDef]*gen.Package),
-		typeDefNames:      make(map[*wit.TypeDef]string),
-		scopes:            make(map[*wit.TypeDef]gen.Scope),
-		functions:         make(map[*wit.Function]gen.Ident),
-		defined:           make(map[any]bool),
+		packages:        make(map[string]*gen.Package),
+		witPackages:     make(map[string]*gen.Package),
+		typeDefPackages: make(map[*wit.TypeDef]*gen.Package),
+		typeDefNames:    make(map[*wit.TypeDef]string),
+		scopes:          make(map[*wit.TypeDef]gen.Scope),
+		functions:       make(map[*wit.Function]gen.Ident),
+		defined:         make(map[any]bool),
 	}
 	err := g.opts.apply(opts...)
 	if err != nil {
@@ -224,13 +216,9 @@ func (g *generator) defineWorld(w *wit.World) error {
 	if g.defined[w] {
 		return nil
 	}
-	if g.worldPackages[w] != nil {
-		return nil
-	}
 	id := w.Package.Name
 	id.Extension = w.Name
 	pkg := g.packageFor(id)
-	g.worldPackages[w] = pkg
 	file := g.fileFor(id)
 
 	var b strings.Builder
@@ -268,16 +256,12 @@ func (g *generator) defineInterface(i *wit.Interface, name string) error {
 	if g.defined[i] {
 		return nil
 	}
-	if g.interfacePackages[i] != nil {
-		return nil
-	}
 	if i.Name != nil {
 		name = *i.Name
 	}
 	id := i.Package.Name
 	id.Extension = name
 	pkg := g.packageFor(id)
-	g.interfacePackages[i] = pkg
 	file := g.fileFor(id)
 
 	var b strings.Builder
