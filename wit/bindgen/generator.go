@@ -679,25 +679,25 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 	file := g.fileFor(owner)
 
 	// Setup
-	core := f.CoreFunction(false)
-	coreIsMethod := f.IsMethod() && core.Params[0] == f.Params[0]
+	lower := f.CoreFunction(wit.Lower)
+	lowerIsMethod := f.IsMethod() && lower.Params[0] == f.Params[0]
 
 	var funcName string
-	var coreName string
+	var lowerName string
 	switch f.Kind.(type) {
 	case *wit.Freestanding:
 		funcName = file.Declare(GoName(f.BaseName(), true))
-		coreName = file.Declare(GoName(f.BaseName(), false))
+		lowerName = file.Declare(GoName(f.BaseName(), false))
 
 	case *wit.Constructor:
 		t := f.Type().(*wit.TypeDef)
 		funcName = file.Declare("New" + g.typeDefNames[t])
-		coreName = file.Declare("new" + g.typeDefNames[t])
+		lowerName = file.Declare("new" + g.typeDefNames[t])
 
 	case *wit.Static:
 		t := f.Type().(*wit.TypeDef)
 		funcName = file.Declare(g.typeDefNames[t] + GoName(f.BaseName(), true))
-		coreName = file.Declare(GoName(*t.Name, false) + GoName(f.BaseName(), true))
+		lowerName = file.Declare(GoName(*t.Name, false) + GoName(f.BaseName(), true))
 
 	case *wit.Method:
 		t := f.Type().(*wit.TypeDef)
@@ -706,10 +706,10 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 		}
 		scope := g.scopes[t]
 		funcName = scope.UniqueName(GoName(f.BaseName(), true))
-		if coreIsMethod {
-			coreName = scope.UniqueName(GoName(f.BaseName(), false))
+		if lowerIsMethod {
+			lowerName = scope.UniqueName(GoName(f.BaseName(), false))
 		} else {
-			coreName = file.Declare(GoName(*t.Name, false) + funcName)
+			lowerName = file.Declare(GoName(*t.Name, false) + funcName)
 		}
 	}
 
@@ -723,43 +723,43 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 		funcParams = funcParams[1:]
 	}
 
-	// Core function parameters and results
-	coreScope := gen.NewScope(file)
-	coreParams := goParams(coreScope, core.Params)
-	coreResults := goParams(coreScope, core.Results)
-	if coreIsMethod {
-		coreParams = coreParams[1:]
+	// Lower function parameters and results
+	lowerScope := gen.NewScope(file)
+	lowerParams := goParams(lowerScope, lower.Params)
+	lowerResults := goParams(lowerScope, lower.Results)
+	if lowerIsMethod {
+		lowerParams = lowerParams[1:]
 	}
 
 	// TODO: make this work with compound params/results
-	callerParams := slices.Clone(coreParams)
-	for i := range callerParams {
+	lowerCallParams := slices.Clone(lowerParams)
+	for i := range lowerCallParams {
 		j := i - len(funcParams)
 		if j < 0 {
-			callerParams[i].Name = funcParams[i].Name
+			lowerCallParams[i].Name = funcParams[i].Name
 		} else {
-			callerParams[i].Name = funcResults[j].Name
+			lowerCallParams[i].Name = funcResults[j].Name
 		}
 	}
 
-	// Bridging between Go and core function
+	// Bridging between Go and lower function
 	var compoundParams wit.Param
-	if len(funcParams) > 0 && derefAnonRecord(coreParams[0].Type) != nil {
+	if len(funcParams) > 0 && derefAnonRecord(lowerParams[0].Type) != nil {
 		name := funcScope.UniqueName("params")
-		callerParams[0].Name = name
-		t := derefAnonRecord(coreParams[0].Type)
-		g.declareTypeDef(file, coreName+"Params", t)
+		lowerCallParams[0].Name = name
+		t := derefAnonRecord(lowerParams[0].Type)
+		g.declareTypeDef(file, lowerName+"Params", t)
 		compoundParams.Name = name
 		compoundParams.Type = t
 	}
 
 	var compoundResults wit.Param
 	var resultsRecord *wit.Record
-	if len(funcResults) > 1 && derefAnonRecord(last(coreParams).Type) != nil {
+	if len(funcResults) > 1 && derefAnonRecord(last(lowerParams).Type) != nil {
 		name := funcScope.UniqueName("results")
-		last(callerParams).Name = name
-		t := derefAnonRecord(last(coreParams).Type)
-		g.declareTypeDef(file, coreName+"Results", t)
+		last(lowerCallParams).Name = name
+		t := derefAnonRecord(last(lowerParams).Type)
+		g.declareTypeDef(file, lowerName+"Results", t)
 		compoundResults.Name = name
 		compoundResults.Type = t
 		resultsRecord = t.Kind.(*wit.Record)
@@ -805,7 +805,7 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 
 	// Emit function body
 	b.WriteString(" {\n")
-	sameResults := slices.Equal(funcResults, coreResults)
+	sameResults := slices.Equal(funcResults, lowerResults)
 	if !namedResults && !sameResults {
 		for _, r := range funcResults {
 			stringio.Write(&b, "var ", r.Name, " ", g.typeRep(file, r.Type), "\n")
@@ -831,21 +831,21 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 	}
 
 	// Emit call to wasmimport function
-	if sameResults && len(coreResults) > 0 {
+	if sameResults && len(lowerResults) > 0 {
 		b.WriteString("return ")
 	}
-	if coreIsMethod {
+	if lowerIsMethod {
 		stringio.Write(&b, receiver.Name, ".")
 	}
-	stringio.Write(&b, coreName, "(")
-	for i, p := range callerParams {
+	stringio.Write(&b, lowerName, "(")
+	for i, p := range lowerCallParams {
 		if i > 0 {
 			b.WriteString(", ")
 		}
 		if isPointer(p.Type) {
 			b.WriteRune('&')
 		}
-		b.WriteString(callerParams[i].Name)
+		b.WriteString(lowerCallParams[i].Name)
 	}
 	b.WriteString(")\n")
 	if !sameResults {
@@ -873,15 +873,15 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 	stringio.Write(&b, "//go:wasmimport ", owner.String(), " ", f.Name, "\n")
 	b.WriteString("//go:noescape\n")
 	b.WriteString("func ")
-	if coreIsMethod {
-		stringio.Write(&b, "(", receiver.Name, " ", g.typeRep(file, receiver.Type), ") ", coreName)
+	if lowerIsMethod {
+		stringio.Write(&b, "(", receiver.Name, " ", g.typeRep(file, receiver.Type), ") ", lowerName)
 	} else {
-		b.WriteString(coreName)
+		b.WriteString(lowerName)
 	}
 	b.WriteRune('(')
 
 	// Emit params
-	for i, p := range coreParams {
+	for i, p := range lowerParams {
 		if i > 0 {
 			b.WriteString(", ")
 		}
@@ -890,11 +890,11 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 	b.WriteString(") ")
 
 	// Emit results
-	if len(coreResults) == 1 {
-		b.WriteString(g.typeRep(file, coreResults[0].Type))
-	} else if len(coreResults) > 0 {
+	if len(lowerResults) == 1 {
+		b.WriteString(g.typeRep(file, lowerResults[0].Type))
+	} else if len(lowerResults) > 0 {
 		b.WriteRune('(')
-		for i, r := range coreResults {
+		for i, r := range lowerResults {
 			if i > 0 {
 				b.WriteString(", ")
 			}
@@ -907,14 +907,14 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 	// Emit shared types
 	if t, ok := compoundParams.Type.(*wit.TypeDef); ok {
 		goName := g.typeDefNames[t]
-		stringio.Write(&b, "// ", goName, " represents the flattened function params for [", coreName, "].\n")
+		stringio.Write(&b, "// ", goName, " represents the flattened function params for [", lowerName, "].\n")
 		stringio.Write(&b, "// See the Canonical ABI flattening rules for more information.\n")
 		stringio.Write(&b, "type ", goName, " ", g.typeDefRep(file, goName, t), "\n\n")
 	}
 
 	if t, ok := compoundResults.Type.(*wit.TypeDef); ok {
 		goName := g.typeDefNames[t]
-		stringio.Write(&b, "// ", goName, " represents the flattened function results for [", coreName, "].\n")
+		stringio.Write(&b, "// ", goName, " represents the flattened function results for [", lowerName, "].\n")
 		stringio.Write(&b, "// See the Canonical ABI flattening rules for more information.\n")
 		stringio.Write(&b, "type ", goName, " ", g.typeDefRep(file, goName, t), "\n\n")
 	}
