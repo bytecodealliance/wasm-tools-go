@@ -60,10 +60,10 @@ type generator struct {
 	// typeDefNames map [wit.TypeDef] to a defined Go name.
 	typeDefNames map[*wit.TypeDef]string
 
-	// scopes map a [wit.TypeDef] to a [gen.Scope]. Used for method lists.
-	scopes map[*wit.TypeDef]gen.Scope
+	// typeDefScopes map a [wit.TypeDef] to a [gen.Scope]. Used for method lists.
+	typeDefScopes map[*wit.TypeDef]gen.Scope
 
-	// functions map [wit.Function] to their equivalent Go identifier.
+	// functions map [wit.Function] to their Go equivalent.
 	functions map[*wit.Function]gen.Ident
 
 	// defined represent whether a type or function has been defined.
@@ -76,7 +76,7 @@ func newGenerator(res *wit.Resolve, opts ...Option) (*generator, error) {
 		witPackages:     make(map[string]*gen.Package),
 		typeDefPackages: make(map[*wit.TypeDef]*gen.Package),
 		typeDefNames:    make(map[*wit.TypeDef]string),
-		scopes:          make(map[*wit.TypeDef]gen.Scope),
+		typeDefScopes:   make(map[*wit.TypeDef]gen.Scope),
 		functions:       make(map[*wit.Function]gen.Ident),
 		defined:         make(map[any]bool),
 	}
@@ -165,7 +165,7 @@ func (g *generator) declareTypeDef(file *gen.File, goName string, t *wit.TypeDef
 	}
 	g.typeDefPackages[t] = file.Package
 	g.typeDefNames[t] = file.Declare(goName)
-	g.scopes[t] = gen.NewScope(nil)
+	g.typeDefScopes[t] = gen.NewScope(nil)
 	// fmt.Fprintf(os.Stderr, "Type:\t%s.%s\n\t%s.%s\n", owner.String(), name, decl.Package.Path, decl.Name)
 	return nil
 }
@@ -704,7 +704,7 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 		if t.Package().Name.Package != owner.Package {
 			return fmt.Errorf("cannot emit functions in package %s to type %s", owner.Package, t.Package().Name.String())
 		}
-		scope := g.scopes[t]
+		scope := g.typeDefScopes[t]
 		funcName = scope.UniqueName(GoName(f.BaseName(), true))
 		if lowerIsMethod {
 			lowerName = scope.UniqueName(GoName(f.BaseName(), false))
