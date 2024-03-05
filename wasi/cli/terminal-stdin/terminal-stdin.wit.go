@@ -28,10 +28,10 @@ type TerminalInput = terminalinput.TerminalInput
 //go:nosplit
 func GetTerminalStdin() cm.Option[TerminalInput] {
 	var result cm.Option[TerminalInput]
-	getTerminalStdin(&result)
+	wasmimport_GetTerminalStdin(&result)
 	return result
 }
 
 //go:wasmimport wasi:cli/terminal-stdin@0.2.0 get-terminal-stdin
 //go:noescape
-func getTerminalStdin(result *cm.Option[TerminalInput])
+func wasmimport_GetTerminalStdin(result *cm.Option[TerminalInput])

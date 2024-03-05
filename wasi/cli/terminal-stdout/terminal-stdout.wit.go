@@ -28,10 +28,10 @@ type TerminalOutput = terminaloutput.TerminalOutput
 //go:nosplit
 func GetTerminalStdout() cm.Option[TerminalOutput] {
 	var result cm.Option[TerminalOutput]
-	getTerminalStdout(&result)
+	wasmimport_GetTerminalStdout(&result)
 	return result
 }
 
 //go:wasmimport wasi:cli/terminal-stdout@0.2.0 get-terminal-stdout
 //go:noescape
-func getTerminalStdout(result *cm.Option[TerminalOutput])
+func wasmimport_GetTerminalStdout(result *cm.Option[TerminalOutput])

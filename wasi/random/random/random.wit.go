@@ -34,13 +34,13 @@ import (
 //go:nosplit
 func GetRandomBytes(len_ uint64) cm.List[uint8] {
 	var result cm.List[uint8]
-	getRandomBytes(len_, &result)
+	wasmimport_GetRandomBytes(len_, &result)
 	return result
 }
 
 //go:wasmimport wasi:random/random@0.2.0 get-random-bytes
 //go:noescape
-func getRandomBytes(len_ uint64, result *cm.List[uint8])
+func wasmimport_GetRandomBytes(len_ uint64, result *cm.List[uint8])
 
 // GetRandomU64 represents function "wasi:random/random@0.2.0#get-random-u64".
 //
@@ -53,9 +53,9 @@ func getRandomBytes(len_ uint64, result *cm.List[uint8])
 //
 //go:nosplit
 func GetRandomU64() uint64 {
-	return getRandomU64()
+	return wasmimport_GetRandomU64()
 }
 
 //go:wasmimport wasi:random/random@0.2.0 get-random-u64
 //go:noescape
-func getRandomU64() uint64
+func wasmimport_GetRandomU64() uint64

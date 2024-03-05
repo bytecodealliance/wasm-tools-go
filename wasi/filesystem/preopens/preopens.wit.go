@@ -24,10 +24,10 @@ type Descriptor = types.Descriptor
 //go:nosplit
 func GetDirectories() cm.List[cm.Tuple[Descriptor, string]] {
 	var result cm.List[cm.Tuple[Descriptor, string]]
-	getDirectories(&result)
+	wasmimport_GetDirectories(&result)
 	return result
 }
 
 //go:wasmimport wasi:filesystem/preopens@0.2.0 get-directories
 //go:noescape
-func getDirectories(result *cm.List[cm.Tuple[Descriptor, string]])
+func wasmimport_GetDirectories(result *cm.List[cm.Tuple[Descriptor, string]])

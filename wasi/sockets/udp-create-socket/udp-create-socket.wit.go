@@ -65,10 +65,10 @@ type UDPSocket = udp.UDPSocket
 //go:nosplit
 func CreateUDPSocket(addressFamily IPAddressFamily) cm.OKResult[UDPSocket, ErrorCode] {
 	var result cm.OKResult[UDPSocket, ErrorCode]
-	createUDPSocket(addressFamily, &result)
+	wasmimport_CreateUDPSocket(addressFamily, &result)
 	return result
 }
 
 //go:wasmimport wasi:sockets/udp-create-socket@0.2.0 create-udp-socket
 //go:noescape
-func createUDPSocket(addressFamily IPAddressFamily, result *cm.OKResult[UDPSocket, ErrorCode])
+func wasmimport_CreateUDPSocket(addressFamily IPAddressFamily, result *cm.OKResult[UDPSocket, ErrorCode])

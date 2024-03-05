@@ -24,9 +24,9 @@ type Network = network.Network
 //
 //go:nosplit
 func InstanceNetwork() Network {
-	return instanceNetwork()
+	return wasmimport_InstanceNetwork()
 }
 
 //go:wasmimport wasi:sockets/instance-network@0.2.0 instance-network
 //go:noescape
-func instanceNetwork() Network
+func wasmimport_InstanceNetwork() Network

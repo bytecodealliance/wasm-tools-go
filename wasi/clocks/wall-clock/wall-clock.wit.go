@@ -54,13 +54,13 @@ type DateTime struct {
 //go:nosplit
 func Now() DateTime {
 	var result DateTime
-	now(&result)
+	wasmimport_Now(&result)
 	return result
 }
 
 //go:wasmimport wasi:clocks/wall-clock@0.2.0 now
 //go:noescape
-func now(result *DateTime)
+func wasmimport_Now(result *DateTime)
 
 // Resolution represents function "wasi:clocks/wall-clock@0.2.0#resolution".
 //
@@ -73,10 +73,10 @@ func now(result *DateTime)
 //go:nosplit
 func Resolution() DateTime {
 	var result DateTime
-	resolution(&result)
+	wasmimport_Resolution(&result)
 	return result
 }
 
 //go:wasmimport wasi:clocks/wall-clock@0.2.0 resolution
 //go:noescape
-func resolution(result *DateTime)
+func wasmimport_Resolution(result *DateTime)

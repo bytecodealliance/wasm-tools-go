@@ -40,12 +40,12 @@ type Error cm.Resource
 //
 //go:nosplit
 func (self Error) ResourceDrop() {
-	self.resourceDrop()
+	self.wasmimport_ResourceDrop()
 }
 
 //go:wasmimport wasi:io/error@0.2.0 [resource-drop]error
 //go:noescape
-func (self Error) resourceDrop()
+func (self Error) wasmimport_ResourceDrop()
 
 // ToDebugString represents method "to-debug-string".
 //
@@ -62,10 +62,10 @@ func (self Error) resourceDrop()
 //go:nosplit
 func (self Error) ToDebugString() string {
 	var result string
-	self.toDebugString(&result)
+	self.wasmimport_ToDebugString(&result)
 	return result
 }
 
 //go:wasmimport wasi:io/error@0.2.0 [method]error.to-debug-string
 //go:noescape
-func (self Error) toDebugString(result *string)
+func (self Error) wasmimport_ToDebugString(result *string)

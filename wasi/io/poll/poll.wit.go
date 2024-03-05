@@ -25,12 +25,12 @@ type Pollable cm.Resource
 //
 //go:nosplit
 func (self Pollable) ResourceDrop() {
-	self.resourceDrop()
+	self.wasmimport_ResourceDrop()
 }
 
 //go:wasmimport wasi:io/poll@0.2.0 [resource-drop]pollable
 //go:noescape
-func (self Pollable) resourceDrop()
+func (self Pollable) wasmimport_ResourceDrop()
 
 // Block represents method "block".
 //
@@ -44,12 +44,12 @@ func (self Pollable) resourceDrop()
 //
 //go:nosplit
 func (self Pollable) Block() {
-	self.block()
+	self.wasmimport_Block()
 }
 
 //go:wasmimport wasi:io/poll@0.2.0 [method]pollable.block
 //go:noescape
-func (self Pollable) block()
+func (self Pollable) wasmimport_Block()
 
 // Ready represents method "ready".
 //
@@ -61,12 +61,12 @@ func (self Pollable) block()
 //
 //go:nosplit
 func (self Pollable) Ready() bool {
-	return self.ready()
+	return self.wasmimport_Ready()
 }
 
 //go:wasmimport wasi:io/poll@0.2.0 [method]pollable.ready
 //go:noescape
-func (self Pollable) ready() bool
+func (self Pollable) wasmimport_Ready() bool
 
 // Poll represents function "wasi:io/poll@0.2.0#poll".
 //
@@ -94,10 +94,10 @@ func (self Pollable) ready() bool
 //go:nosplit
 func Poll(in cm.List[Pollable]) cm.List[uint32] {
 	var result cm.List[uint32]
-	poll(in, &result)
+	wasmimport_Poll(in, &result)
 	return result
 }
 
 //go:wasmimport wasi:io/poll@0.2.0 poll
 //go:noescape
-func poll(in cm.List[Pollable], result *cm.List[uint32])
+func wasmimport_Poll(in cm.List[Pollable], result *cm.List[uint32])
