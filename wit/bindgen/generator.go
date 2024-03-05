@@ -272,10 +272,18 @@ func (g *generator) defineInterface(i *wit.Interface, name string) error {
 	}
 	file.PackageDocs = b.String()
 
+	// Define types
 	for _, name := range codec.SortedKeys(i.TypeDefs) {
 		g.defineTypeDef(i.TypeDefs[name], name)
 	}
 
+	// Declare all functions
+	for _, name := range codec.SortedKeys(i.Functions) {
+		f := i.Functions[name]
+		g.declareFunction(f, id)
+	}
+
+	// Define standalone functions
 	for _, name := range codec.SortedKeys(i.Functions) {
 		f := i.Functions[name]
 		if f.IsFreestanding() {
