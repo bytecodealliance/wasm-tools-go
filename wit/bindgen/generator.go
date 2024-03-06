@@ -677,6 +677,70 @@ func (g *generator) borrowRep(file *gen.File, b *wit.Borrow) string {
 	return g.typeRep(file, b.Type)
 }
 
+func (g *generator) declareFunction(f *wit.Function, owner wit.Ident) (*funcDecl, error) {
+	d := g.functions[f]
+	if d != nil {
+		return d, nil
+	}
+
+	file := g.fileFor(owner)
+
+	// Setup
+	lift := f.CoreFunction(wit.Lift)
+	lower := f.CoreFunction(wit.Lower)
+
+	const (
+		pfxLift  = "wasmexport_"
+		pfxLower = "wasmimport_"
+	)
+
+	var funcName string
+	var liftName string
+	var lowerName string
+	switch f.Kind.(type) {
+	case *wit.Freestanding:
+		funcName = file.Declare(GoName(f.BaseName(), true))
+		liftName = file.Declare(pfxLift + funcName)
+		lowerName = file.Declare(pfxLower + funcName)
+
+	case *wit.Constructor:
+		t := f.Type().(*wit.TypeDef)
+		funcName = file.Declare("New" + g.typeDefNames[t])
+		liftName = file.Declare(pfxLift + funcName)
+		lowerName = file.Declare(pfxLower + funcName)
+
+	case *wit.Static:
+		t := f.Type().(*wit.TypeDef)
+		funcName = file.Declare(g.typeDefNames[t] + GoName(f.BaseName(), true))
+		liftName = file.Declare(pfxLift + funcName)
+		lowerName = file.Declare(pfxLower + funcName)
+
+	case *wit.Method:
+		t := f.Type().(*wit.TypeDef)
+		if t.Package().Name.Package != owner.Package {
+			return nil, fmt.Errorf("cannot emit functions in package %s to type %s", owner.Package, t.Package().Name.String())
+		}
+		scope := g.typeDefScopes[t]
+		funcName = scope.UniqueName(GoName(f.BaseName(), true))
+		liftName = file.Declare(pfxLift + g.typeDefNames[t] + funcName)
+		if lower.IsMethod() {
+			lowerName = scope.UniqueName(pfxLower + funcName)
+		} else {
+			lowerName = file.Declare(pfxLower + g.typeDefNames[t] + funcName)
+		}
+	}
+
+	d = &funcDecl{
+		f:     goFunction(file, f, funcName),
+		lift:  goFunction(file, lift, liftName),
+		lower: goFunction(file, lower, lowerName),
+	}
+
+	g.functions[f] = d
+
+	return d, nil
+}
+
 func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) error {
 	if g.defined[f] {
 		return nil
@@ -728,43 +792,12 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 	// Emit Go function
 	b.WriteString(g.functionDocs(owner, d.f.name, f))
 	b.WriteString("//go:nosplit\n")
-	b.WriteString("func ")
-	if f.IsMethod() {
-		stringio.Write(&b, "(", d.f.receiver.name, " ", g.typeRep(file, d.f.receiver.typ), ") ", d.f.name)
-	} else {
-		b.WriteString(d.f.name)
-	}
-	b.WriteRune('(')
-
-	// Emit params
-	for i, p := range d.f.params {
-		if i > 0 {
-			b.WriteString(", ")
-		}
-		stringio.Write(&b, p.name, " ", g.typeRep(file, p.typ))
-	}
-	b.WriteString(") ")
-
-	// Emit results
-	var namedResults bool
-	if len(d.f.results) == 1 {
-		b.WriteString(g.typeRep(file, d.f.results[0].typ))
-	} else if len(d.f.results) > 0 {
-		namedResults = true
-		b.WriteRune('(')
-		for i, r := range d.f.results {
-			if i > 0 {
-				b.WriteString(", ")
-			}
-			stringio.Write(&b, r.name, " ", g.typeRep(file, r.typ))
-		}
-		b.WriteRune(')')
-	}
+	stringio.Write(&b, "func ", g.functionSignature(file, d.f))
 
 	// Emit function body
 	b.WriteString(" {\n")
 	sameResults := slices.Equal(d.f.results, d.lower.results)
-	if !namedResults && !sameResults {
+	if len(d.f.results) == 1 && !sameResults {
 		for _, r := range d.f.results {
 			stringio.Write(&b, "var ", r.name, " ", g.typeRep(file, r.typ), "\n")
 		}
@@ -885,68 +918,40 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 	return g.ensureEmptyAsm(file.Package)
 }
 
-func (g *generator) declareFunction(f *wit.Function, owner wit.Ident) (*funcDecl, error) {
-	d := g.functions[f]
-	if d != nil {
-		return d, nil
+func (g *generator) functionSignature(file *gen.File, f function) string {
+	var b strings.Builder
+
+	if f.isMethod() {
+		stringio.Write(&b, "(", f.receiver.name, " ", g.typeRep(file, f.receiver.typ), ") ", f.name)
+	} else {
+		b.WriteString(f.name)
 	}
+	b.WriteRune('(')
 
-	file := g.fileFor(owner)
-
-	// Setup
-	lift := f.CoreFunction(wit.Lift)
-	lower := f.CoreFunction(wit.Lower)
-
-	const (
-		pfxLift  = "wasmexport_"
-		pfxLower = "wasmimport_"
-	)
-
-	var funcName string
-	var liftName string
-	var lowerName string
-	switch f.Kind.(type) {
-	case *wit.Freestanding:
-		funcName = file.Declare(GoName(f.BaseName(), true))
-		liftName = file.Declare(pfxLift + funcName)
-		lowerName = file.Declare(pfxLower + funcName)
-
-	case *wit.Constructor:
-		t := f.Type().(*wit.TypeDef)
-		funcName = file.Declare("New" + g.typeDefNames[t])
-		liftName = file.Declare(pfxLift + funcName)
-		lowerName = file.Declare(pfxLower + funcName)
-
-	case *wit.Static:
-		t := f.Type().(*wit.TypeDef)
-		funcName = file.Declare(g.typeDefNames[t] + GoName(f.BaseName(), true))
-		liftName = file.Declare(pfxLift + funcName)
-		lowerName = file.Declare(pfxLower + funcName)
-
-	case *wit.Method:
-		t := f.Type().(*wit.TypeDef)
-		if t.Package().Name.Package != owner.Package {
-			return nil, fmt.Errorf("cannot emit functions in package %s to type %s", owner.Package, t.Package().Name.String())
+	// Emit params
+	for i, p := range f.params {
+		if i > 0 {
+			b.WriteString(", ")
 		}
-		scope := g.typeDefScopes[t]
-		funcName = scope.UniqueName(GoName(f.BaseName(), true))
-		liftName = file.Declare(pfxLift + g.typeDefNames[t] + funcName)
-		if lower.IsMethod() {
-			lowerName = scope.UniqueName(pfxLower + funcName)
-		} else {
-			lowerName = file.Declare(pfxLower + g.typeDefNames[t] + funcName)
+		stringio.Write(&b, p.name, " ", g.typeRep(file, p.typ))
+	}
+	b.WriteString(") ")
+
+	// Emit results
+	if len(f.results) == 1 {
+		b.WriteString(g.typeRep(file, f.results[0].typ))
+	} else if len(f.results) > 0 {
+		b.WriteRune('(')
+		for i, r := range f.results {
+			if i > 0 {
+				b.WriteString(", ")
+			}
+			stringio.Write(&b, r.name, " ", g.typeRep(file, r.typ))
 		}
+		b.WriteRune(')')
 	}
 
-	d = &funcDecl{
-		f:     goFunction(file, f, funcName),
-		lift:  goFunction(file, lift, liftName),
-		lower: goFunction(file, lower, lowerName),
-	}
-
-	g.functions[f] = d
-
-	return d, nil
+	return b.String()
 }
 
 func last[S ~[]E, E any](s S) *E {
