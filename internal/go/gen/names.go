@@ -29,8 +29,8 @@ type Scope interface {
 	// Subsequent calls to DeclareName will return a different name.
 	DeclareName(name string) string
 
-	// GetName returns the existing unique name, if declared.
-	// GetName(name string) string
+	// GetName returns the first declared unique name for name, if declared.
+	GetName(name string) string
 
 	// HasName returns true if this scope or any of its parent scopes contains name.
 	HasName(name string) bool
@@ -38,7 +38,8 @@ type Scope interface {
 
 type scope struct {
 	parent Scope
-	names  map[string]bool
+	exists map[string]bool
+	first  map[string]string
 }
 
 // NewScope returns an initialized [Scope] that's ready to use.
@@ -49,18 +50,30 @@ func NewScope(parent Scope) Scope {
 	}
 	return &scope{
 		parent: parent,
-		names:  make(map[string]bool),
+		exists: make(map[string]bool),
+		first:  make(map[string]string),
 	}
 }
 
 func (s *scope) DeclareName(name string) string {
-	name = UniqueName(name, s.HasName)
-	s.names[name] = true
-	return name
+	unique := UniqueName(name, s.HasName)
+	s.exists[unique] = true
+	if _, ok := s.first[name]; !ok {
+		s.first[name] = unique
+	}
+	return unique
+}
+
+func (s *scope) GetName(name string) string {
+	first := s.parent.GetName(name)
+	if first != "" {
+		return first
+	}
+	return s.first[name]
 }
 
 func (s *scope) HasName(name string) bool {
-	return s.names[name] || s.parent.HasName(name)
+	return s.exists[name] || s.parent.HasName(name)
 }
 
 type reservedScope struct{}
@@ -76,6 +89,13 @@ func Reserved() Scope {
 
 func (reservedScope) DeclareName(name string) string {
 	panic("cannot add a name to reserved scope")
+}
+
+func (reservedScope) GetName(name string) string {
+	if IsReserved(name) {
+		return name
+	}
+	return ""
 }
 
 func (reservedScope) HasName(name string) bool {
