@@ -20,15 +20,6 @@ func UniqueName(name string, filters ...func(string) bool) string {
 	return name
 }
 
-// HasKey returns a function for map m that tests presence of key k.
-// The function returns true if m contains k, and false otherwise.
-func HasKey[M ~map[K]V, K comparable, V any](m M) func(k K) bool {
-	return func(k K) bool {
-		_, ok := m[k]
-		return ok
-	}
-}
-
 // Scope represents a Go name scope, like a package, file, interface, struct, or function blocks.
 type Scope interface {
 	// DeclareName declares name within this scope, modifying it as necessary to avoid
