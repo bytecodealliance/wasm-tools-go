@@ -220,13 +220,15 @@ func (g *generator) defineWorld(w *wit.World) error {
 	pkg := g.packageFor(id)
 	file := g.fileFor(id)
 
-	var b strings.Builder
-	stringio.Write(&b, "Package ", pkg.Name, " represents the ", w.WITKind(), " \"", id.String(), "\".\n")
-	if w.Docs.Contents != "" {
-		b.WriteString("\n")
-		b.WriteString(w.Docs.Contents)
+	{
+		var b strings.Builder
+		stringio.Write(&b, "Package ", pkg.Name, " represents the ", w.WITKind(), " \"", id.String(), "\".\n")
+		if w.Docs.Contents != "" {
+			b.WriteString("\n")
+			b.WriteString(w.Docs.Contents)
+		}
+		file.PackageDocs = b.String()
 	}
-	file.PackageDocs = b.String()
 
 	for _, name := range codec.SortedKeys(w.Imports) {
 		var err error
@@ -262,13 +264,15 @@ func (g *generator) defineInterface(i *wit.Interface, name string) error {
 	pkg := g.packageFor(id)
 	file := g.fileFor(id)
 
-	var b strings.Builder
-	stringio.Write(&b, "Package ", pkg.Name, " represents the ", i.WITKind(), " \"", id.String(), "\".\n")
-	if i.Docs.Contents != "" {
-		b.WriteString("\n")
-		b.WriteString(i.Docs.Contents)
+	{
+		var b strings.Builder
+		stringio.Write(&b, "Package ", pkg.Name, " represents the ", i.WITKind(), " \"", id.String(), "\".\n")
+		if i.Docs.Contents != "" {
+			b.WriteString("\n")
+			b.WriteString(i.Docs.Contents)
+		}
+		file.PackageDocs = b.String()
 	}
-	file.PackageDocs = b.String()
 
 	// Define types
 	for _, name := range codec.SortedKeys(i.TypeDefs) {
@@ -287,6 +291,29 @@ func (g *generator) defineInterface(i *wit.Interface, name string) error {
 		if f.IsFreestanding() {
 			g.defineImportedFunction(f, id)
 		}
+	}
+
+	// Define WIT interface as Go interface
+	{
+		var b bytes.Buffer
+		stringio.Write(&b, "type ", pkg.GetName("Interface"), " interface {\n")
+
+		for _, name := range codec.SortedKeys(i.Functions) {
+			f := i.Functions[name]
+			if f.IsFreestanding() {
+				d := g.functions[f]
+				stringio.Write(&b, g.functionSignature(file, d.f), "\n")
+			}
+		}
+
+		b.WriteString("}\n\n")
+		stringio.Write(&b, "var ", pkg.GetName("instance"), " ", pkg.GetName("Interface"), "\n\n")
+
+		// TODO: enable writing exports interface
+		// _, err := file.Write(b.Bytes())
+		// if err != nil {
+		// 	return err
+		// }
 	}
 
 	g.defined[i] = true
@@ -1064,6 +1091,11 @@ func (g *generator) packageFor(id wit.Ident) *gen.Package {
 	pkg = gen.NewPackage(path + "#" + name)
 	g.packages[pkg.Path] = pkg
 	g.witPackages[id.String()] = pkg
+
+	// Predeclare a few names
+	pkg.DeclareName("Interface")
+	pkg.DeclareName("instance")
+	pkg.DeclareName("Export")
 
 	return pkg
 }
