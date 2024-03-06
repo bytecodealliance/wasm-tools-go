@@ -31,14 +31,18 @@ func HasKey[M ~map[K]V, K comparable, V any](m M) func(k K) bool {
 
 // Scope represents a Go name scope, like a package, file, interface, struct, or function blocks.
 type Scope interface {
+	// DeclareName declares name within this scope, modifying it as necessary to avoid
+	// colliding with any preexisting names. It returns the unique generated name.
+	// Subsequent calls to GetName will return the unique name.
+	// Subsequent calls to HasName with the returned name will return true.
+	// Subsequent calls to DeclareName will return a different name.
+	DeclareName(name string) string
+
+	// GetName returns the existing unique name, if declared.
+	// GetName(name string) string
+
 	// HasName returns true if this scope or any of its parent scopes contains name.
 	HasName(name string) bool
-
-	// UniqueName modifies name if necessary and declares it within this scope.
-	// It returns the unique generated name.
-	// Subsequent calls to HasName with the returned name will return true.
-	// Subsequent calls to UniqueName will return a different name.
-	UniqueName(name string) string
 }
 
 type scope struct {
@@ -58,14 +62,14 @@ func NewScope(parent Scope) Scope {
 	}
 }
 
-func (s *scope) HasName(name string) bool {
-	return s.names[name] || s.parent.HasName(name)
-}
-
-func (s *scope) UniqueName(name string) string {
+func (s *scope) DeclareName(name string) string {
 	name = UniqueName(name, s.HasName)
 	s.names[name] = true
 	return name
+}
+
+func (s *scope) HasName(name string) bool {
+	return s.names[name] || s.parent.HasName(name)
 }
 
 type reservedScope struct{}
@@ -79,12 +83,12 @@ func Reserved() Scope {
 	return reservedScope{}
 }
 
-func (reservedScope) HasName(name string) bool {
-	return IsReserved(name)
+func (reservedScope) DeclareName(name string) string {
+	panic("cannot add a name to reserved scope")
 }
 
-func (reservedScope) UniqueName(name string) string {
-	panic("cannot add a name to reserved scope")
+func (reservedScope) HasName(name string) bool {
+	return IsReserved(name)
 }
 
 // IsReserved returns true for any name that is a Go keyword or predeclared identifier.

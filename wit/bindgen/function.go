@@ -54,7 +54,7 @@ func goFunction(file *gen.File, f *wit.Function, goName string) function {
 func goParams(scope gen.Scope, params []wit.Param) []param {
 	out := make([]param, len(params))
 	for i := range params {
-		out[i].name = scope.UniqueName(GoName(params[i].Name, false))
+		out[i].name = scope.DeclareName(GoName(params[i].Name, false))
 		out[i].typ = params[i].Type
 	}
 	return out

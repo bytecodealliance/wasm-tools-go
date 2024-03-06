@@ -163,7 +163,7 @@ func (g *generator) declareTypeDef(file *gen.File, goName string, t *wit.TypeDef
 		file = g.fileFor(typeDefOwner(t))
 	}
 	g.typeDefPackages[t] = file.Package
-	g.typeDefNames[t] = file.Declare(goName)
+	g.typeDefNames[t] = file.DeclareName(goName)
 	g.typeDefScopes[t] = gen.NewScope(nil)
 	// fmt.Fprintf(os.Stderr, "Type:\t%s.%s\n\t%s.%s\n", owner.String(), name, decl.Package.Path, decl.Name)
 	return nil
@@ -548,7 +548,7 @@ func (g *generator) flagsRep(file *gen.File, goName string, flags *wit.Flags) st
 			b.WriteRune('\n')
 		}
 		b.WriteString(formatDocComments(flag.Docs.Contents, false))
-		flagName := file.Declare(goName + GoName(flag.Name, true))
+		flagName := file.DeclareName(goName + GoName(flag.Name, true))
 		b.WriteString(flagName)
 		if i == 0 {
 			stringio.Write(&b, " ", goName, " = 1 << iota")
@@ -570,7 +570,7 @@ func (g *generator) enumRep(file *gen.File, goName string, e *wit.Enum) string {
 			b.WriteRune('\n')
 		}
 		b.WriteString(formatDocComments(c.Docs.Contents, false))
-		b.WriteString(file.Declare(goName + GoName(c.Name, true)))
+		b.WriteString(file.DeclareName(goName + GoName(c.Name, true)))
 		if i == 0 {
 			b.WriteRune(' ')
 			b.WriteString(goName)
@@ -601,7 +601,7 @@ func (g *generator) variantRep(file *gen.File, goName string, v *wit.Variant) st
 	for i, c := range v.Cases {
 		caseNum := strconv.Itoa(i)
 		caseName := GoName(c.Name, true)
-		constructorName := file.Declare(goName + caseName)
+		constructorName := file.DeclareName(goName + caseName)
 		typeRep := g.typeRep(file, c.Type)
 
 		// Emit constructor
@@ -699,21 +699,21 @@ func (g *generator) declareFunction(f *wit.Function, owner wit.Ident) (*funcDecl
 	var lowerName string
 	switch f.Kind.(type) {
 	case *wit.Freestanding:
-		funcName = file.Declare(GoName(f.BaseName(), true))
-		liftName = file.Declare(pfxLift + funcName)
-		lowerName = file.Declare(pfxLower + funcName)
+		funcName = file.DeclareName(GoName(f.BaseName(), true))
+		liftName = file.DeclareName(pfxLift + funcName)
+		lowerName = file.DeclareName(pfxLower + funcName)
 
 	case *wit.Constructor:
 		t := f.Type().(*wit.TypeDef)
-		funcName = file.Declare("New" + g.typeDefNames[t])
-		liftName = file.Declare(pfxLift + funcName)
-		lowerName = file.Declare(pfxLower + funcName)
+		funcName = file.DeclareName("New" + g.typeDefNames[t])
+		liftName = file.DeclareName(pfxLift + funcName)
+		lowerName = file.DeclareName(pfxLower + funcName)
 
 	case *wit.Static:
 		t := f.Type().(*wit.TypeDef)
-		funcName = file.Declare(g.typeDefNames[t] + GoName(f.BaseName(), true))
-		liftName = file.Declare(pfxLift + funcName)
-		lowerName = file.Declare(pfxLower + funcName)
+		funcName = file.DeclareName(g.typeDefNames[t] + GoName(f.BaseName(), true))
+		liftName = file.DeclareName(pfxLift + funcName)
+		lowerName = file.DeclareName(pfxLower + funcName)
 
 	case *wit.Method:
 		t := f.Type().(*wit.TypeDef)
@@ -721,12 +721,12 @@ func (g *generator) declareFunction(f *wit.Function, owner wit.Ident) (*funcDecl
 			return nil, fmt.Errorf("cannot emit functions in package %s to type %s", owner.Package, t.Package().Name.String())
 		}
 		scope := g.typeDefScopes[t]
-		funcName = scope.UniqueName(GoName(f.BaseName(), true))
-		liftName = file.Declare(pfxLift + g.typeDefNames[t] + funcName)
+		funcName = scope.DeclareName(GoName(f.BaseName(), true))
+		liftName = file.DeclareName(pfxLift + g.typeDefNames[t] + funcName)
 		if lower.IsMethod() {
-			lowerName = scope.UniqueName(pfxLower + funcName)
+			lowerName = scope.DeclareName(pfxLower + funcName)
 		} else {
-			lowerName = file.Declare(pfxLower + g.typeDefNames[t] + funcName)
+			lowerName = file.DeclareName(pfxLower + g.typeDefNames[t] + funcName)
 		}
 	}
 
@@ -767,7 +767,7 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 
 	var compoundParams param
 	if len(d.f.params) > 0 && derefAnonRecord(d.lower.params[0].typ) != nil {
-		name := d.f.scope.UniqueName("params")
+		name := d.f.scope.DeclareName("params")
 		lowerCallParams[0].name = name
 		t := derefAnonRecord(d.lower.params[0].typ)
 		g.declareTypeDef(file, d.lower.name+"Params", t)
@@ -778,7 +778,7 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 	var compoundResults param
 	var resultsRecord *wit.Record
 	if len(d.f.results) > 1 && derefAnonRecord(last(d.lower.params).typ) != nil {
-		name := d.f.scope.UniqueName("results")
+		name := d.f.scope.DeclareName("results")
 		last(lowerCallParams).name = name
 		t := derefAnonRecord(last(d.lower.params).typ)
 		g.declareTypeDef(file, d.lower.name+"Results", t)

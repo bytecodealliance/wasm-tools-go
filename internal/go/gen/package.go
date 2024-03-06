@@ -28,12 +28,6 @@ func NewPackage(path string) *Package {
 	return p
 }
 
-// Declare adds a package-scoped identifier to [Package] pkg.
-// It returns the package-unique name (which may be different than name).
-func (pkg *Package) Declare(name string) string {
-	return pkg.UniqueName(name)
-}
-
 // File finds or adds a new file named name to pkg.
 func (pkg *Package) File(name string) *File {
 	file := pkg.Files[name]

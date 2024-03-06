@@ -105,11 +105,11 @@ func (f *File) Bytes() ([]byte, error) {
 	return formatted, nil
 }
 
-// Declare adds a package-scoped identifier to [File] f.
+// DeclareName adds a package-scoped identifier to [File] f.
 // It additionally checks the file-scoped declarations (local package names).
 // It returns the package-unique name (which may be different than name).
-func (f *File) Declare(name string) string {
-	return f.Package.Declare(f.UniqueName(name))
+func (f *File) DeclareName(name string) string {
+	return f.Package.DeclareName(f.Scope.DeclareName(name))
 }
 
 // Import imports the Go package specified by path, returning the local name for the imported package.
@@ -122,7 +122,7 @@ func (f *File) Import(path string) string {
 		return ""
 	}
 	if f.Imports[path] == "" {
-		f.Imports[path] = f.UniqueName(name)
+		f.Imports[path] = f.Scope.DeclareName(name)
 	}
 	return f.Imports[path]
 }
