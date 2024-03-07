@@ -310,7 +310,7 @@ func (g *generator) defineInterface(i *wit.Interface, name string) error {
 		b.WriteString("}\n\n")
 		stringio.Write(&b, "var ", pkg.GetName("instance"), " ", pkg.GetName("Interface"), "\n\n")
 
-		// TODO: enable writing exports interface
+		// // TODO: enable writing exports interface
 		// _, err := file.Write(b.Bytes())
 		// if err != nil {
 		// 	return err
