@@ -6,6 +6,7 @@ package bindgen
 import (
 	"bytes"
 	"fmt"
+	"go/token"
 	"path/filepath"
 	"runtime"
 	"slices"
@@ -410,7 +411,7 @@ func (g *generator) typeDefKindRep(file *gen.File, goName string, kind wit.TypeD
 	case wit.Type:
 		return g.typeRep(file, kind)
 	case *wit.Record:
-		return g.recordRep(file, kind)
+		return g.recordRep(file, goName, kind)
 	case *wit.Tuple:
 		return g.tupleRep(file, kind)
 	case *wit.Flags:
@@ -500,7 +501,8 @@ func (g *generator) primitiveRep(file *gen.File, p wit.Primitive) string {
 	}
 }
 
-func (g *generator) recordRep(file *gen.File, r *wit.Record) string {
+func (g *generator) recordRep(file *gen.File, goName string, r *wit.Record) string {
+	exported := token.IsExported(goName)
 	var b strings.Builder
 	b.WriteString("struct {")
 	for i, f := range r.Fields {
@@ -508,20 +510,22 @@ func (g *generator) recordRep(file *gen.File, r *wit.Record) string {
 			b.WriteRune('\n')
 		}
 		b.WriteString(formatDocComments(f.Docs.Contents, false))
-		stringio.Write(&b, fieldName(f.Name), " ", g.typeRep(file, f.Type), "\n")
+		stringio.Write(&b, fieldName(f.Name, exported), " ", g.typeRep(file, f.Type), "\n")
 	}
 	b.WriteRune('}')
 	return b.String()
 }
 
-func fieldName(name string) string {
+// Field names are implicitly scoped to their parent struct,
+// so we don't need to track the mapping between WIT names and Go names.
+func fieldName(name string, export bool) string {
 	if name == "" {
 		return ""
 	}
 	if name[0] >= '0' && name[0] <= '9' {
 		name = "f" + name
 	}
-	return GoName(name, true)
+	return GoName(name, export)
 }
 
 func (g *generator) tupleRep(file *gen.File, t *wit.Tuple) string {
@@ -873,7 +877,7 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 				if i > 0 {
 					b.WriteString(", ")
 				}
-				stringio.Write(&b, compoundResults.name, ".", fieldName(f.Name))
+				stringio.Write(&b, compoundResults.name, ".", fieldName(f.Name, false))
 			}
 		} else {
 			for i, r := range d.f.results {
