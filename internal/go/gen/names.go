@@ -1,5 +1,7 @@
 package gen
 
+import "go/token"
+
 // UniqueName tests name against filters and modifies name until all filters return false.
 // Use IsReserved to filter out Go keywords and predeclared identifiers.
 //
@@ -104,37 +106,10 @@ func (reservedScope) HasName(name string) bool {
 
 // IsReserved returns true for any name that is a Go keyword or predeclared identifier.
 func IsReserved(name string) bool {
-	return reserved[name]
+	return token.IsKeyword(name) || reserved[name]
 }
 
 var reserved = mapWords(
-	// Keywords
-	"break",
-	"case",
-	"chan",
-	"const",
-	"continue",
-	"default",
-	"defer",
-	"else",
-	"fallthrough",
-	"for",
-	"func",
-	"go",
-	"goto",
-	"if",
-	"import",
-	"interface",
-	"map",
-	"package",
-	"range",
-	"return",
-	"select",
-	"struct",
-	"switch",
-	"type",
-	"var",
-
 	// Types
 	"any",
 	"bool",
