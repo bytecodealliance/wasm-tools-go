@@ -70,7 +70,7 @@ func CMPackage(path string) Option {
 	})
 }
 
-// Versioned returns an [Option] that that specifies that all generated Go packages
+// Versioned returns an [Option] that specifies that all generated Go packages
 // will have versions that match WIT versions.
 func Versioned(versioned bool) Option {
 	return optionFunc(func(opts *options) error {
