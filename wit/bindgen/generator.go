@@ -294,8 +294,8 @@ func (g *generator) defineInterface(i *wit.Interface, name string) error {
 		}
 	}
 
-	// Define WIT interface as Go interface
-	{
+	// Define export interface
+	if g.opts.exports {
 		var b bytes.Buffer
 		stringio.Write(&b, "type ", pkg.GetName("Interface"), " interface {\n")
 
@@ -310,11 +310,11 @@ func (g *generator) defineInterface(i *wit.Interface, name string) error {
 		b.WriteString("}\n\n")
 		stringio.Write(&b, "var ", pkg.GetName("instance"), " ", pkg.GetName("Interface"), "\n\n")
 
-		// // TODO: enable writing exports interface
-		// _, err := file.Write(b.Bytes())
-		// if err != nil {
-		// 	return err
-		// }
+		// TODO: enable writing exports interface
+		_, err := file.Write(b.Bytes())
+		if err != nil {
+			return err
+		}
 	}
 
 	g.defined[i] = true
