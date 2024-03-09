@@ -17,9 +17,9 @@ import (
 //
 //go:nosplit
 func Exit(status cm.Result) {
-	exit(status)
+	wasmimport_Exit(status)
 }
 
 //go:wasmimport wasi:cli/exit@0.2.0 exit
 //go:noescape
-func exit(status cm.Result)
+func wasmimport_Exit(status cm.Result)

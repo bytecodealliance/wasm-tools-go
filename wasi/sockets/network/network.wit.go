@@ -268,9 +268,9 @@ type Network cm.Resource
 //
 //go:nosplit
 func (self Network) ResourceDrop() {
-	self.resourceDrop()
+	self.wasmimport_ResourceDrop()
 }
 
 //go:wasmimport wasi:sockets/network@0.2.0 [resource-drop]network
 //go:noescape
-func (self Network) resourceDrop()
+func (self Network) wasmimport_ResourceDrop()

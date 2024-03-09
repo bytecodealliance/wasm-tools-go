@@ -18,13 +18,13 @@ import (
 //go:nosplit
 func GetArguments() cm.List[string] {
 	var result cm.List[string]
-	getArguments(&result)
+	wasmimport_GetArguments(&result)
 	return result
 }
 
 //go:wasmimport wasi:cli/environment@0.2.0 get-arguments
 //go:noescape
-func getArguments(result *cm.List[string])
+func wasmimport_GetArguments(result *cm.List[string])
 
 // GetEnvironment represents function "wasi:cli/environment@0.2.0#get-environment".
 //
@@ -42,13 +42,13 @@ func getArguments(result *cm.List[string])
 //go:nosplit
 func GetEnvironment() cm.List[[2]string] {
 	var result cm.List[[2]string]
-	getEnvironment(&result)
+	wasmimport_GetEnvironment(&result)
 	return result
 }
 
 //go:wasmimport wasi:cli/environment@0.2.0 get-environment
 //go:noescape
-func getEnvironment(result *cm.List[[2]string])
+func wasmimport_GetEnvironment(result *cm.List[[2]string])
 
 // InitialCWD represents function "wasi:cli/environment@0.2.0#initial-cwd".
 //
@@ -60,10 +60,10 @@ func getEnvironment(result *cm.List[[2]string])
 //go:nosplit
 func InitialCWD() cm.Option[string] {
 	var result cm.Option[string]
-	initialCWD(&result)
+	wasmimport_InitialCWD(&result)
 	return result
 }
 
 //go:wasmimport wasi:cli/environment@0.2.0 initial-cwd
 //go:noescape
-func initialCWD(result *cm.Option[string])
+func wasmimport_InitialCWD(result *cm.Option[string])

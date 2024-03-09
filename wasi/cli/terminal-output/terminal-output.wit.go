@@ -28,9 +28,9 @@ type TerminalOutput cm.Resource
 //
 //go:nosplit
 func (self TerminalOutput) ResourceDrop() {
-	self.resourceDrop()
+	self.wasmimport_ResourceDrop()
 }
 
 //go:wasmimport wasi:cli/terminal-output@0.2.0 [resource-drop]terminal-output
 //go:noescape
-func (self TerminalOutput) resourceDrop()
+func (self TerminalOutput) wasmimport_ResourceDrop()

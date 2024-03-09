@@ -363,6 +363,18 @@ type _typeDefKind struct{}
 func (_typeDefKind) TypeName() string { return "" }
 func (_typeDefKind) isTypeDefKind()   {}
 
+// KindOf probes [Type] t to determine if it is a [TypeDef] with [Kind] K.
+// It returns the underlying Kind if present.
+func KindOf[K TypeDefKind](t Type) (kind K) {
+	if td, ok := t.(*TypeDef); ok {
+		if kind, ok = td.Kind.(K); ok {
+			return kind
+		}
+	}
+	var zero K
+	return zero
+}
+
 // Pointer represents a pointer to a WIT type.
 // It is only used for ABI representation, e.g. pointers to function parameters or return values.
 type Pointer struct {
@@ -1414,26 +1426,37 @@ func (f *Function) IsAdmin() bool {
 // IsFreestanding returns true if [Function] f is a freestanding function,
 // and not a constructor, method, or static function.
 func (f *Function) IsFreestanding() bool {
-	_, is := f.Kind.(*Freestanding)
-	return is
+	_, ok := f.Kind.(*Freestanding)
+	return ok
 }
 
 // IsConstructor returns true if [Function] f is a constructor.
+// To qualify, it must have a *[Static] Kind with a non-nil type.
 func (f *Function) IsConstructor() bool {
-	_, is := f.Kind.(*Constructor)
-	return is
+	kind, ok := f.Kind.(*Constructor)
+	return ok && kind.Type != nil
 }
 
 // IsMethod returns true if [Function] f is a method.
+// To qualify, it must have a *[Method] Kind with a non-nil [Type] which matches borrow<t> of its first param.
 func (f *Function) IsMethod() bool {
-	_, is := f.Kind.(*Method)
-	return is
+	if len(f.Params) == 0 {
+		return false
+	}
+	kind, ok := f.Kind.(*Method)
+	if !ok {
+		return false
+	}
+	t := f.Params[0].Type
+	h := KindOf[*Borrow](t)
+	return t == kind.Type || (h != nil && h.Type == kind.Type)
 }
 
 // IsStatic returns true if [Function] f is a static function.
+// To qualify, it must have a *[Static] Kind with a non-nil type.
 func (f *Function) IsStatic() bool {
-	_, is := f.Kind.(*Static)
-	return is
+	kind, ok := f.Kind.(*Static)
+	return ok && kind.Type != nil
 }
 
 // FunctionKind represents the kind of a WIT [function], which can be one of

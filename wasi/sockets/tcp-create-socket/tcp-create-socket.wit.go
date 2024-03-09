@@ -65,10 +65,10 @@ type TCPSocket = tcp.TCPSocket
 //go:nosplit
 func CreateTCPSocket(addressFamily IPAddressFamily) cm.OKResult[TCPSocket, ErrorCode] {
 	var result cm.OKResult[TCPSocket, ErrorCode]
-	createTCPSocket(addressFamily, &result)
+	wasmimport_CreateTCPSocket(addressFamily, &result)
 	return result
 }
 
 //go:wasmimport wasi:sockets/tcp-create-socket@0.2.0 create-tcp-socket
 //go:noescape
-func createTCPSocket(addressFamily IPAddressFamily, result *cm.OKResult[TCPSocket, ErrorCode])
+func wasmimport_CreateTCPSocket(addressFamily IPAddressFamily, result *cm.OKResult[TCPSocket, ErrorCode])

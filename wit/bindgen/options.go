@@ -25,6 +25,9 @@ type options struct {
 	// versioned determines if Go packages are generated with version numbers.
 	versioned bool
 
+	// exports determines if export bindings are generated.
+	exports bool
+
 	// idents maps WIT identifiers to Go identifiers. Examples:
 	// "wasi:clocks" -> "wasi/clocks"
 	// "wasi:clocks/wall-clock" -> "wasi/clocks/wall"
@@ -70,11 +73,19 @@ func CMPackage(path string) Option {
 	})
 }
 
-// Versioned returns an [Option] that that specifies that all generated Go packages
+// Versioned returns an [Option] that specifies that all generated Go packages
 // will have versions that match WIT versions.
 func Versioned(versioned bool) Option {
 	return optionFunc(func(opts *options) error {
 		opts.versioned = versioned
+		return nil
+	})
+}
+
+// GenerateExports returns an [Option] that specifies whether to generate export bindings.
+func GenerateExports(exports bool) Option {
+	return optionFunc(func(opts *options) error {
+		opts.exports = exports
 		return nil
 	})
 }

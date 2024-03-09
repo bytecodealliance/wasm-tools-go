@@ -1,5 +1,7 @@
 package gen
 
+import "go/token"
+
 // UniqueName tests name against filters and modifies name until all filters return false.
 // Use IsReserved to filter out Go keywords and predeclared identifiers.
 //
@@ -20,30 +22,26 @@ func UniqueName(name string, filters ...func(string) bool) string {
 	return name
 }
 
-// HasKey returns a function for map m that tests presence of key k.
-// The function returns true if m contains k, and false otherwise.
-func HasKey[M ~map[K]V, K comparable, V any](m M) func(k K) bool {
-	return func(k K) bool {
-		_, ok := m[k]
-		return ok
-	}
-}
-
 // Scope represents a Go name scope, like a package, file, interface, struct, or function blocks.
 type Scope interface {
+	// DeclareName declares name within this scope, modifying it as necessary to avoid
+	// colliding with any preexisting names. It returns the unique generated name.
+	// Subsequent calls to GetName will return the unique name.
+	// Subsequent calls to HasName with the returned name will return true.
+	// Subsequent calls to DeclareName will return a different name.
+	DeclareName(name string) string
+
+	// GetName returns the first declared unique name for name, if declared.
+	GetName(name string) string
+
 	// HasName returns true if this scope or any of its parent scopes contains name.
 	HasName(name string) bool
-
-	// UniqueName modifies name if necessary and declares it within this scope.
-	// It returns the unique generated name.
-	// Subsequent calls to HasName with the returned name will return true.
-	// Subsequent calls to UniqueName will return a different name.
-	UniqueName(name string) string
 }
 
 type scope struct {
 	parent Scope
-	names  map[string]bool
+	exists map[string]bool
+	first  map[string]string
 }
 
 // NewScope returns an initialized [Scope] that's ready to use.
@@ -54,18 +52,30 @@ func NewScope(parent Scope) Scope {
 	}
 	return &scope{
 		parent: parent,
-		names:  make(map[string]bool),
+		exists: make(map[string]bool),
+		first:  make(map[string]string),
 	}
 }
 
-func (s *scope) HasName(name string) bool {
-	return s.names[name] || s.parent.HasName(name)
+func (s *scope) DeclareName(name string) string {
+	unique := UniqueName(name, s.HasName)
+	s.exists[unique] = true
+	if _, ok := s.first[name]; !ok {
+		s.first[name] = unique
+	}
+	return unique
 }
 
-func (s *scope) UniqueName(name string) string {
-	name = UniqueName(name, s.HasName)
-	s.names[name] = true
-	return name
+func (s *scope) GetName(name string) string {
+	first := s.parent.GetName(name)
+	if first != "" {
+		return first
+	}
+	return s.first[name]
+}
+
+func (s *scope) HasName(name string) bool {
+	return s.exists[name] || s.parent.HasName(name)
 }
 
 type reservedScope struct{}
@@ -79,47 +89,27 @@ func Reserved() Scope {
 	return reservedScope{}
 }
 
+func (reservedScope) DeclareName(name string) string {
+	panic("cannot add a name to reserved scope")
+}
+
+func (reservedScope) GetName(name string) string {
+	if IsReserved(name) {
+		return name
+	}
+	return ""
+}
+
 func (reservedScope) HasName(name string) bool {
 	return IsReserved(name)
 }
 
-func (reservedScope) UniqueName(name string) string {
-	panic("cannot add a name to reserved scope")
-}
-
 // IsReserved returns true for any name that is a Go keyword or predeclared identifier.
 func IsReserved(name string) bool {
-	return reserved[name]
+	return token.IsKeyword(name) || reserved[name]
 }
 
 var reserved = mapWords(
-	// Keywords
-	"break",
-	"case",
-	"chan",
-	"const",
-	"continue",
-	"default",
-	"defer",
-	"else",
-	"fallthrough",
-	"for",
-	"func",
-	"go",
-	"goto",
-	"if",
-	"import",
-	"interface",
-	"map",
-	"package",
-	"range",
-	"return",
-	"select",
-	"struct",
-	"switch",
-	"type",
-	"var",
-
 	// Types
 	"any",
 	"bool",

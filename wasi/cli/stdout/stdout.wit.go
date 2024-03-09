@@ -20,9 +20,9 @@ type OutputStream = streams.OutputStream
 //
 //go:nosplit
 func GetStdout() OutputStream {
-	return getStdout()
+	return wasmimport_GetStdout()
 }
 
 //go:wasmimport wasi:cli/stdout@0.2.0 get-stdout
 //go:noescape
-func getStdout() OutputStream
+func wasmimport_GetStdout() OutputStream

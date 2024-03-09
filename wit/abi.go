@@ -57,17 +57,36 @@ func Despecialize(k TypeDefKind) TypeDefKind {
 	return k
 }
 
+// Op represents the [Canonical ABI] [lift] and [lower] operations, for lowering into or lifting out of linear memory.
+//
+// [Canonical ABI]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/Explainer.md#canonical-abi
+// [lift]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#canon-lift
+// [lower]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#canon-lower
+type Op uint8
+
 const (
-	// MaxFlatParams is the maximum number of flattened parameters a function can have
-	// as defined in the Component Model [Canonical ABI].
+	// Lift represents the Canonical ABI [lift] direction, lifting Component Model types out of linear memory.
+	// Used for exporting functions to the WebAssembly host (or another component) using //go:wasmexport.
 	//
-	// [Canonical ABI]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
+	// [lift]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#canon-lift
+	Lift Op = 0
+
+	// Lower represents the Canonical ABI [lower] operation, lowering Component Model types into linear memory.
+	// Used for calling functions imported from the WebAssembly host (or another component) using //go:wasmimport.
+	//
+	// [lower]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#canon-lower
+	Lower Op = 1
+
+	// MaxFlatParams is the maximum number of [flattened parameters] a function can have
+	// as defined in the Component Model Canonical ABI.
+	//
+	// [flattened parameters]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
 	MaxFlatParams = 16
 
-	// MaxFlatResults is the maximum number of flattened results a function can have
-	// as defined in the Component Model [Canonical ABI].
+	// MaxFlatResults is the maximum number of [flattened results] a function can have
+	// as defined in the Component Model Canonical ABI.
 	//
-	// [Canonical ABI]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
+	// [flattened results]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
 	MaxFlatResults = 1
 )
 
@@ -95,7 +114,7 @@ func (t *TypeDef) ResourceDrop() *Function {
 //
 // [Core WebAssembly function]: https://webassembly.github.io/spec/core/syntax/modules.html#syntax-func
 // [flattened]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
-func (f *Function) CoreFunction(export bool) *Function {
+func (f *Function) CoreFunction(op Op) *Function {
 	if len(f.Params) == 0 && len(f.Results) == 0 {
 		return f
 	}
@@ -111,7 +130,7 @@ func (f *Function) CoreFunction(export bool) *Function {
 	// Max 1 result
 	if len(flatParams(f.Results)) > MaxFlatResults {
 		p := compoundParam("result", "results", f.Results)
-		if export {
+		if op == Lift {
 			cf.Results = []Param{p}
 		} else {
 			cf.Params = append(cf.Params, p)

@@ -20,9 +20,9 @@ type InputStream = streams.InputStream
 //
 //go:nosplit
 func GetStdin() InputStream {
-	return getStdin()
+	return wasmimport_GetStdin()
 }
 
 //go:wasmimport wasi:cli/stdin@0.2.0 get-stdin
 //go:noescape
-func getStdin() InputStream
+func wasmimport_GetStdin() InputStream

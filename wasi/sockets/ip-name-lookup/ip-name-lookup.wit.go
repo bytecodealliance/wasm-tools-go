@@ -42,12 +42,12 @@ type ResolveAddressStream cm.Resource
 //
 //go:nosplit
 func (self ResolveAddressStream) ResourceDrop() {
-	self.resourceDrop()
+	self.wasmimport_ResourceDrop()
 }
 
 //go:wasmimport wasi:sockets/ip-name-lookup@0.2.0 [resource-drop]resolve-address-stream
 //go:noescape
-func (self ResolveAddressStream) resourceDrop()
+func (self ResolveAddressStream) wasmimport_ResourceDrop()
 
 // ResolveNextAddress represents method "resolve-next-address".
 //
@@ -73,13 +73,13 @@ func (self ResolveAddressStream) resourceDrop()
 //go:nosplit
 func (self ResolveAddressStream) ResolveNextAddress() cm.OKResult[cm.Option[IPAddress], ErrorCode] {
 	var result cm.OKResult[cm.Option[IPAddress], ErrorCode]
-	self.resolveNextAddress(&result)
+	self.wasmimport_ResolveNextAddress(&result)
 	return result
 }
 
 //go:wasmimport wasi:sockets/ip-name-lookup@0.2.0 [method]resolve-address-stream.resolve-next-address
 //go:noescape
-func (self ResolveAddressStream) resolveNextAddress(result *cm.OKResult[cm.Option[IPAddress], ErrorCode])
+func (self ResolveAddressStream) wasmimport_ResolveNextAddress(result *cm.OKResult[cm.Option[IPAddress], ErrorCode])
 
 // Subscribe represents method "subscribe".
 //
@@ -92,12 +92,12 @@ func (self ResolveAddressStream) resolveNextAddress(result *cm.OKResult[cm.Optio
 //
 //go:nosplit
 func (self ResolveAddressStream) Subscribe() Pollable {
-	return self.subscribe()
+	return self.wasmimport_Subscribe()
 }
 
 //go:wasmimport wasi:sockets/ip-name-lookup@0.2.0 [method]resolve-address-stream.subscribe
 //go:noescape
-func (self ResolveAddressStream) subscribe() Pollable
+func (self ResolveAddressStream) wasmimport_Subscribe() Pollable
 
 // ResolveAddresses represents function "wasi:sockets/ip-name-lookup@0.2.0#resolve-addresses".
 //
@@ -128,10 +128,10 @@ func (self ResolveAddressStream) subscribe() Pollable
 //go:nosplit
 func ResolveAddresses(network_ Network, name string) cm.OKResult[ResolveAddressStream, ErrorCode] {
 	var result cm.OKResult[ResolveAddressStream, ErrorCode]
-	resolveAddresses(network_, name, &result)
+	wasmimport_ResolveAddresses(network_, name, &result)
 	return result
 }
 
 //go:wasmimport wasi:sockets/ip-name-lookup@0.2.0 resolve-addresses
 //go:noescape
-func resolveAddresses(network_ Network, name string, result *cm.OKResult[ResolveAddressStream, ErrorCode])
+func wasmimport_ResolveAddresses(network_ Network, name string, result *cm.OKResult[ResolveAddressStream, ErrorCode])
