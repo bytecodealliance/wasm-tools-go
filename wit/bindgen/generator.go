@@ -301,7 +301,7 @@ func (g *generator) defineInterface(i *wit.Interface, name string) error {
 
 		for _, name := range codec.SortedKeys(i.Functions) {
 			f := i.Functions[name]
-			if f.IsFreestanding() {
+			if !f.IsMethod() {
 				d := g.functions[f]
 				stringio.Write(&b, g.functionSignature(file, d.f), "\n")
 			}
@@ -340,8 +340,8 @@ func (g *generator) defineTypeDef(t *wit.TypeDef, name string) error {
 
 	// If an alias, get root
 	root := t.Root()
-	var rootOwner = typeDefOwner(root)
-	var rootName = name
+	rootOwner := typeDefOwner(root)
+	rootName := name
 	if root.Name != nil {
 		rootName = *root.Name
 	}
