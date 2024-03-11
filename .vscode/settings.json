@@ -4,7 +4,7 @@
 	"editor.detectIndentation": false,
 	"editor.formatOnSave": true,
 	"editor.insertSpaces": false,
-	"editor.tabSize": 8,
+	"editor.tabSize": 4,
 	"files.eol": "\n",
 
 	// Files
@@ -40,12 +40,22 @@
 	"go.diagnostic.vulncheck": "Imports",
 	"gopls": {
 		"formatting.gofumpt": true,
+		"ui.codelenses": {
+			"generate": true,
+			"gc_details": true
+		},
 		"ui.completion.usePlaceholders": true,
 		"ui.diagnostic.staticcheck": true,
 		"ui.diagnostic.analyses": {
 			"unusedwrite": true,
 			"useany": true
-		}
+		},
+		"ui.diagnostic.annotations": {
+			"bounds": true,
+			"escape": true,
+			"nil": true
+		},
+		"ui.semanticTokens": true
 	},
 
 	// JSON
@@ -58,7 +68,7 @@
 
 	// Make
 	"[makefile]": {
-		"editor.tabSize": 8
+		"editor.tabSize": 4
 	},
 
 	// Markdown
@@ -78,6 +88,12 @@
 	// Shell
 	"[shellscript]": {
 		"editor.defaultFormatter": "foxundermoon.shell-format"
+	},
+
+	// WIT
+	"[wit]": {
+		"editor.tabSize": 4,
+		"editor.insertSpaces": false
 	},
 
 	// YAML
