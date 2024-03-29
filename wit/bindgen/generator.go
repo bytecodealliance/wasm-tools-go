@@ -1070,18 +1070,20 @@ func (g *generator) packageFor(id wit.Ident) *gen.Package {
 		return pkg
 	}
 
-	// Create a new package
-	path := id.Namespace + "/" + id.Package + "/" + id.Extension
+	// Create the package path and name
+	var segments []string
 	if g.opts.packageRoot != "" && g.opts.packageRoot != "std" {
-		path = g.opts.packageRoot + "/" + path
+		segments = append(segments, g.opts.packageRoot)
 	}
-	name := id.Extension
+	segments = append(segments, id.Namespace, id.Package)
 	if g.versioned && id.Version != nil {
-		path += "/v" + id.Version.String()
+		segments = append(segments, "v"+id.Version.String())
 	}
+	segments = append(segments, id.Extension)
+	path := strings.Join(segments, "/")
 
 	// TODO: write tests for this
-	name = GoPackageName(name)
+	name := GoPackageName(id.Extension)
 	// Ensure local name doesn’t conflict with Go keywords or predeclared identifiers
 	if gen.UniqueName(name, gen.IsReserved) != name {
 		// Try with package prefix, like error -> ioerror
