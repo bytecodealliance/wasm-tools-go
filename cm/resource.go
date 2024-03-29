@@ -44,6 +44,6 @@ type Own[T Resourcer] struct {
 var _ [unsafe.Sizeof(Own[Resourcer]{})]byte = [unsafe.Sizeof(uint32(0))]byte{}
 
 type Resourcer interface {
-	ResourceRep() Rep
+	// ResourceRep() Rep
 	ResourceDestructor()
 }

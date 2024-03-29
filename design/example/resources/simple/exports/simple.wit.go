@@ -21,10 +21,15 @@ type Interface interface {
 
 // NumberInterface represents the Component Model methods for "example:resources/simple.number".
 type NumberInterface interface {
-	ResourceRep() cm.Rep
+	// ResourceRep() cm.Rep
 	ResourceDestructor()
 	Value() int32
 	String() string
+}
+
+type NumberRep[T any] interface {
+	cm.RepTypes[T]
+	NumberInterface
 }
 
 // TODO: make this a cm.Handle[T]
@@ -37,8 +42,8 @@ var _ NumberInterface = Number(0)
 // Create a new Component Model resource handle for [NumberInterface].
 //
 //go:nosplit
-func NumberResourceNew(i NumberInterface) Number {
-	return wasmimport_NumberResourceNew(i.ResourceRep())
+func NumberResourceNew[T any, Rep NumberRep[T]](number Rep) Number {
+	return wasmimport_NumberResourceNew(cm.IntoRep[T](number))
 }
 
 //go:wasmimport [export]example:resources/simple [resource-new]number
