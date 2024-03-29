@@ -28,10 +28,6 @@ var Command = &cli.Command{
 			OnlyOnce:  true,
 			Usage:     "output directory",
 		},
-		&cli.StringMapFlag{
-			Name:  "map",
-			Usage: "maps WIT identifiers to Go identifiers",
-		},
 		&cli.BoolFlag{
 			Name:  "versioned",
 			Usage: "emit versioned Go package(s) for each WIT version",
@@ -78,7 +74,6 @@ func action(ctx context.Context, cmd *cli.Command) error {
 		bindgen.PackageRoot(pkgPath),
 		bindgen.Versioned(cmd.Bool("versioned")),
 		bindgen.GenerateExports(cmd.Bool("exports")),
-		bindgen.MapIdents(cmd.StringMap("map")),
 	)
 	if err != nil {
 		return err
