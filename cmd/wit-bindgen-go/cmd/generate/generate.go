@@ -26,6 +26,7 @@ var Command = &cli.Command{
 			Value:     ".",
 			TakesFile: true,
 			OnlyOnce:  true,
+			Config:    cli.StringConfig{TrimSpace: true},
 			Usage:     "output directory",
 		},
 		&cli.BoolFlag{
