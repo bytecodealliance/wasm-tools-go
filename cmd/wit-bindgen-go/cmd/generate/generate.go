@@ -29,6 +29,14 @@ var Command = &cli.Command{
 			Config:    cli.StringConfig{TrimSpace: true},
 			Usage:     "output directory",
 		},
+		&cli.StringFlag{
+			Name:     "package-root",
+			Aliases:  []string{"p"},
+			Value:    "",
+			OnlyOnce: true,
+			Config:   cli.StringConfig{TrimSpace: true},
+			Usage:    "Go package root, e.g. github.com/org/repo/internal",
+		},
 		&cli.BoolFlag{
 			Name:  "versioned",
 			Usage: "emit versioned Go package(s) for each WIT version",
@@ -59,11 +67,14 @@ func action(ctx context.Context, cmd *cli.Command) error {
 	fmt.Fprintf(os.Stderr, "Output dir: %s\n", out)
 	outPerm := info.Mode().Perm()
 
-	pkgPath, err := gen.PackagePath(out)
-	if err != nil {
-		return err
+	pkgRoot := cmd.String("package-root")
+	if !cmd.IsSet("package-root") {
+		pkgRoot, err = gen.PackagePath(out)
+		if err != nil {
+			return err
+		}
 	}
-	fmt.Fprintf(os.Stderr, "Package root: %s\n", pkgPath)
+	fmt.Fprintf(os.Stderr, "Package root: %s\n", pkgRoot)
 
 	res, err := witcli.LoadOne(cmd.Bool("force-wit"), cmd.Args().Slice()...)
 	if err != nil {
@@ -72,7 +83,7 @@ func action(ctx context.Context, cmd *cli.Command) error {
 
 	packages, err := bindgen.Go(res,
 		bindgen.GeneratedBy(cmd.Root().Name),
-		bindgen.PackageRoot(pkgPath),
+		bindgen.PackageRoot(pkgRoot),
 		bindgen.Versioned(cmd.Bool("versioned")),
 		bindgen.GenerateExports(cmd.Bool("exports")),
 	)
@@ -92,7 +103,7 @@ func action(ctx context.Context, cmd *cli.Command) error {
 		for _, filename := range codec.SortedKeys(pkg.Files) {
 			file := pkg.Files[filename]
 
-			dir := filepath.Join(out, strings.TrimPrefix(file.Package.Path, pkgPath))
+			dir := filepath.Join(out, strings.TrimPrefix(file.Package.Path, pkgRoot))
 			err := os.MkdirAll(dir, outPerm)
 			if err != nil {
 				return err
