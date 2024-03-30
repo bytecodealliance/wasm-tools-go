@@ -21,6 +21,14 @@ var Command = &cli.Command{
 	Usage:   "generates Go from a fully-resolved WIT JSON file",
 	Flags: []cli.Flag{
 		&cli.StringFlag{
+			Name:     "world",
+			Aliases:  []string{"w"},
+			Value:    "",
+			OnlyOnce: true,
+			Config:   cli.StringConfig{TrimSpace: true},
+			Usage:    "WIT world to generate, otherwise generate all worlds",
+		},
+		&cli.StringFlag{
 			Name:      "out",
 			Aliases:   []string{"o"},
 			Value:     ".",
@@ -83,6 +91,7 @@ func action(ctx context.Context, cmd *cli.Command) error {
 
 	packages, err := bindgen.Go(res,
 		bindgen.GeneratedBy(cmd.Root().Name),
+		bindgen.World(cmd.String("world")),
 		bindgen.PackageRoot(pkgRoot),
 		bindgen.Versioned(cmd.Bool("versioned")),
 		bindgen.GenerateExports(cmd.Bool("exports")),

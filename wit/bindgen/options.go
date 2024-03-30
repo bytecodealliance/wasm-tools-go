@@ -15,6 +15,10 @@ type options struct {
 	// generatedBy is the name of the program that generates code with this package.
 	generatedBy string
 
+	// world is the name of the WIT world to generate, e.g. "command" or "wasi:cli/command".
+	// Default: all worlds in the Resolve will be generated.
+	world string
+
 	// packageRoot is the root Go package or module path used in generated code.
 	packageRoot string
 
@@ -44,6 +48,14 @@ func (opts *options) apply(o ...Option) error {
 func GeneratedBy(name string) Option {
 	return optionFunc(func(opts *options) error {
 		opts.generatedBy = name
+		return nil
+	})
+}
+
+// World returns an [Option] that specifies the WIT world to generate.
+func World(world string) Option {
+	return optionFunc(func(opts *options) error {
+		opts.world = world
 		return nil
 	})
 }
