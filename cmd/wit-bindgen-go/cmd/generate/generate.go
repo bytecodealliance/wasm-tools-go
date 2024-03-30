@@ -18,7 +18,7 @@ import (
 var Command = &cli.Command{
 	Name:    "generate",
 	Aliases: []string{"go"},
-	Usage:   "generates Go from a fully-resolved WIT JSON file",
+	Usage:   "generate Go bindings from from WIT (WebAssembly Interface Types)",
 	Flags: []cli.Flag{
 		&cli.StringFlag{
 			Name:     "world",
