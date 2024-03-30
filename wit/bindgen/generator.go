@@ -209,14 +209,14 @@ func (g *generator) defineInterfaces() error {
 func (g *generator) defineWorlds() error {
 	// fmt.Fprintf(os.Stderr, "Generating Go for %d world(s)\n", len(g.res.Worlds))
 	for _, w := range g.res.Worlds {
-		if g.opts.world == "" || worldNameEquals(w, g.opts.world) {
+		if g.opts.world == "" || matchWorld(w, g.opts.world) {
 			g.defineWorld(w)
 		}
 	}
 	return nil
 }
 
-func worldNameEquals(w *wit.World, name string) bool {
+func matchWorld(w *wit.World, name string) bool {
 	if name == w.Name {
 		return true
 	}
