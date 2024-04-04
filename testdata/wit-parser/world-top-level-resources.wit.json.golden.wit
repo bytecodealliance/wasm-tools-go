@@ -3,7 +3,7 @@ package foo:foo;
 interface handler {
 	use types.{request};
 	use types.{response};
-	handle: func(some: borrow<request>) -> borrow<response>;
+	handle: func(some: borrow<request>) -> own<response>;
 	handle-owned: func(some: own<request>) -> own<response>;
 }
 

@@ -1,0 +1,28 @@
+package d:d;
+
+interface d {}
+
+
+package e:e;
+
+interface e {}
+
+
+package b:b;
+
+interface b {}
+
+
+package c:c;
+
+interface c {}
+
+
+package a:a;
+
+world a {
+	import b:b/b;
+	import c:c/c;
+	import d:d/d;
+	import e:e/e;
+}

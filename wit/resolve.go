@@ -1130,10 +1130,10 @@ func ParseType(s string) (Type, error) {
 		return S64{}, nil
 	case "u64":
 		return U64{}, nil
-	case "float32":
-		return Float32{}, nil
-	case "float64":
-		return Float64{}, nil
+	case "f32", "float32": // TODO: remove float32 at some point
+		return F32{}, nil
+	case "f64", "float64": // TODO: remove float64 at some point
+		return F64{}, nil
 	case "char":
 		return Char{}, nil
 	case "string":
@@ -1216,9 +1216,9 @@ func (_primitive[T]) Flat() []Type {
 	case int64, uint64:
 		return []Type{U64{}}
 	case float32:
-		return []Type{Float32{}}
+		return []Type{F32{}}
 	case float64:
-		return []Type{Float64{}}
+		return []Type{F64{}}
 	case string:
 		return []Type{U32{}, U32{}}
 	default:
@@ -1252,9 +1252,9 @@ func (_primitive[T]) TypeName() string {
 	case uint64:
 		return "u64"
 	case float32:
-		return "float32"
+		return "f32"
 	case float64:
-		return "float64"
+		return "f64"
 	case char:
 		return "char"
 	case string:
@@ -1336,21 +1336,21 @@ type S64 struct{ _primitive[int64] }
 // [uint64]: https://pkg.go.dev/builtin#uint64
 type U64 struct{ _primitive[uint64] }
 
-// Float32 represents the WIT [primitive type] float32, a 32-bit floating point value.
+// F32 represents the WIT [primitive type] f32, a 32-bit floating point value.
 // It is equivalent to the Go type [float32].
 // It implements the [Node], [ABI], [Type], and [TypeDefKind] interfaces.
 //
 // [primitive type]: https://component-model.bytecodealliance.org/design/wit.html#primitive-types
 // [float32]: https://pkg.go.dev/builtin#float32
-type Float32 struct{ _primitive[float32] }
+type F32 struct{ _primitive[float32] }
 
-// Float64 represents the WIT [primitive type] float64, a 64-bit floating point value.
+// F64 represents the WIT [primitive type] f64, a 64-bit floating point value.
 // It is equivalent to the Go type [float64].
 // It implements the [Node], [ABI], [Type], and [TypeDefKind] interfaces.
 //
 // [primitive type]: https://component-model.bytecodealliance.org/design/wit.html#primitive-types
 // [float64]: https://pkg.go.dev/builtin#float64
-type Float64 struct{ _primitive[float64] }
+type F64 struct{ _primitive[float64] }
 
 // Char represents the WIT [primitive type] char, a single Unicode character,
 // specifically a [Unicode scalar value]. It is equivalent to the Go type [rune].
