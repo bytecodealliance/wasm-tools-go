@@ -5,6 +5,6 @@ interface resources1 {
 		f1: func();
 	}
 	t1: func(a: borrow<r1>);
-	t2: func(a: own<r1>);
-	t3: func(a: own<r1>);
+	t2: func(a: r1);
+	t3: func(a: r1);
 }

@@ -2,6 +2,6 @@ package foo:resources-empty;
 
 interface resources-empty {
 	resource r1;
-	t1: func(a: own<r1>);
+	t1: func(a: r1);
 	t2: func(a: borrow<r1>);
 }

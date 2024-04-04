@@ -14,8 +14,8 @@ interface foo {
 		b: static func();
 	}
 	resource e {
-		constructor(other: own<e>, other2: borrow<e>);
-		method: func(thing: own<e>, thing2: borrow<e>);
+		constructor(other: e, other2: borrow<e>);
+		method: func(thing: e, thing2: borrow<e>);
 	}
 }
 

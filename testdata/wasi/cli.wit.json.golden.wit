@@ -140,7 +140,7 @@ interface streams {
 		/// The created `pollable` is a child resource of the `input-stream`.
 		/// Implementations may trap if the `input-stream` is dropped before
 		/// all derived `pollable`s created with this function are dropped.
-		subscribe: func() -> own<pollable>;
+		subscribe: func() -> pollable;
 	}
 
 	/// An output bytestream.
@@ -264,7 +264,7 @@ interface streams {
 		/// The created `pollable` is a child resource of the `output-stream`.
 		/// Implementations may trap if the `output-stream` is dropped before
 		/// all derived `pollable`s created with this function are dropped.
-		subscribe: func() -> own<pollable>;
+		subscribe: func() -> pollable;
 
 		/// Perform a write. This function never blocks.
 		///
@@ -295,7 +295,7 @@ interface streams {
 		/// The last operation (a write or flush) failed before completion.
 		///
 		/// More information is available in the `error` payload.
-		last-operation-failed(own<error>),
+		last-operation-failed(error),
 		/// The stream is closed: no more input will be accepted by the
 		/// stream. A closed output-stream will return this error on all
 		/// future operations.
@@ -346,11 +346,11 @@ interface monotonic-clock {
 	/// Create a `pollable` which will resolve once the given duration has
 	/// elapsed, starting at the time at which this function was called.
 	/// occured.
-	subscribe-duration: func(when: duration) -> own<pollable>;
+	subscribe-duration: func(when: duration) -> pollable;
 
 	/// Create a `pollable` which will resolve once the specified instant
 	/// occured.
-	subscribe-instant: func(when: instant) -> own<pollable>;
+	subscribe-instant: func(when: instant) -> pollable;
 }
 
 /// WASI Wall Clock is a clock API intended to let users query the current
@@ -408,7 +408,7 @@ interface preopens {
 	use types.{descriptor};
 
 	/// Return the set of preopened directories, and their path.
-	get-directories: func() -> list<tuple<own<descriptor>, string>>;
+	get-directories: func() -> list<tuple<descriptor, string>>;
 }
 
 /// WASI filesystem is a filesystem API primarily intended to let users run WASI
@@ -479,7 +479,7 @@ interface types {
 		///
 		/// Note: This allows using `write-stream`, which is similar to `write` with
 		/// `O_APPEND` in in POSIX.
-		append-via-stream: func() -> result<own<output-stream>, error-code>;
+		append-via-stream: func() -> result<output-stream, error-code>;
 
 		/// Create a directory.
 		///
@@ -564,7 +564,7 @@ interface types {
 		/// `error-code::read-only`.
 		///
 		/// Note: This is similar to `openat` in POSIX.
-		open-at: func(path-flags: path-flags, path: string, open-flags: open-flags, flags: descriptor-flags) -> result<own<descriptor>, error-code>;
+		open-at: func(path-flags: path-flags, path: string, open-flags: open-flags, flags: descriptor-flags) -> result<descriptor, error-code>;
 
 		/// Read from a descriptor, without using and updating the descriptor's offset.
 		///
@@ -588,7 +588,7 @@ interface types {
 		/// This always returns a new stream which starts at the beginning of the
 		/// directory. Multiple streams may be active on the same directory, and they
 		/// do not interfere with each other.
-		read-directory: func() -> result<own<directory-entry-stream>, error-code>;
+		read-directory: func() -> result<directory-entry-stream, error-code>;
 
 		/// Return a stream for reading from a file, if available.
 		///
@@ -598,7 +598,7 @@ interface types {
 		/// file and they do not interfere with each other.
 		///
 		/// Note: This allows using `read-stream`, which is similar to `read` in POSIX.
-		read-via-stream: func(offset: filesize) -> result<own<input-stream>, error-code>;
+		read-via-stream: func(offset: filesize) -> result<input-stream, error-code>;
 
 		/// Read the contents of a symbolic link.
 		///
@@ -708,7 +708,7 @@ interface types {
 		///
 		/// Note: This allows using `write-stream`, which is similar to `write` in
 		/// POSIX.
-		write-via-stream: func(offset: filesize) -> result<own<output-stream>, error-code>;
+		write-via-stream: func(offset: filesize) -> result<output-stream, error-code>;
 	}
 
 	/// Descriptor flags.
@@ -1059,7 +1059,7 @@ interface instance-network {
 	use network.{network};
 
 	/// Get a handle to the default network.
-	instance-network: func() -> own<network>;
+	instance-network: func() -> network;
 }
 
 interface ip-name-lookup {
@@ -1091,7 +1091,7 @@ interface ip-name-lookup {
 		///
 		/// Note: this function is here for WASI Preview2 only.
 		/// It's planned to be removed when `future` is natively supported in Preview3.
-		subscribe: func() -> own<pollable>;
+		subscribe: func() -> pollable;
 	}
 
 	/// Resolve an internet host name to a list of IP addresses.
@@ -1114,7 +1114,7 @@ interface ip-name-lookup {
 	/// - <https://man7.org/linux/man-pages/man3/getaddrinfo.3.html>
 	/// - <https://learn.microsoft.com/en-us/windows/win32/api/ws2tcpip/nf-ws2tcpip-getaddrinfo>
 	/// - <https://man.freebsd.org/cgi/man.cgi?query=getaddrinfo&sektion=3>
-	resolve-addresses: func(network: borrow<network>, name: string) -> result<own<resolve-address-stream>, error-code>;
+	resolve-addresses: func(network: borrow<network>, name: string) -> result<resolve-address-stream, error-code>;
 }
 
 interface network {
@@ -1305,14 +1305,14 @@ interface tcp {
 		/// - <https://man7.org/linux/man-pages/man2/accept.2.html>
 		/// - <https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-accept>
 		/// - <https://man.freebsd.org/cgi/man.cgi?query=accept&sektion=2>
-		accept: func() -> result<tuple<own<tcp-socket>, own<input-stream>, own<output-stream>>, error-code>;
+		accept: func() -> result<tuple<tcp-socket, input-stream, output-stream>, error-code>;
 
 		/// Whether this is a IPv4 or IPv6 socket.
 		///
 		/// Equivalent to the SO_DOMAIN socket option.
 		address-family: func() -> ip-address-family;
 		finish-bind: func() -> result<_, error-code>;
-		finish-connect: func() -> result<tuple<own<input-stream>, own<output-stream>>, error-code>;
+		finish-connect: func() -> result<tuple<input-stream, output-stream>, error-code>;
 		finish-listen: func() -> result<_, error-code>;
 
 		/// Equivalent to the IP_TTL & IPV6_UNICAST_HOPS socket options.
@@ -1626,7 +1626,7 @@ interface tcp {
 		///
 		/// Note: this function is here for WASI Preview2 only.
 		/// It's planned to be removed when `future` is natively supported in Preview3.
-		subscribe: func() -> own<pollable>;
+		subscribe: func() -> pollable;
 	}
 }
 
@@ -1661,7 +1661,7 @@ interface tcp-create-socket {
 	/// - <https://man7.org/linux/man-pages/man2/socket.2.html>
 	/// - <https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-wsasocketw>
 	/// - <https://man.freebsd.org/cgi/man.cgi?query=socket&sektion=2>
-	create-tcp-socket: func(address-family: ip-address-family) -> result<own<tcp-socket>, error-code>;
+	create-tcp-socket: func(address-family: ip-address-family) -> result<tcp-socket, error-code>;
 }
 
 interface udp {
@@ -1718,7 +1718,7 @@ interface udp {
 		///
 		/// Note: this function is here for WASI Preview2 only.
 		/// It's planned to be removed when `future` is natively supported in Preview3.
-		subscribe: func() -> own<pollable>;
+		subscribe: func() -> pollable;
 	}
 
 	/// A datagram to be sent out.
@@ -1805,7 +1805,7 @@ interface udp {
 		///
 		/// Note: this function is here for WASI Preview2 only.
 		/// It's planned to be removed when `future` is natively supported in Preview3.
-		subscribe: func() -> own<pollable>;
+		subscribe: func() -> pollable;
 	}
 
 	/// A UDP socket handle.
@@ -1950,13 +1950,13 @@ interface udp {
 		/// - <https://man7.org/linux/man-pages/man2/connect.2.html>
 		/// - <https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-connect>
 		/// - <https://man.freebsd.org/cgi/man.cgi?connect>
-		stream: func(remote-address: option<ip-socket-address>) -> result<tuple<own<incoming-datagram-stream>, own<outgoing-datagram-stream>>, error-code>;
+		stream: func(remote-address: option<ip-socket-address>) -> result<tuple<incoming-datagram-stream, outgoing-datagram-stream>, error-code>;
 
 		/// Create a `pollable` which will resolve once the socket is ready for I/O.
 		///
 		/// Note: this function is here for WASI Preview2 only.
 		/// It's planned to be removed when `future` is natively supported in Preview3.
-		subscribe: func() -> own<pollable>;
+		subscribe: func() -> pollable;
 
 		/// Equivalent to the IP_TTL & IPV6_UNICAST_HOPS socket options.
 		///
@@ -1999,7 +1999,7 @@ interface udp-create-socket {
 	/// - <https://man7.org/linux/man-pages/man2/socket.2.html>
 	/// - <https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-wsasocketw>
 	/// - <https://man.freebsd.org/cgi/man.cgi?query=socket&sektion=2>
-	create-udp-socket: func(address-family: ip-address-family) -> result<own<udp-socket>, error-code>;
+	create-udp-socket: func(address-family: ip-address-family) -> result<udp-socket, error-code>;
 }
 
 world imports {
@@ -2050,17 +2050,17 @@ interface run {
 
 interface stderr {
 	use wasi:io/streams@0.2.0.{output-stream};
-	get-stderr: func() -> own<output-stream>;
+	get-stderr: func() -> output-stream;
 }
 
 interface stdin {
 	use wasi:io/streams@0.2.0.{input-stream};
-	get-stdin: func() -> own<input-stream>;
+	get-stdin: func() -> input-stream;
 }
 
 interface stdout {
 	use wasi:io/streams@0.2.0.{output-stream};
-	get-stdout: func() -> own<output-stream>;
+	get-stdout: func() -> output-stream;
 }
 
 /// Terminal input.
@@ -2090,7 +2090,7 @@ interface terminal-stderr {
 
 	/// If stderr is connected to a terminal, return a `terminal-output` handle
 	/// allowing further interaction with it.
-	get-terminal-stderr: func() -> option<own<terminal-output>>;
+	get-terminal-stderr: func() -> option<terminal-output>;
 }
 
 /// An interface providing an optional `terminal-input` for stdin as a
@@ -2100,7 +2100,7 @@ interface terminal-stdin {
 
 	/// If stdin is connected to a terminal, return a `terminal-input` handle
 	/// allowing further interaction with it.
-	get-terminal-stdin: func() -> option<own<terminal-input>>;
+	get-terminal-stdin: func() -> option<terminal-input>;
 }
 
 /// An interface providing an optional `terminal-output` for stdout as a
@@ -2110,7 +2110,7 @@ interface terminal-stdout {
 
 	/// If stdout is connected to a terminal, return a `terminal-output` handle
 	/// allowing further interaction with it.
-	get-terminal-stdout: func() -> option<own<terminal-output>>;
+	get-terminal-stdout: func() -> option<terminal-output>;
 }
 
 world command {

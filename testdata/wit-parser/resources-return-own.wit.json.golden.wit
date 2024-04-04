@@ -2,7 +2,7 @@ package foo:resources1;
 
 interface resources1 {
 	resource r1 {
-		f1: func() -> own<r1>;
+		f1: func() -> r1;
 	}
-	t1: func(a: own<r1>);
+	t1: func(a: r1);
 }
