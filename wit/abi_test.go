@@ -71,8 +71,8 @@ func TestTypeSize(t *testing.T) {
 		{"u32", U32{}, 4, 4},
 		{"s64", S64{}, 8, 8},
 		{"u64", U64{}, 8, 8},
-		{"float32", Float32{}, 4, 4},
-		{"float64", Float64{}, 8, 8},
+		{"f32", F32{}, 4, 4},
+		{"f64", F64{}, 8, 8},
 		{"char", Char{}, 4, 4},
 		{"string", String{}, 8, 4},
 	}
@@ -86,7 +86,6 @@ func TestTypeSize(t *testing.T) {
 			if align != tt.align {
 				t.Errorf("(Type).Align(): expected %d, got %d", tt.align, align)
 			}
-
 		})
 	}
 }
