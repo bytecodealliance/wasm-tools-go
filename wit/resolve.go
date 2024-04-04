@@ -1252,9 +1252,9 @@ func (_primitive[T]) TypeName() string {
 	case uint64:
 		return "u64"
 	case float32:
-		return "float32"
+		return "f32"
 	case float64:
-		return "float64"
+		return "f64"
 	case char:
 		return "char"
 	case string:
