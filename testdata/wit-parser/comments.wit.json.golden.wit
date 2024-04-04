@@ -1,5 +1,12 @@
 package foo:comments;
 
+/// hello
+/// world
+/// why, yes
+/// this is a comment
+/// * this too */
+/// * is a comment */
+/// * this /* is /* a */ nested */ comment */
 interface foo {
 	type bar = stream<x>;
 	type x = u32;
