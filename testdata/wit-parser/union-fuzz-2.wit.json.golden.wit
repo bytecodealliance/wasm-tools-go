@@ -2,9 +2,9 @@ package foo:bar;
 
 world bar {
 	record foo {}
-	export foo: func() -> (name2: float32);
+	export foo: func() -> (name2: f32);
 }
 
 world foo {
-	export foo: func() -> (name2: float32);
+	export foo: func() -> (name2: f32);
 }
