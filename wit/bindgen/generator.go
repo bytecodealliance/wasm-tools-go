@@ -489,9 +489,9 @@ func (g *generator) primitiveRep(file *gen.File, p wit.Primitive) string {
 	case wit.U64:
 		return "uint64"
 	case wit.F32:
-		return "f32"
+		return "float32"
 	case wit.F64:
-		return "f64"
+		return "float64"
 	case wit.Char:
 		return "rune"
 	case wit.String:
