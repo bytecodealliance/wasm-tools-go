@@ -9,13 +9,9 @@
 
 This repository contains code to generate Go bindings for [Component Model](https://component-model.bytecodealliance.org/) interfaces defined in [WIT](https://component-model.bytecodealliance.org/design/wit.html) (WebAssembly Interface Type) files. The goal of this project is to accelerate adoption of the Component Model and development of [WASI Preview 2](https://bytecodealliance.org/articles/WASI-0.2) in Go.
 
-### WASI
-
-The [wasi](./wasi) directory contains generated bindings for the [`wasi:cli/command@0.2.0`](https://github.com/WebAssembly/wasi-cli) world from [WASI Preview 2](https://github.com/WebAssembly/WASI/blob/main/preview2/README.md). The generated bindings currently target [TinyGo](https://tinygo.org).
-
 ### Component Model
 
-Package [cm](./cm) contains low-level types used by the `wasi` packages, such as `option<t>`, `result<ok, err>`, `variant`, `list`, and `resource`. These are intended for use by generated [Component Model](https://github.com/WebAssembly/component-model/blob/main/design/mvp/Explainer.md#type-definitions) bindings, where the caller converts to a Go equivalent. It attempts to map WIT semantics to their equivalent in Go where possible.
+Package [cm](./cm) contains helper types and functions used by generated packages, such as `option<t>`, `result<ok, err>`, `variant`, `list`, and `resource`. These are intended for use by generated [Component Model](https://github.com/WebAssembly/component-model/blob/main/design/mvp/Explainer.md#type-definitions) bindings, where the caller converts to a Go equivalent. It attempts to map WIT semantics to their equivalent in Go where possible.
 
 #### Note on Memory Safety
 
