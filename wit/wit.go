@@ -76,7 +76,7 @@ func (d *Docs) WIT(_ Node, _ string) string {
 		return ""
 	}
 	var b strings.Builder
-	var lineLength = 0
+	lineLength := 0
 	for _, c := range d.Contents {
 		if lineLength == 0 {
 			b.WriteString(DocPrefix)
@@ -459,10 +459,12 @@ func (o *Own) WIT(ctx Node, name string) string {
 		b.WriteString("type ")
 		b.WriteString(escape(name))
 		b.WriteString(" = ")
+		b.WriteString("own<")
 	}
-	b.WriteString("own<")
 	b.WriteString(o.Type.WIT(o, ""))
-	b.WriteRune('>')
+	if name != "" {
+		b.WriteRune('>')
+	}
 	return b.String()
 }
 

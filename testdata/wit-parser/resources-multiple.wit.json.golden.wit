@@ -14,5 +14,5 @@ interface resources-multiple {
 		f9: func() -> (u: u32, f: f32);
 	}
 	t1: func(a: borrow<r1>);
-	t2: func(a: own<r1>);
+	t2: func(a: r1);
 }
