@@ -103,9 +103,11 @@ func (g *generator) generate() ([]*gen.Package, error) {
 		return nil, err
 	}
 
-	err = g.defineInterfaces()
-	if err != nil {
-		return nil, err
+	if g.opts.world == "" {
+		err = g.defineInterfaces()
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	err = g.defineWorlds()
@@ -207,9 +209,24 @@ func (g *generator) defineInterfaces() error {
 func (g *generator) defineWorlds() error {
 	// fmt.Fprintf(os.Stderr, "Generating Go for %d world(s)\n", len(g.res.Worlds))
 	for _, w := range g.res.Worlds {
-		g.defineWorld(w)
+		if g.opts.world == "" || matchWorld(w, g.opts.world) {
+			g.defineWorld(w)
+		}
 	}
 	return nil
+}
+
+func matchWorld(w *wit.World, name string) bool {
+	if name == w.Name {
+		return true
+	}
+	id := w.Package.Name
+	id.Extension = w.Name
+	if name == id.String() {
+		return true
+	}
+	id.Version = nil
+	return name == id.String()
 }
 
 func (g *generator) defineWorld(w *wit.World) error {
