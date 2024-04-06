@@ -1093,8 +1093,6 @@ func (_typeOwner) isTypeOwner() {}
 //
 // [primitive type]: https://component-model.bytecodealliance.org/design/wit.html#primitive-types
 type Type interface {
-	Node
-	ABI
 	TypeDefKind
 	isType()
 }
