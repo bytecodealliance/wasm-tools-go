@@ -229,7 +229,7 @@ func (i *Interface) AllFunctions(yield func(*Function) bool) {
 
 // TypeDef represents a WIT type definition. A TypeDef may be named or anonymous,
 // and optionally belong to a [World] or [Interface].
-// It implements the [Node], [ABI], [Type], [TypeDefKind] interfaces.
+// It implements the [Node], [ABI], [Type], and [TypeDefKind] interfaces.
 type TypeDef struct {
 	_type
 	_worldItem
@@ -363,7 +363,7 @@ type _typeDefKind struct{}
 func (_typeDefKind) TypeName() string { return "" }
 func (_typeDefKind) isTypeDefKind()   {}
 
-// KindOf probes [Type] t to determine if it is a [TypeDef] with [Kind] K.
+// KindOf probes [Type] t to determine if it is a [TypeDef] with [TypeDefKind] K.
 // It returns the underlying Kind if present.
 func KindOf[K TypeDefKind](t Type) (kind K) {
 	if td, ok := t.(*TypeDef); ok {
