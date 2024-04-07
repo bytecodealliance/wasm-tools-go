@@ -7,6 +7,8 @@ import (
 	"strconv"
 	"strings"
 	"unsafe"
+
+	"github.com/ydnar/wasm-tools-go/internal/visitor"
 )
 
 // Resolve represents a fully resolved set of WIT ([WebAssembly Interface Type])
@@ -31,27 +33,16 @@ type Resolve struct {
 //
 // [iterates]: https://github.com/golang/go/issues/61897
 func (r *Resolve) AllFunctions(yield func(*Function) bool) {
-	var done bool
-	seen := make(map[*Function]bool)
-	yieldNew := func(f *Function) bool {
-		if seen[f] {
-			return !done
-		}
-		seen[f] = true
-		if !yield(f) {
-			done = true
-		}
-		return !done
-	}
+	v := visitor.New(yield)
 	for _, w := range r.Worlds {
-		w.AllFunctions(yieldNew)
-		if done {
+		w.AllFunctions(v.Yield)
+		if v.Done() {
 			return
 		}
 	}
 	for _, i := range r.Interfaces {
-		i.AllFunctions(yieldNew)
-		if done {
+		i.AllFunctions(v.Yield)
+		if v.Done() {
 			return
 		}
 	}
