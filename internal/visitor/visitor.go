@@ -1,25 +1,19 @@
 package visitor
 
-type Visitor[T comparable] interface {
-	Yield(T) bool
-	Visited(T) bool
-	Done() bool
-}
-
-func New[T comparable](yield func(T) bool) Visitor[T] {
-	return &visitor[T]{
-		yield:   yield,
-		visited: make(map[T]struct{}),
-	}
-}
-
-type visitor[T comparable] struct {
+type Visitor[T comparable] struct {
 	yield   func(T) bool
 	visited map[T]struct{}
 	done    bool
 }
 
-func (v *visitor[T]) Yield(e T) bool {
+func New[T comparable](yield func(T) bool) *Visitor[T] {
+	return &Visitor[T]{
+		yield:   yield,
+		visited: make(map[T]struct{}),
+	}
+}
+
+func (v *Visitor[T]) Yield(e T) bool {
 	if v.done {
 		return false
 	}
@@ -31,11 +25,11 @@ func (v *visitor[T]) Yield(e T) bool {
 	return !v.done
 }
 
-func (v *visitor[T]) Visited(e T) bool {
+func (v *Visitor[T]) Visited(e T) bool {
 	_, visited := v.visited[e]
 	return visited
 }
 
-func (v *visitor[T]) Done() bool {
+func (v *Visitor[T]) Done() bool {
 	return v.done
 }
