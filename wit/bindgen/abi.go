@@ -20,9 +20,9 @@ func variantShape(v *wit.Variant) wit.Type {
 			return -1
 		case a.Size() < b.Size():
 			return 1
-		case a.HasPointer() && !b.HasPointer():
+		case wit.HasPointer(a) && !wit.HasPointer(b):
 			return -1
-		case !a.HasPointer() && b.HasPointer():
+		case !wit.HasPointer(a) && wit.HasPointer(b):
 			return 1
 		default:
 			return 0

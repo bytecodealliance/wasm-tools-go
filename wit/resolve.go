@@ -337,7 +337,7 @@ func (t *TypeDef) Align() uintptr {
 //
 // [ABI]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md
 func (t *TypeDef) HasPointer() bool {
-	return t.Kind.HasPointer()
+	return HasPointer(t.Kind)
 }
 
 // Flat returns the [flattened] ABI representation of [TypeDef] t.
@@ -402,16 +402,16 @@ func (*Pointer) Size() uintptr { return 4 }
 // [ABI byte alignment]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#alignment
 func (*Pointer) Align() uintptr { return 4 }
 
+// Flat returns the [flattened] ABI representation of [Pointer].
+//
+// [flattened]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
+func (*Pointer) Flat() []Type { return []Type{U32{}} }
+
 // HasPointer returns whether the [ABI] representation of [Pointer] contains a pointer.
 // This always returns true.
 //
 // [ABI]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md
 func (*Pointer) HasPointer() bool { return true }
-
-// Flat returns the [flattened] ABI representation of [Pointer].
-//
-// [flattened]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
-func (*Pointer) Flat() []Type { return []Type{U32{}} }
 
 // Record represents a WIT [record type], akin to a struct.
 // It implements the [Node], [ABI], and [TypeDefKind] interfaces.
@@ -463,7 +463,7 @@ func (r *Record) Align() uintptr {
 // [ABI]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md
 func (r *Record) HasPointer() bool {
 	for _, f := range r.Fields {
-		if f.Type.HasPointer() {
+		if HasPointer(f.Type) {
 			return true
 		}
 	}
@@ -504,11 +504,6 @@ func (*Resource) Size() uintptr { return 4 }
 // [ABI byte alignment]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#alignment
 func (*Resource) Align() uintptr { return 4 }
 
-// HasPointer returns whether the [ABI] representation of [Resource] contains a pointer.
-//
-// [ABI byte alignment]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md
-func (*Resource) HasPointer() bool { return false }
-
 // Flat returns the [flattened] ABI representation of [Resource].
 //
 // [flattened]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
@@ -542,10 +537,6 @@ func (_handle) Size() uintptr { return 4 }
 //
 // [ABI byte alignment]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#alignment
 func (_handle) Align() uintptr { return 4 }
-
-// HasPointer returns whether the ABI representation of this type contains a pointer.
-// This will always return false.
-func (_handle) HasPointer() bool { return false }
 
 // Flat returns the [flattened] ABI representation of this type.
 //
@@ -620,12 +611,6 @@ func (f *Flags) Align() uintptr {
 	}
 	return 4
 }
-
-// HasPointer returns whether the [ABI] representation of [Flags] contains a pointer.
-// This always returns false.
-//
-// [ABI]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md
-func (*Flags) HasPointer() bool { return false }
 
 // Flat returns the [flattened] ABI representation of [Flags] f.
 //
@@ -717,13 +702,6 @@ func (t *Tuple) Align() uintptr {
 	return t.Despecialize().Align()
 }
 
-// HasPointer returns whether the [ABI] representation of a [Tuple] contains a pointer.
-//
-// [ABI]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md
-func (t *Tuple) HasPointer() bool {
-	return t.Despecialize().HasPointer()
-}
-
 // Flat returns the [flattened] ABI representation of [Tuple] t.
 //
 // [flattened]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
@@ -811,7 +789,7 @@ func (v *Variant) Align() uintptr {
 // that contains a pointer (e.g. string, list).
 func (v *Variant) HasPointer() bool {
 	for _, t := range v.Types() {
-		if t.HasPointer() {
+		if HasPointer(t) {
 			return true
 		}
 	}
@@ -907,13 +885,6 @@ func (e *Enum) Align() uintptr {
 	return e.Despecialize().Align()
 }
 
-// HasPointer returns whether the [ABI] representation of [Enum] e contains a pointer.
-//
-// [ABI]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md
-func (e *Enum) HasPointer() bool {
-	return e.Despecialize().HasPointer()
-}
-
 // Flat returns the [flattened] ABI representation of [Enum] e.
 //
 // [flattened]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
@@ -979,13 +950,6 @@ func (o *Option) Size() uintptr {
 // [despecialized]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#despecialization
 func (o *Option) Align() uintptr {
 	return o.Despecialize().Align()
-}
-
-// HasPointer returns whether the [ABI] representation of an [Option] contains a pointer.
-//
-// [ABI]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md
-func (o *Option) HasPointer() bool {
-	return o.Despecialize().HasPointer()
 }
 
 // Flat returns the [flattened] ABI representation of [Option] o.
@@ -1055,13 +1019,6 @@ func (r *Result) Size() uintptr {
 // [despecialized]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#despecialization
 func (r *Result) Align() uintptr {
 	return r.Despecialize().Align()
-}
-
-// HasPointer returns whether the [ABI] representation of a [Result] contains a pointer.
-//
-// [ABI]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md
-func (r *Result) HasPointer() bool {
-	return r.Despecialize().HasPointer()
 }
 
 // Flat returns the [flattened] ABI representation of [Result] r.
@@ -1141,12 +1098,6 @@ func (*Future) Size() uintptr { return 0 }
 // [ABI byte alignment]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#alignment
 func (*Future) Align() uintptr { return 0 }
 
-// HasPointer returns whether the [ABI] representation of a [Future] contains a pointer.
-// TODO: what is the ABI representation of a stream?
-//
-// [ABI]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md
-func (*Future) HasPointer() bool { return false }
-
 // Flat returns the [flattened] ABI representation of [Future].
 // TODO: what is the ABI representation of a stream?
 //
@@ -1194,12 +1145,6 @@ func (*Stream) Size() uintptr { return 0 }
 //
 // [ABI byte alignment]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#alignment
 func (*Stream) Align() uintptr { return 0 }
-
-// HasPointer returns whether the [ABI] representation of a [Stream] contains a pointer.
-// TODO: what is the ABI representation of a stream?
-//
-// [ABI]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md
-func (*Stream) HasPointer() bool { return false }
 
 // Flat returns the [flattened] ABI representation of [Stream].
 // TODO: what is the ABI representation of a stream?

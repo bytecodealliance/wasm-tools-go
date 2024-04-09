@@ -19,8 +19,8 @@ func Discriminant(n int) Type {
 	return U32{}
 }
 
-// ABI is the interface implemented by any type that reports its [Canonical ABI] [size], [alignment],
-// whether the type contains a pointer (e.g. [List] or [String]), and its [flat] ABI representation.
+// ABI is the interface implemented by any type that can report its
+// [Canonical ABI] [size], [alignment], and [flat] representation.
 //
 // [Canonical ABI]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md
 // [size]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#size
@@ -29,7 +29,6 @@ func Discriminant(n int) Type {
 type ABI interface {
 	Size() uintptr
 	Align() uintptr
-	HasPointer() bool
 	Flat() []Type
 }
 
@@ -57,23 +56,17 @@ func Despecialize(k TypeDefKind) TypeDefKind {
 	return k
 }
 
-func HasPointer(t Type) bool {
-	var hasPointer bool
-	t.AllTypes()(func(t Type) bool {
-		switch t := t.(type) {
-		case *TypeDef:
-			switch t.Kind.(type) {
-			case String, *List:
-				hasPointer = true
-				return false
-			}
-		case String:
-			hasPointer = true
-			return false
-		}
-		return true
-	})
-	return hasPointer
+type hasPointer interface {
+	HasPointer() bool
+}
+
+// HasPointer returns whether or not t contains a [Type] that contains a pointer, e.g. [String] or [List].
+func HasPointer(t TypeDefKind) bool {
+	t = Despecialize(t)
+	if p, ok := t.(hasPointer); ok {
+		return p.HasPointer()
+	}
+	return false
 }
 
 // Op represents the [Canonical ABI] [lift] and [lower] operations, for lowering into or lifting out of linear memory.
