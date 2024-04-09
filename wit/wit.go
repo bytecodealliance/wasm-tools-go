@@ -14,9 +14,6 @@ import (
 //
 // [WebAssembly Interface Type]: https://component-model.bytecodealliance.org/design/wit.html
 type Node interface {
-	// AllNodes returns a sequence that recursively yields each Node, starting with the receiver.
-	AllNodes() iterate.Seq[Node]
-
 	// WITKind returns the human-readable WIT kind this Node represents, e.g. "type" or "function".
 	WITKind() string
 

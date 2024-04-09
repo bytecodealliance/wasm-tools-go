@@ -29,35 +29,6 @@ type Resolve struct {
 	Packages   []*Package
 }
 
-// AllNodes returns a [sequence] that recursively yields each [Node] in a [Resolve].
-// The returned sequence first yields the [Resolve], followed by each
-// [World], [Interface], [TypeDef], and [Package]. Only the first instance of a Node
-// is yielded. Subsequent references are ignored to prevent infinite recursion.
-// The sequence stops if yield returns false.
-//
-// [sequence]: https://github.com/golang/go/issues/61897
-func (r *Resolve) AllNodes() iterate.Seq[Node] {
-	return func(yield func(Node) bool) {
-		var done bool
-		yield = iterate.Done(iterate.Once(yield), func() { done = true })
-		if !yield(r) {
-			return
-		}
-		for i := 0; i < len(r.Worlds) && !done; i++ {
-			r.Worlds[i].AllNodes()(yield)
-		}
-		for i := 0; i < len(r.Interfaces) && !done; i++ {
-			r.Interfaces[i].AllNodes()(yield)
-		}
-		for i := 0; i < len(r.TypeDefs) && !done; i++ {
-			r.TypeDefs[i].AllNodes()(yield)
-		}
-		for i := 0; i < len(r.Packages) && !done; i++ {
-			r.Packages[i].AllNodes()(yield)
-		}
-	}
-}
-
 // AllFunctions returns a [sequence] that yields each [Function] in a [Resolve].
 // The sequence stops if yield returns false.
 //
@@ -91,34 +62,6 @@ type World struct {
 	Docs    Docs
 }
 
-// AllNodes returns a [sequence] that recursively yields each [Node] in a [World].
-// The returned sequence first yields the [World], followed by each import and export.
-// Only the first instance of each Node is yielded.
-// Subsequent references are ignored to prevent infinite recursion.
-// The sequence stops if yield returns false.
-//
-// [sequence]: https://github.com/golang/go/issues/61897
-func (w *World) AllNodes() iterate.Seq[Node] {
-	return func(yield func(Node) bool) {
-		var done bool
-		yield = iterate.Done(iterate.Once(yield), func() { done = true })
-		if !yield(w) {
-			return
-		}
-		w.AllImports()(func(_ string, i WorldItem) bool {
-			i.AllNodes()(yield)
-			return !done
-		})
-		if done {
-			return
-		}
-		w.AllExports()(func(_ string, i WorldItem) bool {
-			i.AllNodes()(yield)
-			return !done
-		})
-	}
-}
-
 // AllFunctions returns a [sequence] that yields each [Function] in a [World].
 // The sequence stops if yield returns false.
 //
@@ -129,22 +72,18 @@ func (w *World) AllFunctions() iterate.Seq[*Function] {
 		yield = iterate.Done(iterate.Once(yield), func() { done = true })
 		w.AllImports()(func(_ string, i WorldItem) bool {
 			if f, ok := i.(*Function); ok {
-				if !yield(f) {
-					return false
-				}
+				return yield(f)
 			}
-			return !done
+			return true
 		})
 		if done {
 			return
 		}
 		w.AllExports()(func(_ string, i WorldItem) bool {
 			if f, ok := i.(*Function); ok {
-				if !yield(f) {
-					return false
-				}
+				return yield(f)
 			}
-			return !done
+			return true
 		})
 	}
 }
@@ -261,42 +200,14 @@ type Interface struct {
 	Docs    Docs
 }
 
-// AllNodes returns a [sequence] that recursively yields each [Node] in an [Interface].
-// The returned sequence first yields the [Interface], followed by each child Node.
-// The sequence stops if yield returns false.
-// See [Node] for more information.
-//
-// [sequence]: https://github.com/golang/go/issues/61897
-func (i *Interface) AllNodes() iterate.Seq[Node] {
-	return func(yield func(Node) bool) {
-		var done bool
-		yield = iterate.Done(iterate.Once(yield), func() { done = true })
-		if !yield(i) {
-			return
-		}
-		for _, name := range codec.SortedKeys(i.TypeDefs) {
-			if done {
-				return
-			}
-			i.TypeDefs[name].AllNodes()(yield)
-		}
-		for _, name := range codec.SortedKeys(i.Functions) {
-			if done {
-				return
-			}
-			i.Functions[name].AllNodes()(yield)
-		}
-	}
-}
-
 // AllFunctions returns a [sequence] that yields each [Function] in an [Interface].
 // The sequence stops if yield returns false.
 //
 // [sequence]: https://github.com/golang/go/issues/61897
 func (i *Interface) AllFunctions() iterate.Seq[*Function] {
 	return func(yield func(*Function) bool) {
-		for _, f := range i.Functions {
-			if !yield(f) {
+		for _, name := range codec.SortedKeys(i.Functions) {
+			if !yield(i.Functions[name]) {
 				return
 			}
 		}
@@ -366,18 +277,17 @@ func (t *TypeDef) Constructor() *Function {
 	return constructor
 }
 
-// AllNodes returns a [sequence] that recursively yields each [Node] in a [TypeDef].
-// The returned sequence first yields the [TypeDef], followed by each child Node.
+// AllTypes returns a [sequence] that recursively yields each [Type] in a [TypeDef].
 // The sequence stops if yield returns false.
 // See [Node] for more information.
 //
 // [sequence]: https://github.com/golang/go/issues/61897
-func (t *TypeDef) AllNodes() iterate.Seq[Node] {
-	return func(yield func(Node) bool) {
+func (t *TypeDef) AllTypes() iterate.Seq[Type] {
+	return func(yield func(Type) bool) {
 		if !yield(t) {
 			return
 		}
-		t.Kind.AllNodes()(yield)
+		t.Kind.AllTypes()(yield)
 	}
 }
 
@@ -444,6 +354,7 @@ func (t *TypeDef) Flat() []Type {
 type TypeDefKind interface {
 	Node
 	ABI
+	AllTypes() iterate.Seq[Type]
 	TypeName() string
 	isTypeDefKind()
 }
@@ -451,8 +362,9 @@ type TypeDefKind interface {
 // _typeDefKind is an embeddable type that conforms to the [TypeDefKind] interface.
 type _typeDefKind struct{}
 
-func (_typeDefKind) TypeName() string { return "" }
-func (_typeDefKind) isTypeDefKind()   {}
+func (_typeDefKind) AllTypes() iterate.Seq[Type] { return func(func(Type) bool) {} }
+func (_typeDefKind) TypeName() string            { return "" }
+func (_typeDefKind) isTypeDefKind()              {}
 
 // KindOf probes [Type] t to determine if it is a [TypeDef] with [TypeDefKind] K.
 // It returns the underlying Kind if present.
@@ -473,16 +385,11 @@ type Pointer struct {
 	Type Type
 }
 
-// AllNodes returns a sequence that recursively yields each [Node].
+// AllTypes returns a sequence that recursively yields each [Type].
 // The sequence stops if yield returns false.
-// See [Node] for more information.
-func (p *Pointer) AllNodes() iterate.Seq[Node] {
-	return func(yield func(Node) bool) {
-		if !yield(p) {
-			return
-		}
-		p.Type.AllNodes()(yield)
-	}
+// See [TypeDefKind] for more information.
+func (p *Pointer) AllTypes() iterate.Seq[Type] {
+	return p.Type.AllTypes()
 }
 
 // Size returns the [ABI byte size] for [Pointer].
@@ -515,20 +422,15 @@ type Record struct {
 	Fields []Field
 }
 
-// AllNodes returns a [sequence] that recursively yields each [Node] in a [Record].
-// The returned sequence first yields the [Record], followed by each [Field].
+// AllTypes returns a sequence that recursively yields each [Type].
 // The sequence stops if yield returns false.
-//
-// [sequence]: https://github.com/golang/go/issues/61897
-func (r *Record) AllNodes() iterate.Seq[Node] {
-	return func(yield func(Node) bool) {
+// See [TypeDefKind] for more information.
+func (r *Record) AllTypes() iterate.Seq[Type] {
+	return func(yield func(Type) bool) {
 		var done bool
 		yield = iterate.Done(yield, func() { done = true })
-		if !yield(r) {
-			return
-		}
 		for i := 0; i < len(r.Fields) && !done; i++ {
-			r.Fields[i].AllNodes()(yield)
+			r.Fields[i].Type.AllTypes()(yield)
 		}
 	}
 }
@@ -586,32 +488,11 @@ type Field struct {
 	Docs Docs
 }
 
-// AllNodes returns a sequence that recursively yields each [Node].
-// The sequence stops if yield returns false.
-// See [Node] for more information.
-func (f *Field) AllNodes() iterate.Seq[Node] {
-	return func(yield func(Node) bool) {
-		if !yield(f) {
-			return
-		}
-		if f.Type != nil {
-			f.Type.AllNodes()(yield)
-		}
-	}
-}
-
 // Resource represents a WIT [resource type].
 // It implements the [Node], [ABI], and [TypeDefKind] interfaces.
 //
 // [resource type]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md#item-resource
 type Resource struct{ _typeDefKind }
-
-// AllNodes returns a sequence that recursively yields each [Node].
-// The sequence stops if yield returns false.
-// See [Node] for more information.
-func (r *Resource) AllNodes() iterate.Seq[Node] {
-	return leafNodeSeq(r)
-}
 
 // Size returns the [ABI byte size] for [Resource].
 //
@@ -680,16 +561,11 @@ type Own struct {
 	Type *TypeDef
 }
 
-// AllNodes returns a sequence that recursively yields each [Node].
+// AllTypes returns a sequence that recursively yields each [Type].
 // The sequence stops if yield returns false.
-// See [Node] for more information.
-func (o *Own) AllNodes() iterate.Seq[Node] {
-	return func(yield func(Node) bool) {
-		if !yield(o) {
-			return
-		}
-		o.Type.AllNodes()(yield)
-	}
+// See [TypeDefKind] for more information.
+func (o *Own) AllTypes() iterate.Seq[Type] {
+	return o.Type.AllTypes()
 }
 
 // Borrow represents a WIT [borrowed handle].
@@ -701,16 +577,11 @@ type Borrow struct {
 	Type *TypeDef
 }
 
-// AllNodes returns a sequence that recursively yields each [Node].
+// AllTypes returns a sequence that recursively yields each [Type].
 // The sequence stops if yield returns false.
-// See [Node] for more information.
-func (b *Borrow) AllNodes() iterate.Seq[Node] {
-	return func(yield func(Node) bool) {
-		if !yield(b) {
-			return
-		}
-		b.Type.AllNodes()(yield)
-	}
+// See [TypeDefKind] for more information.
+func (b *Borrow) AllTypes() iterate.Seq[Type] {
+	return b.Type.AllTypes()
 }
 
 // Flags represents a WIT [flags type], stored as a bitfield.
@@ -720,22 +591,6 @@ func (b *Borrow) AllNodes() iterate.Seq[Node] {
 type Flags struct {
 	_typeDefKind
 	Flags []Flag
-}
-
-// AllNodes returns a sequence that recursively yields each [Node].
-// The sequence stops if yield returns false.
-// See [Node] for more information.
-func (f *Flags) AllNodes() iterate.Seq[Node] {
-	return func(yield func(Node) bool) {
-		var done bool
-		yield = iterate.Done(yield, func() { done = true })
-		if !yield(f) {
-			return
-		}
-		for i := 0; i < len(f.Flags) && !done; i++ {
-			f.Flags[i].AllNodes()(yield)
-		}
-	}
 }
 
 // Size returns the [ABI byte size] of [Flags] f.
@@ -790,13 +645,6 @@ type Flag struct {
 	Docs Docs
 }
 
-// AllNodes returns a sequence that recursively yields each [Node].
-// The sequence stops if yield returns false.
-// See [Node] for more information.
-func (f *Flag) AllNodes() iterate.Seq[Node] {
-	return leafNodeSeq(f)
-}
-
 // Tuple represents a WIT [tuple type].
 // A tuple type is an ordered fixed length sequence of values of specified types.
 // It is similar to a [Record], except that the fields are identified by their order instead of by names.
@@ -808,18 +656,15 @@ type Tuple struct {
 	Types []Type
 }
 
-// AllNodes returns a sequence that recursively yields each [Node].
+// AllTypes returns a sequence that recursively yields each [Type].
 // The sequence stops if yield returns false.
-// See [Node] for more information.
-func (t *Tuple) AllNodes() iterate.Seq[Node] {
-	return func(yield func(Node) bool) {
+// See [TypeDefKind] for more information.
+func (t *Tuple) AllTypes() iterate.Seq[Type] {
+	return func(yield func(Type) bool) {
 		var done bool
 		yield = iterate.Done(yield, func() { done = true })
-		if !yield(t) {
-			return
-		}
 		for i := 0; i < len(t.Types) && !done; i++ {
-			t.Types[i].AllNodes()(yield)
+			t.Types[i].AllTypes()(yield)
 		}
 	}
 }
@@ -930,18 +775,17 @@ func (v *Variant) Types() []Type {
 	return types
 }
 
-// AllNodes returns a sequence that recursively yields each [Node].
+// AllTypes returns a sequence that recursively yields each [Type].
 // The sequence stops if yield returns false.
-// See [Node] for more information.
-func (v *Variant) AllNodes() iterate.Seq[Node] {
-	return func(yield func(Node) bool) {
+// See [TypeDefKind] for more information.
+func (v *Variant) AllTypes() iterate.Seq[Type] {
+	return func(yield func(Type) bool) {
 		var done bool
-		yield = iterate.Done(yield, func() { done = true })
-		if !yield(v) {
-			return
-		}
+		yield = iterate.Done(iterate.Once(yield), func() { done = true })
 		for i := 0; i < len(v.Cases) && !done; i++ {
-			v.Cases[i].AllNodes()(yield)
+			if v.Cases[i].Type != nil {
+				v.Cases[i].Type.AllTypes()(yield)
+			}
 		}
 	}
 }
@@ -1019,20 +863,6 @@ type Case struct {
 	Docs Docs
 }
 
-// AllNodes returns a sequence that recursively yields each [Node].
-// The sequence stops if yield returns false.
-// See [Node] for more information.
-func (c *Case) AllNodes() iterate.Seq[Node] {
-	return func(yield func(Node) bool) {
-		if !yield(c) {
-			return
-		}
-		if c.Type != nil {
-			c.Type.AllNodes()(yield)
-		}
-	}
-}
-
 // Enum represents a WIT [enum type], which is a [Variant] without associated data.
 // The equivalent in Go is a set of const identifiers declared with iota.
 // It implements the [Node], [ABI], and [TypeDefKind] interfaces.
@@ -1056,22 +886,6 @@ func (e *Enum) Despecialize() TypeDefKind {
 		v.Cases[i].Docs = e.Cases[i].Docs
 	}
 	return v
-}
-
-// AllNodes returns a sequence that recursively yields each [Node].
-// The sequence stops if yield returns false.
-// See [Node] for more information.
-func (e *Enum) AllNodes() iterate.Seq[Node] {
-	return func(yield func(Node) bool) {
-		var done bool
-		yield = iterate.Done(yield, func() { done = true })
-		if !yield(e) {
-			return
-		}
-		for i := 0; i < len(e.Cases) && !done; i++ {
-			e.Cases[i].AllNodes()(yield)
-		}
-	}
 }
 
 // Size returns the [ABI byte size] for [Enum] e, the smallest integer
@@ -1114,13 +928,6 @@ type EnumCase struct {
 	Docs Docs
 }
 
-// AllNodes returns a sequence that recursively yields each [Node].
-// The sequence stops if yield returns false.
-// See [Node] for more information.
-func (c *EnumCase) AllNodes() iterate.Seq[Node] {
-	return leafNodeSeq(c)
-}
-
 // Option represents a WIT [option type], a special case of [Variant]. An Option can
 // contain a value of a single type, either build-in or user defined, or no value.
 // The equivalent in Go for an option<string> could be represented as *string.
@@ -1132,16 +939,13 @@ type Option struct {
 	Type Type
 }
 
-// AllNodes returns a sequence that recursively yields each [Node].
+// AllTypes returns a sequence that recursively yields each [Type].
 // The sequence stops if yield returns false.
-// See [Node] for more information.
-func (o *Option) AllNodes() iterate.Seq[Node] {
-	return func(yield func(Node) bool) {
-		if !yield(o) {
-			return
-		}
+// See [TypeDefKind] for more information.
+func (o *Option) AllTypes() iterate.Seq[Type] {
+	return func(yield func(Type) bool) {
 		if o.Type != nil {
-			o.Type.AllNodes()(yield)
+			o.Type.AllTypes()(yield)
 		}
 	}
 }
@@ -1203,21 +1007,21 @@ type Result struct {
 	Err Type // optional associated Type (can be nil)
 }
 
-// AllNodes returns a sequence that recursively yields each [Node].
+// AllTypes returns a sequence that recursively yields each [Type].
 // The sequence stops if yield returns false.
-// See [Node] for more information.
-func (r *Result) AllNodes() iterate.Seq[Node] {
-	return func(yield func(Node) bool) {
+// See [TypeDefKind] for more information.
+func (r *Result) AllTypes() iterate.Seq[Type] {
+	return func(yield func(Type) bool) {
 		var done bool
-		yield = iterate.Done(yield, func() { done = true })
-		if !yield(r) {
+		yield = iterate.Done(iterate.Once(yield), func() { done = true })
+		if r.OK != nil {
+			r.OK.AllTypes()(yield)
+		}
+		if done {
 			return
 		}
-		if !done && r.OK != nil {
-			r.OK.AllNodes()(yield)
-		}
-		if !done && r.Err != nil {
-			r.Err.AllNodes()(yield)
+		if r.Err != nil {
+			r.Err.AllTypes()(yield)
 		}
 	}
 }
@@ -1276,16 +1080,11 @@ type List struct {
 	Type Type
 }
 
-// AllNodes returns a sequence that recursively yields each [Node].
+// AllTypes returns a sequence that recursively yields each [Type].
 // The sequence stops if yield returns false.
-// See [Node] for more information.
-func (l *List) AllNodes() iterate.Seq[Node] {
-	return func(yield func(Node) bool) {
-		if !yield(l) {
-			return
-		}
-		l.Type.AllNodes()(yield)
-	}
+// See [TypeDefKind] for more information.
+func (l *List) AllTypes() iterate.Seq[Type] {
+	return l.Type.AllTypes()
 }
 
 // Size returns the [ABI byte size] for a [List].
@@ -1319,16 +1118,13 @@ type Future struct {
 	Type Type // optional associated Type (can be nil)
 }
 
-// AllNodes returns a sequence that recursively yields each [Node].
+// AllTypes returns a sequence that recursively yields each [Type].
 // The sequence stops if yield returns false.
-// See [Node] for more information.
-func (f *Future) AllNodes() iterate.Seq[Node] {
-	return func(yield func(Node) bool) {
-		if !yield(f) {
-			return
-		}
+// See [TypeDefKind] for more information.
+func (f *Future) AllTypes() iterate.Seq[Type] {
+	return func(yield func(Type) bool) {
 		if f.Type != nil {
-			f.Type.AllNodes()(yield)
+			f.Type.AllTypes()(yield)
 		}
 	}
 }
@@ -1368,19 +1164,21 @@ type Stream struct {
 	End     Type // optional associated Type (can be nil)
 }
 
-// AllNodes returns a sequence that recursively yields each [Node].
+// AllTypes returns a sequence that recursively yields each [Type].
 // The sequence stops if yield returns false.
-// See [Node] for more information.
-func (s *Stream) AllNodes() iterate.Seq[Node] {
-	return func(yield func(Node) bool) {
-		if !yield(s) {
+// See [TypeDefKind] for more information.
+func (s *Stream) AllTypes() iterate.Seq[Type] {
+	return func(yield func(Type) bool) {
+		var done bool
+		yield = iterate.Done(iterate.Once(yield), func() { done = true })
+		if s.Element != nil {
+			s.Element.AllTypes()(yield)
+		}
+		if done {
 			return
 		}
-		if s.Element != nil {
-			s.Element.AllNodes()(yield)
-		}
 		if s.End != nil {
-			s.End.AllNodes()(yield)
+			s.End.AllTypes()(yield)
 		}
 	}
 }
@@ -1503,11 +1301,9 @@ type _primitive[T primitive] struct{ _type }
 // isPrimitive conforms to the [Primitive] interface.
 func (_primitive[T]) isPrimitive() {}
 
-func (p _primitive[T]) AllNodes() iterate.Seq[Node] {
-	return func(yield func(Node) bool) {
-		if !yield(p.outerType()) {
-			return
-		}
+func (p _primitive[T]) AllTypes() iterate.Seq[Type] {
+	return func(yield func(Type) bool) {
+		yield(p.outerType())
 	}
 }
 
@@ -1833,26 +1629,6 @@ func (f *Function) IsStatic() bool {
 	return ok && kind.Type != nil
 }
 
-// AllNodes returns a sequence that recursively yields each [Node] in a [Function].
-// The returned sequence first yields the [Function], followed by each param and result.
-// The sequence stops if yield returns false.
-// See [Node] for more information.
-func (f *Function) AllNodes() iterate.Seq[Node] {
-	return func(yield func(Node) bool) {
-		var done bool
-		yield = iterate.Done(iterate.Once(yield), func() { done = true })
-		if !yield(f) {
-			return
-		}
-		for i := 0; i < len(f.Params) && !done; i++ {
-			f.Params[i].AllNodes()(yield)
-		}
-		for i := 0; i < len(f.Results) && !done; i++ {
-			f.Results[i].AllNodes()(yield)
-		}
-	}
-}
-
 // FunctionKind represents the kind of a WIT [function], which can be one of
 // [Freestanding], [Method], [Static], or [Constructor].
 //
@@ -1895,18 +1671,6 @@ type Param struct {
 	Type Type
 }
 
-// AllNodes returns a sequence that recursively yields each [Node].
-// The sequence stops if yield returns false.
-// See [Node] for more information.
-func (p *Param) AllNodes() iterate.Seq[Node] {
-	return func(yield func(Node) bool) {
-		if !yield(p) {
-			return
-		}
-		p.Type.AllNodes()(yield)
-	}
-}
-
 // Package represents a [WIT package] within a [Resolve].
 // It implements the [Node] interface.
 //
@@ -1920,34 +1684,6 @@ type Package struct {
 	Interfaces map[string]*Interface
 	Worlds     map[string]*World
 	Docs       Docs
-}
-
-// AllNodes returns a sequence that recursively yields each [Node] in a [Package].
-// The returned sequence first yields the [Package], followed by each [Interface] and [World].
-// Only the first instance of each Node is yielded.
-// Subsequent references are ignored to prevent infinite recursion.
-// The sequence stops if yield returns false.
-// See [Node] for more information.
-func (p *Package) AllNodes() iterate.Seq[Node] {
-	return func(yield func(Node) bool) {
-		var done bool
-		yield = iterate.Done(iterate.Once(yield), func() { done = true })
-		if !yield(p) {
-			return
-		}
-		for _, name := range codec.SortedKeys(p.Interfaces) {
-			if done {
-				return
-			}
-			p.Interfaces[name].AllNodes()(yield)
-		}
-		for _, name := range codec.SortedKeys(p.Worlds) {
-			if done {
-				return
-			}
-			p.Worlds[name].AllNodes()(yield)
-		}
-	}
 }
 
 // Docs represent WIT documentation text extracted from comments.

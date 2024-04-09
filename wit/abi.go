@@ -59,11 +59,16 @@ func Despecialize(k TypeDefKind) TypeDefKind {
 
 func HasPointer(t Type) bool {
 	var hasPointer bool
-	t.AllNodes()(func(n Node) bool {
-		switch n.(type) {
-		case *Pointer, String, *List:
+	t.AllTypes()(func(t Type) bool {
+		switch t := t.(type) {
+		case *TypeDef:
+			switch t.Kind.(type) {
+			case String, *List:
+				hasPointer = true
+				return false
+			}
+		case String:
 			hasPointer = true
-			print("!")
 			return false
 		}
 		return true
