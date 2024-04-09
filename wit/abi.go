@@ -57,6 +57,20 @@ func Despecialize(k TypeDefKind) TypeDefKind {
 	return k
 }
 
+func HasPointer(t Type) bool {
+	var hasPointer bool
+	t.AllNodes()(func(n Node) bool {
+		switch n.(type) {
+		case *Pointer, String, *List:
+			hasPointer = true
+			print("!")
+			return false
+		}
+		return true
+	})
+	return hasPointer
+}
+
 // Op represents the [Canonical ABI] [lift] and [lower] operations, for lowering into or lifting out of linear memory.
 //
 // [Canonical ABI]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/Explainer.md#canonical-abi

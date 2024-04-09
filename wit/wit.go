@@ -6,15 +6,28 @@ import (
 	"strings"
 
 	"github.com/ydnar/wasm-tools-go/internal/codec"
+	"github.com/ydnar/wasm-tools-go/internal/iterate"
 )
 
-// Node is the interface implemented by the WIT ([WebAssembly Interface Type])
+// Node is the common interface implemented by the WIT ([WebAssembly Interface Type])
 // types in this package.
 //
 // [WebAssembly Interface Type]: https://component-model.bytecodealliance.org/design/wit.html
 type Node interface {
+	// AllNodes returns a sequence that recursively yields each Node, starting with the receiver.
+	AllNodes() iterate.Seq[Node]
+
+	// WITKind returns the human-readable WIT kind this Node represents, e.g. "type" or "function".
 	WITKind() string
+
+	// WIT returns the WIT text format for a Node in a given context, which may be nil.
 	WIT(ctx Node, name string) string
+}
+
+func leafNodeSeq[V Node](v V) iterate.Seq[Node] {
+	return func(yield func(Node) bool) {
+		yield(v)
+	}
 }
 
 func indent(s string) string {
@@ -133,7 +146,7 @@ func (w *World) WIT(ctx Node, name string) string {
 	b.WriteString(escape(name)) // TODO: compare to w.Name?
 	b.WriteString(" {")
 	n := 0
-	w.AllImports(func(name string, i WorldItem) bool {
+	w.AllImports()(func(name string, i WorldItem) bool {
 		if f, ok := i.(*Function); ok {
 			if !f.IsFreestanding() {
 				return true
@@ -147,7 +160,7 @@ func (w *World) WIT(ctx Node, name string) string {
 		n++
 		return true
 	})
-	w.AllExports(func(name string, i WorldItem) bool {
+	w.AllExports()(func(name string, i WorldItem) bool {
 		if n == 0 {
 			b.WriteRune('\n')
 		}

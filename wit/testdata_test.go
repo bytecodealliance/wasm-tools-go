@@ -18,7 +18,7 @@ var update = flag.Bool("update", false, "update golden files")
 
 func compareOrWrite(t *testing.T, path, golden, data string) {
 	if *update {
-		err := os.WriteFile(golden, []byte(data), 0644)
+		err := os.WriteFile(golden, []byte(data), 0o644)
 		if err != nil {
 			t.Error(err)
 		}
@@ -57,7 +57,6 @@ func TestGoldenWITFiles(t *testing.T) {
 		})
 		return nil
 	})
-
 	if err != nil {
 		t.Error(err)
 	}
@@ -114,7 +113,6 @@ func TestGoldenWITRoundTrip(t *testing.T) {
 		})
 		return nil
 	})
-
 	if err != nil {
 		t.Error(err)
 	}
@@ -161,7 +159,7 @@ func TestFunctionBaseName(t *testing.T) {
 		t.Run(path, func(t *testing.T) {
 			// TODO: when GOEXPERIMENT=rangefunc lands:
 			// for f := range res.AllFunctions {
-			res.AllFunctions(func(f *Function) bool {
+			res.AllFunctions()(func(f *Function) bool {
 				t.Run(f.Name, func(t *testing.T) {
 					want, after, found := strings.Cut(f.Name, ".")
 					if found {
@@ -254,7 +252,7 @@ func TestFunctionNameConsistency(t *testing.T) {
 func TestConstructorResult(t *testing.T) {
 	err := loadTestdata(func(path string, res *Resolve) error {
 		t.Run(path, func(t *testing.T) {
-			res.AllFunctions(func(f *Function) bool {
+			res.AllFunctions()(func(f *Function) bool {
 				if !f.IsConstructor() {
 					return true
 				}
@@ -421,6 +419,25 @@ func TestNoExportedTypeDefs(t *testing.T) {
 						}
 					}
 				})
+			}
+		})
+		return nil
+	})
+	if err != nil {
+		t.Error(err)
+	}
+}
+
+// TestHasPointer verifies that the HasPointer method and HasPointer function return the same result.
+func TestHasPointer(t *testing.T) {
+	err := loadTestdata(func(path string, res *Resolve) error {
+		t.Run(path, func(t *testing.T) {
+			for _, td := range res.TypeDefs {
+				a := td.HasPointer()
+				b := HasPointer(td)
+				if a != b {
+					t.Errorf("td.HasPointer(): %t != HasPointer(td): %t (%s)", a, b, td.TypeName())
+				}
 			}
 		})
 		return nil
