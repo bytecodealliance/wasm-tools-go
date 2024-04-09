@@ -171,7 +171,7 @@ func worldItemTypeSort(i WorldItem) int {
 	case *Function:
 		return 2
 	}
-	panic("BUG: worldItemTypeSort: unknown WorldItem type")
+	panic("BUG: unknown WorldItem type")
 }
 
 // A WorldItem is any item that can be exported from or imported into a [World],
@@ -1211,7 +1211,7 @@ func (_primitive[T]) Flat() []Type {
 	case string:
 		return []Type{U32{}, U32{}}
 	default:
-		panic(fmt.Sprintf("BUG: Flat: unknown primitive type %T", v)) // should never reach here
+		panic(fmt.Sprintf("BUG: unknown primitive type %T", v)) // should never reach here
 	}
 }
 
@@ -1249,7 +1249,7 @@ func (_primitive[T]) TypeName() string {
 	case string:
 		return "string"
 	default:
-		panic(fmt.Sprintf("BUG: String: unknown primitive type %T", v)) // should never reach here
+		panic(fmt.Sprintf("BUG: unknown primitive type %T", v)) // should never reach here
 	}
 }
 

@@ -153,7 +153,7 @@ func flatParams(params []Param) []Type {
 // the combined param(s), using a [Pointer].
 func compoundParam(singular, plural string, params []Param) Param {
 	if len(params) == 0 {
-		panic("BUG: compoundParam: len(params) == 0")
+		panic("BUG: len(params) == 0")
 	}
 
 	name := params[0].Name
