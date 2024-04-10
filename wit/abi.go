@@ -19,8 +19,8 @@ func Discriminant(n int) Type {
 	return U32{}
 }
 
-// ABI is the interface implemented by any type that reports its [Canonical ABI] [size], [alignment],
-// whether the type contains a pointer (e.g. [List] or [String]), and its [flat] ABI representation.
+// ABI is the interface implemented by any type that can report its
+// [Canonical ABI] [size], [alignment], and [flat] representation.
 //
 // [Canonical ABI]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md
 // [size]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#size
@@ -29,19 +29,7 @@ func Discriminant(n int) Type {
 type ABI interface {
 	Size() uintptr
 	Align() uintptr
-	HasPointer() bool
 	Flat() []Type
-}
-
-// Despecializer is the interface implemented by any [TypeDefKind] that can
-// [despecialize] itself into another TypeDefKind. Examples include [Result],
-// which despecializes into a [Variant] with two cases, "ok" and "error".
-// See the [canonical ABI documentation] for more information.
-//
-// [despecialize]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#despecialization
-// [canonical ABI documentation]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#despecialization
-type Despecializer interface {
-	Despecialize() TypeDefKind
 }
 
 // Despecialize [despecializes] k if k implements [Despecializer].
@@ -51,10 +39,40 @@ type Despecializer interface {
 // [despecializes]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#despecialization
 // [canonical ABI documentation]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#despecialization
 func Despecialize(k TypeDefKind) TypeDefKind {
-	if d, ok := k.(Despecializer); ok {
+	if d, ok := k.(despecialize); ok {
 		return d.Despecialize()
 	}
 	return k
+}
+
+type despecialize interface {
+	Despecialize() TypeDefKind
+}
+
+// HasPointer returns whether or not t contains a [Type] with a pointer, e.g. [String] or [List].
+func HasPointer(t TypeDefKind) bool {
+	t = Despecialize(t)
+	if p, ok := t.(hasPointer); ok {
+		return p.HasPointer()
+	}
+	return false
+}
+
+type hasPointer interface {
+	HasPointer() bool
+}
+
+// HasBorrow returns whether or not t contains a [Borrow] type.
+func HasBorrow(t TypeDefKind) bool {
+	t = Despecialize(t)
+	if p, ok := t.(hasBorrow); ok {
+		return p.HasBorrow()
+	}
+	return false
+}
+
+type hasBorrow interface {
+	HasBorrow() bool
 }
 
 // Op represents the [Canonical ABI] [lift] and [lower] operations, for lowering into or lifting out of linear memory.
@@ -107,6 +125,17 @@ func (t *TypeDef) ResourceDrop() *Function {
 	return f
 }
 
+// ReturnsBorrow reports whether [Function] f returns a [Borrow] handle,
+// which is not permitted by the Component Model specification.
+func (f *Function) ReturnsBorrow() bool {
+	for _, r := range f.Results {
+		if HasBorrow(r.Type) {
+			return true
+		}
+	}
+	return false
+}
+
 // CoreFunction returns a [Core WebAssembly function] of [Function] f.
 // Its params and results may be [flattened] according to the Canonical ABI specification.
 // The flattening rules vary based on whether the returned function is imported or exported,
@@ -153,7 +182,7 @@ func flatParams(params []Param) []Type {
 // the combined param(s), using a [Pointer].
 func compoundParam(singular, plural string, params []Param) Param {
 	if len(params) == 0 {
-		panic("BUG: compoundParam: len(params) == 0")
+		panic("BUG: len(params) == 0")
 	}
 
 	name := params[0].Name

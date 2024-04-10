@@ -18,7 +18,7 @@ var update = flag.Bool("update", false, "update golden files")
 
 func compareOrWrite(t *testing.T, path, golden, data string) {
 	if *update {
-		err := os.WriteFile(golden, []byte(data), 0644)
+		err := os.WriteFile(golden, []byte(data), 0o644)
 		if err != nil {
 			t.Error(err)
 		}
@@ -57,7 +57,6 @@ func TestGoldenWITFiles(t *testing.T) {
 		})
 		return nil
 	})
-
 	if err != nil {
 		t.Error(err)
 	}
@@ -114,7 +113,6 @@ func TestGoldenWITRoundTrip(t *testing.T) {
 		})
 		return nil
 	})
-
 	if err != nil {
 		t.Error(err)
 	}
@@ -155,13 +153,42 @@ func TestSizeAndAlign(t *testing.T) {
 	}
 }
 
+// TestFunctionReturnsBorrow validates that no functions in the test data return borrowed handles.
+func TestFunctionReturnsBorrow(t *testing.T) {
+	err := loadTestdata(func(path string, res *Resolve) error {
+		// Skip two fixtures:
+		// testdata/wit-parser/resources-multiple-returns-borrow.wit.json
+		// testdata/wit-parser/resources-return-borrow.wit.json
+		if strings.Contains(path, "-return") && strings.Contains(path, "-borrow") {
+			return nil
+		}
+		t.Run(path, func(t *testing.T) {
+			// TODO: when GOEXPERIMENT=rangefunc lands:
+			// for f := range res.AllFunctions() {
+			res.AllFunctions()(func(f *Function) bool {
+				t.Run(f.Name, func(t *testing.T) {
+					got, want := f.ReturnsBorrow(), false
+					if got != want {
+						t.Errorf("(*Function).ReturnsBorrow(): got %t, expected %t", got, want)
+					}
+				})
+				return true
+			})
+		})
+		return nil
+	})
+	if err != nil {
+		t.Error(err)
+	}
+}
+
 // TestFunctionBaseName tests the [Function] BaseName method.
 func TestFunctionBaseName(t *testing.T) {
 	err := loadTestdata(func(path string, res *Resolve) error {
 		t.Run(path, func(t *testing.T) {
 			// TODO: when GOEXPERIMENT=rangefunc lands:
-			// for f := range res.AllFunctions {
-			res.AllFunctions(func(f *Function) bool {
+			// for f := range res.AllFunctions() {
+			res.AllFunctions()(func(f *Function) bool {
 				t.Run(f.Name, func(t *testing.T) {
 					want, after, found := strings.Cut(f.Name, ".")
 					if found {
@@ -254,7 +281,7 @@ func TestFunctionNameConsistency(t *testing.T) {
 func TestConstructorResult(t *testing.T) {
 	err := loadTestdata(func(path string, res *Resolve) error {
 		t.Run(path, func(t *testing.T) {
-			res.AllFunctions(func(f *Function) bool {
+			res.AllFunctions()(func(f *Function) bool {
 				if !f.IsConstructor() {
 					return true
 				}
@@ -421,6 +448,45 @@ func TestNoExportedTypeDefs(t *testing.T) {
 						}
 					}
 				})
+			}
+		})
+		return nil
+	})
+	if err != nil {
+		t.Error(err)
+	}
+}
+
+// TestHasPointer verifies that the HasPointer method and HasPointer function return the same result.
+func TestHasPointer(t *testing.T) {
+	err := loadTestdata(func(path string, res *Resolve) error {
+		t.Run(path, func(t *testing.T) {
+			for _, td := range res.TypeDefs {
+				a := td.HasPointer()
+				b := HasPointer(td)
+				if a != b {
+					t.Errorf("td.HasPointer(): %t != HasPointer(td): %t (%s)", a, b, td.WIT(nil, td.TypeName()))
+				}
+			}
+		})
+		return nil
+	})
+	if err != nil {
+		t.Error(err)
+	}
+}
+
+// TestHasBorrow verifies that HasBorrow returns true for all WIT types that contain a borrow<T>.
+func TestHasBorrow(t *testing.T) {
+	err := loadTestdata(func(path string, res *Resolve) error {
+		t.Run(path, func(t *testing.T) {
+			for _, td := range res.TypeDefs {
+				wit := td.WIT(nil, td.TypeName())
+				a := strings.Contains(wit, "borrow<")
+				b := HasBorrow(td)
+				if a != b {
+					t.Errorf("has \"borrow<\": %t != HasBorrow(td): %t (%s)", a, b, wit)
+				}
 			}
 		})
 		return nil

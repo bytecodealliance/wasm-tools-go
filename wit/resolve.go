@@ -7,6 +7,9 @@ import (
 	"strconv"
 	"strings"
 	"unsafe"
+
+	"github.com/ydnar/wasm-tools-go/internal/codec"
+	"github.com/ydnar/wasm-tools-go/internal/iterate"
 )
 
 // Resolve represents a fully resolved set of WIT ([WebAssembly Interface Type])
@@ -26,33 +29,19 @@ type Resolve struct {
 	Packages   []*Package
 }
 
-// AllFunctions [iterates] through functions in a [Resolve],
-// calling yield for each. Iteration will stop if yield returns false.
+// AllFunctions returns a [sequence] that yields each [Function] in a [Resolve].
+// The sequence stops if yield returns false.
 //
-// [iterates]: https://github.com/golang/go/issues/61897
-func (r *Resolve) AllFunctions(yield func(*Function) bool) {
-	var done bool
-	seen := make(map[*Function]bool)
-	yieldNew := func(f *Function) bool {
-		if seen[f] {
-			return !done
+// [sequence]: https://github.com/golang/go/issues/61897
+func (r *Resolve) AllFunctions() iterate.Seq[*Function] {
+	return func(yield func(*Function) bool) {
+		var done bool
+		yield = iterate.Done(iterate.Once(yield), func() { done = true })
+		for i := 0; i < len(r.Worlds) && !done; i++ {
+			r.Worlds[i].AllFunctions()(yield)
 		}
-		seen[f] = true
-		if !yield(f) {
-			done = true
-		}
-		return !done
-	}
-	for _, w := range r.Worlds {
-		w.AllFunctions(yieldNew)
-		if done {
-			return
-		}
-	}
-	for _, i := range r.Interfaces {
-		i.AllFunctions(yieldNew)
-		if done {
-			return
+		for i := 0; i < len(r.Interfaces) && !done; i++ {
+			r.Interfaces[i].AllFunctions()(yield)
 		}
 	}
 }
@@ -73,100 +62,96 @@ type World struct {
 	Docs    Docs
 }
 
-// AllFunctions [iterates] through all functions exported from or imported into a [World],
-// calling yield for each. Iteration will stop if yield returns false.
+// AllFunctions returns a [sequence] that yields each [Function] in a [World].
+// The sequence stops if yield returns false.
 //
-// [iterates]: https://github.com/golang/go/issues/61897
-func (w *World) AllFunctions(yield func(*Function) bool) {
-	var done bool
-
-	w.AllImports(func(name string, i WorldItem) bool {
-		if f, ok := i.(*Function); ok {
-			if !yield(f) {
-				done = true
-				return false
+// [sequence]: https://github.com/golang/go/issues/61897
+func (w *World) AllFunctions() iterate.Seq[*Function] {
+	return func(yield func(*Function) bool) {
+		var done bool
+		yield = iterate.Done(iterate.Once(yield), func() { done = true })
+		w.AllImports()(func(_ string, i WorldItem) bool {
+			if f, ok := i.(*Function); ok {
+				return yield(f)
 			}
+			return true
+		})
+		if done {
+			return
 		}
-		return true
-	})
-
-	if done {
-		return
+		w.AllExports()(func(_ string, i WorldItem) bool {
+			if f, ok := i.(*Function); ok {
+				return yield(f)
+			}
+			return true
+		})
 	}
-
-	w.AllExports(func(name string, i WorldItem) bool {
-		if f, ok := i.(*Function); ok {
-			if !yield(f) {
-				return false
-			}
-		}
-		return true
-	})
 }
 
 // AllImports [iterates] through all imports in a [World] in a deterministic order,
 // calling yield for each. Iteration will stop if yield returns false.
 //
 // [iterates]: https://github.com/golang/go/issues/61897
-func (w *World) AllImports(yield func(name string, i WorldItem) bool) {
-	iterateWorldItems(w.Imports, yield)
+func (w *World) AllImports() iterate.Seq2[string, WorldItem] {
+	return sortedWorldItems(w.Imports)
 }
 
 // AllExports [iterates] through all exports in a [World] in a deterministic order,
 // calling yield for each. Iteration will stop if yield returns false.
 //
 // [iterates]: https://github.com/golang/go/issues/61897
-func (w *World) AllExports(yield func(name string, i WorldItem) bool) {
-	iterateWorldItems(w.Exports, yield)
+func (w *World) AllExports() iterate.Seq2[string, WorldItem] {
+	return sortedWorldItems(w.Exports)
 }
 
-// iterateWorldItems sorts a map of [WorldItem] by type, then name,
-// calling yield for each item.
-func iterateWorldItems(m map[string]WorldItem, yield func(name string, i WorldItem) bool) {
-	type named struct {
-		name     string
-		sortName string
-		item     WorldItem
-	}
-	items := make([]named, 0, len(m))
-	for name, v := range m {
-		item := named{name, name, v}
-		// TODO: add WorldItem.ItemName() method or something
-		switch v := v.(type) {
-		case *Interface:
-			if v.Name != nil {
-				item.sortName = *v.Name
-			}
-		case *TypeDef:
-			if v.Name != nil {
-				item.sortName = *v.Name
-			}
-		case *Function:
-			item.sortName = v.Name
+// sortedWorldItems returns a sequence of [WorldItem] sorted by type and name.
+func sortedWorldItems(m map[string]WorldItem) iterate.Seq2[string, WorldItem] {
+	return func(yield func(name string, i WorldItem) bool) {
+		type named struct {
+			name     string
+			sortName string
+			item     WorldItem
 		}
-		items = append(items, item)
-	}
-
-	// Sort slice
-	slices.SortFunc(items, func(a, b named) int {
-		as, bs := worldItemTypeSort(a.item), worldItemTypeSort(b.item)
-		switch {
-		case as < bs:
-			return -1
-		case as > bs:
-			return 1
-		case a.sortName < b.sortName:
-			return -1
-		case a.sortName > b.sortName:
-			return 1
+		items := make([]named, 0, len(m))
+		for name, v := range m {
+			item := named{name, name, v}
+			// TODO: add WorldItem.ItemName() method or something
+			switch v := v.(type) {
+			case *Interface:
+				if v.Name != nil {
+					item.sortName = *v.Name
+				}
+			case *TypeDef:
+				if v.Name != nil {
+					item.sortName = *v.Name
+				}
+			case *Function:
+				item.sortName = v.Name
+			}
+			items = append(items, item)
 		}
-		return cmp.Compare(a.name, b.name)
-	})
 
-	// Iterate
-	for _, item := range items {
-		if !yield(item.name, item.item) {
-			return
+		// Sort slice
+		slices.SortFunc(items, func(a, b named) int {
+			as, bs := worldItemTypeSort(a.item), worldItemTypeSort(b.item)
+			switch {
+			case as < bs:
+				return -1
+			case as > bs:
+				return 1
+			case a.sortName < b.sortName:
+				return -1
+			case a.sortName > b.sortName:
+				return 1
+			}
+			return cmp.Compare(a.name, b.name)
+		})
+
+		// Iterate
+		for _, item := range items {
+			if !yield(item.name, item.item) {
+				return
+			}
 		}
 	}
 }
@@ -180,7 +165,7 @@ func worldItemTypeSort(i WorldItem) int {
 	case *Function:
 		return 2
 	}
-	panic("BUG: worldItemTypeSort: unknown WorldItem type")
+	panic("BUG: unknown WorldItem type")
 }
 
 // A WorldItem is any item that can be exported from or imported into a [World],
@@ -215,21 +200,23 @@ type Interface struct {
 	Docs    Docs
 }
 
-// AllFunctions [iterates] through all functions in [Interface] i, calling yield for each.
-// Iteration will stop if yield returns false.
+// AllFunctions returns a [sequence] that yields each [Function] in an [Interface].
+// The sequence stops if yield returns false.
 //
-// [iterates]: https://github.com/golang/go/issues/61897
-func (i *Interface) AllFunctions(yield func(*Function) bool) {
-	for _, f := range i.Functions {
-		if !yield(f) {
-			return
+// [sequence]: https://github.com/golang/go/issues/61897
+func (i *Interface) AllFunctions() iterate.Seq[*Function] {
+	return func(yield func(*Function) bool) {
+		for _, name := range codec.SortedKeys(i.Functions) {
+			if !yield(i.Functions[name]) {
+				return
+			}
 		}
 	}
 }
 
 // TypeDef represents a WIT type definition. A TypeDef may be named or anonymous,
 // and optionally belong to a [World] or [Interface].
-// It implements the [Node], [ABI], [Type], [TypeDefKind] interfaces.
+// It implements the [Node], [ABI], [Type], and [TypeDefKind] interfaces.
 type TypeDef struct {
 	_type
 	_worldItem
@@ -280,7 +267,7 @@ func (t *TypeDef) Package() *Package {
 // Currently t must be a [Resource] to have a constructor.
 func (t *TypeDef) Constructor() *Function {
 	var constructor *Function
-	t.Owner.AllFunctions(func(f *Function) bool {
+	t.Owner.AllFunctions()(func(f *Function) bool {
 		if c, ok := f.Kind.(*Constructor); ok && c.Type == t {
 			constructor = f
 			return false
@@ -294,7 +281,7 @@ func (t *TypeDef) Constructor() *Function {
 // Currently t must be a [Resource] to have static functions.
 func (t *TypeDef) StaticFunctions() []*Function {
 	var statics []*Function
-	t.Owner.AllFunctions(func(f *Function) bool {
+	t.Owner.AllFunctions()(func(f *Function) bool {
 		if s, ok := f.Kind.(*Static); ok && s.Type == t {
 			statics = append(statics, f)
 		}
@@ -310,7 +297,7 @@ func (t *TypeDef) StaticFunctions() []*Function {
 // Currently t must be a [Resource] to have methods.
 func (t *TypeDef) Methods() []*Function {
 	var methods []*Function
-	t.Owner.AllFunctions(func(f *Function) bool {
+	t.Owner.AllFunctions()(func(f *Function) bool {
 		if m, ok := f.Kind.(*Method); ok && m.Type == t {
 			methods = append(methods, f)
 		}
@@ -332,18 +319,23 @@ func (t *TypeDef) Align() uintptr {
 	return t.Kind.Align()
 }
 
-// HasPointer returns whether the [ABI] representation of [TypeDef] t contains a pointer.
-//
-// [ABI]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md
-func (t *TypeDef) HasPointer() bool {
-	return t.Kind.HasPointer()
-}
-
-// Flat returns the [flattened] ABI representation of [TypeDef] t.
+// Flat returns the [flattened] ABI representation of t.
 //
 // [flattened]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
 func (t *TypeDef) Flat() []Type {
 	return t.Kind.Flat()
+}
+
+// HasPointer returns whether the [ABI] representation of [TypeDef] t contains a pointer.
+//
+// [ABI]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md
+func (t *TypeDef) HasPointer() bool {
+	return HasPointer(t.Kind)
+}
+
+// HasBorrow returns whether [TypeDef] t contains a [Borrow].
+func (t *TypeDef) HasBorrow() bool {
+	return HasBorrow(t.Kind)
 }
 
 // TypeDefKind represents the underlying type in a [TypeDef], which can be one of
@@ -363,7 +355,7 @@ type _typeDefKind struct{}
 func (_typeDefKind) TypeName() string { return "" }
 func (_typeDefKind) isTypeDefKind()   {}
 
-// KindOf probes [Type] t to determine if it is a [TypeDef] with [Kind] K.
+// KindOf probes [Type] t to determine if it is a [TypeDef] with [TypeDefKind] K.
 // It returns the underlying Kind if present.
 func KindOf[K TypeDefKind](t Type) (kind K) {
 	if td, ok := t.(*TypeDef); ok {
@@ -392,16 +384,16 @@ func (*Pointer) Size() uintptr { return 4 }
 // [ABI byte alignment]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#alignment
 func (*Pointer) Align() uintptr { return 4 }
 
+// Flat returns the [flattened] ABI representation of [Pointer].
+//
+// [flattened]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
+func (*Pointer) Flat() []Type { return []Type{U32{}} }
+
 // HasPointer returns whether the [ABI] representation of [Pointer] contains a pointer.
 // This always returns true.
 //
 // [ABI]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md
 func (*Pointer) HasPointer() bool { return true }
-
-// Flat returns the [flattened] ABI representation of [Pointer].
-//
-// [flattened]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
-func (*Pointer) Flat() []Type { return []Type{U32{}} }
 
 // Record represents a WIT [record type], akin to a struct.
 // It implements the [Node], [ABI], and [TypeDefKind] interfaces.
@@ -440,7 +432,7 @@ func (r *Record) Align() uintptr {
 // [ABI]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md
 func (r *Record) HasPointer() bool {
 	for _, f := range r.Fields {
-		if f.Type.HasPointer() {
+		if HasPointer(f.Type) {
 			return true
 		}
 	}
@@ -481,11 +473,6 @@ func (*Resource) Size() uintptr { return 4 }
 // [ABI byte alignment]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#alignment
 func (*Resource) Align() uintptr { return 4 }
 
-// HasPointer returns whether the [ABI] representation of [Resource] contains a pointer.
-//
-// [ABI byte alignment]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md
-func (*Resource) HasPointer() bool { return false }
-
 // Flat returns the [flattened] ABI representation of [Resource].
 //
 // [flattened]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
@@ -520,10 +507,6 @@ func (_handle) Size() uintptr { return 4 }
 // [ABI byte alignment]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#alignment
 func (_handle) Align() uintptr { return 4 }
 
-// HasPointer returns whether the ABI representation of this type contains a pointer.
-// This will always return false.
-func (_handle) HasPointer() bool { return false }
-
 // Flat returns the [flattened] ABI representation of this type.
 //
 // [flattened]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
@@ -546,6 +529,10 @@ type Borrow struct {
 	_handle
 	Type *TypeDef
 }
+
+// HasBorrow returns whether t contains a [Borrow].
+// This always returns true.
+func (b *Borrow) HasBorrow() bool { return true }
 
 // Flags represents a WIT [flags type], stored as a bitfield.
 // It implements the [Node], [ABI], and [TypeDefKind] interfaces.
@@ -583,12 +570,6 @@ func (f *Flags) Align() uintptr {
 	}
 	return 4
 }
-
-// HasPointer returns whether the [ABI] representation of [Flags] contains a pointer.
-// This always returns false.
-//
-// [ABI]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md
-func (*Flags) HasPointer() bool { return false }
 
 // Flat returns the [flattened] ABI representation of [Flags] f.
 //
@@ -667,13 +648,6 @@ func (t *Tuple) Align() uintptr {
 	return t.Despecialize().Align()
 }
 
-// HasPointer returns whether the [ABI] representation of a [Tuple] contains a pointer.
-//
-// [ABI]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md
-func (t *Tuple) HasPointer() bool {
-	return t.Despecialize().HasPointer()
-}
-
 // Flat returns the [flattened] ABI representation of [Tuple] t.
 //
 // [flattened]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
@@ -742,17 +716,6 @@ func (v *Variant) Align() uintptr {
 	return max(Discriminant(len(v.Cases)).Align(), v.maxCaseAlign())
 }
 
-// HasPointer returns true if [Variant] v has an associated type
-// that contains a pointer (e.g. string, list).
-func (v *Variant) HasPointer() bool {
-	for _, t := range v.Types() {
-		if t.HasPointer() {
-			return true
-		}
-	}
-	return false
-}
-
 // Flat returns the [flattened] ABI representation of [Variant] v.
 //
 // [flattened]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
@@ -788,6 +751,27 @@ func (v *Variant) maxCaseAlign() uintptr {
 		}
 	}
 	return a
+}
+
+// HasPointer returns true if [Variant] v has an associated type
+// that contains a pointer (e.g. string, list).
+func (v *Variant) HasPointer() bool {
+	for _, t := range v.Types() {
+		if HasPointer(t) {
+			return true
+		}
+	}
+	return false
+}
+
+// HasBorrow returns whether [Variant] v contains a [Borrow].
+func (v *Variant) HasBorrow() bool {
+	for _, t := range v.Types() {
+		if HasBorrow(t) {
+			return true
+		}
+	}
+	return false
 }
 
 // Case represents a single case in a [Variant].
@@ -840,13 +824,6 @@ func (e *Enum) Size() uintptr {
 // [despecialized]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#despecialization
 func (e *Enum) Align() uintptr {
 	return e.Despecialize().Align()
-}
-
-// HasPointer returns whether the [ABI] representation of [Enum] e contains a pointer.
-//
-// [ABI]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md
-func (e *Enum) HasPointer() bool {
-	return e.Despecialize().HasPointer()
 }
 
 // Flat returns the [flattened] ABI representation of [Enum] e.
@@ -905,13 +882,6 @@ func (o *Option) Align() uintptr {
 	return o.Despecialize().Align()
 }
 
-// HasPointer returns whether the [ABI] representation of an [Option] contains a pointer.
-//
-// [ABI]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md
-func (o *Option) HasPointer() bool {
-	return o.Despecialize().HasPointer()
-}
-
 // Flat returns the [flattened] ABI representation of [Option] o.
 //
 // [flattened]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
@@ -962,13 +932,6 @@ func (r *Result) Align() uintptr {
 	return r.Despecialize().Align()
 }
 
-// HasPointer returns whether the [ABI] representation of a [Result] contains a pointer.
-//
-// [ABI]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md
-func (r *Result) HasPointer() bool {
-	return r.Despecialize().HasPointer()
-}
-
 // Flat returns the [flattened] ABI representation of [Result] r.
 //
 // [flattened]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
@@ -995,16 +958,21 @@ func (*List) Size() uintptr { return 8 } // [2]int32
 // [ABI byte alignment]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#alignment
 func (*List) Align() uintptr { return 8 } // [2]int32
 
+// Flat returns the [flattened] ABI representation of [List].
+//
+// [flattened]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
+func (*List) Flat() []Type { return []Type{U32{}, U32{}} }
+
 // HasPointer returns whether the [ABI] representation of a [List] contains a pointer.
 // This always returns true.
 //
 // [ABI]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md
 func (*List) HasPointer() bool { return true }
 
-// Flat returns the [flattened] ABI representation of [List].
-//
-// [flattened]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
-func (*List) Flat() []Type { return []Type{U32{}, U32{}} }
+// HasBorrow returns whether [List] l contains a [Borrow].
+func (l *List) HasBorrow() bool {
+	return HasBorrow(l.Type)
+}
 
 // Future represents a WIT [future type], expected to be part of [WASI Preview 3].
 // It implements the [Node], [ABI], and [TypeDefKind] interfaces.
@@ -1028,17 +996,21 @@ func (*Future) Size() uintptr { return 0 }
 // [ABI byte alignment]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#alignment
 func (*Future) Align() uintptr { return 0 }
 
-// HasPointer returns whether the [ABI] representation of a [Future] contains a pointer.
-// TODO: what is the ABI representation of a stream?
-//
-// [ABI]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md
-func (*Future) HasPointer() bool { return false }
-
 // Flat returns the [flattened] ABI representation of [Future].
 // TODO: what is the ABI representation of a stream?
 //
 // [flattened]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
 func (*Future) Flat() []Type { return nil }
+
+// HasPointer returns whether the [ABI] representation of [Future] f contains a pointer.
+func (f *Future) HasPointer() bool {
+	return HasPointer(f.Type)
+}
+
+// HasBorrow returns whether [Future] f contains a [Borrow].
+func (f *Future) HasBorrow() bool {
+	return HasBorrow(f.Type)
+}
 
 // Stream represents a WIT [stream type], expected to be part of [WASI Preview 3].
 // It implements the [Node], [ABI], and [TypeDefKind] interfaces.
@@ -1063,23 +1035,27 @@ func (*Stream) Size() uintptr { return 0 }
 // [ABI byte alignment]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#alignment
 func (*Stream) Align() uintptr { return 0 }
 
-// HasPointer returns whether the [ABI] representation of a [Stream] contains a pointer.
-// TODO: what is the ABI representation of a stream?
-//
-// [ABI]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md
-func (*Stream) HasPointer() bool { return false }
-
 // Flat returns the [flattened] ABI representation of [Stream].
 // TODO: what is the ABI representation of a stream?
 //
 // [flattened]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
 func (*Stream) Flat() []Type { return nil }
 
+// HasPointer returns whether the [ABI] representation of [Stream] s contains a pointer.
+func (s *Stream) HasPointer() bool {
+	return HasPointer(s.Element) || HasPointer(s.End)
+}
+
+// HasBorrow returns whether [Stream] s contains a [Borrow].
+func (s *Stream) HasBorrow() bool {
+	return HasBorrow(s.Element) || HasBorrow(s.End)
+}
+
 // TypeOwner is the interface implemented by any type that can own a TypeDef,
 // currently [World] and [Interface].
 type TypeOwner interface {
 	Node
-	AllFunctions(yield func(*Function) bool)
+	AllFunctions() iterate.Seq[*Function]
 	isTypeOwner()
 }
 
@@ -1093,8 +1069,6 @@ func (_typeOwner) isTypeOwner() {}
 //
 // [primitive type]: https://component-model.bytecodealliance.org/design/wit.html#primitive-types
 type Type interface {
-	Node
-	ABI
 	TypeDefKind
 	isType()
 }
@@ -1222,7 +1196,7 @@ func (_primitive[T]) Flat() []Type {
 	case string:
 		return []Type{U32{}, U32{}}
 	default:
-		panic(fmt.Sprintf("BUG: Flat: unknown primitive type %T", v)) // should never reach here
+		panic(fmt.Sprintf("BUG: unknown primitive type %T", v)) // should never reach here
 	}
 }
 
@@ -1260,7 +1234,7 @@ func (_primitive[T]) TypeName() string {
 	case string:
 		return "string"
 	default:
-		panic(fmt.Sprintf("BUG: String: unknown primitive type %T", v)) // should never reach here
+		panic(fmt.Sprintf("BUG: unknown primitive type %T", v)) // should never reach here
 	}
 }
 
