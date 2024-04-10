@@ -436,7 +436,27 @@ func TestHasPointer(t *testing.T) {
 				a := td.HasPointer()
 				b := HasPointer(td)
 				if a != b {
-					t.Errorf("td.HasPointer(): %t != HasPointer(td): %t (%s)", a, b, td.TypeName())
+					t.Errorf("td.HasPointer(): %t != HasPointer(td): %t (%s)", a, b, td.WIT(nil, td.TypeName()))
+				}
+			}
+		})
+		return nil
+	})
+	if err != nil {
+		t.Error(err)
+	}
+}
+
+// TestHasBorrow verifies that HasBorrow returns true for all WIT types that contain a borrow<T>.
+func TestHasBorrow(t *testing.T) {
+	err := loadTestdata(func(path string, res *Resolve) error {
+		t.Run(path, func(t *testing.T) {
+			for _, td := range res.TypeDefs {
+				wit := td.WIT(nil, td.TypeName())
+				a := strings.Contains(wit, "borrow<")
+				b := HasBorrow(td)
+				if a != b {
+					t.Errorf("has \"borrow<\": %t != HasBorrow(td): %t (%s)", a, b, wit)
 				}
 			}
 		})

@@ -333,6 +333,13 @@ func (t *TypeDef) Align() uintptr {
 	return t.Kind.Align()
 }
 
+// Flat returns the [flattened] ABI representation of t.
+//
+// [flattened]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
+func (t *TypeDef) Flat() []Type {
+	return t.Kind.Flat()
+}
+
 // HasPointer returns whether the [ABI] representation of [TypeDef] t contains a pointer.
 //
 // [ABI]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md
@@ -340,11 +347,9 @@ func (t *TypeDef) HasPointer() bool {
 	return HasPointer(t.Kind)
 }
 
-// Flat returns the [flattened] ABI representation of [TypeDef] t.
-//
-// [flattened]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
-func (t *TypeDef) Flat() []Type {
-	return t.Kind.Flat()
+// HasBorrow returns whether [TypeDef] t contains a [Borrow].
+func (t *TypeDef) HasBorrow() bool {
+	return HasBorrow(t.Kind)
 }
 
 // TypeDefKind represents the underlying type in a [TypeDef], which can be one of
@@ -575,6 +580,10 @@ func (b *Borrow) AllTypes() iterate.Seq[Type] {
 	return b.Type.AllTypes()
 }
 
+// HasBorrow returns whether t contains a [Borrow].
+// This always returns true.
+func (b *Borrow) HasBorrow() bool { return true }
+
 // Flags represents a WIT [flags type], stored as a bitfield.
 // It implements the [Node], [ABI], and [TypeDefKind] interfaces.
 //
@@ -785,17 +794,6 @@ func (v *Variant) Align() uintptr {
 	return max(Discriminant(len(v.Cases)).Align(), v.maxCaseAlign())
 }
 
-// HasPointer returns true if [Variant] v has an associated type
-// that contains a pointer (e.g. string, list).
-func (v *Variant) HasPointer() bool {
-	for _, t := range v.Types() {
-		if HasPointer(t) {
-			return true
-		}
-	}
-	return false
-}
-
 // Flat returns the [flattened] ABI representation of [Variant] v.
 //
 // [flattened]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
@@ -831,6 +829,27 @@ func (v *Variant) maxCaseAlign() uintptr {
 		}
 	}
 	return a
+}
+
+// HasPointer returns true if [Variant] v has an associated type
+// that contains a pointer (e.g. string, list).
+func (v *Variant) HasPointer() bool {
+	for _, t := range v.Types() {
+		if HasPointer(t) {
+			return true
+		}
+	}
+	return false
+}
+
+// HasBorrow returns whether [Variant] v contains a [Borrow].
+func (v *Variant) HasBorrow() bool {
+	for _, t := range v.Types() {
+		if HasBorrow(t) {
+			return true
+		}
+	}
+	return false
 }
 
 // Case represents a single case in a [Variant].
@@ -1054,16 +1073,21 @@ func (*List) Size() uintptr { return 8 } // [2]int32
 // [ABI byte alignment]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#alignment
 func (*List) Align() uintptr { return 8 } // [2]int32
 
+// Flat returns the [flattened] ABI representation of [List].
+//
+// [flattened]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
+func (*List) Flat() []Type { return []Type{U32{}, U32{}} }
+
 // HasPointer returns whether the [ABI] representation of a [List] contains a pointer.
 // This always returns true.
 //
 // [ABI]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md
 func (*List) HasPointer() bool { return true }
 
-// Flat returns the [flattened] ABI representation of [List].
-//
-// [flattened]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
-func (*List) Flat() []Type { return []Type{U32{}, U32{}} }
+// HasBorrow returns whether [List] l contains a [Borrow].
+func (l *List) HasBorrow() bool {
+	return HasBorrow(l.Type)
+}
 
 // Future represents a WIT [future type], expected to be part of [WASI Preview 3].
 // It implements the [Node], [ABI], and [TypeDefKind] interfaces.
@@ -1103,6 +1127,16 @@ func (*Future) Align() uintptr { return 0 }
 //
 // [flattened]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
 func (*Future) Flat() []Type { return nil }
+
+// HasPointer returns whether the [ABI] representation of [Future] f contains a pointer.
+func (f *Future) HasPointer() bool {
+	return HasPointer(f.Type)
+}
+
+// HasBorrow returns whether [Future] f contains a [Borrow].
+func (f *Future) HasBorrow() bool {
+	return HasBorrow(f.Type)
+}
 
 // Stream represents a WIT [stream type], expected to be part of [WASI Preview 3].
 // It implements the [Node], [ABI], and [TypeDefKind] interfaces.
@@ -1151,6 +1185,16 @@ func (*Stream) Align() uintptr { return 0 }
 //
 // [flattened]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
 func (*Stream) Flat() []Type { return nil }
+
+// HasPointer returns whether the [ABI] representation of [Stream] s contains a pointer.
+func (s *Stream) HasPointer() bool {
+	return HasPointer(s.Element) || HasPointer(s.End)
+}
+
+// HasBorrow returns whether [Stream] s contains a [Borrow].
+func (s *Stream) HasBorrow() bool {
+	return HasBorrow(s.Element) || HasBorrow(s.End)
+}
 
 // TypeOwner is the interface implemented by any type that can own a TypeDef,
 // currently [World] and [Interface].

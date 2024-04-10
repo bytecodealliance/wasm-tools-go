@@ -56,17 +56,30 @@ func Despecialize(k TypeDefKind) TypeDefKind {
 	return k
 }
 
-type hasPointer interface {
-	HasPointer() bool
-}
-
-// HasPointer returns whether or not t contains a [Type] that contains a pointer, e.g. [String] or [List].
+// HasPointer returns whether or not t contains a [Type] with a pointer, e.g. [String] or [List].
 func HasPointer(t TypeDefKind) bool {
 	t = Despecialize(t)
 	if p, ok := t.(hasPointer); ok {
 		return p.HasPointer()
 	}
 	return false
+}
+
+type hasPointer interface {
+	HasPointer() bool
+}
+
+// HasBorrow returns whether or not t contains a [Borrow] type.
+func HasBorrow(t TypeDefKind) bool {
+	t = Despecialize(t)
+	if p, ok := t.(hasBorrow); ok {
+		return p.HasBorrow()
+	}
+	return false
+}
+
+type hasBorrow interface {
+	HasBorrow() bool
 }
 
 // Op represents the [Canonical ABI] [lift] and [lower] operations, for lowering into or lifting out of linear memory.
