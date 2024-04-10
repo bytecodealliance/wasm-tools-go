@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"github.com/ydnar/wasm-tools-go/internal/codec"
-	"github.com/ydnar/wasm-tools-go/internal/iterate"
 )
 
 // Node is the common interface implemented by the WIT ([WebAssembly Interface Type])
@@ -19,12 +18,6 @@ type Node interface {
 
 	// WIT returns the WIT text format for a Node in a given context, which may be nil.
 	WIT(ctx Node, name string) string
-}
-
-func leafNodeSeq[V Node](v V) iterate.Seq[Node] {
-	return func(yield func(Node) bool) {
-		yield(v)
-	}
 }
 
 func indent(s string) string {
