@@ -125,6 +125,17 @@ func (t *TypeDef) ResourceDrop() *Function {
 	return f
 }
 
+// ReturnsBorrow reports whether [Function] f returns a [Borrow] handle,
+// which is not permitted by the Component Model specification.
+func (f *Function) ReturnsBorrow() bool {
+	for _, r := range f.Results {
+		if HasBorrow(r.Type) {
+			return true
+		}
+	}
+	return false
+}
+
 // CoreFunction returns a [Core WebAssembly function] of [Function] f.
 // Its params and results may be [flattened] according to the Canonical ABI specification.
 // The flattening rules vary based on whether the returned function is imported or exported,

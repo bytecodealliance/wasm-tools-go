@@ -153,12 +153,41 @@ func TestSizeAndAlign(t *testing.T) {
 	}
 }
 
+// TestFunctionReturnsBorrow validates that no functions in the test data return borrowed handles.
+func TestFunctionReturnsBorrow(t *testing.T) {
+	err := loadTestdata(func(path string, res *Resolve) error {
+		// Skip two fixtures:
+		// testdata/wit-parser/resources-multiple-returns-borrow.wit.json
+		// testdata/wit-parser/resources-return-borrow.wit.json
+		if strings.Contains(path, "-return") && strings.Contains(path, "-borrow") {
+			return nil
+		}
+		t.Run(path, func(t *testing.T) {
+			// TODO: when GOEXPERIMENT=rangefunc lands:
+			// for f := range res.AllFunctions() {
+			res.AllFunctions()(func(f *Function) bool {
+				t.Run(f.Name, func(t *testing.T) {
+					got, want := f.ReturnsBorrow(), false
+					if got != want {
+						t.Errorf("(*Function).ReturnsBorrow(): got %t, expected %t", got, want)
+					}
+				})
+				return true
+			})
+		})
+		return nil
+	})
+	if err != nil {
+		t.Error(err)
+	}
+}
+
 // TestFunctionBaseName tests the [Function] BaseName method.
 func TestFunctionBaseName(t *testing.T) {
 	err := loadTestdata(func(path string, res *Resolve) error {
 		t.Run(path, func(t *testing.T) {
 			// TODO: when GOEXPERIMENT=rangefunc lands:
-			// for f := range res.AllFunctions {
+			// for f := range res.AllFunctions() {
 			res.AllFunctions()(func(f *Function) bool {
 				t.Run(f.Name, func(t *testing.T) {
 					want, after, found := strings.Cut(f.Name, ".")
