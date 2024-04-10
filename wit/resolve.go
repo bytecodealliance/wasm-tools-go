@@ -277,20 +277,6 @@ func (t *TypeDef) Constructor() *Function {
 	return constructor
 }
 
-// AllTypes returns a [sequence] that recursively yields each [Type] in a [TypeDef].
-// The sequence stops if yield returns false.
-// See [Node] for more information.
-//
-// [sequence]: https://github.com/golang/go/issues/61897
-func (t *TypeDef) AllTypes() iterate.Seq[Type] {
-	return func(yield func(Type) bool) {
-		if !yield(t) {
-			return
-		}
-		t.Kind.AllTypes()(yield)
-	}
-}
-
 // StaticFunctions returns all static functions for [TypeDef] t.
 // Currently t must be a [Resource] to have static functions.
 func (t *TypeDef) StaticFunctions() []*Function {
@@ -359,7 +345,6 @@ func (t *TypeDef) HasBorrow() bool {
 type TypeDefKind interface {
 	Node
 	ABI
-	AllTypes() iterate.Seq[Type]
 	TypeName() string
 	isTypeDefKind()
 }
@@ -367,9 +352,8 @@ type TypeDefKind interface {
 // _typeDefKind is an embeddable type that conforms to the [TypeDefKind] interface.
 type _typeDefKind struct{}
 
-func (_typeDefKind) AllTypes() iterate.Seq[Type] { return func(func(Type) bool) {} }
-func (_typeDefKind) TypeName() string            { return "" }
-func (_typeDefKind) isTypeDefKind()              {}
+func (_typeDefKind) TypeName() string { return "" }
+func (_typeDefKind) isTypeDefKind()   {}
 
 // KindOf probes [Type] t to determine if it is a [TypeDef] with [TypeDefKind] K.
 // It returns the underlying Kind if present.
@@ -388,13 +372,6 @@ func KindOf[K TypeDefKind](t Type) (kind K) {
 type Pointer struct {
 	_typeDefKind
 	Type Type
-}
-
-// AllTypes returns a sequence that recursively yields each [Type].
-// The sequence stops if yield returns false.
-// See [TypeDefKind] for more information.
-func (p *Pointer) AllTypes() iterate.Seq[Type] {
-	return p.Type.AllTypes()
 }
 
 // Size returns the [ABI byte size] for [Pointer].
@@ -425,19 +402,6 @@ func (*Pointer) HasPointer() bool { return true }
 type Record struct {
 	_typeDefKind
 	Fields []Field
-}
-
-// AllTypes returns a sequence that recursively yields each [Type].
-// The sequence stops if yield returns false.
-// See [TypeDefKind] for more information.
-func (r *Record) AllTypes() iterate.Seq[Type] {
-	return func(yield func(Type) bool) {
-		var done bool
-		yield = iterate.Done(yield, func() { done = true })
-		for i := 0; i < len(r.Fields) && !done; i++ {
-			r.Fields[i].Type.AllTypes()(yield)
-		}
-	}
 }
 
 // Size returns the [ABI byte size] for [Record] r.
@@ -557,13 +521,6 @@ type Own struct {
 	Type *TypeDef
 }
 
-// AllTypes returns a sequence that recursively yields each [Type].
-// The sequence stops if yield returns false.
-// See [TypeDefKind] for more information.
-func (o *Own) AllTypes() iterate.Seq[Type] {
-	return o.Type.AllTypes()
-}
-
 // Borrow represents a WIT [borrowed handle].
 // It implements the [Handle], [Node], [ABI], and [TypeDefKind] interfaces.
 //
@@ -571,13 +528,6 @@ func (o *Own) AllTypes() iterate.Seq[Type] {
 type Borrow struct {
 	_handle
 	Type *TypeDef
-}
-
-// AllTypes returns a sequence that recursively yields each [Type].
-// The sequence stops if yield returns false.
-// See [TypeDefKind] for more information.
-func (b *Borrow) AllTypes() iterate.Seq[Type] {
-	return b.Type.AllTypes()
 }
 
 // HasBorrow returns whether t contains a [Borrow].
@@ -648,19 +598,6 @@ type Flag struct {
 type Tuple struct {
 	_typeDefKind
 	Types []Type
-}
-
-// AllTypes returns a sequence that recursively yields each [Type].
-// The sequence stops if yield returns false.
-// See [TypeDefKind] for more information.
-func (t *Tuple) AllTypes() iterate.Seq[Type] {
-	return func(yield func(Type) bool) {
-		var done bool
-		yield = iterate.Done(yield, func() { done = true })
-		for i := 0; i < len(t.Types) && !done; i++ {
-			t.Types[i].AllTypes()(yield)
-		}
-	}
 }
 
 // Type returns a non-nil [Type] if all types in t
@@ -760,21 +697,6 @@ func (v *Variant) Types() []Type {
 		typeMap[t] = true
 	}
 	return types
-}
-
-// AllTypes returns a sequence that recursively yields each [Type].
-// The sequence stops if yield returns false.
-// See [TypeDefKind] for more information.
-func (v *Variant) AllTypes() iterate.Seq[Type] {
-	return func(yield func(Type) bool) {
-		var done bool
-		yield = iterate.Done(iterate.Once(yield), func() { done = true })
-		for i := 0; i < len(v.Cases) && !done; i++ {
-			if v.Cases[i].Type != nil {
-				v.Cases[i].Type.AllTypes()(yield)
-			}
-		}
-	}
 }
 
 // Size returns the [ABI byte size] for [Variant] v.
@@ -929,17 +851,6 @@ type Option struct {
 	Type Type
 }
 
-// AllTypes returns a sequence that recursively yields each [Type].
-// The sequence stops if yield returns false.
-// See [TypeDefKind] for more information.
-func (o *Option) AllTypes() iterate.Seq[Type] {
-	return func(yield func(Type) bool) {
-		if o.Type != nil {
-			o.Type.AllTypes()(yield)
-		}
-	}
-}
-
 // Despecialize despecializes [Option] o into a [Variant] with two cases, "none" and "some".
 // See the [canonical ABI documentation] for more information.
 //
@@ -990,25 +901,6 @@ type Result struct {
 	Err Type // optional associated Type (can be nil)
 }
 
-// AllTypes returns a sequence that recursively yields each [Type].
-// The sequence stops if yield returns false.
-// See [TypeDefKind] for more information.
-func (r *Result) AllTypes() iterate.Seq[Type] {
-	return func(yield func(Type) bool) {
-		var done bool
-		yield = iterate.Done(iterate.Once(yield), func() { done = true })
-		if r.OK != nil {
-			r.OK.AllTypes()(yield)
-		}
-		if done {
-			return
-		}
-		if r.Err != nil {
-			r.Err.AllTypes()(yield)
-		}
-	}
-}
-
 // Despecialize despecializes [Result] o into a [Variant] with two cases, "ok" and "error".
 // See the [canonical ABI documentation] for more information.
 //
@@ -1056,13 +948,6 @@ type List struct {
 	Type Type
 }
 
-// AllTypes returns a sequence that recursively yields each [Type].
-// The sequence stops if yield returns false.
-// See [TypeDefKind] for more information.
-func (l *List) AllTypes() iterate.Seq[Type] {
-	return l.Type.AllTypes()
-}
-
 // Size returns the [ABI byte size] for a [List].
 //
 // [ABI byte size]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#size
@@ -1097,17 +982,6 @@ func (l *List) HasBorrow() bool {
 type Future struct {
 	_typeDefKind
 	Type Type // optional associated Type (can be nil)
-}
-
-// AllTypes returns a sequence that recursively yields each [Type].
-// The sequence stops if yield returns false.
-// See [TypeDefKind] for more information.
-func (f *Future) AllTypes() iterate.Seq[Type] {
-	return func(yield func(Type) bool) {
-		if f.Type != nil {
-			f.Type.AllTypes()(yield)
-		}
-	}
 }
 
 // Size returns the [ABI byte size] for a [Future].
@@ -1147,25 +1021,6 @@ type Stream struct {
 	_typeDefKind
 	Element Type // optional associated Type (can be nil)
 	End     Type // optional associated Type (can be nil)
-}
-
-// AllTypes returns a sequence that recursively yields each [Type].
-// The sequence stops if yield returns false.
-// See [TypeDefKind] for more information.
-func (s *Stream) AllTypes() iterate.Seq[Type] {
-	return func(yield func(Type) bool) {
-		var done bool
-		yield = iterate.Done(iterate.Once(yield), func() { done = true })
-		if s.Element != nil {
-			s.Element.AllTypes()(yield)
-		}
-		if done {
-			return
-		}
-		if s.End != nil {
-			s.End.AllTypes()(yield)
-		}
-	}
 }
 
 // Size returns the [ABI byte size] for a [Stream].
@@ -1289,46 +1144,6 @@ type _primitive[T primitive] struct{ _type }
 
 // isPrimitive conforms to the [Primitive] interface.
 func (_primitive[T]) isPrimitive() {}
-
-func (p _primitive[T]) AllTypes() iterate.Seq[Type] {
-	return func(yield func(Type) bool) {
-		yield(p.outerType())
-	}
-}
-
-func (p _primitive[T]) outerType() Type {
-	var v T
-	switch any(v).(type) {
-	case bool:
-		return Bool{}
-	case int8:
-		return S8{}
-	case uint8:
-		return U8{}
-	case int16:
-		return S16{}
-	case uint16:
-		return U16{}
-	case int32:
-		return S32{}
-	case uint32:
-		return U32{}
-	case int64:
-		return S64{}
-	case uint64:
-		return U64{}
-	case float32:
-		return F32{}
-	case float64:
-		return F64{}
-	case char:
-		return Char{}
-	case string:
-		return String{}
-	default:
-		panic(fmt.Sprintf("BUG: unknown primitive type %T", v)) // should never reach here
-	}
-}
 
 // Size returns the byte size for values of this type.
 func (_primitive[T]) Size() uintptr {
