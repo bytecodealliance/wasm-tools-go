@@ -1,0 +1,17 @@
+package example:uses;
+
+interface a {
+	record rec {
+		v: s32,
+	}
+}
+
+interface f {
+	use a.{rec};
+	report: func(r: rec);
+}
+
+world default {
+	import a;
+	export f;
+}

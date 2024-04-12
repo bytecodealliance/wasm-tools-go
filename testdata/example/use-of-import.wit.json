@@ -1,0 +1,87 @@
+{
+  "worlds": [
+    {
+      "name": "default",
+      "imports": {
+        "interface-0": {
+          "interface": 0
+        }
+      },
+      "exports": {
+        "interface-1": {
+          "interface": 1
+        }
+      },
+      "package": 0
+    }
+  ],
+  "interfaces": [
+    {
+      "name": "a",
+      "types": {
+        "rec": 0
+      },
+      "functions": {},
+      "package": 0
+    },
+    {
+      "name": "f",
+      "types": {
+        "rec": 1
+      },
+      "functions": {
+        "report": {
+          "name": "report",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "r",
+              "type": 1
+            }
+          ],
+          "results": []
+        }
+      },
+      "package": 0
+    }
+  ],
+  "types": [
+    {
+      "name": "rec",
+      "kind": {
+        "record": {
+          "fields": [
+            {
+              "name": "v",
+              "type": "s32"
+            }
+          ]
+        }
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": "rec",
+      "kind": {
+        "type": 0
+      },
+      "owner": {
+        "interface": 1
+      }
+    }
+  ],
+  "packages": [
+    {
+      "name": "example:uses",
+      "interfaces": {
+        "a": 0,
+        "f": 1
+      },
+      "worlds": {
+        "default": 0
+      }
+    }
+  ]
+}
