@@ -1,9 +1,7 @@
 package example:uses;
 
 interface a {
-	resource res {
-		do: func();
-	}
+	resource res;
 }
 
 interface f {
@@ -12,6 +10,6 @@ interface f {
 }
 
 world default {
-	export a;
+	import a;
 	export f;
 }

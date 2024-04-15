@@ -12,6 +12,7 @@ interface f {
 }
 
 world default {
+	import a;
 	export a;
 	export f;
 }

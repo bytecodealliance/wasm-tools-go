@@ -8,6 +8,9 @@
         }
       },
       "exports": {
+        "interface-0": {
+          "interface": 0
+        },
         "interface-1": {
           "interface": 1
         }

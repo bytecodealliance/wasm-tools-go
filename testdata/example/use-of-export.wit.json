@@ -18,7 +18,7 @@
     {
       "name": "a",
       "types": {
-        "rec": 0
+        "res": 0
       },
       "functions": {},
       "package": 0
@@ -26,7 +26,7 @@
     {
       "name": "f",
       "types": {
-        "rec": 1
+        "res": 1
       },
       "functions": {
         "report": {
@@ -35,7 +35,7 @@
           "params": [
             {
               "name": "r",
-              "type": 1
+              "type": 2
             }
           ],
           "results": []
@@ -46,29 +46,29 @@
   ],
   "types": [
     {
-      "name": "rec",
-      "kind": {
-        "record": {
-          "fields": [
-            {
-              "name": "v",
-              "type": "s32"
-            }
-          ]
-        }
-      },
+      "name": "res",
+      "kind": "resource",
       "owner": {
         "interface": 0
       }
     },
     {
-      "name": "rec",
+      "name": "res",
       "kind": {
         "type": 0
       },
       "owner": {
         "interface": 1
       }
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "own": 1
+        }
+      },
+      "owner": null
     }
   ],
   "packages": [

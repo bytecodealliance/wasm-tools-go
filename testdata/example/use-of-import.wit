@@ -1,14 +1,14 @@
 package example:uses;
 
 interface a {
-	record rec {
-		v: s32,
+	resource res {
+		do: func();
 	}
 }
 
 interface f {
-	use a.{rec};
-	report: func(r: rec);
+	use a.{res};
+	report: func(r: res);
 }
 
 world default {
