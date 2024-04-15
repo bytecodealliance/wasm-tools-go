@@ -5,7 +5,7 @@ import (
 )
 
 func TestMap(t *testing.T) {
-	m := New[int, int]()
+	var m Map[int, int]
 	m.Set(0, 0)
 	m.Set(5, 5)
 	m.Set(1, 1)

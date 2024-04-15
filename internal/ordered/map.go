@@ -1,19 +1,16 @@
 package ordered
 
-import "github.com/ydnar/wasm-tools-go/internal/iterate"
+import (
+	"github.com/ydnar/wasm-tools-go/internal/iterate"
+)
 
 // Map represents an ordered map of key-value pairs.
 // Use the All method to iterate over pairs in the order they were added.
+// The zero value of Map is ready to use.
+// Methods on Map are not safe for concurrent use and must be protected by a synchronization mechanism.
 type Map[K comparable, V any] struct {
 	l list[K, V]
 	m map[K]*element[K, V]
-}
-
-// New returns a new Map with key type K and value type V.
-func New[K comparable, V any]() *Map[K, V] {
-	return &Map[K, V]{
-		m: make(map[K]*element[K, V]),
-	}
 }
 
 // All returns a sequence that iterates over all items in m.
@@ -50,6 +47,9 @@ func (m *Map[K, V]) Set(k K, v V) (replaced bool) {
 		return true
 	}
 	e := m.l.pushBack(k, v)
+	if m.m == nil {
+		m.m = make(map[K]*element[K, V])
+	}
 	m.m[k] = e
 	return
 }
