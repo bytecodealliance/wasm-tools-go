@@ -16,6 +16,11 @@ func TestMap(t *testing.T) {
 	m.Set(4, 4)
 	m.Set(5, 5)
 
+	got, want := m.Len(), 6
+	if got != want {
+		t.Errorf("m.Len(): %d, expected %d", got, want)
+	}
+
 	// Test values
 	for i := 0; i < 5; i++ {
 		got, want := m.Get(i), i

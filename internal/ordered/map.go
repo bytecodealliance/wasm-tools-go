@@ -1,6 +1,7 @@
 package ordered
 
 import (
+	"github.com/ydnar/wasm-tools-go/internal/codec"
 	"github.com/ydnar/wasm-tools-go/internal/iterate"
 )
 
@@ -11,13 +12,6 @@ import (
 type Map[K comparable, V any] struct {
 	l list[K, V]
 	m map[K]*element[K, V]
-}
-
-// All returns a sequence that iterates over all items in m.
-// It is safe to add or delete items from the map while iterating.
-// New items added to the map will be yielded, deleted items will not.
-func (m *Map[K, V]) All() iterate.Seq2[K, V] {
-	return m.l.all()
 }
 
 // Get returns a value of type V if it exists in the map, otherwise the zero value.
@@ -62,4 +56,27 @@ func (m *Map[K, V]) Delete(k K) (deleted bool) {
 		return true
 	}
 	return
+}
+
+// Len returns the number of elements in m.
+func (m *Map[K, V]) Len() int {
+	return len(m.m)
+}
+
+// All returns a sequence that iterates over all items in m.
+// It is safe to add or delete items from the map while iterating.
+// New items added to the map will be yielded, deleted items will not.
+func (m *Map[K, V]) All() iterate.Seq2[K, V] {
+	return m.l.all()
+}
+
+// DecodeField implements the [codec.FieldDecoder] interface (if K == string).
+func (m *Map[K, V]) DecodeField(dec codec.Decoder, k K) error {
+	var v V
+	err := dec.Decode(&v)
+	if err != nil {
+		return err
+	}
+	m.Set(k, v)
+	return nil
 }
