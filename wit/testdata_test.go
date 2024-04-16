@@ -218,7 +218,7 @@ func TestFunctionNameConsistency(t *testing.T) {
 	err := loadTestdata(func(path string, res *Resolve) error {
 		t.Run(path, func(t *testing.T) {
 			for i, face := range res.Interfaces {
-				if len(face.Functions) == 0 {
+				if face.Functions.Len() == 0 {
 					continue
 				}
 				name := fmt.Sprintf("Interfaces[%d]", i)
@@ -226,18 +226,19 @@ func TestFunctionNameConsistency(t *testing.T) {
 					name += "#" + *face.Name
 				}
 				t.Run(name, func(t *testing.T) {
-					for name, f := range face.Functions {
+					face.Functions.All()(func(name string, f *Function) bool {
 						t.Run(name, func(t *testing.T) {
 							if name != f.Name {
 								t.Errorf("Interface.Functions[%q] != %q", name, f.Name)
 							}
 						})
-					}
+						return true
+					})
 				})
 			}
 
 			for i, w := range res.Worlds {
-				if len(w.Imports) == 0 && len(w.Exports) == 0 {
+				if w.Imports.Len() == 0 && w.Exports.Len() == 0 {
 					continue
 				}
 				name := fmt.Sprintf("Worlds[%d]#%s", i, w.Name)
@@ -256,17 +257,18 @@ func TestFunctionNameConsistency(t *testing.T) {
 					// }
 
 					// TODO: can a world rename an exported function?
-					for name, item := range w.Exports {
+					w.Exports.All()(func(name string, item WorldItem) bool {
 						f, ok := item.(*Function)
 						if !ok {
-							continue
+							return true
 						}
 						t.Run(fmt.Sprintf("Exports[%q]==%q", name, f.Name), func(t *testing.T) {
 							if name != f.Name {
 								t.Errorf("Exports[%q] != %q", name, f.Name)
 							}
 						})
-					}
+						return true
+					})
 				})
 			}
 		})
@@ -437,16 +439,17 @@ func TestNoExportedTypeDefs(t *testing.T) {
 	err := loadTestdata(func(path string, res *Resolve) error {
 		t.Run(path, func(t *testing.T) {
 			for i, w := range res.Worlds {
-				if len(w.Imports) == 0 && len(w.Exports) == 0 {
+				if w.Imports.Len() == 0 && w.Exports.Len() == 0 {
 					continue
 				}
 				name := fmt.Sprintf("Worlds[%d]#%s", i, w.Name)
 				t.Run(name, func(t *testing.T) {
-					for name, item := range w.Exports {
+					w.Exports.All()(func(name string, item WorldItem) bool {
 						if _, ok := item.(*TypeDef); ok {
 							t.Errorf("found TypeDef in World.Exports: %s", name)
 						}
-					}
+						return true
+					})
 				})
 			}
 		})

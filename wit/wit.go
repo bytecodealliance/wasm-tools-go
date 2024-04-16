@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"slices"
 	"strings"
-
-	"github.com/ydnar/wasm-tools-go/internal/codec"
 )
 
 // Node is the common interface implemented by the WIT ([WebAssembly Interface Type])
@@ -136,7 +134,7 @@ func (w *World) WIT(ctx Node, name string) string {
 	b.WriteString(escape(name)) // TODO: compare to w.Name?
 	b.WriteString(" {")
 	n := 0
-	w.AllImports()(func(name string, i WorldItem) bool {
+	w.Imports.All()(func(name string, i WorldItem) bool {
 		if f, ok := i.(*Function); ok {
 			if !f.IsFreestanding() {
 				return true
@@ -150,7 +148,7 @@ func (w *World) WIT(ctx Node, name string) string {
 		n++
 		return true
 	})
-	w.AllExports()(func(name string, i WorldItem) bool {
+	w.Exports.All()(func(name string, i WorldItem) bool {
 		if n == 0 {
 			b.WriteRune('\n')
 		}
@@ -206,12 +204,11 @@ func (i *Interface) WIT(ctx Node, name string) string {
 
 	b.WriteRune('{')
 	n := 0
-	keys := codec.SortedKeys(i.TypeDefs)
+
 	// Emit use statements first
-	for _, name := range keys {
-		td := i.TypeDefs[name]
+	i.TypeDefs.All()(func(name string, td *TypeDef) bool {
 		if td.Root().Owner == td.Owner {
-			continue // Skip declarations
+			return true // Skip declarations
 		}
 		if n == 0 || td.Docs.Contents != "" {
 			b.WriteRune('\n')
@@ -219,12 +216,13 @@ func (i *Interface) WIT(ctx Node, name string) string {
 		b.WriteString(indent(td.WIT(i, name)))
 		b.WriteRune('\n')
 		n++
-	}
+		return true
+	})
+
 	// Declarations
-	for _, name := range keys {
-		td := i.TypeDefs[name]
+	i.TypeDefs.All()(func(name string, td *TypeDef) bool {
 		if td.Root().Owner != td.Owner {
-			continue // Skip use statements
+			return true // Skip use statements
 		}
 		if n == 0 || td.Docs.Contents != "" {
 			b.WriteRune('\n')
@@ -232,12 +230,13 @@ func (i *Interface) WIT(ctx Node, name string) string {
 		b.WriteString(indent(td.WIT(i, name)))
 		b.WriteRune('\n')
 		n++
-	}
+		return true
+	})
+
 	// Functions
-	for _, name := range codec.SortedKeys(i.Functions) {
-		f := i.Functions[name]
+	i.Functions.All()(func(name string, f *Function) bool {
 		if !f.IsFreestanding() {
-			continue
+			return true
 		}
 		if n == 0 || f.Docs.Contents != "" {
 			b.WriteRune('\n')
@@ -245,7 +244,9 @@ func (i *Interface) WIT(ctx Node, name string) string {
 		b.WriteString(indent(f.WIT(i, name)))
 		b.WriteRune('\n')
 		n++
-	}
+		return true
+	})
+
 	b.WriteRune('}')
 	return b.String()
 }
@@ -874,25 +875,30 @@ func (p *Package) WIT(ctx Node, _ string) string {
 	b.WriteString("package ")
 	b.WriteString(p.Name.String())
 	b.WriteString(";\n")
-	if len(p.Interfaces) > 0 {
+	if p.Interfaces.Len() > 0 {
 		b.WriteRune('\n')
-		for i, name := range codec.SortedKeys(p.Interfaces) {
+		i := 0
+		p.Interfaces.All()(func(name string, face *Interface) bool {
 			if i > 0 {
 				b.WriteRune('\n')
 			}
-			b.WriteString(p.Interfaces[name].WIT(p, name))
+			b.WriteString(face.WIT(p, name))
 			b.WriteRune('\n')
-		}
+			i++
+			return true
+		})
 	}
-	if len(p.Worlds) > 0 {
+	if p.Worlds.Len() > 0 {
 		b.WriteRune('\n')
-		for i, name := range codec.SortedKeys(p.Worlds) {
+		i := 0
+		p.Worlds.All()(func(name string, w *World) bool {
 			if i > 0 {
 				b.WriteRune('\n')
 			}
-			b.WriteString(p.Worlds[name].WIT(p, name))
+			b.WriteString(w.WIT(p, name))
 			b.WriteRune('\n')
-		}
+			return true
+		})
 	}
 	return b.String()
 }

@@ -8,8 +8,8 @@ import (
 	"strings"
 	"unsafe"
 
-	"github.com/ydnar/wasm-tools-go/internal/codec"
 	"github.com/ydnar/wasm-tools-go/internal/iterate"
+	"github.com/ydnar/wasm-tools-go/ordered"
 )
 
 // Resolve represents a fully resolved set of WIT ([WebAssembly Interface Type])
@@ -54,8 +54,8 @@ type World struct {
 	_typeOwner
 
 	Name    string
-	Imports map[string]WorldItem
-	Exports map[string]WorldItem
+	Imports ordered.Map[string, WorldItem]
+	Exports ordered.Map[string, WorldItem]
 
 	// The [Package] that this World belongs to. It must be non-nil when fully resolved.
 	Package *Package
@@ -70,7 +70,7 @@ func (w *World) AllFunctions() iterate.Seq[*Function] {
 	return func(yield func(*Function) bool) {
 		var done bool
 		yield = iterate.Done(iterate.Once(yield), func() { done = true })
-		w.AllImports()(func(_ string, i WorldItem) bool {
+		w.Imports.All()(func(_ string, i WorldItem) bool {
 			if f, ok := i.(*Function); ok {
 				return yield(f)
 			}
@@ -79,93 +79,13 @@ func (w *World) AllFunctions() iterate.Seq[*Function] {
 		if done {
 			return
 		}
-		w.AllExports()(func(_ string, i WorldItem) bool {
+		w.Exports.All()(func(_ string, i WorldItem) bool {
 			if f, ok := i.(*Function); ok {
 				return yield(f)
 			}
 			return true
 		})
 	}
-}
-
-// AllImports [iterates] through all imports in a [World] in a deterministic order,
-// calling yield for each. Iteration will stop if yield returns false.
-//
-// [iterates]: https://github.com/golang/go/issues/61897
-func (w *World) AllImports() iterate.Seq2[string, WorldItem] {
-	return sortedWorldItems(w.Imports)
-}
-
-// AllExports [iterates] through all exports in a [World] in a deterministic order,
-// calling yield for each. Iteration will stop if yield returns false.
-//
-// [iterates]: https://github.com/golang/go/issues/61897
-func (w *World) AllExports() iterate.Seq2[string, WorldItem] {
-	return sortedWorldItems(w.Exports)
-}
-
-// sortedWorldItems returns a sequence of [WorldItem] sorted by type and name.
-func sortedWorldItems(m map[string]WorldItem) iterate.Seq2[string, WorldItem] {
-	return func(yield func(name string, i WorldItem) bool) {
-		type named struct {
-			name     string
-			sortName string
-			item     WorldItem
-		}
-		items := make([]named, 0, len(m))
-		for name, v := range m {
-			item := named{name, name, v}
-			// TODO: add WorldItem.ItemName() method or something
-			switch v := v.(type) {
-			case *Interface:
-				if v.Name != nil {
-					item.sortName = *v.Name
-				}
-			case *TypeDef:
-				if v.Name != nil {
-					item.sortName = *v.Name
-				}
-			case *Function:
-				item.sortName = v.Name
-			}
-			items = append(items, item)
-		}
-
-		// Sort slice
-		slices.SortFunc(items, func(a, b named) int {
-			as, bs := worldItemTypeSort(a.item), worldItemTypeSort(b.item)
-			switch {
-			case as < bs:
-				return -1
-			case as > bs:
-				return 1
-			case a.sortName < b.sortName:
-				return -1
-			case a.sortName > b.sortName:
-				return 1
-			}
-			return cmp.Compare(a.name, b.name)
-		})
-
-		// Iterate
-		for _, item := range items {
-			if !yield(item.name, item.item) {
-				return
-			}
-		}
-	}
-}
-
-func worldItemTypeSort(i WorldItem) int {
-	switch i.(type) {
-	case *Interface:
-		return 0
-	case *TypeDef:
-		return 1
-	case *Function:
-		return 2
-	}
-	panic("BUG: unknown WorldItem type")
 }
 
 // A WorldItem is any item that can be exported from or imported into a [World],
@@ -192,8 +112,8 @@ type Interface struct {
 	_worldItem
 
 	Name      *string
-	TypeDefs  map[string]*TypeDef
-	Functions map[string]*Function
+	TypeDefs  ordered.Map[string, *TypeDef]
+	Functions ordered.Map[string, *Function]
 
 	// The [Package] that this Interface belongs to. It must be non-nil when fully resolved.
 	Package *Package
@@ -206,11 +126,9 @@ type Interface struct {
 // [sequence]: https://github.com/golang/go/issues/61897
 func (i *Interface) AllFunctions() iterate.Seq[*Function] {
 	return func(yield func(*Function) bool) {
-		for _, name := range codec.SortedKeys(i.Functions) {
-			if !yield(i.Functions[name]) {
-				return
-			}
-		}
+		i.Functions.All()(func(_ string, f *Function) bool {
+			return yield(f)
+		})
 	}
 }
 
@@ -1485,8 +1403,8 @@ type Param struct {
 // [WIT package]: https://component-model.bytecodealliance.org/design/wit.html#packages
 type Package struct {
 	Name       Ident
-	Interfaces map[string]*Interface
-	Worlds     map[string]*World
+	Interfaces ordered.Map[string, *Interface]
+	Worlds     ordered.Map[string, *World]
 	Docs       Docs
 }
 

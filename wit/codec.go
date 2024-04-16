@@ -101,9 +101,9 @@ func (c *worldCodec) DecodeField(dec codec.Decoder, name string) error {
 	case "name":
 		return dec.Decode(&w.Name)
 	case "imports":
-		return codec.DecodeMap(dec, &w.Imports)
+		return dec.Decode(&w.Imports)
 	case "exports":
-		return codec.DecodeMap(dec, &w.Exports)
+		return dec.Decode(&w.Exports)
 	case "package":
 		return dec.Decode(&w.Package)
 	case "docs":
@@ -129,9 +129,9 @@ func (c *interfaceCodec) DecodeField(dec codec.Decoder, name string) error {
 	case "name":
 		return dec.Decode(&i.Name)
 	case "types":
-		return codec.DecodeMap(dec, &i.TypeDefs)
+		return dec.Decode(&i.TypeDefs)
 	case "functions":
-		return codec.DecodeMap(dec, &i.Functions)
+		return dec.Decode(&i.Functions)
 	case "package":
 		return dec.Decode(&i.Package)
 	case "docs":
@@ -183,9 +183,9 @@ func (c *packageCodec) DecodeField(dec codec.Decoder, name string) error {
 	case "name":
 		return dec.Decode(&p.Name)
 	case "interfaces":
-		return codec.DecodeMap(dec, &p.Interfaces)
+		return dec.Decode(&p.Interfaces)
 	case "worlds":
-		return codec.DecodeMap(dec, &p.Worlds)
+		return dec.Decode(&p.Worlds)
 	case "docs":
 		return dec.Decode(&p.Docs)
 	}

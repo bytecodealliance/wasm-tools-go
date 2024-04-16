@@ -248,9 +248,9 @@ func (g *generator) defineWorld(w *wit.World) error {
 		file.PackageDocs = b.String()
 	}
 
-	for _, name := range codec.SortedKeys(w.Imports) {
-		var err error
-		switch v := w.Imports[name].(type) {
+	var err error
+	w.Imports.All()(func(name string, v wit.WorldItem) bool {
+		switch v := v.(type) {
 		case *wit.Interface:
 			err = g.defineInterface(v, name)
 		case *wit.TypeDef:
@@ -261,8 +261,12 @@ func (g *generator) defineWorld(w *wit.World) error {
 			}
 		}
 		if err != nil {
-			return err
+			return false
 		}
+		return true
+	})
+	if err != nil {
+		return err
 	}
 
 	g.defined[w] = true
@@ -293,36 +297,37 @@ func (g *generator) defineInterface(i *wit.Interface, name string) error {
 	}
 
 	// Define types
-	for _, name := range codec.SortedKeys(i.TypeDefs) {
-		g.defineTypeDef(i.TypeDefs[name], name)
-	}
+	i.TypeDefs.All()(func(name string, td *wit.TypeDef) bool {
+		g.defineTypeDef(td, name)
+		return true
+	})
 
 	// Declare all functions
-	for _, name := range codec.SortedKeys(i.Functions) {
-		f := i.Functions[name]
+	i.Functions.All()(func(_ string, f *wit.Function) bool {
 		g.declareFunction(f, id)
-	}
+		return true
+	})
 
 	// Define standalone functions
-	for _, name := range codec.SortedKeys(i.Functions) {
-		f := i.Functions[name]
+	i.Functions.All()(func(_ string, f *wit.Function) bool {
 		if f.IsFreestanding() {
 			g.defineImportedFunction(f, id)
 		}
-	}
+		return true
+	})
 
 	// Define export interface
 	if g.opts.exports {
 		var b bytes.Buffer
 		stringio.Write(&b, "type ", pkg.GetName("Interface"), " interface {\n")
 
-		for _, name := range codec.SortedKeys(i.Functions) {
-			f := i.Functions[name]
+		i.Functions.All()(func(_ string, f *wit.Function) bool {
 			if !f.IsMethod() {
 				d := g.functions[f]
 				stringio.Write(&b, g.functionSignature(file, d.f), "\n")
 			}
-		}
+			return true
+		})
 
 		b.WriteString("}\n\n")
 		stringio.Write(&b, "var ", pkg.GetName("instance"), " ", pkg.GetName("Interface"), "\n\n")
