@@ -1,6 +1,11 @@
 package example:escaped-names;
 
 interface %interface {
+	enum error { ok, fail }
+	record %export {
+		headers: list<tuple<list<u8>, list<u8>>>,
+		body: list<u8>,
+	}
 	enum %enum {
 		%enum,
 		%export,
@@ -16,11 +21,6 @@ interface %interface {
 		%type,
 		%variant,
 		%world
-	}
-	enum error { ok, fail }
-	record %export {
-		headers: list<tuple<list<u8>, list<u8>>>,
-		body: list<u8>,
 	}
 	record %record {
 		%enum: %enum,

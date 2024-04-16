@@ -1,8 +1,8 @@
 package foo:foo;
 
 world foo {
-	import bar: func(arg: list<u32>);
 	import foo: func();
+	import bar: func(arg: list<u32>);
 	export foo2: func();
 	export some-name: func() -> list<option<u32>>;
 }

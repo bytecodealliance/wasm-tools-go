@@ -1,5 +1,9 @@
 package foo:foo;
 
+interface shared-items {
+	type foo = u32;
+}
+
 interface i1 {
 	use shared-items.{foo};
 	a: func() -> foo;
@@ -10,13 +14,9 @@ interface i2 {
 	a: func() -> foo;
 }
 
-interface shared-items {
-	type foo = u32;
-}
-
 world the-world {
+	import shared-items;
 	import i1;
 	import i2;
-	import shared-items;
 	import a: func();
 }

@@ -16,12 +16,10 @@ world my-world-a {
 	import a1;
 	import b1;
 }
-
 world my-world-b {
 	import a1;
 	import b1;
 }
-
 world union-my-world {
 	import a1;
 	import b1;

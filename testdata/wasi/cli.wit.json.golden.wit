@@ -82,6 +82,18 @@ interface streams {
 	use error.{error};
 	use poll.{pollable};
 
+	/// An error for input-stream and output-stream operations.
+	variant stream-error {
+		/// The last operation (a write or flush) failed before completion.
+		///
+		/// More information is available in the `error` payload.
+		last-operation-failed(error),
+		/// The stream is closed: no more input will be accepted by the
+		/// stream. A closed output-stream will return this error on all
+		/// future operations.
+		closed,
+	}
+
 	/// An input bytestream.
 	///
 	/// `input-stream`s are *non-blocking* to the extent practical on underlying
@@ -289,18 +301,6 @@ interface streams {
 		/// that should be written.
 		write-zeroes: func(len: u64) -> result<_, stream-error>;
 	}
-
-	/// An error for input-stream and output-stream operations.
-	variant stream-error {
-		/// The last operation (a write or flush) failed before completion.
-		///
-		/// More information is available in the `error` payload.
-		last-operation-failed(error),
-		/// The stream is closed: no more input will be accepted by the
-		/// stream. A closed output-stream will return this error on all
-		/// future operations.
-		closed,
-	}
 }
 
 world imports {
@@ -325,13 +325,13 @@ package wasi:clocks@0.2.0;
 interface monotonic-clock {
 	use wasi:io/poll@0.2.0.{pollable};
 
-	/// A duration of time, in nanoseconds.
-	type duration = u64;
-
 	/// An instant in time, in nanoseconds. An instant is relative to an
 	/// unspecified initial value, and can only be compared to instances from
 	/// the same monotonic-clock.
 	type instant = u64;
+
+	/// A duration of time, in nanoseconds.
+	type duration = u64;
 
 	/// Read the current value of the clock.
 	///
@@ -343,14 +343,14 @@ interface monotonic-clock {
 	/// corresponding to a clock tick.
 	resolution: func() -> duration;
 
+	/// Create a `pollable` which will resolve once the specified instant
+	/// occured.
+	subscribe-instant: func(when: instant) -> pollable;
+
 	/// Create a `pollable` which will resolve once the given duration has
 	/// elapsed, starting at the time at which this function was called.
 	/// occured.
 	subscribe-duration: func(when: duration) -> pollable;
-
-	/// Create a `pollable` which will resolve once the specified instant
-	/// occured.
-	subscribe-instant: func(when: instant) -> pollable;
 }
 
 /// WASI Wall Clock is a clock API intended to let users query the current
@@ -396,20 +396,13 @@ interface wall-clock {
 }
 
 world imports {
-	import monotonic-clock;
 	import wasi:io/poll@0.2.0;
+	import monotonic-clock;
 	import wall-clock;
 }
 
 
 package wasi:filesystem@0.2.0;
-
-interface preopens {
-	use types.{descriptor};
-
-	/// Return the set of preopened directories, and their path.
-	get-directories: func() -> list<tuple<descriptor, string>>;
-}
 
 /// WASI filesystem is a filesystem API primarily intended to let users run WASI
 /// programs that access their files on their existing filesystems, without
@@ -436,10 +429,230 @@ interface preopens {
 ///
 /// [WASI filesystem path resolution]: https://github.com/WebAssembly/wasi-filesystem/blob/main/path-resolution.md
 interface types {
-	use wasi:clocks/wall-clock@0.2.0.{datetime};
-	use wasi:io/streams@0.2.0.{error};
 	use wasi:io/streams@0.2.0.{input-stream};
 	use wasi:io/streams@0.2.0.{output-stream};
+	use wasi:io/streams@0.2.0.{error};
+	use wasi:clocks/wall-clock@0.2.0.{datetime};
+
+	/// File size or length of a region within a file.
+	type filesize = u64;
+
+	/// The type of a filesystem object referenced by a descriptor.
+	///
+	/// Note: This was called `filetype` in earlier versions of WASI.
+	enum descriptor-type {
+		/// The type of the descriptor or file is unknown or is different from
+		/// any of the other types specified.
+		unknown,
+		/// The descriptor refers to a block device inode.
+		block-device,
+		/// The descriptor refers to a character device inode.
+		character-device,
+		/// The descriptor refers to a directory inode.
+		directory,
+		/// The descriptor refers to a named pipe.
+		fifo,
+		/// The file refers to a symbolic link inode.
+		symbolic-link,
+		/// The descriptor refers to a regular file inode.
+		regular-file,
+		/// The descriptor refers to a socket.
+		socket
+	}
+
+	/// Descriptor flags.
+	///
+	/// Note: This was called `fdflags` in earlier versions of WASI.
+	flags descriptor-flags {
+		/// Read mode: Data can be read.
+		read,
+		/// Write mode: Data can be written to.
+		write,
+		/// Request that writes be performed according to synchronized I/O file
+		/// integrity completion. The data stored in the file and the file's
+		/// metadata are synchronized. This is similar to `O_SYNC` in POSIX.
+		///
+		/// The precise semantics of this operation have not yet been defined for
+		/// WASI. At this time, it should be interpreted as a request, and not a
+		/// requirement.
+		file-integrity-sync,
+		/// Request that writes be performed according to synchronized I/O data
+		/// integrity completion. Only the data stored in the file is
+		/// synchronized. This is similar to `O_DSYNC` in POSIX.
+		///
+		/// The precise semantics of this operation have not yet been defined for
+		/// WASI. At this time, it should be interpreted as a request, and not a
+		/// requirement.
+		data-integrity-sync,
+		/// Requests that reads be performed at the same level of integrety
+		/// requested for writes. This is similar to `O_RSYNC` in POSIX.
+		///
+		/// The precise semantics of this operation have not yet been defined for
+		/// WASI. At this time, it should be interpreted as a request, and not a
+		/// requirement.
+		requested-write-sync,
+		/// Mutating directories mode: Directory contents may be mutated.
+		///
+		/// When this flag is unset on a descriptor, operations using the
+		/// descriptor which would create, rename, delete, modify the data or
+		/// metadata of filesystem objects, or obtain another handle which
+		/// would permit any of those, shall fail with `error-code::read-only` if
+		/// they would otherwise succeed.
+		///
+		/// This may only be set on directories.
+		mutate-directory,
+	}
+
+	/// Flags determining the method of how paths are resolved.
+	flags path-flags {
+		/// As long as the resolved path corresponds to a symbolic link, it is
+		/// expanded.
+		symlink-follow,
+	}
+
+	/// Open flags used by `open-at`.
+	flags open-flags {
+		/// Create file if it does not exist, similar to `O_CREAT` in POSIX.
+		create,
+		/// Fail if not a directory, similar to `O_DIRECTORY` in POSIX.
+		directory,
+		/// Fail if file already exists, similar to `O_EXCL` in POSIX.
+		exclusive,
+		/// Truncate file to size 0, similar to `O_TRUNC` in POSIX.
+		truncate,
+	}
+
+	/// Number of hard links to an inode.
+	type link-count = u64;
+
+	/// File attributes.
+	///
+	/// Note: This was called `filestat` in earlier versions of WASI.
+	record descriptor-stat {
+		/// File type.
+		%type: descriptor-type,
+		/// Number of hard links to the file.
+		link-count: link-count,
+		/// For regular files, the file size in bytes. For symbolic links, the
+		/// length in bytes of the pathname contained in the symbolic link.
+		size: filesize,
+		/// Last data access timestamp.
+		///
+		/// If the `option` is none, the platform doesn't maintain an access
+		/// timestamp for this file.
+		data-access-timestamp: option<datetime>,
+		/// Last data modification timestamp.
+		///
+		/// If the `option` is none, the platform doesn't maintain a
+		/// modification timestamp for this file.
+		data-modification-timestamp: option<datetime>,
+		/// Last file status-change timestamp.
+		///
+		/// If the `option` is none, the platform doesn't maintain a
+		/// status-change timestamp for this file.
+		status-change-timestamp: option<datetime>,
+	}
+
+	/// When setting a timestamp, this gives the value to set it to.
+	variant new-timestamp {
+		/// Leave the timestamp set to its previous value.
+		no-change,
+		/// Set the timestamp to the current time of the system clock associated
+		/// with the filesystem.
+		now,
+		/// Set the timestamp to the given value.
+		timestamp(datetime),
+	}
+
+	/// A directory entry.
+	record directory-entry {
+		/// The type of the file referred to by this directory entry.
+		%type: descriptor-type,
+		/// The name of the object.
+		name: string,
+	}
+
+	/// Error codes returned by functions, similar to `errno` in POSIX.
+	/// Not all of these error codes are returned by the functions provided by this
+	/// API; some are used in higher-level library layers, and others are provided
+	/// merely for alignment with POSIX.
+	enum error-code {
+		/// Permission denied, similar to `EACCES` in POSIX.
+		access,
+		/// Resource unavailable, or operation would block, similar to `EAGAIN` and `EWOULDBLOCK`
+		/// in POSIX.
+		would-block,
+		/// Connection already in progress, similar to `EALREADY` in POSIX.
+		already,
+		/// Bad descriptor, similar to `EBADF` in POSIX.
+		bad-descriptor,
+		/// Device or resource busy, similar to `EBUSY` in POSIX.
+		busy,
+		/// Resource deadlock would occur, similar to `EDEADLK` in POSIX.
+		deadlock,
+		/// Storage quota exceeded, similar to `EDQUOT` in POSIX.
+		quota,
+		/// File exists, similar to `EEXIST` in POSIX.
+		exist,
+		/// File too large, similar to `EFBIG` in POSIX.
+		file-too-large,
+		/// Illegal byte sequence, similar to `EILSEQ` in POSIX.
+		illegal-byte-sequence,
+		/// Operation in progress, similar to `EINPROGRESS` in POSIX.
+		in-progress,
+		/// Interrupted function, similar to `EINTR` in POSIX.
+		interrupted,
+		/// Invalid argument, similar to `EINVAL` in POSIX.
+		invalid,
+		/// I/O error, similar to `EIO` in POSIX.
+		io,
+		/// Is a directory, similar to `EISDIR` in POSIX.
+		is-directory,
+		/// Too many levels of symbolic links, similar to `ELOOP` in POSIX.
+		loop,
+		/// Too many links, similar to `EMLINK` in POSIX.
+		too-many-links,
+		/// Message too large, similar to `EMSGSIZE` in POSIX.
+		message-size,
+		/// Filename too long, similar to `ENAMETOOLONG` in POSIX.
+		name-too-long,
+		/// No such device, similar to `ENODEV` in POSIX.
+		no-device,
+		/// No such file or directory, similar to `ENOENT` in POSIX.
+		no-entry,
+		/// No locks available, similar to `ENOLCK` in POSIX.
+		no-lock,
+		/// Not enough space, similar to `ENOMEM` in POSIX.
+		insufficient-memory,
+		/// No space left on device, similar to `ENOSPC` in POSIX.
+		insufficient-space,
+		/// Not a directory or a symbolic link to a directory, similar to `ENOTDIR` in POSIX.
+		not-directory,
+		/// Directory not empty, similar to `ENOTEMPTY` in POSIX.
+		not-empty,
+		/// State not recoverable, similar to `ENOTRECOVERABLE` in POSIX.
+		not-recoverable,
+		/// Not supported, similar to `ENOTSUP` and `ENOSYS` in POSIX.
+		unsupported,
+		/// Inappropriate I/O control operation, similar to `ENOTTY` in POSIX.
+		no-tty,
+		/// No such device or address, similar to `ENXIO` in POSIX.
+		no-such-device,
+		/// Value too large to be stored in data type, similar to `EOVERFLOW` in POSIX.
+		overflow,
+		/// Operation not permitted, similar to `EPERM` in POSIX.
+		not-permitted,
+		/// Broken pipe, similar to `EPIPE` in POSIX.
+		pipe,
+		/// Read-only file system, similar to `EROFS` in POSIX.
+		read-only,
+		/// Invalid seek, similar to `ESPIPE` in POSIX.
+		invalid-seek,
+		/// Text file busy, similar to `ETXTBSY` in POSIX.
+		text-file-busy,
+		/// Cross-device link, similar to `EXDEV` in POSIX.
+		cross-device
+	}
 
 	/// File or memory access pattern advisory information.
 	enum advice {
@@ -461,6 +674,15 @@ interface types {
 		/// The application expects to access the specified data once and then
 		/// not reuse it thereafter.
 		no-reuse
+	}
+
+	/// A 128-bit hash value, split into parts because wasm doesn't have a
+	/// 128-bit integer type.
+	record metadata-hash-value {
+		/// 64 bits of a 128-bit hash value.
+		lower: u64,
+		/// Another 64 bits of a 128-bit hash value.
+		upper: u64,
 	}
 
 	/// A descriptor is a reference to a filesystem object, which may be a file,
@@ -711,240 +933,11 @@ interface types {
 		write-via-stream: func(offset: filesize) -> result<output-stream, error-code>;
 	}
 
-	/// Descriptor flags.
-	///
-	/// Note: This was called `fdflags` in earlier versions of WASI.
-	flags descriptor-flags {
-		/// Read mode: Data can be read.
-		read,
-		/// Write mode: Data can be written to.
-		write,
-		/// Request that writes be performed according to synchronized I/O file
-		/// integrity completion. The data stored in the file and the file's
-		/// metadata are synchronized. This is similar to `O_SYNC` in POSIX.
-		///
-		/// The precise semantics of this operation have not yet been defined for
-		/// WASI. At this time, it should be interpreted as a request, and not a
-		/// requirement.
-		file-integrity-sync,
-		/// Request that writes be performed according to synchronized I/O data
-		/// integrity completion. Only the data stored in the file is
-		/// synchronized. This is similar to `O_DSYNC` in POSIX.
-		///
-		/// The precise semantics of this operation have not yet been defined for
-		/// WASI. At this time, it should be interpreted as a request, and not a
-		/// requirement.
-		data-integrity-sync,
-		/// Requests that reads be performed at the same level of integrety
-		/// requested for writes. This is similar to `O_RSYNC` in POSIX.
-		///
-		/// The precise semantics of this operation have not yet been defined for
-		/// WASI. At this time, it should be interpreted as a request, and not a
-		/// requirement.
-		requested-write-sync,
-		/// Mutating directories mode: Directory contents may be mutated.
-		///
-		/// When this flag is unset on a descriptor, operations using the
-		/// descriptor which would create, rename, delete, modify the data or
-		/// metadata of filesystem objects, or obtain another handle which
-		/// would permit any of those, shall fail with `error-code::read-only` if
-		/// they would otherwise succeed.
-		///
-		/// This may only be set on directories.
-		mutate-directory,
-	}
-
-	/// File attributes.
-	///
-	/// Note: This was called `filestat` in earlier versions of WASI.
-	record descriptor-stat {
-		/// File type.
-		%type: descriptor-type,
-		/// Number of hard links to the file.
-		link-count: link-count,
-		/// For regular files, the file size in bytes. For symbolic links, the
-		/// length in bytes of the pathname contained in the symbolic link.
-		size: filesize,
-		/// Last data access timestamp.
-		///
-		/// If the `option` is none, the platform doesn't maintain an access
-		/// timestamp for this file.
-		data-access-timestamp: option<datetime>,
-		/// Last data modification timestamp.
-		///
-		/// If the `option` is none, the platform doesn't maintain a
-		/// modification timestamp for this file.
-		data-modification-timestamp: option<datetime>,
-		/// Last file status-change timestamp.
-		///
-		/// If the `option` is none, the platform doesn't maintain a
-		/// status-change timestamp for this file.
-		status-change-timestamp: option<datetime>,
-	}
-
-	/// The type of a filesystem object referenced by a descriptor.
-	///
-	/// Note: This was called `filetype` in earlier versions of WASI.
-	enum descriptor-type {
-		/// The type of the descriptor or file is unknown or is different from
-		/// any of the other types specified.
-		unknown,
-		/// The descriptor refers to a block device inode.
-		block-device,
-		/// The descriptor refers to a character device inode.
-		character-device,
-		/// The descriptor refers to a directory inode.
-		directory,
-		/// The descriptor refers to a named pipe.
-		fifo,
-		/// The file refers to a symbolic link inode.
-		symbolic-link,
-		/// The descriptor refers to a regular file inode.
-		regular-file,
-		/// The descriptor refers to a socket.
-		socket
-	}
-
-	/// A directory entry.
-	record directory-entry {
-		/// The type of the file referred to by this directory entry.
-		%type: descriptor-type,
-		/// The name of the object.
-		name: string,
-	}
-
 	/// A stream of directory entries.
 	resource directory-entry-stream {
 
 		/// Read a single directory entry from a `directory-entry-stream`.
 		read-directory-entry: func() -> result<option<directory-entry>, error-code>;
-	}
-
-	/// Error codes returned by functions, similar to `errno` in POSIX.
-	/// Not all of these error codes are returned by the functions provided by this
-	/// API; some are used in higher-level library layers, and others are provided
-	/// merely for alignment with POSIX.
-	enum error-code {
-		/// Permission denied, similar to `EACCES` in POSIX.
-		access,
-		/// Resource unavailable, or operation would block, similar to `EAGAIN` and `EWOULDBLOCK`
-		/// in POSIX.
-		would-block,
-		/// Connection already in progress, similar to `EALREADY` in POSIX.
-		already,
-		/// Bad descriptor, similar to `EBADF` in POSIX.
-		bad-descriptor,
-		/// Device or resource busy, similar to `EBUSY` in POSIX.
-		busy,
-		/// Resource deadlock would occur, similar to `EDEADLK` in POSIX.
-		deadlock,
-		/// Storage quota exceeded, similar to `EDQUOT` in POSIX.
-		quota,
-		/// File exists, similar to `EEXIST` in POSIX.
-		exist,
-		/// File too large, similar to `EFBIG` in POSIX.
-		file-too-large,
-		/// Illegal byte sequence, similar to `EILSEQ` in POSIX.
-		illegal-byte-sequence,
-		/// Operation in progress, similar to `EINPROGRESS` in POSIX.
-		in-progress,
-		/// Interrupted function, similar to `EINTR` in POSIX.
-		interrupted,
-		/// Invalid argument, similar to `EINVAL` in POSIX.
-		invalid,
-		/// I/O error, similar to `EIO` in POSIX.
-		io,
-		/// Is a directory, similar to `EISDIR` in POSIX.
-		is-directory,
-		/// Too many levels of symbolic links, similar to `ELOOP` in POSIX.
-		loop,
-		/// Too many links, similar to `EMLINK` in POSIX.
-		too-many-links,
-		/// Message too large, similar to `EMSGSIZE` in POSIX.
-		message-size,
-		/// Filename too long, similar to `ENAMETOOLONG` in POSIX.
-		name-too-long,
-		/// No such device, similar to `ENODEV` in POSIX.
-		no-device,
-		/// No such file or directory, similar to `ENOENT` in POSIX.
-		no-entry,
-		/// No locks available, similar to `ENOLCK` in POSIX.
-		no-lock,
-		/// Not enough space, similar to `ENOMEM` in POSIX.
-		insufficient-memory,
-		/// No space left on device, similar to `ENOSPC` in POSIX.
-		insufficient-space,
-		/// Not a directory or a symbolic link to a directory, similar to `ENOTDIR` in POSIX.
-		not-directory,
-		/// Directory not empty, similar to `ENOTEMPTY` in POSIX.
-		not-empty,
-		/// State not recoverable, similar to `ENOTRECOVERABLE` in POSIX.
-		not-recoverable,
-		/// Not supported, similar to `ENOTSUP` and `ENOSYS` in POSIX.
-		unsupported,
-		/// Inappropriate I/O control operation, similar to `ENOTTY` in POSIX.
-		no-tty,
-		/// No such device or address, similar to `ENXIO` in POSIX.
-		no-such-device,
-		/// Value too large to be stored in data type, similar to `EOVERFLOW` in POSIX.
-		overflow,
-		/// Operation not permitted, similar to `EPERM` in POSIX.
-		not-permitted,
-		/// Broken pipe, similar to `EPIPE` in POSIX.
-		pipe,
-		/// Read-only file system, similar to `EROFS` in POSIX.
-		read-only,
-		/// Invalid seek, similar to `ESPIPE` in POSIX.
-		invalid-seek,
-		/// Text file busy, similar to `ETXTBSY` in POSIX.
-		text-file-busy,
-		/// Cross-device link, similar to `EXDEV` in POSIX.
-		cross-device
-	}
-
-	/// File size or length of a region within a file.
-	type filesize = u64;
-
-	/// Number of hard links to an inode.
-	type link-count = u64;
-
-	/// A 128-bit hash value, split into parts because wasm doesn't have a
-	/// 128-bit integer type.
-	record metadata-hash-value {
-		/// 64 bits of a 128-bit hash value.
-		lower: u64,
-		/// Another 64 bits of a 128-bit hash value.
-		upper: u64,
-	}
-
-	/// When setting a timestamp, this gives the value to set it to.
-	variant new-timestamp {
-		/// Leave the timestamp set to its previous value.
-		no-change,
-		/// Set the timestamp to the current time of the system clock associated
-		/// with the filesystem.
-		now,
-		/// Set the timestamp to the given value.
-		timestamp(datetime),
-	}
-
-	/// Open flags used by `open-at`.
-	flags open-flags {
-		/// Create file if it does not exist, similar to `O_CREAT` in POSIX.
-		create,
-		/// Fail if not a directory, similar to `O_DIRECTORY` in POSIX.
-		directory,
-		/// Fail if file already exists, similar to `O_EXCL` in POSIX.
-		exclusive,
-		/// Truncate file to size 0, similar to `O_TRUNC` in POSIX.
-		truncate,
-	}
-
-	/// Flags determining the method of how paths are resolved.
-	flags path-flags {
-		/// As long as the resolved path corresponds to a symbolic link, it is
-		/// expanded.
-		symlink-follow,
 	}
 
 	/// Attempts to extract a filesystem-related `error-code` from the stream
@@ -960,39 +953,24 @@ interface types {
 	filesystem-error-code: func(err: borrow<error>) -> option<error-code>;
 }
 
+interface preopens {
+	use types.{descriptor};
+
+	/// Return the set of preopened directories, and their path.
+	get-directories: func() -> list<tuple<descriptor, string>>;
+}
+
 world imports {
 	import wasi:io/error@0.2.0;
 	import wasi:io/poll@0.2.0;
-	import preopens;
 	import wasi:io/streams@0.2.0;
-	import types;
 	import wasi:clocks/wall-clock@0.2.0;
+	import types;
+	import preopens;
 }
 
 
 package wasi:random@0.2.0;
-
-/// The insecure interface for insecure pseudo-random numbers.
-///
-/// It is intended to be portable at least between Unix-family platforms and
-/// Windows.
-interface insecure {
-	/// Return `len` insecure pseudo-random bytes.
-	///
-	/// This function is not cryptographically secure. Do not use it for
-	/// anything related to security.
-	///
-	/// There are no requirements on the values of the returned bytes, however
-	/// implementations are encouraged to return evenly distributed values with
-	/// a long period.
-	get-insecure-random-bytes: func(len: u64) -> list<u8>;
-
-	/// Return an insecure pseudo-random `u64` value.
-	///
-	/// This function returns the same type of pseudo-random data as
-	/// `get-insecure-random-bytes`, represented as a `u64`.
-	get-insecure-random-u64: func() -> u64;
-}
 
 /// The insecure-seed interface for seeding hash-map DoS resistance.
 ///
@@ -1017,6 +995,28 @@ interface insecure-seed {
 	/// called multiple times and potentially used for purposes other than DoS
 	/// protection.
 	insecure-seed: func() -> tuple<u64, u64>;
+}
+
+/// The insecure interface for insecure pseudo-random numbers.
+///
+/// It is intended to be portable at least between Unix-family platforms and
+/// Windows.
+interface insecure {
+	/// Return `len` insecure pseudo-random bytes.
+	///
+	/// This function is not cryptographically secure. Do not use it for
+	/// anything related to security.
+	///
+	/// There are no requirements on the values of the returned bytes, however
+	/// implementations are encouraged to return evenly distributed values with
+	/// a long period.
+	get-insecure-random-bytes: func(len: u64) -> list<u8>;
+
+	/// Return an insecure pseudo-random `u64` value.
+	///
+	/// This function returns the same type of pseudo-random data as
+	/// `get-insecure-random-bytes`, represented as a `u64`.
+	get-insecure-random-u64: func() -> u64;
 }
 
 /// WASI Random is a random data API.
@@ -1046,78 +1046,20 @@ interface random {
 }
 
 world imports {
+	import random;
 	import insecure;
 	import insecure-seed;
-	import random;
 }
 
 
 package wasi:sockets@0.2.0;
 
-/// This interface provides a value-export of the default network handle..
-interface instance-network {
-	use network.{network};
-
-	/// Get a handle to the default network.
-	instance-network: func() -> network;
-}
-
-interface ip-name-lookup {
-	use network.{error-code};
-	use network.{ip-address};
-	use network.{network};
-	use wasi:io/poll@0.2.0.{pollable};
-	resource resolve-address-stream {
-
-		/// Returns the next address from the resolver.
-		///
-		/// This function should be called multiple times. On each call, it will
-		/// return the next address in connection order preference. If all
-		/// addresses have been exhausted, this function returns `none`.
-		///
-		/// This function never returns IPv4-mapped IPv6 addresses.
-		///
-		/// # Typical errors
-		/// - `name-unresolvable`:          Name does not exist or has no suitable associated
-		/// IP addresses. (EAI_NONAME, EAI_NODATA, EAI_ADDRFAMILY)
-		/// - `temporary-resolver-failure`: A temporary failure in name resolution occurred.
-		/// (EAI_AGAIN)
-		/// - `permanent-resolver-failure`: A permanent failure in name resolution occurred.
-		/// (EAI_FAIL)
-		/// - `would-block`:                A result is not available yet. (EWOULDBLOCK, EAGAIN)
-		resolve-next-address: func() -> result<option<ip-address>, error-code>;
-
-		/// Create a `pollable` which will resolve once the stream is ready for I/O.
-		///
-		/// Note: this function is here for WASI Preview2 only.
-		/// It's planned to be removed when `future` is natively supported in Preview3.
-		subscribe: func() -> pollable;
-	}
-
-	/// Resolve an internet host name to a list of IP addresses.
-	///
-	/// Unicode domain names are automatically converted to ASCII using IDNA encoding.
-	/// If the input is an IP address string, the address is parsed and returned
-	/// as-is without making any external requests.
-	///
-	/// See the wasi-socket proposal README.md for a comparison with getaddrinfo.
-	///
-	/// This function never blocks. It either immediately fails or immediately
-	/// returns successfully with a `resolve-address-stream` that can be used
-	/// to (asynchronously) fetch the results.
-	///
-	/// # Typical errors
-	/// - `invalid-argument`: `name` is a syntactically invalid domain name or IP address.
-	///
-	/// # References:
-	/// - <https://pubs.opengroup.org/onlinepubs/9699919799/functions/getaddrinfo.html>
-	/// - <https://man7.org/linux/man-pages/man3/getaddrinfo.3.html>
-	/// - <https://learn.microsoft.com/en-us/windows/win32/api/ws2tcpip/nf-ws2tcpip-getaddrinfo>
-	/// - <https://man.freebsd.org/cgi/man.cgi?query=getaddrinfo&sektion=3>
-	resolve-addresses: func(network: borrow<network>, name: string) -> result<resolve-address-stream, error-code>;
-}
-
 interface network {
+	/// An opaque resource that represents access to (a subset of) the network.
+	/// This enables context-based security for networking.
+	/// There is no need for this to map 1:1 to a physical network interface.
+	resource network;
+
 	/// Error codes.
 	///
 	/// In theory, every API can return any error code.
@@ -1195,28 +1137,24 @@ interface network {
 		/// A permanent failure in name resolution occurred.
 		permanent-resolver-failure
 	}
-	variant ip-address {
-		ipv4(ipv4-address),
-		ipv6(ipv6-address),
-	}
 	enum ip-address-family {
 		/// Similar to `AF_INET` in POSIX.
 		ipv4,
 		/// Similar to `AF_INET6` in POSIX.
 		ipv6
 	}
-	variant ip-socket-address {
-		ipv4(ipv4-socket-address),
-		ipv6(ipv6-socket-address),
-	}
 	type ipv4-address = tuple<u8, u8, u8, u8>;
+	type ipv6-address = tuple<u16, u16, u16, u16, u16, u16, u16, u16>;
+	variant ip-address {
+		ipv4(ipv4-address),
+		ipv6(ipv6-address),
+	}
 	record ipv4-socket-address {
 		/// sin_port
 		port: u16,
 		/// sin_addr
 		address: ipv4-address,
 	}
-	type ipv6-address = tuple<u16, u16, u16, u16, u16, u16, u16, u16>;
 	record ipv6-socket-address {
 		/// sin6_port
 		port: u16,
@@ -1227,22 +1165,84 @@ interface network {
 		/// sin6_scope_id
 		scope-id: u32,
 	}
+	variant ip-socket-address {
+		ipv4(ipv4-socket-address),
+		ipv6(ipv6-socket-address),
+	}
+}
 
-	/// An opaque resource that represents access to (a subset of) the network.
-	/// This enables context-based security for networking.
-	/// There is no need for this to map 1:1 to a physical network interface.
-	resource network;
+/// This interface provides a value-export of the default network handle..
+interface instance-network {
+	use network.{network};
+
+	/// Get a handle to the default network.
+	instance-network: func() -> network;
+}
+
+interface ip-name-lookup {
+	use wasi:io/poll@0.2.0.{pollable};
+	use network.{network};
+	use network.{error-code};
+	use network.{ip-address};
+	resource resolve-address-stream {
+
+		/// Returns the next address from the resolver.
+		///
+		/// This function should be called multiple times. On each call, it will
+		/// return the next address in connection order preference. If all
+		/// addresses have been exhausted, this function returns `none`.
+		///
+		/// This function never returns IPv4-mapped IPv6 addresses.
+		///
+		/// # Typical errors
+		/// - `name-unresolvable`:          Name does not exist or has no suitable associated
+		/// IP addresses. (EAI_NONAME, EAI_NODATA, EAI_ADDRFAMILY)
+		/// - `temporary-resolver-failure`: A temporary failure in name resolution occurred.
+		/// (EAI_AGAIN)
+		/// - `permanent-resolver-failure`: A permanent failure in name resolution occurred.
+		/// (EAI_FAIL)
+		/// - `would-block`:                A result is not available yet. (EWOULDBLOCK, EAGAIN)
+		resolve-next-address: func() -> result<option<ip-address>, error-code>;
+
+		/// Create a `pollable` which will resolve once the stream is ready for I/O.
+		///
+		/// Note: this function is here for WASI Preview2 only.
+		/// It's planned to be removed when `future` is natively supported in Preview3.
+		subscribe: func() -> pollable;
+	}
+
+	/// Resolve an internet host name to a list of IP addresses.
+	///
+	/// Unicode domain names are automatically converted to ASCII using IDNA encoding.
+	/// If the input is an IP address string, the address is parsed and returned
+	/// as-is without making any external requests.
+	///
+	/// See the wasi-socket proposal README.md for a comparison with getaddrinfo.
+	///
+	/// This function never blocks. It either immediately fails or immediately
+	/// returns successfully with a `resolve-address-stream` that can be used
+	/// to (asynchronously) fetch the results.
+	///
+	/// # Typical errors
+	/// - `invalid-argument`: `name` is a syntactically invalid domain name or IP address.
+	///
+	/// # References:
+	/// - <https://pubs.opengroup.org/onlinepubs/9699919799/functions/getaddrinfo.html>
+	/// - <https://man7.org/linux/man-pages/man3/getaddrinfo.3.html>
+	/// - <https://learn.microsoft.com/en-us/windows/win32/api/ws2tcpip/nf-ws2tcpip-getaddrinfo>
+	/// - <https://man.freebsd.org/cgi/man.cgi?query=getaddrinfo&sektion=3>
+	resolve-addresses: func(network: borrow<network>, name: string) -> result<resolve-address-stream, error-code>;
 }
 
 interface tcp {
-	use wasi:clocks/monotonic-clock@0.2.0.{duration};
-	use network.{error-code};
 	use wasi:io/streams@0.2.0.{input-stream};
-	use network.{ip-address-family};
-	use network.{ip-socket-address};
-	use network.{network};
 	use wasi:io/streams@0.2.0.{output-stream};
 	use wasi:io/poll@0.2.0.{pollable};
+	use wasi:clocks/monotonic-clock@0.2.0.{duration};
+	use network.{network};
+	use network.{error-code};
+	use network.{ip-socket-address};
+	use network.{ip-address-family};
 	enum shutdown-type {
 		/// Similar to `SHUT_RD` in POSIX.
 		receive,
@@ -1631,9 +1631,9 @@ interface tcp {
 }
 
 interface tcp-create-socket {
+	use network.{network};
 	use network.{error-code};
 	use network.{ip-address-family};
-	use network.{network};
 	use tcp.{tcp-socket};
 
 	/// Create a new TCP socket.
@@ -1665,11 +1665,11 @@ interface tcp-create-socket {
 }
 
 interface udp {
-	use network.{error-code};
-	use network.{ip-address-family};
-	use network.{ip-socket-address};
-	use network.{network};
 	use wasi:io/poll@0.2.0.{pollable};
+	use network.{network};
+	use network.{error-code};
+	use network.{ip-socket-address};
+	use network.{ip-address-family};
 
 	/// A received datagram.
 	record incoming-datagram {
@@ -1684,41 +1684,6 @@ interface udp {
 		///
 		/// Equivalent to the `src_addr` out parameter of `recvfrom`.
 		remote-address: ip-socket-address,
-	}
-	resource incoming-datagram-stream {
-
-		/// Receive messages on the socket.
-		///
-		/// This function attempts to receive up to `max-results` datagrams on the socket
-		/// without blocking.
-		/// The returned list may contain fewer elements than requested, but never more.
-		///
-		/// This function returns successfully with an empty list when either:
-		/// - `max-results` is 0, or:
-		/// - `max-results` is greater than 0, but no results are immediately available.
-		/// This function never returns `error(would-block)`.
-		///
-		/// # Typical errors
-		/// - `remote-unreachable`: The remote address is not reachable. (ECONNRESET, ENETRESET
-		/// on Windows, EHOSTUNREACH, EHOSTDOWN, ENETUNREACH, ENETDOWN, ENONET)
-		/// - `connection-refused`: The connection was refused. (ECONNREFUSED)
-		///
-		/// # References
-		/// - <https://pubs.opengroup.org/onlinepubs/9699919799/functions/recvfrom.html>
-		/// - <https://pubs.opengroup.org/onlinepubs/9699919799/functions/recvmsg.html>
-		/// - <https://man7.org/linux/man-pages/man2/recv.2.html>
-		/// - <https://man7.org/linux/man-pages/man2/recvmmsg.2.html>
-		/// - <https://learn.microsoft.com/en-us/windows/win32/api/winsock/nf-winsock-recv>
-		/// - <https://learn.microsoft.com/en-us/windows/win32/api/winsock/nf-winsock-recvfrom>
-		/// - <https://learn.microsoft.com/en-us/previous-versions/windows/desktop/legacy/ms741687(v=vs.85)>
-		/// - <https://man.freebsd.org/cgi/man.cgi?query=recv&sektion=2>
-		receive: func(max-results: u64) -> result<list<incoming-datagram>, error-code>;
-
-		/// Create a `pollable` which will resolve once the stream is ready to receive again.
-		///
-		/// Note: this function is here for WASI Preview2 only.
-		/// It's planned to be removed when `future` is natively supported in Preview3.
-		subscribe: func() -> pollable;
 	}
 
 	/// A datagram to be sent out.
@@ -1735,77 +1700,6 @@ interface udp {
 		/// If this value is None, the send operation is equivalent to `send` in POSIX. Otherwise
 		/// it is equivalent to `sendto`.
 		remote-address: option<ip-socket-address>,
-	}
-	resource outgoing-datagram-stream {
-
-		/// Check readiness for sending. This function never blocks.
-		///
-		/// Returns the number of datagrams permitted for the next call to `send`,
-		/// or an error. Calling `send` with more datagrams than this function has
-		/// permitted will trap.
-		///
-		/// When this function returns ok(0), the `subscribe` pollable will
-		/// become ready when this function will report at least ok(1), or an
-		/// error.
-		///
-		/// Never returns `would-block`.
-		check-send: func() -> result<u64, error-code>;
-
-		/// Send messages on the socket.
-		///
-		/// This function attempts to send all provided `datagrams` on the socket without
-		/// blocking and
-		/// returns how many messages were actually sent (or queued for sending). This function
-		/// never
-		/// returns `error(would-block)`. If none of the datagrams were able to be sent, `ok(0)`
-		/// is returned.
-		///
-		/// This function semantically behaves the same as iterating the `datagrams` list
-		/// and sequentially
-		/// sending each individual datagram until either the end of the list has been reached
-		/// or the first error occurred.
-		/// If at least one datagram has been sent successfully, this function never returns
-		/// an error.
-		///
-		/// If the input list is empty, the function returns `ok(0)`.
-		///
-		/// Each call to `send` must be permitted by a preceding `check-send`. Implementations
-		/// must trap if
-		/// either `check-send` was not called or `datagrams` contains more items than `check-send`
-		/// permitted.
-		///
-		/// # Typical errors
-		/// - `invalid-argument`:        The `remote-address` has the wrong address family.
-		/// (EAFNOSUPPORT)
-		/// - `invalid-argument`:        The IP address in `remote-address` is set to INADDR_ANY
-		/// (`0.0.0.0` / `::`). (EDESTADDRREQ, EADDRNOTAVAIL)
-		/// - `invalid-argument`:        The port in `remote-address` is set to 0. (EDESTADDRREQ,
-		/// EADDRNOTAVAIL)
-		/// - `invalid-argument`:        The socket is in "connected" mode and `remote-address`
-		/// is `some` value that does not match the address passed to `stream`. (EISCONN)
-		/// - `invalid-argument`:        The socket is not "connected" and no value for `remote-address`
-		/// was provided. (EDESTADDRREQ)
-		/// - `remote-unreachable`:      The remote address is not reachable. (ECONNRESET,
-		/// ENETRESET on Windows, EHOSTUNREACH, EHOSTDOWN, ENETUNREACH, ENETDOWN, ENONET)
-		/// - `connection-refused`:      The connection was refused. (ECONNREFUSED)
-		/// - `datagram-too-large`:      The datagram is too large. (EMSGSIZE)
-		///
-		/// # References
-		/// - <https://pubs.opengroup.org/onlinepubs/9699919799/functions/sendto.html>
-		/// - <https://pubs.opengroup.org/onlinepubs/9699919799/functions/sendmsg.html>
-		/// - <https://man7.org/linux/man-pages/man2/send.2.html>
-		/// - <https://man7.org/linux/man-pages/man2/sendmmsg.2.html>
-		/// - <https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-send>
-		/// - <https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-sendto>
-		/// - <https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-wsasendmsg>
-		/// - <https://man.freebsd.org/cgi/man.cgi?query=send&sektion=2>
-		send: func(datagrams: list<outgoing-datagram>) -> result<u64, error-code>;
-
-		/// Create a `pollable` which will resolve once the stream is ready to send again.
-		///
-		/// Note: this function is here for WASI Preview2 only.
-		/// It's planned to be removed when `future` is natively supported in Preview3.
-		subscribe: func() -> pollable;
 	}
 
 	/// A UDP socket handle.
@@ -1966,12 +1860,118 @@ interface udp {
 		/// - `invalid-argument`:     (set) The TTL value must be 1 or higher.
 		unicast-hop-limit: func() -> result<u8, error-code>;
 	}
+	resource incoming-datagram-stream {
+
+		/// Receive messages on the socket.
+		///
+		/// This function attempts to receive up to `max-results` datagrams on the socket
+		/// without blocking.
+		/// The returned list may contain fewer elements than requested, but never more.
+		///
+		/// This function returns successfully with an empty list when either:
+		/// - `max-results` is 0, or:
+		/// - `max-results` is greater than 0, but no results are immediately available.
+		/// This function never returns `error(would-block)`.
+		///
+		/// # Typical errors
+		/// - `remote-unreachable`: The remote address is not reachable. (ECONNRESET, ENETRESET
+		/// on Windows, EHOSTUNREACH, EHOSTDOWN, ENETUNREACH, ENETDOWN, ENONET)
+		/// - `connection-refused`: The connection was refused. (ECONNREFUSED)
+		///
+		/// # References
+		/// - <https://pubs.opengroup.org/onlinepubs/9699919799/functions/recvfrom.html>
+		/// - <https://pubs.opengroup.org/onlinepubs/9699919799/functions/recvmsg.html>
+		/// - <https://man7.org/linux/man-pages/man2/recv.2.html>
+		/// - <https://man7.org/linux/man-pages/man2/recvmmsg.2.html>
+		/// - <https://learn.microsoft.com/en-us/windows/win32/api/winsock/nf-winsock-recv>
+		/// - <https://learn.microsoft.com/en-us/windows/win32/api/winsock/nf-winsock-recvfrom>
+		/// - <https://learn.microsoft.com/en-us/previous-versions/windows/desktop/legacy/ms741687(v=vs.85)>
+		/// - <https://man.freebsd.org/cgi/man.cgi?query=recv&sektion=2>
+		receive: func(max-results: u64) -> result<list<incoming-datagram>, error-code>;
+
+		/// Create a `pollable` which will resolve once the stream is ready to receive again.
+		///
+		/// Note: this function is here for WASI Preview2 only.
+		/// It's planned to be removed when `future` is natively supported in Preview3.
+		subscribe: func() -> pollable;
+	}
+	resource outgoing-datagram-stream {
+
+		/// Check readiness for sending. This function never blocks.
+		///
+		/// Returns the number of datagrams permitted for the next call to `send`,
+		/// or an error. Calling `send` with more datagrams than this function has
+		/// permitted will trap.
+		///
+		/// When this function returns ok(0), the `subscribe` pollable will
+		/// become ready when this function will report at least ok(1), or an
+		/// error.
+		///
+		/// Never returns `would-block`.
+		check-send: func() -> result<u64, error-code>;
+
+		/// Send messages on the socket.
+		///
+		/// This function attempts to send all provided `datagrams` on the socket without
+		/// blocking and
+		/// returns how many messages were actually sent (or queued for sending). This function
+		/// never
+		/// returns `error(would-block)`. If none of the datagrams were able to be sent, `ok(0)`
+		/// is returned.
+		///
+		/// This function semantically behaves the same as iterating the `datagrams` list
+		/// and sequentially
+		/// sending each individual datagram until either the end of the list has been reached
+		/// or the first error occurred.
+		/// If at least one datagram has been sent successfully, this function never returns
+		/// an error.
+		///
+		/// If the input list is empty, the function returns `ok(0)`.
+		///
+		/// Each call to `send` must be permitted by a preceding `check-send`. Implementations
+		/// must trap if
+		/// either `check-send` was not called or `datagrams` contains more items than `check-send`
+		/// permitted.
+		///
+		/// # Typical errors
+		/// - `invalid-argument`:        The `remote-address` has the wrong address family.
+		/// (EAFNOSUPPORT)
+		/// - `invalid-argument`:        The IP address in `remote-address` is set to INADDR_ANY
+		/// (`0.0.0.0` / `::`). (EDESTADDRREQ, EADDRNOTAVAIL)
+		/// - `invalid-argument`:        The port in `remote-address` is set to 0. (EDESTADDRREQ,
+		/// EADDRNOTAVAIL)
+		/// - `invalid-argument`:        The socket is in "connected" mode and `remote-address`
+		/// is `some` value that does not match the address passed to `stream`. (EISCONN)
+		/// - `invalid-argument`:        The socket is not "connected" and no value for `remote-address`
+		/// was provided. (EDESTADDRREQ)
+		/// - `remote-unreachable`:      The remote address is not reachable. (ECONNRESET,
+		/// ENETRESET on Windows, EHOSTUNREACH, EHOSTDOWN, ENETUNREACH, ENETDOWN, ENONET)
+		/// - `connection-refused`:      The connection was refused. (ECONNREFUSED)
+		/// - `datagram-too-large`:      The datagram is too large. (EMSGSIZE)
+		///
+		/// # References
+		/// - <https://pubs.opengroup.org/onlinepubs/9699919799/functions/sendto.html>
+		/// - <https://pubs.opengroup.org/onlinepubs/9699919799/functions/sendmsg.html>
+		/// - <https://man7.org/linux/man-pages/man2/send.2.html>
+		/// - <https://man7.org/linux/man-pages/man2/sendmmsg.2.html>
+		/// - <https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-send>
+		/// - <https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-sendto>
+		/// - <https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-wsasendmsg>
+		/// - <https://man.freebsd.org/cgi/man.cgi?query=send&sektion=2>
+		send: func(datagrams: list<outgoing-datagram>) -> result<u64, error-code>;
+
+		/// Create a `pollable` which will resolve once the stream is ready to send again.
+		///
+		/// Note: this function is here for WASI Preview2 only.
+		/// It's planned to be removed when `future` is natively supported in Preview3.
+		subscribe: func() -> pollable;
+	}
 }
 
 interface udp-create-socket {
+	use network.{network};
 	use network.{error-code};
 	use network.{ip-address-family};
-	use network.{network};
 	use udp.{udp-socket};
 
 	/// Create a new UDP socket.
@@ -2003,26 +2003,23 @@ interface udp-create-socket {
 }
 
 world imports {
-	import wasi:io/error@0.2.0;
-	import instance-network;
-	import ip-name-lookup;
-	import wasi:clocks/monotonic-clock@0.2.0;
 	import network;
+	import instance-network;
 	import wasi:io/poll@0.2.0;
-	import wasi:io/streams@0.2.0;
-	import tcp;
-	import tcp-create-socket;
 	import udp;
 	import udp-create-socket;
+	import wasi:io/error@0.2.0;
+	import wasi:io/streams@0.2.0;
+	import wasi:clocks/monotonic-clock@0.2.0;
+	import tcp;
+	import tcp-create-socket;
+	import ip-name-lookup;
 }
 
 
 package wasi:cli@0.2.0;
 
 interface environment {
-	/// Get the POSIX-style arguments to the program.
-	get-arguments: func() -> list<string>;
-
 	/// Get the POSIX-style environment variables.
 	///
 	/// Each environment variable is provided as a pair of string variable names
@@ -2032,6 +2029,9 @@ interface environment {
 	/// in the component model, this import function should return the same
 	/// values each time it is called.
 	get-environment: func() -> list<tuple<string, string>>;
+
+	/// Get the POSIX-style arguments to the program.
+	get-arguments: func() -> list<string>;
 
 	/// Return a path that programs should use as their initial current working
 	/// directory, interpreting `.` as shorthand for this.
@@ -2048,11 +2048,6 @@ interface run {
 	run: func() -> result;
 }
 
-interface stderr {
-	use wasi:io/streams@0.2.0.{output-stream};
-	get-stderr: func() -> output-stream;
-}
-
 interface stdin {
 	use wasi:io/streams@0.2.0.{input-stream};
 	get-stdin: func() -> input-stream;
@@ -2061,6 +2056,11 @@ interface stdin {
 interface stdout {
 	use wasi:io/streams@0.2.0.{output-stream};
 	get-stdout: func() -> output-stream;
+}
+
+interface stderr {
+	use wasi:io/streams@0.2.0.{output-stream};
+	get-stderr: func() -> output-stream;
 }
 
 /// Terminal input.
@@ -2083,16 +2083,6 @@ interface terminal-output {
 	resource terminal-output;
 }
 
-/// An interface providing an optional `terminal-output` for stderr as a
-/// link-time authority.
-interface terminal-stderr {
-	use terminal-output.{terminal-output};
-
-	/// If stderr is connected to a terminal, return a `terminal-output` handle
-	/// allowing further interaction with it.
-	get-terminal-stderr: func() -> option<terminal-output>;
-}
-
 /// An interface providing an optional `terminal-input` for stdin as a
 /// link-time authority.
 interface terminal-stdin {
@@ -2113,63 +2103,72 @@ interface terminal-stdout {
 	get-terminal-stdout: func() -> option<terminal-output>;
 }
 
-world command {
-	import environment;
-	import wasi:io/error@0.2.0;
-	import exit;
-	import wasi:random/insecure@0.2.0;
-	import wasi:random/insecure-seed@0.2.0;
-	import wasi:sockets/instance-network@0.2.0;
-	import wasi:sockets/ip-name-lookup@0.2.0;
-	import wasi:clocks/monotonic-clock@0.2.0;
-	import wasi:sockets/network@0.2.0;
-	import wasi:io/poll@0.2.0;
-	import wasi:filesystem/preopens@0.2.0;
-	import wasi:random/random@0.2.0;
-	import stderr;
-	import stdin;
-	import stdout;
-	import wasi:io/streams@0.2.0;
-	import wasi:sockets/tcp@0.2.0;
-	import wasi:sockets/tcp-create-socket@0.2.0;
-	import terminal-input;
-	import terminal-output;
-	import terminal-stderr;
-	import terminal-stdin;
-	import terminal-stdout;
-	import wasi:filesystem/types@0.2.0;
-	import wasi:sockets/udp@0.2.0;
-	import wasi:sockets/udp-create-socket@0.2.0;
-	import wasi:clocks/wall-clock@0.2.0;
-	export run;
+/// An interface providing an optional `terminal-output` for stderr as a
+/// link-time authority.
+interface terminal-stderr {
+	use terminal-output.{terminal-output};
+
+	/// If stderr is connected to a terminal, return a `terminal-output` handle
+	/// allowing further interaction with it.
+	get-terminal-stderr: func() -> option<terminal-output>;
 }
 
 world imports {
 	import environment;
-	import wasi:io/error@0.2.0;
 	import exit;
-	import wasi:random/insecure@0.2.0;
-	import wasi:random/insecure-seed@0.2.0;
-	import wasi:sockets/instance-network@0.2.0;
-	import wasi:sockets/ip-name-lookup@0.2.0;
-	import wasi:clocks/monotonic-clock@0.2.0;
-	import wasi:sockets/network@0.2.0;
+	import wasi:io/error@0.2.0;
 	import wasi:io/poll@0.2.0;
-	import wasi:filesystem/preopens@0.2.0;
-	import wasi:random/random@0.2.0;
-	import stderr;
+	import wasi:io/streams@0.2.0;
 	import stdin;
 	import stdout;
-	import wasi:io/streams@0.2.0;
-	import wasi:sockets/tcp@0.2.0;
-	import wasi:sockets/tcp-create-socket@0.2.0;
+	import stderr;
 	import terminal-input;
 	import terminal-output;
-	import terminal-stderr;
 	import terminal-stdin;
 	import terminal-stdout;
+	import terminal-stderr;
+	import wasi:clocks/monotonic-clock@0.2.0;
+	import wasi:clocks/wall-clock@0.2.0;
 	import wasi:filesystem/types@0.2.0;
+	import wasi:filesystem/preopens@0.2.0;
+	import wasi:sockets/network@0.2.0;
+	import wasi:sockets/instance-network@0.2.0;
 	import wasi:sockets/udp@0.2.0;
 	import wasi:sockets/udp-create-socket@0.2.0;
+	import wasi:sockets/tcp@0.2.0;
+	import wasi:sockets/tcp-create-socket@0.2.0;
+	import wasi:sockets/ip-name-lookup@0.2.0;
+	import wasi:random/random@0.2.0;
+	import wasi:random/insecure@0.2.0;
+	import wasi:random/insecure-seed@0.2.0;
+}
+world command {
+	import environment;
+	import exit;
+	import wasi:io/error@0.2.0;
+	import wasi:io/poll@0.2.0;
+	import wasi:io/streams@0.2.0;
+	import stdin;
+	import stdout;
+	import stderr;
+	import terminal-input;
+	import terminal-output;
+	import terminal-stdin;
+	import terminal-stdout;
+	import terminal-stderr;
+	import wasi:clocks/monotonic-clock@0.2.0;
 	import wasi:clocks/wall-clock@0.2.0;
+	import wasi:filesystem/types@0.2.0;
+	import wasi:filesystem/preopens@0.2.0;
+	import wasi:sockets/network@0.2.0;
+	import wasi:sockets/instance-network@0.2.0;
+	import wasi:sockets/udp@0.2.0;
+	import wasi:sockets/udp-create-socket@0.2.0;
+	import wasi:sockets/tcp@0.2.0;
+	import wasi:sockets/tcp-create-socket@0.2.0;
+	import wasi:sockets/ip-name-lookup@0.2.0;
+	import wasi:random/random@0.2.0;
+	import wasi:random/insecure@0.2.0;
+	import wasi:random/insecure-seed@0.2.0;
+	export run;
 }

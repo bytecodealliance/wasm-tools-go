@@ -5,9 +5,9 @@ interface foo {
 }
 
 world the-world {
+	import foo;
 	import bar: interface {
 		use foo.{a};
 	}
 	import foo: interface {}
-	import foo;
 }

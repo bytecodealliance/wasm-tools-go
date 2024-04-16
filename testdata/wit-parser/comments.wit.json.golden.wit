@@ -8,6 +8,6 @@ package foo:comments;
 /// * is a comment */
 /// * this /* is /* a */ nested */ comment */
 interface foo {
-	type bar = stream<x>;
 	type x = u32;
+	type bar = stream<x>;
 }

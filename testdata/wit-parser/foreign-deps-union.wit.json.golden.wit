@@ -22,16 +22,16 @@ interface the-default {
 
 package foo:some-pkg;
 
-interface another-interface {
-	type yet-another-type = u8;
+interface the-default {
+	type from-default = string;
 }
 
 interface some-interface {
 	type another-type = u32;
 }
 
-interface the-default {
-	type from-default = string;
+interface another-interface {
+	type yet-another-type = u8;
 }
 
 
@@ -46,22 +46,22 @@ interface filesystem {
 }
 
 world wasi {
-	import clocks;
 	import filesystem;
+	import clocks;
 }
 
 
 package foo:root;
 
-interface bar {
-	use foo:some-pkg/some-interface.{another-type};
-	use foo:some-pkg/the-default.{from-default};
-	use foo:some-pkg/another-interface.{yet-another-type};
+interface foo {
+	use foo:wasi/clocks.{timestamp};
+	use foo:wasi/filesystem.{stat};
 }
 
-interface foo {
-	use foo:wasi/filesystem.{stat};
-	use foo:wasi/clocks.{timestamp};
+interface bar {
+	use foo:some-pkg/the-default.{from-default};
+	use foo:some-pkg/some-interface.{another-type};
+	use foo:some-pkg/another-interface.{yet-another-type};
 }
 
 interface use1 {
@@ -72,27 +72,24 @@ interface use2 {
 	use foo:foreign-pkg/the-default.{some-type};
 }
 
-world bars-world {
-	import foo:another-pkg/other-interface;
-	import foo:some-pkg/the-default;
-}
-
 world my-world {
-	import foo:wasi/clocks;
 	import foo:wasi/filesystem;
+	import foo:wasi/clocks;
 	export foo:corp/saas;
 }
-
 world my-world2 {
-	import foo:wasi/clocks;
 	import foo:wasi/filesystem;
+	import foo:wasi/clocks;
 	export foo;
 	export foo:corp/saas;
 }
-
+world bars-world {
+	import foo:some-pkg/the-default;
+	import foo:another-pkg/other-interface;
+}
 world unionw-world {
-	import foo:wasi/clocks;
 	import foo:wasi/filesystem;
-	export foo;
+	import foo:wasi/clocks;
 	export foo:corp/saas;
+	export foo;
 }

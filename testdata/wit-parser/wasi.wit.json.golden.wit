@@ -12,6 +12,9 @@ interface wasi {
 		monotonic
 	}
 
+	/// Timestamp in nanoseconds.
+	type timestamp = u64;
+
 	/// Error codes returned by functions.
 	/// Not all of these error codes are returned by the functions provided by this
 	/// API/ some are used in higher-level library layers, and others are provided
@@ -172,7 +175,4 @@ interface wasi {
 		/// Extension: Capabilities insufficient.
 		notcapable
 	}
-
-	/// Timestamp in nanoseconds.
-	type timestamp = u64;
 }
