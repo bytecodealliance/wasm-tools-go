@@ -2,7 +2,7 @@ package ordered
 
 import (
 	"github.com/ydnar/wasm-tools-go/internal/codec"
-	"github.com/ydnar/wasm-tools-go/internal/iterate"
+	"github.com/ydnar/wasm-tools-go/x/iterate"
 )
 
 // Map represents an ordered map of key-value pairs.

@@ -8,8 +8,8 @@ import (
 	"strings"
 	"unsafe"
 
-	"github.com/ydnar/wasm-tools-go/internal/iterate"
-	"github.com/ydnar/wasm-tools-go/ordered"
+	"github.com/ydnar/wasm-tools-go/x/iterate"
+	"github.com/ydnar/wasm-tools-go/x/ordered"
 )
 
 // Resolve represents a fully resolved set of WIT ([WebAssembly Interface Type])
