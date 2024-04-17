@@ -1,6 +1,6 @@
 package ordered
 
-import "github.com/ydnar/wasm-tools-go/x/iterate"
+import "github.com/ydnar/wasm-tools-go/wit/iterate"
 
 type list[K, V any] struct {
 	root element[K, V]
