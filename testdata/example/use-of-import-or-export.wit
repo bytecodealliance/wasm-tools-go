@@ -1,0 +1,18 @@
+package example:uses;
+
+interface a {
+	resource res {
+		do: func();
+	}
+}
+
+interface f {
+	use a.{res};
+	report: func(r: res);
+}
+
+world default {
+	import a;
+	export a;
+	export f;
+}

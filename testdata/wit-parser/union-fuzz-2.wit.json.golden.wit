@@ -1,10 +1,9 @@
 package foo:bar;
 
-world bar {
-	record foo {}
+world foo {
 	export foo: func() -> (name2: f32);
 }
-
-world foo {
+world bar {
+	record foo {}
 	export foo: func() -> (name2: f32);
 }

@@ -8,7 +8,6 @@ world bar {
 	import a;
 	export b;
 }
-
 world foo {
 	import a;
 	export b;

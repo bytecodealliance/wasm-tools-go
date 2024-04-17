@@ -1,0 +1,90 @@
+{
+  "worlds": [
+    {
+      "name": "default",
+      "imports": {
+        "interface-0": {
+          "interface": 0
+        }
+      },
+      "exports": {
+        "interface-0": {
+          "interface": 0
+        },
+        "interface-1": {
+          "interface": 1
+        }
+      },
+      "package": 0
+    }
+  ],
+  "interfaces": [
+    {
+      "name": "a",
+      "types": {
+        "res": 0
+      },
+      "functions": {},
+      "package": 0
+    },
+    {
+      "name": "f",
+      "types": {
+        "res": 1
+      },
+      "functions": {
+        "report": {
+          "name": "report",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "r",
+              "type": 2
+            }
+          ],
+          "results": []
+        }
+      },
+      "package": 0
+    }
+  ],
+  "types": [
+    {
+      "name": "res",
+      "kind": "resource",
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": "res",
+      "kind": {
+        "type": 0
+      },
+      "owner": {
+        "interface": 1
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "own": 1
+        }
+      },
+      "owner": null
+    }
+  ],
+  "packages": [
+    {
+      "name": "example:uses",
+      "interfaces": {
+        "a": 0,
+        "f": 1
+      },
+      "worlds": {
+        "default": 0
+      }
+    }
+  ]
+}

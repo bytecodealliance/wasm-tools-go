@@ -82,6 +82,18 @@ interface streams {
 	use error.{error};
 	use poll.{pollable};
 
+	/// An error for input-stream and output-stream operations.
+	variant stream-error {
+		/// The last operation (a write or flush) failed before completion.
+		///
+		/// More information is available in the `error` payload.
+		last-operation-failed(error),
+		/// The stream is closed: no more input will be accepted by the
+		/// stream. A closed output-stream will return this error on all
+		/// future operations.
+		closed,
+	}
+
 	/// An input bytestream.
 	///
 	/// `input-stream`s are *non-blocking* to the extent practical on underlying
@@ -289,18 +301,6 @@ interface streams {
 		/// that should be written.
 		write-zeroes: func(len: u64) -> result<_, stream-error>;
 	}
-
-	/// An error for input-stream and output-stream operations.
-	variant stream-error {
-		/// The last operation (a write or flush) failed before completion.
-		///
-		/// More information is available in the `error` payload.
-		last-operation-failed(error),
-		/// The stream is closed: no more input will be accepted by the
-		/// stream. A closed output-stream will return this error on all
-		/// future operations.
-		closed,
-	}
 }
 
 world imports {
@@ -325,13 +325,13 @@ package wasi:clocks@0.2.0;
 interface monotonic-clock {
 	use wasi:io/poll@0.2.0.{pollable};
 
-	/// A duration of time, in nanoseconds.
-	type duration = u64;
-
 	/// An instant in time, in nanoseconds. An instant is relative to an
 	/// unspecified initial value, and can only be compared to instances from
 	/// the same monotonic-clock.
 	type instant = u64;
+
+	/// A duration of time, in nanoseconds.
+	type duration = u64;
 
 	/// Read the current value of the clock.
 	///
@@ -343,14 +343,14 @@ interface monotonic-clock {
 	/// corresponding to a clock tick.
 	resolution: func() -> duration;
 
+	/// Create a `pollable` which will resolve once the specified instant
+	/// occured.
+	subscribe-instant: func(when: instant) -> pollable;
+
 	/// Create a `pollable` which will resolve once the given duration has
 	/// elapsed, starting at the time at which this function was called.
 	/// occured.
 	subscribe-duration: func(when: duration) -> pollable;
-
-	/// Create a `pollable` which will resolve once the specified instant
-	/// occured.
-	subscribe-instant: func(when: instant) -> pollable;
 }
 
 /// WASI Wall Clock is a clock API intended to let users query the current
@@ -396,20 +396,13 @@ interface wall-clock {
 }
 
 world imports {
-	import monotonic-clock;
 	import wasi:io/poll@0.2.0;
+	import monotonic-clock;
 	import wall-clock;
 }
 
 
 package wasi:filesystem@0.2.0;
-
-interface preopens {
-	use types.{descriptor};
-
-	/// Return the set of preopened directories, and their path.
-	get-directories: func() -> list<tuple<descriptor, string>>;
-}
 
 /// WASI filesystem is a filesystem API primarily intended to let users run WASI
 /// programs that access their files on their existing filesystems, without
@@ -436,10 +429,230 @@ interface preopens {
 ///
 /// [WASI filesystem path resolution]: https://github.com/WebAssembly/wasi-filesystem/blob/main/path-resolution.md
 interface types {
-	use wasi:clocks/wall-clock@0.2.0.{datetime};
-	use wasi:io/streams@0.2.0.{error};
 	use wasi:io/streams@0.2.0.{input-stream};
 	use wasi:io/streams@0.2.0.{output-stream};
+	use wasi:io/streams@0.2.0.{error};
+	use wasi:clocks/wall-clock@0.2.0.{datetime};
+
+	/// File size or length of a region within a file.
+	type filesize = u64;
+
+	/// The type of a filesystem object referenced by a descriptor.
+	///
+	/// Note: This was called `filetype` in earlier versions of WASI.
+	enum descriptor-type {
+		/// The type of the descriptor or file is unknown or is different from
+		/// any of the other types specified.
+		unknown,
+		/// The descriptor refers to a block device inode.
+		block-device,
+		/// The descriptor refers to a character device inode.
+		character-device,
+		/// The descriptor refers to a directory inode.
+		directory,
+		/// The descriptor refers to a named pipe.
+		fifo,
+		/// The file refers to a symbolic link inode.
+		symbolic-link,
+		/// The descriptor refers to a regular file inode.
+		regular-file,
+		/// The descriptor refers to a socket.
+		socket
+	}
+
+	/// Descriptor flags.
+	///
+	/// Note: This was called `fdflags` in earlier versions of WASI.
+	flags descriptor-flags {
+		/// Read mode: Data can be read.
+		read,
+		/// Write mode: Data can be written to.
+		write,
+		/// Request that writes be performed according to synchronized I/O file
+		/// integrity completion. The data stored in the file and the file's
+		/// metadata are synchronized. This is similar to `O_SYNC` in POSIX.
+		///
+		/// The precise semantics of this operation have not yet been defined for
+		/// WASI. At this time, it should be interpreted as a request, and not a
+		/// requirement.
+		file-integrity-sync,
+		/// Request that writes be performed according to synchronized I/O data
+		/// integrity completion. Only the data stored in the file is
+		/// synchronized. This is similar to `O_DSYNC` in POSIX.
+		///
+		/// The precise semantics of this operation have not yet been defined for
+		/// WASI. At this time, it should be interpreted as a request, and not a
+		/// requirement.
+		data-integrity-sync,
+		/// Requests that reads be performed at the same level of integrety
+		/// requested for writes. This is similar to `O_RSYNC` in POSIX.
+		///
+		/// The precise semantics of this operation have not yet been defined for
+		/// WASI. At this time, it should be interpreted as a request, and not a
+		/// requirement.
+		requested-write-sync,
+		/// Mutating directories mode: Directory contents may be mutated.
+		///
+		/// When this flag is unset on a descriptor, operations using the
+		/// descriptor which would create, rename, delete, modify the data or
+		/// metadata of filesystem objects, or obtain another handle which
+		/// would permit any of those, shall fail with `error-code::read-only` if
+		/// they would otherwise succeed.
+		///
+		/// This may only be set on directories.
+		mutate-directory,
+	}
+
+	/// Flags determining the method of how paths are resolved.
+	flags path-flags {
+		/// As long as the resolved path corresponds to a symbolic link, it is
+		/// expanded.
+		symlink-follow,
+	}
+
+	/// Open flags used by `open-at`.
+	flags open-flags {
+		/// Create file if it does not exist, similar to `O_CREAT` in POSIX.
+		create,
+		/// Fail if not a directory, similar to `O_DIRECTORY` in POSIX.
+		directory,
+		/// Fail if file already exists, similar to `O_EXCL` in POSIX.
+		exclusive,
+		/// Truncate file to size 0, similar to `O_TRUNC` in POSIX.
+		truncate,
+	}
+
+	/// Number of hard links to an inode.
+	type link-count = u64;
+
+	/// File attributes.
+	///
+	/// Note: This was called `filestat` in earlier versions of WASI.
+	record descriptor-stat {
+		/// File type.
+		%type: descriptor-type,
+		/// Number of hard links to the file.
+		link-count: link-count,
+		/// For regular files, the file size in bytes. For symbolic links, the
+		/// length in bytes of the pathname contained in the symbolic link.
+		size: filesize,
+		/// Last data access timestamp.
+		///
+		/// If the `option` is none, the platform doesn't maintain an access
+		/// timestamp for this file.
+		data-access-timestamp: option<datetime>,
+		/// Last data modification timestamp.
+		///
+		/// If the `option` is none, the platform doesn't maintain a
+		/// modification timestamp for this file.
+		data-modification-timestamp: option<datetime>,
+		/// Last file status-change timestamp.
+		///
+		/// If the `option` is none, the platform doesn't maintain a
+		/// status-change timestamp for this file.
+		status-change-timestamp: option<datetime>,
+	}
+
+	/// When setting a timestamp, this gives the value to set it to.
+	variant new-timestamp {
+		/// Leave the timestamp set to its previous value.
+		no-change,
+		/// Set the timestamp to the current time of the system clock associated
+		/// with the filesystem.
+		now,
+		/// Set the timestamp to the given value.
+		timestamp(datetime),
+	}
+
+	/// A directory entry.
+	record directory-entry {
+		/// The type of the file referred to by this directory entry.
+		%type: descriptor-type,
+		/// The name of the object.
+		name: string,
+	}
+
+	/// Error codes returned by functions, similar to `errno` in POSIX.
+	/// Not all of these error codes are returned by the functions provided by this
+	/// API; some are used in higher-level library layers, and others are provided
+	/// merely for alignment with POSIX.
+	enum error-code {
+		/// Permission denied, similar to `EACCES` in POSIX.
+		access,
+		/// Resource unavailable, or operation would block, similar to `EAGAIN` and `EWOULDBLOCK`
+		/// in POSIX.
+		would-block,
+		/// Connection already in progress, similar to `EALREADY` in POSIX.
+		already,
+		/// Bad descriptor, similar to `EBADF` in POSIX.
+		bad-descriptor,
+		/// Device or resource busy, similar to `EBUSY` in POSIX.
+		busy,
+		/// Resource deadlock would occur, similar to `EDEADLK` in POSIX.
+		deadlock,
+		/// Storage quota exceeded, similar to `EDQUOT` in POSIX.
+		quota,
+		/// File exists, similar to `EEXIST` in POSIX.
+		exist,
+		/// File too large, similar to `EFBIG` in POSIX.
+		file-too-large,
+		/// Illegal byte sequence, similar to `EILSEQ` in POSIX.
+		illegal-byte-sequence,
+		/// Operation in progress, similar to `EINPROGRESS` in POSIX.
+		in-progress,
+		/// Interrupted function, similar to `EINTR` in POSIX.
+		interrupted,
+		/// Invalid argument, similar to `EINVAL` in POSIX.
+		invalid,
+		/// I/O error, similar to `EIO` in POSIX.
+		io,
+		/// Is a directory, similar to `EISDIR` in POSIX.
+		is-directory,
+		/// Too many levels of symbolic links, similar to `ELOOP` in POSIX.
+		loop,
+		/// Too many links, similar to `EMLINK` in POSIX.
+		too-many-links,
+		/// Message too large, similar to `EMSGSIZE` in POSIX.
+		message-size,
+		/// Filename too long, similar to `ENAMETOOLONG` in POSIX.
+		name-too-long,
+		/// No such device, similar to `ENODEV` in POSIX.
+		no-device,
+		/// No such file or directory, similar to `ENOENT` in POSIX.
+		no-entry,
+		/// No locks available, similar to `ENOLCK` in POSIX.
+		no-lock,
+		/// Not enough space, similar to `ENOMEM` in POSIX.
+		insufficient-memory,
+		/// No space left on device, similar to `ENOSPC` in POSIX.
+		insufficient-space,
+		/// Not a directory or a symbolic link to a directory, similar to `ENOTDIR` in POSIX.
+		not-directory,
+		/// Directory not empty, similar to `ENOTEMPTY` in POSIX.
+		not-empty,
+		/// State not recoverable, similar to `ENOTRECOVERABLE` in POSIX.
+		not-recoverable,
+		/// Not supported, similar to `ENOTSUP` and `ENOSYS` in POSIX.
+		unsupported,
+		/// Inappropriate I/O control operation, similar to `ENOTTY` in POSIX.
+		no-tty,
+		/// No such device or address, similar to `ENXIO` in POSIX.
+		no-such-device,
+		/// Value too large to be stored in data type, similar to `EOVERFLOW` in POSIX.
+		overflow,
+		/// Operation not permitted, similar to `EPERM` in POSIX.
+		not-permitted,
+		/// Broken pipe, similar to `EPIPE` in POSIX.
+		pipe,
+		/// Read-only file system, similar to `EROFS` in POSIX.
+		read-only,
+		/// Invalid seek, similar to `ESPIPE` in POSIX.
+		invalid-seek,
+		/// Text file busy, similar to `ETXTBSY` in POSIX.
+		text-file-busy,
+		/// Cross-device link, similar to `EXDEV` in POSIX.
+		cross-device
+	}
 
 	/// File or memory access pattern advisory information.
 	enum advice {
@@ -461,6 +674,15 @@ interface types {
 		/// The application expects to access the specified data once and then
 		/// not reuse it thereafter.
 		no-reuse
+	}
+
+	/// A 128-bit hash value, split into parts because wasm doesn't have a
+	/// 128-bit integer type.
+	record metadata-hash-value {
+		/// 64 bits of a 128-bit hash value.
+		lower: u64,
+		/// Another 64 bits of a 128-bit hash value.
+		upper: u64,
 	}
 
 	/// A descriptor is a reference to a filesystem object, which may be a file,
@@ -711,240 +933,11 @@ interface types {
 		write-via-stream: func(offset: filesize) -> result<output-stream, error-code>;
 	}
 
-	/// Descriptor flags.
-	///
-	/// Note: This was called `fdflags` in earlier versions of WASI.
-	flags descriptor-flags {
-		/// Read mode: Data can be read.
-		read,
-		/// Write mode: Data can be written to.
-		write,
-		/// Request that writes be performed according to synchronized I/O file
-		/// integrity completion. The data stored in the file and the file's
-		/// metadata are synchronized. This is similar to `O_SYNC` in POSIX.
-		///
-		/// The precise semantics of this operation have not yet been defined for
-		/// WASI. At this time, it should be interpreted as a request, and not a
-		/// requirement.
-		file-integrity-sync,
-		/// Request that writes be performed according to synchronized I/O data
-		/// integrity completion. Only the data stored in the file is
-		/// synchronized. This is similar to `O_DSYNC` in POSIX.
-		///
-		/// The precise semantics of this operation have not yet been defined for
-		/// WASI. At this time, it should be interpreted as a request, and not a
-		/// requirement.
-		data-integrity-sync,
-		/// Requests that reads be performed at the same level of integrety
-		/// requested for writes. This is similar to `O_RSYNC` in POSIX.
-		///
-		/// The precise semantics of this operation have not yet been defined for
-		/// WASI. At this time, it should be interpreted as a request, and not a
-		/// requirement.
-		requested-write-sync,
-		/// Mutating directories mode: Directory contents may be mutated.
-		///
-		/// When this flag is unset on a descriptor, operations using the
-		/// descriptor which would create, rename, delete, modify the data or
-		/// metadata of filesystem objects, or obtain another handle which
-		/// would permit any of those, shall fail with `error-code::read-only` if
-		/// they would otherwise succeed.
-		///
-		/// This may only be set on directories.
-		mutate-directory,
-	}
-
-	/// File attributes.
-	///
-	/// Note: This was called `filestat` in earlier versions of WASI.
-	record descriptor-stat {
-		/// File type.
-		%type: descriptor-type,
-		/// Number of hard links to the file.
-		link-count: link-count,
-		/// For regular files, the file size in bytes. For symbolic links, the
-		/// length in bytes of the pathname contained in the symbolic link.
-		size: filesize,
-		/// Last data access timestamp.
-		///
-		/// If the `option` is none, the platform doesn't maintain an access
-		/// timestamp for this file.
-		data-access-timestamp: option<datetime>,
-		/// Last data modification timestamp.
-		///
-		/// If the `option` is none, the platform doesn't maintain a
-		/// modification timestamp for this file.
-		data-modification-timestamp: option<datetime>,
-		/// Last file status-change timestamp.
-		///
-		/// If the `option` is none, the platform doesn't maintain a
-		/// status-change timestamp for this file.
-		status-change-timestamp: option<datetime>,
-	}
-
-	/// The type of a filesystem object referenced by a descriptor.
-	///
-	/// Note: This was called `filetype` in earlier versions of WASI.
-	enum descriptor-type {
-		/// The type of the descriptor or file is unknown or is different from
-		/// any of the other types specified.
-		unknown,
-		/// The descriptor refers to a block device inode.
-		block-device,
-		/// The descriptor refers to a character device inode.
-		character-device,
-		/// The descriptor refers to a directory inode.
-		directory,
-		/// The descriptor refers to a named pipe.
-		fifo,
-		/// The file refers to a symbolic link inode.
-		symbolic-link,
-		/// The descriptor refers to a regular file inode.
-		regular-file,
-		/// The descriptor refers to a socket.
-		socket
-	}
-
-	/// A directory entry.
-	record directory-entry {
-		/// The type of the file referred to by this directory entry.
-		%type: descriptor-type,
-		/// The name of the object.
-		name: string,
-	}
-
 	/// A stream of directory entries.
 	resource directory-entry-stream {
 
 		/// Read a single directory entry from a `directory-entry-stream`.
 		read-directory-entry: func() -> result<option<directory-entry>, error-code>;
-	}
-
-	/// Error codes returned by functions, similar to `errno` in POSIX.
-	/// Not all of these error codes are returned by the functions provided by this
-	/// API; some are used in higher-level library layers, and others are provided
-	/// merely for alignment with POSIX.
-	enum error-code {
-		/// Permission denied, similar to `EACCES` in POSIX.
-		access,
-		/// Resource unavailable, or operation would block, similar to `EAGAIN` and `EWOULDBLOCK`
-		/// in POSIX.
-		would-block,
-		/// Connection already in progress, similar to `EALREADY` in POSIX.
-		already,
-		/// Bad descriptor, similar to `EBADF` in POSIX.
-		bad-descriptor,
-		/// Device or resource busy, similar to `EBUSY` in POSIX.
-		busy,
-		/// Resource deadlock would occur, similar to `EDEADLK` in POSIX.
-		deadlock,
-		/// Storage quota exceeded, similar to `EDQUOT` in POSIX.
-		quota,
-		/// File exists, similar to `EEXIST` in POSIX.
-		exist,
-		/// File too large, similar to `EFBIG` in POSIX.
-		file-too-large,
-		/// Illegal byte sequence, similar to `EILSEQ` in POSIX.
-		illegal-byte-sequence,
-		/// Operation in progress, similar to `EINPROGRESS` in POSIX.
-		in-progress,
-		/// Interrupted function, similar to `EINTR` in POSIX.
-		interrupted,
-		/// Invalid argument, similar to `EINVAL` in POSIX.
-		invalid,
-		/// I/O error, similar to `EIO` in POSIX.
-		io,
-		/// Is a directory, similar to `EISDIR` in POSIX.
-		is-directory,
-		/// Too many levels of symbolic links, similar to `ELOOP` in POSIX.
-		loop,
-		/// Too many links, similar to `EMLINK` in POSIX.
-		too-many-links,
-		/// Message too large, similar to `EMSGSIZE` in POSIX.
-		message-size,
-		/// Filename too long, similar to `ENAMETOOLONG` in POSIX.
-		name-too-long,
-		/// No such device, similar to `ENODEV` in POSIX.
-		no-device,
-		/// No such file or directory, similar to `ENOENT` in POSIX.
-		no-entry,
-		/// No locks available, similar to `ENOLCK` in POSIX.
-		no-lock,
-		/// Not enough space, similar to `ENOMEM` in POSIX.
-		insufficient-memory,
-		/// No space left on device, similar to `ENOSPC` in POSIX.
-		insufficient-space,
-		/// Not a directory or a symbolic link to a directory, similar to `ENOTDIR` in POSIX.
-		not-directory,
-		/// Directory not empty, similar to `ENOTEMPTY` in POSIX.
-		not-empty,
-		/// State not recoverable, similar to `ENOTRECOVERABLE` in POSIX.
-		not-recoverable,
-		/// Not supported, similar to `ENOTSUP` and `ENOSYS` in POSIX.
-		unsupported,
-		/// Inappropriate I/O control operation, similar to `ENOTTY` in POSIX.
-		no-tty,
-		/// No such device or address, similar to `ENXIO` in POSIX.
-		no-such-device,
-		/// Value too large to be stored in data type, similar to `EOVERFLOW` in POSIX.
-		overflow,
-		/// Operation not permitted, similar to `EPERM` in POSIX.
-		not-permitted,
-		/// Broken pipe, similar to `EPIPE` in POSIX.
-		pipe,
-		/// Read-only file system, similar to `EROFS` in POSIX.
-		read-only,
-		/// Invalid seek, similar to `ESPIPE` in POSIX.
-		invalid-seek,
-		/// Text file busy, similar to `ETXTBSY` in POSIX.
-		text-file-busy,
-		/// Cross-device link, similar to `EXDEV` in POSIX.
-		cross-device
-	}
-
-	/// File size or length of a region within a file.
-	type filesize = u64;
-
-	/// Number of hard links to an inode.
-	type link-count = u64;
-
-	/// A 128-bit hash value, split into parts because wasm doesn't have a
-	/// 128-bit integer type.
-	record metadata-hash-value {
-		/// 64 bits of a 128-bit hash value.
-		lower: u64,
-		/// Another 64 bits of a 128-bit hash value.
-		upper: u64,
-	}
-
-	/// When setting a timestamp, this gives the value to set it to.
-	variant new-timestamp {
-		/// Leave the timestamp set to its previous value.
-		no-change,
-		/// Set the timestamp to the current time of the system clock associated
-		/// with the filesystem.
-		now,
-		/// Set the timestamp to the given value.
-		timestamp(datetime),
-	}
-
-	/// Open flags used by `open-at`.
-	flags open-flags {
-		/// Create file if it does not exist, similar to `O_CREAT` in POSIX.
-		create,
-		/// Fail if not a directory, similar to `O_DIRECTORY` in POSIX.
-		directory,
-		/// Fail if file already exists, similar to `O_EXCL` in POSIX.
-		exclusive,
-		/// Truncate file to size 0, similar to `O_TRUNC` in POSIX.
-		truncate,
-	}
-
-	/// Flags determining the method of how paths are resolved.
-	flags path-flags {
-		/// As long as the resolved path corresponds to a symbolic link, it is
-		/// expanded.
-		symlink-follow,
 	}
 
 	/// Attempts to extract a filesystem-related `error-code` from the stream
@@ -960,82 +953,31 @@ interface types {
 	filesystem-error-code: func(err: borrow<error>) -> option<error-code>;
 }
 
+interface preopens {
+	use types.{descriptor};
+
+	/// Return the set of preopened directories, and their path.
+	get-directories: func() -> list<tuple<descriptor, string>>;
+}
+
 world imports {
 	import wasi:io/error@0.2.0;
 	import wasi:io/poll@0.2.0;
-	import preopens;
 	import wasi:io/streams@0.2.0;
-	import types;
 	import wasi:clocks/wall-clock@0.2.0;
+	import types;
+	import preopens;
 }
 
 
 package wasi:sockets@0.2.0;
 
-/// This interface provides a value-export of the default network handle..
-interface instance-network {
-	use network.{network};
-
-	/// Get a handle to the default network.
-	instance-network: func() -> network;
-}
-
-interface ip-name-lookup {
-	use network.{error-code};
-	use network.{ip-address};
-	use network.{network};
-	use wasi:io/poll@0.2.0.{pollable};
-	resource resolve-address-stream {
-
-		/// Returns the next address from the resolver.
-		///
-		/// This function should be called multiple times. On each call, it will
-		/// return the next address in connection order preference. If all
-		/// addresses have been exhausted, this function returns `none`.
-		///
-		/// This function never returns IPv4-mapped IPv6 addresses.
-		///
-		/// # Typical errors
-		/// - `name-unresolvable`:          Name does not exist or has no suitable associated
-		/// IP addresses. (EAI_NONAME, EAI_NODATA, EAI_ADDRFAMILY)
-		/// - `temporary-resolver-failure`: A temporary failure in name resolution occurred.
-		/// (EAI_AGAIN)
-		/// - `permanent-resolver-failure`: A permanent failure in name resolution occurred.
-		/// (EAI_FAIL)
-		/// - `would-block`:                A result is not available yet. (EWOULDBLOCK, EAGAIN)
-		resolve-next-address: func() -> result<option<ip-address>, error-code>;
-
-		/// Create a `pollable` which will resolve once the stream is ready for I/O.
-		///
-		/// Note: this function is here for WASI Preview2 only.
-		/// It's planned to be removed when `future` is natively supported in Preview3.
-		subscribe: func() -> pollable;
-	}
-
-	/// Resolve an internet host name to a list of IP addresses.
-	///
-	/// Unicode domain names are automatically converted to ASCII using IDNA encoding.
-	/// If the input is an IP address string, the address is parsed and returned
-	/// as-is without making any external requests.
-	///
-	/// See the wasi-socket proposal README.md for a comparison with getaddrinfo.
-	///
-	/// This function never blocks. It either immediately fails or immediately
-	/// returns successfully with a `resolve-address-stream` that can be used
-	/// to (asynchronously) fetch the results.
-	///
-	/// # Typical errors
-	/// - `invalid-argument`: `name` is a syntactically invalid domain name or IP address.
-	///
-	/// # References:
-	/// - <https://pubs.opengroup.org/onlinepubs/9699919799/functions/getaddrinfo.html>
-	/// - <https://man7.org/linux/man-pages/man3/getaddrinfo.3.html>
-	/// - <https://learn.microsoft.com/en-us/windows/win32/api/ws2tcpip/nf-ws2tcpip-getaddrinfo>
-	/// - <https://man.freebsd.org/cgi/man.cgi?query=getaddrinfo&sektion=3>
-	resolve-addresses: func(network: borrow<network>, name: string) -> result<resolve-address-stream, error-code>;
-}
-
 interface network {
+	/// An opaque resource that represents access to (a subset of) the network.
+	/// This enables context-based security for networking.
+	/// There is no need for this to map 1:1 to a physical network interface.
+	resource network;
+
 	/// Error codes.
 	///
 	/// In theory, every API can return any error code.
@@ -1113,28 +1055,24 @@ interface network {
 		/// A permanent failure in name resolution occurred.
 		permanent-resolver-failure
 	}
-	variant ip-address {
-		ipv4(ipv4-address),
-		ipv6(ipv6-address),
-	}
 	enum ip-address-family {
 		/// Similar to `AF_INET` in POSIX.
 		ipv4,
 		/// Similar to `AF_INET6` in POSIX.
 		ipv6
 	}
-	variant ip-socket-address {
-		ipv4(ipv4-socket-address),
-		ipv6(ipv6-socket-address),
-	}
 	type ipv4-address = tuple<u8, u8, u8, u8>;
+	type ipv6-address = tuple<u16, u16, u16, u16, u16, u16, u16, u16>;
+	variant ip-address {
+		ipv4(ipv4-address),
+		ipv6(ipv6-address),
+	}
 	record ipv4-socket-address {
 		/// sin_port
 		port: u16,
 		/// sin_addr
 		address: ipv4-address,
 	}
-	type ipv6-address = tuple<u16, u16, u16, u16, u16, u16, u16, u16>;
 	record ipv6-socket-address {
 		/// sin6_port
 		port: u16,
@@ -1145,22 +1083,84 @@ interface network {
 		/// sin6_scope_id
 		scope-id: u32,
 	}
+	variant ip-socket-address {
+		ipv4(ipv4-socket-address),
+		ipv6(ipv6-socket-address),
+	}
+}
 
-	/// An opaque resource that represents access to (a subset of) the network.
-	/// This enables context-based security for networking.
-	/// There is no need for this to map 1:1 to a physical network interface.
-	resource network;
+/// This interface provides a value-export of the default network handle..
+interface instance-network {
+	use network.{network};
+
+	/// Get a handle to the default network.
+	instance-network: func() -> network;
+}
+
+interface ip-name-lookup {
+	use wasi:io/poll@0.2.0.{pollable};
+	use network.{network};
+	use network.{error-code};
+	use network.{ip-address};
+	resource resolve-address-stream {
+
+		/// Returns the next address from the resolver.
+		///
+		/// This function should be called multiple times. On each call, it will
+		/// return the next address in connection order preference. If all
+		/// addresses have been exhausted, this function returns `none`.
+		///
+		/// This function never returns IPv4-mapped IPv6 addresses.
+		///
+		/// # Typical errors
+		/// - `name-unresolvable`:          Name does not exist or has no suitable associated
+		/// IP addresses. (EAI_NONAME, EAI_NODATA, EAI_ADDRFAMILY)
+		/// - `temporary-resolver-failure`: A temporary failure in name resolution occurred.
+		/// (EAI_AGAIN)
+		/// - `permanent-resolver-failure`: A permanent failure in name resolution occurred.
+		/// (EAI_FAIL)
+		/// - `would-block`:                A result is not available yet. (EWOULDBLOCK, EAGAIN)
+		resolve-next-address: func() -> result<option<ip-address>, error-code>;
+
+		/// Create a `pollable` which will resolve once the stream is ready for I/O.
+		///
+		/// Note: this function is here for WASI Preview2 only.
+		/// It's planned to be removed when `future` is natively supported in Preview3.
+		subscribe: func() -> pollable;
+	}
+
+	/// Resolve an internet host name to a list of IP addresses.
+	///
+	/// Unicode domain names are automatically converted to ASCII using IDNA encoding.
+	/// If the input is an IP address string, the address is parsed and returned
+	/// as-is without making any external requests.
+	///
+	/// See the wasi-socket proposal README.md for a comparison with getaddrinfo.
+	///
+	/// This function never blocks. It either immediately fails or immediately
+	/// returns successfully with a `resolve-address-stream` that can be used
+	/// to (asynchronously) fetch the results.
+	///
+	/// # Typical errors
+	/// - `invalid-argument`: `name` is a syntactically invalid domain name or IP address.
+	///
+	/// # References:
+	/// - <https://pubs.opengroup.org/onlinepubs/9699919799/functions/getaddrinfo.html>
+	/// - <https://man7.org/linux/man-pages/man3/getaddrinfo.3.html>
+	/// - <https://learn.microsoft.com/en-us/windows/win32/api/ws2tcpip/nf-ws2tcpip-getaddrinfo>
+	/// - <https://man.freebsd.org/cgi/man.cgi?query=getaddrinfo&sektion=3>
+	resolve-addresses: func(network: borrow<network>, name: string) -> result<resolve-address-stream, error-code>;
 }
 
 interface tcp {
-	use wasi:clocks/monotonic-clock@0.2.0.{duration};
-	use network.{error-code};
 	use wasi:io/streams@0.2.0.{input-stream};
-	use network.{ip-address-family};
-	use network.{ip-socket-address};
-	use network.{network};
 	use wasi:io/streams@0.2.0.{output-stream};
 	use wasi:io/poll@0.2.0.{pollable};
+	use wasi:clocks/monotonic-clock@0.2.0.{duration};
+	use network.{network};
+	use network.{error-code};
+	use network.{ip-socket-address};
+	use network.{ip-address-family};
 	enum shutdown-type {
 		/// Similar to `SHUT_RD` in POSIX.
 		receive,
@@ -1549,9 +1549,9 @@ interface tcp {
 }
 
 interface tcp-create-socket {
+	use network.{network};
 	use network.{error-code};
 	use network.{ip-address-family};
-	use network.{network};
 	use tcp.{tcp-socket};
 
 	/// Create a new TCP socket.
@@ -1583,11 +1583,11 @@ interface tcp-create-socket {
 }
 
 interface udp {
-	use network.{error-code};
-	use network.{ip-address-family};
-	use network.{ip-socket-address};
-	use network.{network};
 	use wasi:io/poll@0.2.0.{pollable};
+	use network.{network};
+	use network.{error-code};
+	use network.{ip-socket-address};
+	use network.{ip-address-family};
 
 	/// A received datagram.
 	record incoming-datagram {
@@ -1602,41 +1602,6 @@ interface udp {
 		///
 		/// Equivalent to the `src_addr` out parameter of `recvfrom`.
 		remote-address: ip-socket-address,
-	}
-	resource incoming-datagram-stream {
-
-		/// Receive messages on the socket.
-		///
-		/// This function attempts to receive up to `max-results` datagrams on the socket
-		/// without blocking.
-		/// The returned list may contain fewer elements than requested, but never more.
-		///
-		/// This function returns successfully with an empty list when either:
-		/// - `max-results` is 0, or:
-		/// - `max-results` is greater than 0, but no results are immediately available.
-		/// This function never returns `error(would-block)`.
-		///
-		/// # Typical errors
-		/// - `remote-unreachable`: The remote address is not reachable. (ECONNRESET, ENETRESET
-		/// on Windows, EHOSTUNREACH, EHOSTDOWN, ENETUNREACH, ENETDOWN, ENONET)
-		/// - `connection-refused`: The connection was refused. (ECONNREFUSED)
-		///
-		/// # References
-		/// - <https://pubs.opengroup.org/onlinepubs/9699919799/functions/recvfrom.html>
-		/// - <https://pubs.opengroup.org/onlinepubs/9699919799/functions/recvmsg.html>
-		/// - <https://man7.org/linux/man-pages/man2/recv.2.html>
-		/// - <https://man7.org/linux/man-pages/man2/recvmmsg.2.html>
-		/// - <https://learn.microsoft.com/en-us/windows/win32/api/winsock/nf-winsock-recv>
-		/// - <https://learn.microsoft.com/en-us/windows/win32/api/winsock/nf-winsock-recvfrom>
-		/// - <https://learn.microsoft.com/en-us/previous-versions/windows/desktop/legacy/ms741687(v=vs.85)>
-		/// - <https://man.freebsd.org/cgi/man.cgi?query=recv&sektion=2>
-		receive: func(max-results: u64) -> result<list<incoming-datagram>, error-code>;
-
-		/// Create a `pollable` which will resolve once the stream is ready to receive again.
-		///
-		/// Note: this function is here for WASI Preview2 only.
-		/// It's planned to be removed when `future` is natively supported in Preview3.
-		subscribe: func() -> pollable;
 	}
 
 	/// A datagram to be sent out.
@@ -1653,77 +1618,6 @@ interface udp {
 		/// If this value is None, the send operation is equivalent to `send` in POSIX. Otherwise
 		/// it is equivalent to `sendto`.
 		remote-address: option<ip-socket-address>,
-	}
-	resource outgoing-datagram-stream {
-
-		/// Check readiness for sending. This function never blocks.
-		///
-		/// Returns the number of datagrams permitted for the next call to `send`,
-		/// or an error. Calling `send` with more datagrams than this function has
-		/// permitted will trap.
-		///
-		/// When this function returns ok(0), the `subscribe` pollable will
-		/// become ready when this function will report at least ok(1), or an
-		/// error.
-		///
-		/// Never returns `would-block`.
-		check-send: func() -> result<u64, error-code>;
-
-		/// Send messages on the socket.
-		///
-		/// This function attempts to send all provided `datagrams` on the socket without
-		/// blocking and
-		/// returns how many messages were actually sent (or queued for sending). This function
-		/// never
-		/// returns `error(would-block)`. If none of the datagrams were able to be sent, `ok(0)`
-		/// is returned.
-		///
-		/// This function semantically behaves the same as iterating the `datagrams` list
-		/// and sequentially
-		/// sending each individual datagram until either the end of the list has been reached
-		/// or the first error occurred.
-		/// If at least one datagram has been sent successfully, this function never returns
-		/// an error.
-		///
-		/// If the input list is empty, the function returns `ok(0)`.
-		///
-		/// Each call to `send` must be permitted by a preceding `check-send`. Implementations
-		/// must trap if
-		/// either `check-send` was not called or `datagrams` contains more items than `check-send`
-		/// permitted.
-		///
-		/// # Typical errors
-		/// - `invalid-argument`:        The `remote-address` has the wrong address family.
-		/// (EAFNOSUPPORT)
-		/// - `invalid-argument`:        The IP address in `remote-address` is set to INADDR_ANY
-		/// (`0.0.0.0` / `::`). (EDESTADDRREQ, EADDRNOTAVAIL)
-		/// - `invalid-argument`:        The port in `remote-address` is set to 0. (EDESTADDRREQ,
-		/// EADDRNOTAVAIL)
-		/// - `invalid-argument`:        The socket is in "connected" mode and `remote-address`
-		/// is `some` value that does not match the address passed to `stream`. (EISCONN)
-		/// - `invalid-argument`:        The socket is not "connected" and no value for `remote-address`
-		/// was provided. (EDESTADDRREQ)
-		/// - `remote-unreachable`:      The remote address is not reachable. (ECONNRESET,
-		/// ENETRESET on Windows, EHOSTUNREACH, EHOSTDOWN, ENETUNREACH, ENETDOWN, ENONET)
-		/// - `connection-refused`:      The connection was refused. (ECONNREFUSED)
-		/// - `datagram-too-large`:      The datagram is too large. (EMSGSIZE)
-		///
-		/// # References
-		/// - <https://pubs.opengroup.org/onlinepubs/9699919799/functions/sendto.html>
-		/// - <https://pubs.opengroup.org/onlinepubs/9699919799/functions/sendmsg.html>
-		/// - <https://man7.org/linux/man-pages/man2/send.2.html>
-		/// - <https://man7.org/linux/man-pages/man2/sendmmsg.2.html>
-		/// - <https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-send>
-		/// - <https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-sendto>
-		/// - <https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-wsasendmsg>
-		/// - <https://man.freebsd.org/cgi/man.cgi?query=send&sektion=2>
-		send: func(datagrams: list<outgoing-datagram>) -> result<u64, error-code>;
-
-		/// Create a `pollable` which will resolve once the stream is ready to send again.
-		///
-		/// Note: this function is here for WASI Preview2 only.
-		/// It's planned to be removed when `future` is natively supported in Preview3.
-		subscribe: func() -> pollable;
 	}
 
 	/// A UDP socket handle.
@@ -1884,12 +1778,118 @@ interface udp {
 		/// - `invalid-argument`:     (set) The TTL value must be 1 or higher.
 		unicast-hop-limit: func() -> result<u8, error-code>;
 	}
+	resource incoming-datagram-stream {
+
+		/// Receive messages on the socket.
+		///
+		/// This function attempts to receive up to `max-results` datagrams on the socket
+		/// without blocking.
+		/// The returned list may contain fewer elements than requested, but never more.
+		///
+		/// This function returns successfully with an empty list when either:
+		/// - `max-results` is 0, or:
+		/// - `max-results` is greater than 0, but no results are immediately available.
+		/// This function never returns `error(would-block)`.
+		///
+		/// # Typical errors
+		/// - `remote-unreachable`: The remote address is not reachable. (ECONNRESET, ENETRESET
+		/// on Windows, EHOSTUNREACH, EHOSTDOWN, ENETUNREACH, ENETDOWN, ENONET)
+		/// - `connection-refused`: The connection was refused. (ECONNREFUSED)
+		///
+		/// # References
+		/// - <https://pubs.opengroup.org/onlinepubs/9699919799/functions/recvfrom.html>
+		/// - <https://pubs.opengroup.org/onlinepubs/9699919799/functions/recvmsg.html>
+		/// - <https://man7.org/linux/man-pages/man2/recv.2.html>
+		/// - <https://man7.org/linux/man-pages/man2/recvmmsg.2.html>
+		/// - <https://learn.microsoft.com/en-us/windows/win32/api/winsock/nf-winsock-recv>
+		/// - <https://learn.microsoft.com/en-us/windows/win32/api/winsock/nf-winsock-recvfrom>
+		/// - <https://learn.microsoft.com/en-us/previous-versions/windows/desktop/legacy/ms741687(v=vs.85)>
+		/// - <https://man.freebsd.org/cgi/man.cgi?query=recv&sektion=2>
+		receive: func(max-results: u64) -> result<list<incoming-datagram>, error-code>;
+
+		/// Create a `pollable` which will resolve once the stream is ready to receive again.
+		///
+		/// Note: this function is here for WASI Preview2 only.
+		/// It's planned to be removed when `future` is natively supported in Preview3.
+		subscribe: func() -> pollable;
+	}
+	resource outgoing-datagram-stream {
+
+		/// Check readiness for sending. This function never blocks.
+		///
+		/// Returns the number of datagrams permitted for the next call to `send`,
+		/// or an error. Calling `send` with more datagrams than this function has
+		/// permitted will trap.
+		///
+		/// When this function returns ok(0), the `subscribe` pollable will
+		/// become ready when this function will report at least ok(1), or an
+		/// error.
+		///
+		/// Never returns `would-block`.
+		check-send: func() -> result<u64, error-code>;
+
+		/// Send messages on the socket.
+		///
+		/// This function attempts to send all provided `datagrams` on the socket without
+		/// blocking and
+		/// returns how many messages were actually sent (or queued for sending). This function
+		/// never
+		/// returns `error(would-block)`. If none of the datagrams were able to be sent, `ok(0)`
+		/// is returned.
+		///
+		/// This function semantically behaves the same as iterating the `datagrams` list
+		/// and sequentially
+		/// sending each individual datagram until either the end of the list has been reached
+		/// or the first error occurred.
+		/// If at least one datagram has been sent successfully, this function never returns
+		/// an error.
+		///
+		/// If the input list is empty, the function returns `ok(0)`.
+		///
+		/// Each call to `send` must be permitted by a preceding `check-send`. Implementations
+		/// must trap if
+		/// either `check-send` was not called or `datagrams` contains more items than `check-send`
+		/// permitted.
+		///
+		/// # Typical errors
+		/// - `invalid-argument`:        The `remote-address` has the wrong address family.
+		/// (EAFNOSUPPORT)
+		/// - `invalid-argument`:        The IP address in `remote-address` is set to INADDR_ANY
+		/// (`0.0.0.0` / `::`). (EDESTADDRREQ, EADDRNOTAVAIL)
+		/// - `invalid-argument`:        The port in `remote-address` is set to 0. (EDESTADDRREQ,
+		/// EADDRNOTAVAIL)
+		/// - `invalid-argument`:        The socket is in "connected" mode and `remote-address`
+		/// is `some` value that does not match the address passed to `stream`. (EISCONN)
+		/// - `invalid-argument`:        The socket is not "connected" and no value for `remote-address`
+		/// was provided. (EDESTADDRREQ)
+		/// - `remote-unreachable`:      The remote address is not reachable. (ECONNRESET,
+		/// ENETRESET on Windows, EHOSTUNREACH, EHOSTDOWN, ENETUNREACH, ENETDOWN, ENONET)
+		/// - `connection-refused`:      The connection was refused. (ECONNREFUSED)
+		/// - `datagram-too-large`:      The datagram is too large. (EMSGSIZE)
+		///
+		/// # References
+		/// - <https://pubs.opengroup.org/onlinepubs/9699919799/functions/sendto.html>
+		/// - <https://pubs.opengroup.org/onlinepubs/9699919799/functions/sendmsg.html>
+		/// - <https://man7.org/linux/man-pages/man2/send.2.html>
+		/// - <https://man7.org/linux/man-pages/man2/sendmmsg.2.html>
+		/// - <https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-send>
+		/// - <https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-sendto>
+		/// - <https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-wsasendmsg>
+		/// - <https://man.freebsd.org/cgi/man.cgi?query=send&sektion=2>
+		send: func(datagrams: list<outgoing-datagram>) -> result<u64, error-code>;
+
+		/// Create a `pollable` which will resolve once the stream is ready to send again.
+		///
+		/// Note: this function is here for WASI Preview2 only.
+		/// It's planned to be removed when `future` is natively supported in Preview3.
+		subscribe: func() -> pollable;
+	}
 }
 
 interface udp-create-socket {
+	use network.{network};
 	use network.{error-code};
 	use network.{ip-address-family};
-	use network.{network};
 	use udp.{udp-socket};
 
 	/// Create a new UDP socket.
@@ -1921,43 +1921,21 @@ interface udp-create-socket {
 }
 
 world imports {
-	import wasi:io/error@0.2.0;
-	import instance-network;
-	import ip-name-lookup;
-	import wasi:clocks/monotonic-clock@0.2.0;
 	import network;
+	import instance-network;
 	import wasi:io/poll@0.2.0;
-	import wasi:io/streams@0.2.0;
-	import tcp;
-	import tcp-create-socket;
 	import udp;
 	import udp-create-socket;
+	import wasi:io/error@0.2.0;
+	import wasi:io/streams@0.2.0;
+	import wasi:clocks/monotonic-clock@0.2.0;
+	import tcp;
+	import tcp-create-socket;
+	import ip-name-lookup;
 }
 
 
 package wasi:random@0.2.0;
-
-/// The insecure interface for insecure pseudo-random numbers.
-///
-/// It is intended to be portable at least between Unix-family platforms and
-/// Windows.
-interface insecure {
-	/// Return `len` insecure pseudo-random bytes.
-	///
-	/// This function is not cryptographically secure. Do not use it for
-	/// anything related to security.
-	///
-	/// There are no requirements on the values of the returned bytes, however
-	/// implementations are encouraged to return evenly distributed values with
-	/// a long period.
-	get-insecure-random-bytes: func(len: u64) -> list<u8>;
-
-	/// Return an insecure pseudo-random `u64` value.
-	///
-	/// This function returns the same type of pseudo-random data as
-	/// `get-insecure-random-bytes`, represented as a `u64`.
-	get-insecure-random-u64: func() -> u64;
-}
 
 /// The insecure-seed interface for seeding hash-map DoS resistance.
 ///
@@ -1982,6 +1960,28 @@ interface insecure-seed {
 	/// called multiple times and potentially used for purposes other than DoS
 	/// protection.
 	insecure-seed: func() -> tuple<u64, u64>;
+}
+
+/// The insecure interface for insecure pseudo-random numbers.
+///
+/// It is intended to be portable at least between Unix-family platforms and
+/// Windows.
+interface insecure {
+	/// Return `len` insecure pseudo-random bytes.
+	///
+	/// This function is not cryptographically secure. Do not use it for
+	/// anything related to security.
+	///
+	/// There are no requirements on the values of the returned bytes, however
+	/// implementations are encouraged to return evenly distributed values with
+	/// a long period.
+	get-insecure-random-bytes: func(len: u64) -> list<u8>;
+
+	/// Return an insecure pseudo-random `u64` value.
+	///
+	/// This function returns the same type of pseudo-random data as
+	/// `get-insecure-random-bytes`, represented as a `u64`.
+	get-insecure-random-u64: func() -> u64;
 }
 
 /// WASI Random is a random data API.
@@ -2011,18 +2011,15 @@ interface random {
 }
 
 world imports {
+	import random;
 	import insecure;
 	import insecure-seed;
-	import random;
 }
 
 
 package wasi:cli@0.2.0;
 
 interface environment {
-	/// Get the POSIX-style arguments to the program.
-	get-arguments: func() -> list<string>;
-
 	/// Get the POSIX-style environment variables.
 	///
 	/// Each environment variable is provided as a pair of string variable names
@@ -2032,6 +2029,9 @@ interface environment {
 	/// in the component model, this import function should return the same
 	/// values each time it is called.
 	get-environment: func() -> list<tuple<string, string>>;
+
+	/// Get the POSIX-style arguments to the program.
+	get-arguments: func() -> list<string>;
 
 	/// Return a path that programs should use as their initial current working
 	/// directory, interpreting `.` as shorthand for this.
@@ -2048,11 +2048,6 @@ interface run {
 	run: func() -> result;
 }
 
-interface stderr {
-	use wasi:io/streams@0.2.0.{output-stream};
-	get-stderr: func() -> output-stream;
-}
-
 interface stdin {
 	use wasi:io/streams@0.2.0.{input-stream};
 	get-stdin: func() -> input-stream;
@@ -2061,6 +2056,11 @@ interface stdin {
 interface stdout {
 	use wasi:io/streams@0.2.0.{output-stream};
 	get-stdout: func() -> output-stream;
+}
+
+interface stderr {
+	use wasi:io/streams@0.2.0.{output-stream};
+	get-stderr: func() -> output-stream;
 }
 
 /// Terminal input.
@@ -2083,16 +2083,6 @@ interface terminal-output {
 	resource terminal-output;
 }
 
-/// An interface providing an optional `terminal-output` for stderr as a
-/// link-time authority.
-interface terminal-stderr {
-	use terminal-output.{terminal-output};
-
-	/// If stderr is connected to a terminal, return a `terminal-output` handle
-	/// allowing further interaction with it.
-	get-terminal-stderr: func() -> option<terminal-output>;
-}
-
 /// An interface providing an optional `terminal-input` for stdin as a
 /// link-time authority.
 interface terminal-stdin {
@@ -2113,109 +2103,78 @@ interface terminal-stdout {
 	get-terminal-stdout: func() -> option<terminal-output>;
 }
 
-world command {
-	import environment;
-	import wasi:io/error@0.2.0;
-	import exit;
-	import wasi:random/insecure@0.2.0;
-	import wasi:random/insecure-seed@0.2.0;
-	import wasi:sockets/instance-network@0.2.0;
-	import wasi:sockets/ip-name-lookup@0.2.0;
-	import wasi:clocks/monotonic-clock@0.2.0;
-	import wasi:sockets/network@0.2.0;
-	import wasi:io/poll@0.2.0;
-	import wasi:filesystem/preopens@0.2.0;
-	import wasi:random/random@0.2.0;
-	import stderr;
-	import stdin;
-	import stdout;
-	import wasi:io/streams@0.2.0;
-	import wasi:sockets/tcp@0.2.0;
-	import wasi:sockets/tcp-create-socket@0.2.0;
-	import terminal-input;
-	import terminal-output;
-	import terminal-stderr;
-	import terminal-stdin;
-	import terminal-stdout;
-	import wasi:filesystem/types@0.2.0;
-	import wasi:sockets/udp@0.2.0;
-	import wasi:sockets/udp-create-socket@0.2.0;
-	import wasi:clocks/wall-clock@0.2.0;
-	export run;
+/// An interface providing an optional `terminal-output` for stderr as a
+/// link-time authority.
+interface terminal-stderr {
+	use terminal-output.{terminal-output};
+
+	/// If stderr is connected to a terminal, return a `terminal-output` handle
+	/// allowing further interaction with it.
+	get-terminal-stderr: func() -> option<terminal-output>;
 }
 
 world imports {
 	import environment;
-	import wasi:io/error@0.2.0;
 	import exit;
-	import wasi:random/insecure@0.2.0;
-	import wasi:random/insecure-seed@0.2.0;
-	import wasi:sockets/instance-network@0.2.0;
-	import wasi:sockets/ip-name-lookup@0.2.0;
-	import wasi:clocks/monotonic-clock@0.2.0;
-	import wasi:sockets/network@0.2.0;
+	import wasi:io/error@0.2.0;
 	import wasi:io/poll@0.2.0;
-	import wasi:filesystem/preopens@0.2.0;
-	import wasi:random/random@0.2.0;
-	import stderr;
+	import wasi:io/streams@0.2.0;
 	import stdin;
 	import stdout;
-	import wasi:io/streams@0.2.0;
-	import wasi:sockets/tcp@0.2.0;
-	import wasi:sockets/tcp-create-socket@0.2.0;
+	import stderr;
 	import terminal-input;
 	import terminal-output;
-	import terminal-stderr;
 	import terminal-stdin;
 	import terminal-stdout;
+	import terminal-stderr;
+	import wasi:clocks/monotonic-clock@0.2.0;
+	import wasi:clocks/wall-clock@0.2.0;
 	import wasi:filesystem/types@0.2.0;
+	import wasi:filesystem/preopens@0.2.0;
+	import wasi:sockets/network@0.2.0;
+	import wasi:sockets/instance-network@0.2.0;
 	import wasi:sockets/udp@0.2.0;
 	import wasi:sockets/udp-create-socket@0.2.0;
+	import wasi:sockets/tcp@0.2.0;
+	import wasi:sockets/tcp-create-socket@0.2.0;
+	import wasi:sockets/ip-name-lookup@0.2.0;
+	import wasi:random/random@0.2.0;
+	import wasi:random/insecure@0.2.0;
+	import wasi:random/insecure-seed@0.2.0;
+}
+world command {
+	import environment;
+	import exit;
+	import wasi:io/error@0.2.0;
+	import wasi:io/poll@0.2.0;
+	import wasi:io/streams@0.2.0;
+	import stdin;
+	import stdout;
+	import stderr;
+	import terminal-input;
+	import terminal-output;
+	import terminal-stdin;
+	import terminal-stdout;
+	import terminal-stderr;
+	import wasi:clocks/monotonic-clock@0.2.0;
 	import wasi:clocks/wall-clock@0.2.0;
+	import wasi:filesystem/types@0.2.0;
+	import wasi:filesystem/preopens@0.2.0;
+	import wasi:sockets/network@0.2.0;
+	import wasi:sockets/instance-network@0.2.0;
+	import wasi:sockets/udp@0.2.0;
+	import wasi:sockets/udp-create-socket@0.2.0;
+	import wasi:sockets/tcp@0.2.0;
+	import wasi:sockets/tcp-create-socket@0.2.0;
+	import wasi:sockets/ip-name-lookup@0.2.0;
+	import wasi:random/random@0.2.0;
+	import wasi:random/insecure@0.2.0;
+	import wasi:random/insecure-seed@0.2.0;
+	export run;
 }
 
 
 package wasi:http@0.2.0;
-
-/// This interface defines a handler of incoming HTTP Requests. It should
-/// be exported by components which can respond to HTTP Requests.
-interface incoming-handler {
-	use types.{incoming-request};
-	use types.{response-outparam};
-
-	/// This function is invoked with an incoming HTTP Request, and a resource
-	/// `response-outparam` which provides the capability to reply with an HTTP
-	/// Response. The response is sent by calling the `response-outparam.set`
-	/// method, which allows execution to continue after the response has been
-	/// sent. This enables both streaming to the response body, and performing other
-	/// work.
-	///
-	/// The implementor of this function must write a response to the
-	/// `response-outparam` before returning, or else the caller will respond
-	/// with an error on its behalf.
-	handle: func(request: incoming-request, response-out: response-outparam);
-}
-
-/// This interface defines a handler of outgoing HTTP Requests. It should be
-/// imported by components which wish to make HTTP Requests.
-interface outgoing-handler {
-	use types.{error-code};
-	use types.{future-incoming-response};
-	use types.{outgoing-request};
-	use types.{request-options};
-
-	/// This function is invoked with an outgoing HTTP Request, and it returns
-	/// a resource `future-incoming-response` which represents an HTTP Response
-	/// which may arrive in the future.
-	///
-	/// The `options` argument accepts optional parameters for the HTTP
-	/// protocol's transport layer.
-	///
-	/// This function may return an error if the `outgoing-request` is invalid
-	/// or not allowed to be made. Otherwise, protocol errors are reported
-	/// through the `future-incoming-response`.
-	handle: func(request: outgoing-request, options: option<request-options>) -> result<future-incoming-response, error-code>;
-}
 
 /// This interface defines all of the types and methods for implementing
 /// HTTP Requests and Responses, both incoming and outgoing, as well as
@@ -2223,9 +2182,26 @@ interface outgoing-handler {
 interface types {
 	use wasi:clocks/monotonic-clock@0.2.0.{duration};
 	use wasi:io/streams@0.2.0.{input-stream};
-	use wasi:io/error@0.2.0.{error as io-error};
 	use wasi:io/streams@0.2.0.{output-stream};
+	use wasi:io/error@0.2.0.{error as io-error};
 	use wasi:io/poll@0.2.0.{pollable};
+
+	/// This type corresponds to HTTP standard Methods.
+	variant method {
+		get,
+		head,
+		post,
+		put,
+		delete,
+		connect,
+		options,
+		trace,
+		patch,
+		other(string),
+	}
+
+	/// This type corresponds to HTTP standard Related Schemes.
+	variant scheme { HTTP, HTTPS, other(string) }
 
 	/// Defines the case payload type for `DNS-error` above:
 	record DNS-error-payload {
@@ -2237,6 +2213,12 @@ interface types {
 	record TLS-alert-received-payload {
 		alert-id: option<u8>,
 		alert-message: option<string>,
+	}
+
+	/// Defines the case payload type for `HTTP-response-{header,trailer}-size` above:
+	record field-size-payload {
+		field-name: option<string>,
+		field-size: option<u32>,
 	}
 
 	/// These cases are inspired by the IANA HTTP Proxy Error Types:
@@ -2288,14 +2270,23 @@ interface types {
 		internal-error(option<string>),
 	}
 
+	/// This type enumerates the different kinds of errors that may occur when
+	/// setting or appending to a `fields` resource.
+	variant header-error {
+		/// This error indicates that a `field-key` or `field-value` was
+		/// syntactically invalid when used with an operation that sets headers in a
+		/// `fields`.
+		invalid-syntax,
+		/// This error indicates that a forbidden `field-key` was used when trying
+		/// to set a header in a `fields`.
+		forbidden,
+		/// This error indicates that the operation on the `fields` was not
+		/// permitted because the fields are immutable.
+		immutable,
+	}
+
 	/// Field keys are always strings.
 	type field-key = string;
-
-	/// Defines the case payload type for `HTTP-response-{header,trailer}-size` above:
-	record field-size-payload {
-		field-name: option<string>,
-		field-size: option<u32>,
-	}
 
 	/// Field values should always be ASCII strings. However, in
 	/// reality, HTTP implementations often have to interpret malformed values,
@@ -2384,118 +2375,11 @@ interface types {
 		from-list: static func(entries: list<tuple<field-key, field-value>>) -> result<fields, header-error>;
 	}
 
-	/// Represents a future which may eventaully return an incoming HTTP
-	/// Response, or an error.
-	///
-	/// This resource is returned by the `wasi:http/outgoing-handler` interface to
-	/// provide the HTTP Response corresponding to the sent Request.
-	resource future-incoming-response {
-
-		/// Returns the incoming HTTP Response, or an error, once one is ready.
-		///
-		/// The outer `option` represents future readiness. Users can wait on this
-		/// `option` to become `some` using the `subscribe` method.
-		///
-		/// The outer `result` is used to retrieve the response or error at most
-		/// once. It will be success on the first call in which the outer option
-		/// is `some`, and error on subsequent calls.
-		///
-		/// The inner `result` represents that either the incoming HTTP Response
-		/// status and headers have recieved successfully, or that an error
-		/// occured. Errors may also occur while consuming the response body,
-		/// but those will be reported by the `incoming-body` and its
-		/// `output-stream` child.
-		get: func() -> option<result<result<incoming-response, error-code>>>;
-
-		/// Returns a pollable which becomes ready when either the Response has
-		/// been received, or an error has occured. When this pollable is ready,
-		/// the `get` method will return `some`.
-		subscribe: func() -> pollable;
-	}
-
-	/// Represents a future which may eventaully return trailers, or an error.
-	///
-	/// In the case that the incoming HTTP Request or Response did not have any
-	/// trailers, this future will resolve to the empty set of trailers once the
-	/// complete Request or Response body has been received.
-	resource future-trailers {
-
-		/// Returns the contents of the trailers, or an error which occured,
-		/// once the future is ready.
-		///
-		/// The outer `option` represents future readiness. Users can wait on this
-		/// `option` to become `some` using the `subscribe` method.
-		///
-		/// The outer `result` is used to retrieve the trailers or error at most
-		/// once. It will be success on the first call in which the outer option
-		/// is `some`, and error on subsequent calls.
-		///
-		/// The inner `result` represents that either the HTTP Request or Response
-		/// body, as well as any trailers, were received successfully, or that an
-		/// error occured receiving them. The optional `trailers` indicates whether
-		/// or not trailers were present in the body.
-		///
-		/// When some `trailers` are returned by this method, the `trailers`
-		/// resource is immutable, and a child. Use of the `set`, `append`, or
-		/// `delete` methods will return an error, and the resource must be
-		/// dropped before the parent `future-trailers` is dropped.
-		get: func() -> option<result<result<option<trailers>, error-code>>>;
-
-		/// Returns a pollable which becomes ready when either the trailers have
-		/// been received, or an error has occured. When this pollable is ready,
-		/// the `get` method will return `some`.
-		subscribe: func() -> pollable;
-	}
-
-	/// This type enumerates the different kinds of errors that may occur when
-	/// setting or appending to a `fields` resource.
-	variant header-error {
-		/// This error indicates that a `field-key` or `field-value` was
-		/// syntactically invalid when used with an operation that sets headers in a
-		/// `fields`.
-		invalid-syntax,
-		/// This error indicates that a forbidden `field-key` was used when trying
-		/// to set a header in a `fields`.
-		forbidden,
-		/// This error indicates that the operation on the `fields` was not
-		/// permitted because the fields are immutable.
-		immutable,
-	}
-
 	/// Headers is an alias for Fields.
 	type headers = fields;
 
-	/// Represents an incoming HTTP Request or Response's Body.
-	///
-	/// A body has both its contents - a stream of bytes - and a (possibly
-	/// empty) set of trailers, indicating that the full contents of the
-	/// body have been received. This resource represents the contents as
-	/// an `input-stream` and the delivery of trailers as a `future-trailers`,
-	/// and ensures that the user of this interface may only be consuming either
-	/// the body contents or waiting on trailers at any given time.
-	resource incoming-body {
-
-		/// Returns the contents of the body, as a stream of bytes.
-		///
-		/// Returns success on first call: the stream representing the contents
-		/// can be retrieved at most once. Subsequent calls will return error.
-		///
-		/// The returned `input-stream` resource is a child: it must be dropped
-		/// before the parent `incoming-body` is dropped, or consumed by
-		/// `incoming-body.finish`.
-		///
-		/// This invariant ensures that the implementation can determine whether
-		/// the user is consuming the contents of the body, waiting on the
-		/// `future-trailers` to be ready, or neither. This allows for network
-		/// backpressure is to be applied when the user is consuming the body,
-		/// and for that backpressure to not inhibit delivery of the trailers if
-		/// the user does not read the entire body.
-		stream: func() -> result<input-stream>;
-
-		/// Takes ownership of `incoming-body`, and returns a `future-trailers`.
-		/// This function will trap if the `input-stream` child is still alive.
-		finish: static func(this: incoming-body) -> future-trailers;
-	}
+	/// Trailers is an alias for Fields.
+	type trailers = fields;
 
 	/// Represents an incoming HTTP Request.
 	resource incoming-request {
@@ -2525,81 +2409,6 @@ interface types {
 
 		/// Returns the protocol scheme from the request.
 		scheme: func() -> option<scheme>;
-	}
-
-	/// Represents an incoming HTTP Response.
-	resource incoming-response {
-
-		/// Returns the incoming body. May be called at most once. Returns error
-		/// if called additional times.
-		consume: func() -> result<incoming-body>;
-
-		/// Returns the headers from the incoming response.
-		///
-		/// The returned `headers` resource is immutable: `set`, `append`, and
-		/// `delete` operations will fail with `header-error.immutable`.
-		///
-		/// This headers resource is a child: it must be dropped before the parent
-		/// `incoming-response` is dropped.
-		headers: func() -> headers;
-
-		/// Returns the status code from the incoming response.
-		status: func() -> status-code;
-	}
-
-	/// This type corresponds to HTTP standard Methods.
-	variant method {
-		get,
-		head,
-		post,
-		put,
-		delete,
-		connect,
-		options,
-		trace,
-		patch,
-		other(string),
-	}
-
-	/// Represents an outgoing HTTP Request or Response's Body.
-	///
-	/// A body has both its contents - a stream of bytes - and a (possibly
-	/// empty) set of trailers, inducating the full contents of the body
-	/// have been sent. This resource represents the contents as an
-	/// `output-stream` child resource, and the completion of the body (with
-	/// optional trailers) with a static function that consumes the
-	/// `outgoing-body` resource, and ensures that the user of this interface
-	/// may not write to the body contents after the body has been finished.
-	///
-	/// If the user code drops this resource, as opposed to calling the static
-	/// method `finish`, the implementation should treat the body as incomplete,
-	/// and that an error has occured. The implementation should propogate this
-	/// error to the HTTP protocol by whatever means it has available,
-	/// including: corrupting the body on the wire, aborting the associated
-	/// Request, or sending a late status code for the Response.
-	resource outgoing-body {
-
-		/// Returns a stream for writing the body contents.
-		///
-		/// The returned `output-stream` is a child resource: it must be dropped
-		/// before the parent `outgoing-body` resource is dropped (or finished),
-		/// otherwise the `outgoing-body` drop or `finish` will trap.
-		///
-		/// Returns success on the first call: the `output-stream` resource for
-		/// this `outgoing-body` may be retrieved at most once. Subsequent calls
-		/// will return error.
-		write: func() -> result<output-stream>;
-
-		/// Finalize an outgoing body, optionally providing trailers. This must be
-		/// called to signal that the response is complete. If the `outgoing-body`
-		/// is dropped without calling `outgoing-body.finalize`, the implementation
-		/// should treat the body as corrupted.
-		///
-		/// Fails if the body's `outgoing-request` or `outgoing-response` was
-		/// constructed with a Content-Length header, and the contents written
-		/// to the body (via `write`) does not match the value given in the
-		/// Content-Length.
-		finish: static func(this: outgoing-body, trailers: option<trailers>) -> result<_, error-code>;
 	}
 
 	/// Represents an outgoing HTTP Request.
@@ -2671,40 +2480,6 @@ interface types {
 		set-scheme: func(scheme: option<scheme>) -> result;
 	}
 
-	/// Represents an outgoing HTTP Response.
-	resource outgoing-response {
-		/// Construct an `outgoing-response`, with a default `status-code` of `200`.
-		/// If a different `status-code` is needed, it must be set via the
-		/// `set-status-code` method.
-		///
-		/// * `headers` is the HTTP Headers for the Response.
-		constructor(headers: headers);
-
-		/// Returns the resource corresponding to the outgoing Body for this Response.
-		///
-		/// Returns success on the first call: the `outgoing-body` resource for
-		/// this `outgoing-response` can be retrieved at most once. Subsequent
-		/// calls will return error.
-		body: func() -> result<outgoing-body>;
-
-		/// Get the headers associated with the Request.
-		///
-		/// The returned `headers` resource is immutable: `set`, `append`, and
-		/// `delete` operations will fail with `header-error.immutable`.
-		///
-		/// This headers resource is a child: it must be dropped before the parent
-		/// `outgoing-request` is dropped, or its ownership is transfered to
-		/// another component by e.g. `outgoing-handler.handle`.
-		headers: func() -> headers;
-
-		/// Set the HTTP Status Code for the Response. Fails if the status-code
-		/// given is not a valid http status code.
-		set-status-code: func(status-code: status-code) -> result;
-
-		/// Get the HTTP Status Code for the Response.
-		status-code: func() -> status-code;
-	}
-
 	/// Parameters for making an HTTP Request. Each of these parameters is
 	/// currently an optional timeout applicable to the transport layer of the
 	/// HTTP protocol.
@@ -2758,14 +2533,198 @@ interface types {
 		set: static func(param: response-outparam, response: result<outgoing-response, error-code>);
 	}
 
-	/// This type corresponds to HTTP standard Related Schemes.
-	variant scheme { HTTP, HTTPS, other(string) }
-
 	/// This type corresponds to the HTTP standard Status Code.
 	type status-code = u16;
 
-	/// Trailers is an alias for Fields.
-	type trailers = fields;
+	/// Represents an incoming HTTP Response.
+	resource incoming-response {
+
+		/// Returns the incoming body. May be called at most once. Returns error
+		/// if called additional times.
+		consume: func() -> result<incoming-body>;
+
+		/// Returns the headers from the incoming response.
+		///
+		/// The returned `headers` resource is immutable: `set`, `append`, and
+		/// `delete` operations will fail with `header-error.immutable`.
+		///
+		/// This headers resource is a child: it must be dropped before the parent
+		/// `incoming-response` is dropped.
+		headers: func() -> headers;
+
+		/// Returns the status code from the incoming response.
+		status: func() -> status-code;
+	}
+
+	/// Represents an incoming HTTP Request or Response's Body.
+	///
+	/// A body has both its contents - a stream of bytes - and a (possibly
+	/// empty) set of trailers, indicating that the full contents of the
+	/// body have been received. This resource represents the contents as
+	/// an `input-stream` and the delivery of trailers as a `future-trailers`,
+	/// and ensures that the user of this interface may only be consuming either
+	/// the body contents or waiting on trailers at any given time.
+	resource incoming-body {
+
+		/// Returns the contents of the body, as a stream of bytes.
+		///
+		/// Returns success on first call: the stream representing the contents
+		/// can be retrieved at most once. Subsequent calls will return error.
+		///
+		/// The returned `input-stream` resource is a child: it must be dropped
+		/// before the parent `incoming-body` is dropped, or consumed by
+		/// `incoming-body.finish`.
+		///
+		/// This invariant ensures that the implementation can determine whether
+		/// the user is consuming the contents of the body, waiting on the
+		/// `future-trailers` to be ready, or neither. This allows for network
+		/// backpressure is to be applied when the user is consuming the body,
+		/// and for that backpressure to not inhibit delivery of the trailers if
+		/// the user does not read the entire body.
+		stream: func() -> result<input-stream>;
+
+		/// Takes ownership of `incoming-body`, and returns a `future-trailers`.
+		/// This function will trap if the `input-stream` child is still alive.
+		finish: static func(this: incoming-body) -> future-trailers;
+	}
+
+	/// Represents a future which may eventaully return trailers, or an error.
+	///
+	/// In the case that the incoming HTTP Request or Response did not have any
+	/// trailers, this future will resolve to the empty set of trailers once the
+	/// complete Request or Response body has been received.
+	resource future-trailers {
+
+		/// Returns the contents of the trailers, or an error which occured,
+		/// once the future is ready.
+		///
+		/// The outer `option` represents future readiness. Users can wait on this
+		/// `option` to become `some` using the `subscribe` method.
+		///
+		/// The outer `result` is used to retrieve the trailers or error at most
+		/// once. It will be success on the first call in which the outer option
+		/// is `some`, and error on subsequent calls.
+		///
+		/// The inner `result` represents that either the HTTP Request or Response
+		/// body, as well as any trailers, were received successfully, or that an
+		/// error occured receiving them. The optional `trailers` indicates whether
+		/// or not trailers were present in the body.
+		///
+		/// When some `trailers` are returned by this method, the `trailers`
+		/// resource is immutable, and a child. Use of the `set`, `append`, or
+		/// `delete` methods will return an error, and the resource must be
+		/// dropped before the parent `future-trailers` is dropped.
+		get: func() -> option<result<result<option<trailers>, error-code>>>;
+
+		/// Returns a pollable which becomes ready when either the trailers have
+		/// been received, or an error has occured. When this pollable is ready,
+		/// the `get` method will return `some`.
+		subscribe: func() -> pollable;
+	}
+
+	/// Represents an outgoing HTTP Response.
+	resource outgoing-response {
+		/// Construct an `outgoing-response`, with a default `status-code` of `200`.
+		/// If a different `status-code` is needed, it must be set via the
+		/// `set-status-code` method.
+		///
+		/// * `headers` is the HTTP Headers for the Response.
+		constructor(headers: headers);
+
+		/// Returns the resource corresponding to the outgoing Body for this Response.
+		///
+		/// Returns success on the first call: the `outgoing-body` resource for
+		/// this `outgoing-response` can be retrieved at most once. Subsequent
+		/// calls will return error.
+		body: func() -> result<outgoing-body>;
+
+		/// Get the headers associated with the Request.
+		///
+		/// The returned `headers` resource is immutable: `set`, `append`, and
+		/// `delete` operations will fail with `header-error.immutable`.
+		///
+		/// This headers resource is a child: it must be dropped before the parent
+		/// `outgoing-request` is dropped, or its ownership is transfered to
+		/// another component by e.g. `outgoing-handler.handle`.
+		headers: func() -> headers;
+
+		/// Set the HTTP Status Code for the Response. Fails if the status-code
+		/// given is not a valid http status code.
+		set-status-code: func(status-code: status-code) -> result;
+
+		/// Get the HTTP Status Code for the Response.
+		status-code: func() -> status-code;
+	}
+
+	/// Represents an outgoing HTTP Request or Response's Body.
+	///
+	/// A body has both its contents - a stream of bytes - and a (possibly
+	/// empty) set of trailers, inducating the full contents of the body
+	/// have been sent. This resource represents the contents as an
+	/// `output-stream` child resource, and the completion of the body (with
+	/// optional trailers) with a static function that consumes the
+	/// `outgoing-body` resource, and ensures that the user of this interface
+	/// may not write to the body contents after the body has been finished.
+	///
+	/// If the user code drops this resource, as opposed to calling the static
+	/// method `finish`, the implementation should treat the body as incomplete,
+	/// and that an error has occured. The implementation should propogate this
+	/// error to the HTTP protocol by whatever means it has available,
+	/// including: corrupting the body on the wire, aborting the associated
+	/// Request, or sending a late status code for the Response.
+	resource outgoing-body {
+
+		/// Returns a stream for writing the body contents.
+		///
+		/// The returned `output-stream` is a child resource: it must be dropped
+		/// before the parent `outgoing-body` resource is dropped (or finished),
+		/// otherwise the `outgoing-body` drop or `finish` will trap.
+		///
+		/// Returns success on the first call: the `output-stream` resource for
+		/// this `outgoing-body` may be retrieved at most once. Subsequent calls
+		/// will return error.
+		write: func() -> result<output-stream>;
+
+		/// Finalize an outgoing body, optionally providing trailers. This must be
+		/// called to signal that the response is complete. If the `outgoing-body`
+		/// is dropped without calling `outgoing-body.finalize`, the implementation
+		/// should treat the body as corrupted.
+		///
+		/// Fails if the body's `outgoing-request` or `outgoing-response` was
+		/// constructed with a Content-Length header, and the contents written
+		/// to the body (via `write`) does not match the value given in the
+		/// Content-Length.
+		finish: static func(this: outgoing-body, trailers: option<trailers>) -> result<_, error-code>;
+	}
+
+	/// Represents a future which may eventaully return an incoming HTTP
+	/// Response, or an error.
+	///
+	/// This resource is returned by the `wasi:http/outgoing-handler` interface to
+	/// provide the HTTP Response corresponding to the sent Request.
+	resource future-incoming-response {
+
+		/// Returns the incoming HTTP Response, or an error, once one is ready.
+		///
+		/// The outer `option` represents future readiness. Users can wait on this
+		/// `option` to become `some` using the `subscribe` method.
+		///
+		/// The outer `result` is used to retrieve the response or error at most
+		/// once. It will be success on the first call in which the outer option
+		/// is `some`, and error on subsequent calls.
+		///
+		/// The inner `result` represents that either the incoming HTTP Response
+		/// status and headers have recieved successfully, or that an error
+		/// occured. Errors may also occur while consuming the response body,
+		/// but those will be reported by the `incoming-body` and its
+		/// `output-stream` child.
+		get: func() -> option<result<result<incoming-response, error-code>>>;
+
+		/// Returns a pollable which becomes ready when either the Response has
+		/// been received, or an error has occured. When this pollable is ready,
+		/// the `get` method will return `some`.
+		subscribe: func() -> pollable;
+	}
 
 	/// Attempts to extract a http-related `error` from the wasi:io `error`
 	/// provided.
@@ -2781,37 +2740,76 @@ interface types {
 	http-error-code: func(err: borrow<io-error>) -> option<error-code>;
 }
 
+/// This interface defines a handler of incoming HTTP Requests. It should
+/// be exported by components which can respond to HTTP Requests.
+interface incoming-handler {
+	use types.{incoming-request};
+	use types.{response-outparam};
+
+	/// This function is invoked with an incoming HTTP Request, and a resource
+	/// `response-outparam` which provides the capability to reply with an HTTP
+	/// Response. The response is sent by calling the `response-outparam.set`
+	/// method, which allows execution to continue after the response has been
+	/// sent. This enables both streaming to the response body, and performing other
+	/// work.
+	///
+	/// The implementor of this function must write a response to the
+	/// `response-outparam` before returning, or else the caller will respond
+	/// with an error on its behalf.
+	handle: func(request: incoming-request, response-out: response-outparam);
+}
+
+/// This interface defines a handler of outgoing HTTP Requests. It should be
+/// imported by components which wish to make HTTP Requests.
+interface outgoing-handler {
+	use types.{outgoing-request};
+	use types.{request-options};
+	use types.{future-incoming-response};
+	use types.{error-code};
+
+	/// This function is invoked with an outgoing HTTP Request, and it returns
+	/// a resource `future-incoming-response` which represents an HTTP Response
+	/// which may arrive in the future.
+	///
+	/// The `options` argument accepts optional parameters for the HTTP
+	/// protocol's transport layer.
+	///
+	/// This function may return an error if the `outgoing-request` is invalid
+	/// or not allowed to be made. Otherwise, protocol errors are reported
+	/// through the `future-incoming-response`.
+	handle: func(request: outgoing-request, options: option<request-options>) -> result<future-incoming-response, error-code>;
+}
+
 /// The `wasi:http/imports` world imports all the APIs for HTTP proxies.
 /// It is intended to be `include`d in other worlds.
 world imports {
-	import wasi:io/error@0.2.0;
-	import wasi:clocks/monotonic-clock@0.2.0;
-	import outgoing-handler;
-	import wasi:io/poll@0.2.0;
 	import wasi:random/random@0.2.0;
+	import wasi:io/error@0.2.0;
+	import wasi:io/poll@0.2.0;
+	import wasi:io/streams@0.2.0;
+	import wasi:cli/stdout@0.2.0;
 	import wasi:cli/stderr@0.2.0;
 	import wasi:cli/stdin@0.2.0;
-	import wasi:cli/stdout@0.2.0;
-	import wasi:io/streams@0.2.0;
+	import wasi:clocks/monotonic-clock@0.2.0;
 	import types;
+	import outgoing-handler;
 	import wasi:clocks/wall-clock@0.2.0;
 }
-
 /// The `wasi:http/proxy` world captures a widely-implementable intersection of
 /// hosts that includes HTTP forward and reverse proxies. Components targeting
 /// this world may concurrently stream in and out any number of incoming and
 /// outgoing HTTP requests.
 world proxy {
-	import wasi:io/error@0.2.0;
-	import wasi:clocks/monotonic-clock@0.2.0;
-	import outgoing-handler;
 	import wasi:io/poll@0.2.0;
-	import wasi:random/random@0.2.0;
-	import wasi:cli/stderr@0.2.0;
-	import wasi:cli/stdin@0.2.0;
-	import wasi:cli/stdout@0.2.0;
+	import wasi:clocks/monotonic-clock@0.2.0;
+	import wasi:io/error@0.2.0;
 	import wasi:io/streams@0.2.0;
 	import types;
+	import wasi:random/random@0.2.0;
+	import wasi:cli/stdout@0.2.0;
+	import wasi:cli/stderr@0.2.0;
+	import wasi:cli/stdin@0.2.0;
+	import outgoing-handler;
 	import wasi:clocks/wall-clock@0.2.0;
 	export incoming-handler;
 }

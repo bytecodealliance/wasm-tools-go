@@ -1,14 +1,12 @@
 package foo:foo;
 
+world foo {
+	import a: func();
+}
 world bar {
 	import a: func();
 }
-
 world baz {
-	import a: func();
 	import b: func();
-}
-
-world foo {
 	import a: func();
 }

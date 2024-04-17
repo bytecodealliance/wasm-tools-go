@@ -1,14 +1,18 @@
 package foo:multi-file;
 
-interface bar {
-	use irrelevant-name.{a-name};
-	use foo.{x};
-	use foo.{x as x2};
-	use foo.{x as x3};
-	use depend-on-me.{x as x4};
-	use something-else.{y};
-	use something-else.{y as y2};
+interface irrelevant-name {
+	record a-name {}
 }
+
+interface depend-on-me {
+	type x = u32;
+}
+
+interface depends-on-later-item {
+	use depend-on-me.{x};
+}
+
+interface later-interface {}
 
 interface cycle1 {
 	type t = u32;
@@ -22,33 +26,28 @@ interface cycle3 {
 	use cycle2.{t};
 }
 
-interface depend-on-me {
-	type x = u32;
-}
-
-interface depends-on-later-item {
-	use depend-on-me.{x};
-}
-
 interface foo {
 	type x = u32;
 }
 
-interface irrelevant-name {
-	record a-name {}
-}
-
-interface later-interface {}
-
 interface something-else {
 	type y = u64;
+}
+
+interface bar {
+	use foo.{x};
+	use foo.{x as x2};
+	use foo.{x as x3};
+	use depend-on-me.{x as x4};
+	use something-else.{y};
+	use something-else.{y as y2};
+	use irrelevant-name.{a-name};
 }
 
 world more-depends-on-later-things {
 	import later-interface;
 	export later-interface;
 }
-
 world the-world {
 	import depend-on-me;
 	use depend-on-me.{x};

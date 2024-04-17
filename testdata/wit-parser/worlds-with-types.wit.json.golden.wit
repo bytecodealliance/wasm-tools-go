@@ -4,18 +4,16 @@ interface disambiguate {
 	type t = u32;
 }
 
-world bar {
-	import disambiguate;
-	use disambiguate.{t};
-	export foo: func() -> t;
-}
-
 world foo {
 	type a = u32;
 	type b = a;
 	export c: func(a: a) -> b;
 }
-
+world bar {
+	import disambiguate;
+	use disambiguate.{t};
+	export foo: func() -> t;
+}
 world the-test {
 	record a { x: u32 }
 	variant b { c(a) }

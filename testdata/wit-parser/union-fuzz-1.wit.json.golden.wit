@@ -1,7 +1,5 @@
 package foo:bar;
 
-world name {}
-
-world x {}
-
 world xo {}
+world name {}
+world x {}

@@ -5,8 +5,8 @@ interface shared-items {
 }
 
 world foo {
-	import shared-items;
 	import shared-items: interface {}
+	import shared-items;
 	export a-name: interface {
 		use shared-items.{a};
 	}
