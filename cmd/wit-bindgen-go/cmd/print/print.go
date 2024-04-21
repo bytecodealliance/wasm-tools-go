@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/ydnar/wasm-tools-go/internal/pretty"
 	"github.com/ydnar/wasm-tools-go/internal/witcli"
 
-	"github.com/kr/pretty"
 	"github.com/urfave/cli/v3"
 )
 
