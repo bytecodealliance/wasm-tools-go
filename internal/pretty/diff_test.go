@@ -123,8 +123,8 @@ var diffs = []difftest{
 	},
 	{
 		struct{ x unsafe.Pointer }{unsafe.Pointer(nil)},
-		struct{ x unsafe.Pointer }{unsafe.Pointer(uintptr(unsafe.Pointer(nil)) + uintptr(1))},
-		[]string{`x: 0x0 != 0x1`},
+		struct{ x unsafe.Pointer }{unsafe.Pointer(&i0)},
+		[]string{fmt.Sprintf("x: %p != %p", unsafe.Pointer(nil), unsafe.Pointer(&i0))},
 	},
 }
 
