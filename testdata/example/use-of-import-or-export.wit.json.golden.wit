@@ -1,16 +1,27 @@
 package example:uses;
 
 interface a {
-	resource res;
+	resource res {
+		do: func();
+	}
+}
+
+interface b {
+	use a.{res};
+	record rec { res: res }
 }
 
 interface f {
 	use a.{res};
-	report: func(r: res);
+	use b.{rec};
+	report-res: func(r: res);
+	report-rec: func(r: rec);
 }
 
 world default {
 	import a;
+	import b;
 	export a;
+	export b;
 	export f;
 }
