@@ -123,7 +123,7 @@ var diffs = []difftest{
 	},
 	{
 		struct{ x unsafe.Pointer }{unsafe.Pointer(nil)},
-		struct{ x unsafe.Pointer }{unsafe.Add(nil, 1)},
+		struct{ x unsafe.Pointer }{unsafe.Pointer(uintptr(unsafe.Pointer(nil)) + uintptr(1))},
 		[]string{`x: 0x0 != 0x1`},
 	},
 }
