@@ -4,9 +4,6 @@ go 1.22
 
 require (
 	github.com/coreos/go-semver v0.3.1
-	github.com/kr/pretty v0.1.0
-	github.com/kr/text v0.2.0
-	github.com/rogpeppe/go-internal v1.9.0
 	github.com/sergi/go-diff v1.3.1
 	github.com/urfave/cli/v3 v3.0.0-alpha9
 	golang.org/x/mod v0.17.0
