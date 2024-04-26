@@ -253,10 +253,7 @@ func (g *generator) defineWorld(w *wit.World) error {
 				err = g.defineImportedFunction(v, id)
 			}
 		}
-		if err != nil {
-			return false
-		}
-		return true
+		return err == nil
 	})
 	if err != nil {
 		return err
