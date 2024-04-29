@@ -1,5 +1,7 @@
 package wit
 
+import "strconv"
+
 // Align aligns ptr with alignment align.
 func Align(ptr, align uintptr) uintptr {
 	return (ptr + align - 1) &^ (align - 1)
@@ -75,37 +77,41 @@ type hasBorrow interface {
 	HasBorrow() bool
 }
 
-// Op represents the [Canonical ABI] [lift] and [lower] operations, for lowering into or lifting out of linear memory.
+// Direction represents the direction a type or function is represented within a component,
+// whether it is an importer (consumer), or an exporter (producer). When applied to functions,
+// this represents the [Canonical ABI] [lift] and [lower] operations, for lowering into or lifting out of linear memory.
 //
 // [Canonical ABI]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/Explainer.md#canonical-abi
 // [lift]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#canon-lift
 // [lower]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#canon-lower
-type Op uint8
+type Direction int
+
+// String implements the Stringer interface.
+func (dir Direction) String() string {
+	switch dir {
+	case Exported:
+		return "exported"
+	case Imported:
+		return "imported"
+	default:
+		return strconv.Itoa(int(dir))
+	}
+}
 
 const (
-	// Lift represents the Canonical ABI [lift] direction, lifting Component Model types out of linear memory.
-	// Used for exporting functions to the WebAssembly host (or another component) using //go:wasmexport.
+	// Exported represents types and functions exported from a component to the host or another component.
+	// This corresponds to the Canonical ABI [lift] operation, lifting Component Model types out of linear memory.
+	// Used for exporting functions using //go:wasmexport.
 	//
 	// [lift]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#canon-lift
-	Lift Op = 0
+	Exported Direction = 0
 
-	// Lower represents the Canonical ABI [lower] operation, lowering Component Model types into linear memory.
-	// Used for calling functions imported from the WebAssembly host (or another component) using //go:wasmimport.
+	// Exported represents types and functions imported into a component from the host or another component.
+	// This corresponds to the the Canonical ABI [lower] operation, lowering Component Model types into linear memory.
+	// Used for calling functions imported using //go:wasmimport.
 	//
 	// [lower]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#canon-lower
-	Lower Op = 1
-
-	// MaxFlatParams is the maximum number of [flattened parameters] a function can have
-	// as defined in the Component Model Canonical ABI.
-	//
-	// [flattened parameters]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
-	MaxFlatParams = 16
-
-	// MaxFlatResults is the maximum number of [flattened results] a function can have
-	// as defined in the Component Model Canonical ABI.
-	//
-	// [flattened results]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
-	MaxFlatResults = 1
+	Imported Direction = 1
 )
 
 // ResourceDrop returns the implied [resource-drop] method for t.
@@ -136,6 +142,20 @@ func (f *Function) ReturnsBorrow() bool {
 	return false
 }
 
+const (
+	// MaxFlatParams is the maximum number of [flattened parameters] a function can have
+	// as defined in the Component Model Canonical ABI.
+	//
+	// [flattened parameters]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
+	MaxFlatParams = 16
+
+	// MaxFlatResults is the maximum number of [flattened results] a function can have
+	// as defined in the Component Model Canonical ABI.
+	//
+	// [flattened results]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
+	MaxFlatResults = 1
+)
+
 // CoreFunction returns a [Core WebAssembly function] of [Function] f.
 // Its params and results may be [flattened] according to the Canonical ABI specification.
 // The flattening rules vary based on whether the returned function is imported or exported,
@@ -143,7 +163,7 @@ func (f *Function) ReturnsBorrow() bool {
 //
 // [Core WebAssembly function]: https://webassembly.github.io/spec/core/syntax/modules.html#syntax-func
 // [flattened]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
-func (f *Function) CoreFunction(op Op) *Function {
+func (f *Function) CoreFunction(op Direction) *Function {
 	if len(f.Params) == 0 && len(f.Results) == 0 {
 		return f
 	}
@@ -159,7 +179,7 @@ func (f *Function) CoreFunction(op Op) *Function {
 	// Max 1 result
 	if len(flatParams(f.Results)) > MaxFlatResults {
 		p := compoundParam("result", "results", f.Results)
-		if op == Lift {
+		if op == Exported {
 			cf.Results = []Param{p}
 		} else {
 			cf.Params = append(cf.Params, p)

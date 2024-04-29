@@ -760,8 +760,8 @@ func (g *generator) declareFunction(f *wit.Function, owner wit.Ident) (funcDecl,
 	file := g.fileFor(owner)
 
 	// Setup
-	lift := f.CoreFunction(wit.Lift)
-	lower := f.CoreFunction(wit.Lower)
+	lift := f.CoreFunction(wit.Exported)
+	lower := f.CoreFunction(wit.Imported)
 
 	const (
 		pfxLift  = "wasmexport_"
