@@ -58,7 +58,7 @@ type generator struct {
 	typeDefs map[*wit.TypeDef]typeDecl
 
 	// functions map [wit.Function] to their Go equivalent.
-	functions map[*wit.Function]*funcDecl
+	functions map[*wit.Function]funcDecl
 
 	// defined represent whether a type or function has been defined.
 	defined map[any]bool
@@ -69,7 +69,7 @@ func newGenerator(res *wit.Resolve, opts ...Option) (*generator, error) {
 		packages:    make(map[string]*gen.Package),
 		witPackages: make(map[string]*gen.Package),
 		typeDefs:    make(map[*wit.TypeDef]typeDecl),
-		functions:   make(map[*wit.Function]*funcDecl),
+		functions:   make(map[*wit.Function]funcDecl),
 		defined:     make(map[any]bool),
 	}
 	err := g.opts.apply(opts...)
@@ -714,9 +714,9 @@ func (g *generator) borrowRep(file *gen.File, b *wit.Borrow) string {
 	return g.typeRep(file, b.Type)
 }
 
-func (g *generator) declareFunction(f *wit.Function, owner wit.Ident) (*funcDecl, error) {
-	d := g.functions[f]
-	if d != nil {
+func (g *generator) declareFunction(f *wit.Function, owner wit.Ident) (funcDecl, error) {
+	d, ok := g.functions[f]
+	if ok {
 		return d, nil
 	}
 
@@ -755,7 +755,7 @@ func (g *generator) declareFunction(f *wit.Function, owner wit.Ident) (*funcDecl
 	case *wit.Method:
 		t := f.Type().(*wit.TypeDef)
 		if t.Package().Name.Package != owner.Package {
-			return nil, fmt.Errorf("cannot emit functions in package %s to type %s", owner.Package, t.Package().Name.String())
+			return d, fmt.Errorf("cannot emit functions in package %s to type %s", owner.Package, t.Package().Name.String())
 		}
 		scope := g.typeDefs[t].scope
 		funcName = scope.DeclareName(GoName(f.BaseName(), true))
@@ -767,7 +767,7 @@ func (g *generator) declareFunction(f *wit.Function, owner wit.Ident) (*funcDecl
 		}
 	}
 
-	d = &funcDecl{
+	d = funcDecl{
 		f:     goFunction(file, f, funcName),
 		lift:  goFunction(file, lift, liftName),
 		lower: goFunction(file, lower, lowerName),
