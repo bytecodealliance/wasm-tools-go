@@ -118,6 +118,9 @@ type Interface struct {
 	// The [Package] that this Interface belongs to. It must be non-nil when fully resolved.
 	Package *Package
 	Docs    Docs
+
+	// The [Direction] of this Interface, either [None], [Imported], or [Exported].
+	Direction Direction
 }
 
 // AllFunctions returns a [sequence] that yields each [Function] in an [Interface].
@@ -142,6 +145,9 @@ type TypeDef struct {
 	Kind  TypeDefKind
 	Owner TypeOwner
 	Docs  Docs
+
+	// The [Direction] of this TypeDef, either [None], [Imported], or [Exported].
+	Direction Direction
 }
 
 // TypeName returns the [WIT] type name for t.
@@ -1273,6 +1279,9 @@ type Function struct {
 	Params  []Param // arguments to the function
 	Results []Param // a function can have a single anonymous result, or > 1 named results
 	Docs    Docs
+
+	// The [Direction] of this Function, either [None], [Imported], or [Exported].
+	Direction Direction
 }
 
 // BaseName returns the base name of [Function] f.
