@@ -54,14 +54,8 @@ type generator struct {
 	// witPackages map WIT identifier paths to Go packages.
 	witPackages map[string]*gen.Package
 
-	// typeDefPackages map [wit.TypeDef] to Go packages.
-	typeDefPackages map[*wit.TypeDef]*gen.Package
-
-	// typeDefNames map [wit.TypeDef] to a defined Go name.
-	typeDefNames map[*wit.TypeDef]string
-
-	// typeDefScopes map a [wit.TypeDef] to a [gen.Scope]. Used for method lists.
-	typeDefScopes map[*wit.TypeDef]gen.Scope
+	// typeDefs map [wit.TypeDef] to their Go equivalent.
+	typeDefs map[*wit.TypeDef]typeDecl
 
 	// functions map [wit.Function] to their Go equivalent.
 	functions map[*wit.Function]*funcDecl
@@ -72,13 +66,11 @@ type generator struct {
 
 func newGenerator(res *wit.Resolve, opts ...Option) (*generator, error) {
 	g := &generator{
-		packages:        make(map[string]*gen.Package),
-		witPackages:     make(map[string]*gen.Package),
-		typeDefPackages: make(map[*wit.TypeDef]*gen.Package),
-		typeDefNames:    make(map[*wit.TypeDef]string),
-		typeDefScopes:   make(map[*wit.TypeDef]gen.Scope),
-		functions:       make(map[*wit.Function]*funcDecl),
-		defined:         make(map[any]bool),
+		packages:    make(map[string]*gen.Package),
+		witPackages: make(map[string]*gen.Package),
+		typeDefs:    make(map[*wit.TypeDef]typeDecl),
+		functions:   make(map[*wit.Function]*funcDecl),
+		defined:     make(map[any]bool),
 	}
 	err := g.opts.apply(opts...)
 	if err != nil {
@@ -158,9 +150,11 @@ func (g *generator) declareTypeDef(file *gen.File, goName string, t *wit.TypeDef
 	if file == nil {
 		file = g.fileFor(typeDefOwner(t))
 	}
-	g.typeDefPackages[t] = file.Package
-	g.typeDefNames[t] = file.DeclareName(goName)
-	g.typeDefScopes[t] = gen.NewScope(nil)
+	g.typeDefs[t] = typeDecl{
+		file:  file,
+		name:  file.DeclareName(goName),
+		scope: gen.NewScope(nil),
+	}
 	// fmt.Fprintf(os.Stderr, "Type:\t%s.%s\n\t%s.%s\n", owner.String(), name, decl.Package.Path, decl.Name)
 	return nil
 }
@@ -342,8 +336,8 @@ func (g *generator) defineTypeDef(t *wit.TypeDef, name string) error {
 		name = *t.Name
 	}
 
-	pkg := g.typeDefPackages[t]
-	goName := g.typeDefNames[t]
+	pkg := g.typeDefs[t].file.Package
+	goName := g.typeDefs[t].name
 	if pkg == nil || goName == "" {
 		return fmt.Errorf("TypeDef %s not declared", name)
 	}
@@ -464,8 +458,8 @@ func (g *generator) typeRep(file *gen.File, t wit.Type) string {
 		return "struct{}"
 
 	case *wit.TypeDef:
-		if name, ok := g.typeDefNames[t]; ok {
-			return file.RelativeName(g.typeDefPackages[t], name)
+		if td, ok := g.typeDefs[t]; ok {
+			return file.RelativeName(td.file.Package, td.name)
 		}
 		// FIXME: this is only valid for built-in WIT types.
 		// User-defined types must be named, so the Ident check above must have succeeded.
@@ -748,13 +742,13 @@ func (g *generator) declareFunction(f *wit.Function, owner wit.Ident) (*funcDecl
 
 	case *wit.Constructor:
 		t := f.Type().(*wit.TypeDef)
-		funcName = file.DeclareName("New" + g.typeDefNames[t])
+		funcName = file.DeclareName("New" + g.typeDefs[t].name)
 		liftName = file.DeclareName(pfxLift + funcName)
 		lowerName = file.DeclareName(pfxLower + funcName)
 
 	case *wit.Static:
 		t := f.Type().(*wit.TypeDef)
-		funcName = file.DeclareName(g.typeDefNames[t] + GoName(f.BaseName(), true))
+		funcName = file.DeclareName(g.typeDefs[t].name + GoName(f.BaseName(), true))
 		liftName = file.DeclareName(pfxLift + funcName)
 		lowerName = file.DeclareName(pfxLower + funcName)
 
@@ -763,13 +757,13 @@ func (g *generator) declareFunction(f *wit.Function, owner wit.Ident) (*funcDecl
 		if t.Package().Name.Package != owner.Package {
 			return nil, fmt.Errorf("cannot emit functions in package %s to type %s", owner.Package, t.Package().Name.String())
 		}
-		scope := g.typeDefScopes[t]
+		scope := g.typeDefs[t].scope
 		funcName = scope.DeclareName(GoName(f.BaseName(), true))
-		liftName = file.DeclareName(pfxLift + g.typeDefNames[t] + funcName)
+		liftName = file.DeclareName(pfxLift + g.typeDefs[t].name + funcName)
 		if lower.IsMethod() {
 			lowerName = scope.DeclareName(pfxLower + funcName)
 		} else {
-			lowerName = file.DeclareName(pfxLower + g.typeDefNames[t] + funcName)
+			lowerName = file.DeclareName(pfxLower + g.typeDefs[t].name + funcName)
 		}
 	}
 
@@ -940,14 +934,14 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 
 	// Emit shared types
 	if t, ok := compoundParams.typ.(*wit.TypeDef); ok {
-		goName := g.typeDefNames[t]
+		goName := g.typeDefs[t].name
 		stringio.Write(&b, "// ", goName, " represents the flattened function params for [", d.lower.name, "].\n")
 		stringio.Write(&b, "// See the Canonical ABI flattening rules for more information.\n")
 		stringio.Write(&b, "type ", goName, " ", g.typeDefRep(file, goName, t), "\n\n")
 	}
 
 	if t, ok := compoundResults.typ.(*wit.TypeDef); ok {
-		goName := g.typeDefNames[t]
+		goName := g.typeDefs[t].name
 		stringio.Write(&b, "// ", goName, " represents the flattened function results for [", d.lower.name, "].\n")
 		stringio.Write(&b, "// See the Canonical ABI flattening rules for more information.\n")
 		stringio.Write(&b, "type ", goName, " ", g.typeDefRep(file, goName, t), "\n\n")

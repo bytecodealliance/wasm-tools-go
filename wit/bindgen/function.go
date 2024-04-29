@@ -15,7 +15,7 @@ type funcDecl struct {
 type function struct {
 	file     *gen.File // The Go file this function belongs to
 	scope    gen.Scope // Scope for function-local declarations
-	name     string    // The scoped unique Go name for this function (method names are scoped to recevier type)
+	name     string    // The scoped unique Go name for this function (method names are scoped to receiver type)
 	receiver param     // The method receiver, if any
 	params   []param   // Function param(s), with unique Go name(s)
 	results  []param   // Function result(s), with unique Go name(s)
