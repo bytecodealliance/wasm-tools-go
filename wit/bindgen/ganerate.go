@@ -123,20 +123,6 @@ func typeDefOwner(t *wit.TypeDef) wit.Ident {
 	return id
 }
 
-func (g *generator) defineInterfaces() error {
-	var interfaces []*wit.Interface
-	for _, i := range g.res.Interfaces {
-		if i.Name != nil {
-			interfaces = append(interfaces, i)
-		}
-	}
-	// fmt.Fprintf(os.Stderr, "Generating Go for %d named interface(s)\n", len(interfaces))
-	for _, i := range interfaces {
-		g.defineInterface(i, *i.Name)
-	}
-	return nil
-}
-
 // By default, each WIT interface and world maps to a single Go package.
 // Options might override the Go package, including combining multiple
 // WIT interfaces and/or worlds into a single Go package.
