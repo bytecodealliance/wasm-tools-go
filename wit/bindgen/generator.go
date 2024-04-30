@@ -173,47 +173,6 @@ func (g *generator) detectVersionedPackages() {
 	// }
 }
 
-func (g *generator) declareTypeDef(file *gen.File, goName string, t *wit.TypeDef) (typeDecl, error) {
-	decl, ok := g.typeDefs[t]
-	if ok {
-		return decl, nil
-	}
-	if goName == "" {
-		if t.Name == nil {
-			return decl, nil
-		}
-		goName = GoName(*t.Name, true)
-	}
-	if file == nil {
-		file = g.fileFor(typeDefOwner(t))
-	}
-	decl = typeDecl{
-		file:  file,
-		name:  file.DeclareName(goName),
-		scope: gen.NewScope(nil),
-	}
-	g.typeDefs[t] = decl
-	// fmt.Fprintf(os.Stderr, "Type:\t%s.%s\n\t%s.%s\n", owner.String(), name, decl.Package.Path, decl.Name)
-	return decl, nil
-}
-
-func typeDefOwner(t *wit.TypeDef) wit.Ident {
-	var id wit.Ident
-	switch owner := t.Owner.(type) {
-	case *wit.World:
-		id = owner.Package.Name
-		id.Extension = owner.Name
-	case *wit.Interface:
-		id = owner.Package.Name
-		if owner.Name == nil {
-			id.Extension = "unknown"
-		} else {
-			id.Extension = *owner.Name
-		}
-	}
-	return id
-}
-
 // By default, each WIT interface and world maps to a single Go package.
 // Options might override the Go package, including combining multiple
 // WIT interfaces and/or worlds into a single Go package.
@@ -426,6 +385,47 @@ func (g *generator) defineTypeDef(t *wit.TypeDef, name string) error {
 	}
 
 	return nil
+}
+
+func (g *generator) declareTypeDef(file *gen.File, goName string, t *wit.TypeDef) (typeDecl, error) {
+	decl, ok := g.typeDefs[t]
+	if ok {
+		return decl, nil
+	}
+	if goName == "" {
+		if t.Name == nil {
+			return decl, nil
+		}
+		goName = GoName(*t.Name, true)
+	}
+	if file == nil {
+		file = g.fileFor(typeDefOwner(t))
+	}
+	decl = typeDecl{
+		file:  file,
+		name:  file.DeclareName(goName),
+		scope: gen.NewScope(nil),
+	}
+	g.typeDefs[t] = decl
+	// fmt.Fprintf(os.Stderr, "Type:\t%s.%s\n\t%s.%s\n", owner.String(), name, decl.Package.Path, decl.Name)
+	return decl, nil
+}
+
+func typeDefOwner(t *wit.TypeDef) wit.Ident {
+	var id wit.Ident
+	switch owner := t.Owner.(type) {
+	case *wit.World:
+		id = owner.Package.Name
+		id.Extension = owner.Name
+	case *wit.Interface:
+		id = owner.Package.Name
+		if owner.Name == nil {
+			id.Extension = "unknown"
+		} else {
+			id.Extension = *owner.Name
+		}
+	}
+	return id
 }
 
 func (g *generator) typeDefRep(file *gen.File, goName string, t *wit.TypeDef) string {
