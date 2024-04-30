@@ -227,7 +227,7 @@ func (g *generator) defineWorld(w *wit.World) error {
 			err = g.defineTypeDef(v, name)
 		case *wit.Function:
 			if v.IsFreestanding() {
-				err = g.defineImportedFunction(v, id)
+				err = g.defineFunction(v, id)
 			}
 		}
 		return err == nil
@@ -278,7 +278,7 @@ func (g *generator) defineInterface(i *wit.Interface, name string) error {
 	// Define standalone functions
 	i.Functions.All()(func(_ string, f *wit.Function) bool {
 		if f.IsFreestanding() {
-			g.defineImportedFunction(f, id)
+			g.defineFunction(f, id)
 		}
 		return true
 	})
@@ -357,28 +357,28 @@ func (g *generator) defineTypeDef(t *wit.TypeDef, name string) error {
 
 	// Define any associated functions
 	if f := t.ResourceDrop(); f != nil {
-		err := g.defineImportedFunction(f, owner)
+		err := g.defineFunction(f, owner)
 		if err != nil {
 			return nil
 		}
 	}
 
 	if f := t.Constructor(); f != nil {
-		err := g.defineImportedFunction(f, owner)
+		err := g.defineFunction(f, owner)
 		if err != nil {
 			return nil
 		}
 	}
 
 	for _, f := range t.StaticFunctions() {
-		err := g.defineImportedFunction(f, owner)
+		err := g.defineFunction(f, owner)
 		if err != nil {
 			return nil
 		}
 	}
 
 	for _, f := range t.Methods() {
-		err := g.defineImportedFunction(f, owner)
+		err := g.defineFunction(f, owner)
 		if err != nil {
 			return nil
 		}
@@ -800,7 +800,7 @@ func (g *generator) declareFunction(f *wit.Function, owner wit.Ident) (funcDecl,
 	return d, nil
 }
 
-func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) error {
+func (g *generator) defineFunction(f *wit.Function, owner wit.Ident) error {
 	if g.defined[f] {
 		return nil
 	}
