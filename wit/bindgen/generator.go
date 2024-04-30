@@ -805,42 +805,41 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 		return nil
 	}
 
-	file := g.fileFor(owner)
-
 	// Setup
-	d, err := g.declareFunction(f, owner)
+	decl, err := g.declareFunction(f, owner)
 	if err != nil {
 		return err
 	}
+	file := decl.f.file
 
 	// Bridging between Go and wasmimport function
-	callParams := slices.Clone(d.imported.params)
+	callParams := slices.Clone(decl.imported.params)
 	for i := range callParams {
-		j := i - len(d.f.params)
+		j := i - len(decl.f.params)
 		if j < 0 {
-			callParams[i].name = d.f.params[i].name
+			callParams[i].name = decl.f.params[i].name
 		} else {
-			callParams[i].name = d.f.results[j].name
+			callParams[i].name = decl.f.results[j].name
 		}
 	}
 
 	var compoundParams param
-	if len(d.f.params) > 0 && derefAnonRecord(d.imported.params[0].typ) != nil {
-		name := d.f.scope.DeclareName("params")
+	if len(decl.f.params) > 0 && derefAnonRecord(decl.imported.params[0].typ) != nil {
+		name := decl.f.scope.DeclareName("params")
 		callParams[0].name = name
-		t := derefAnonRecord(d.imported.params[0].typ)
-		g.declareTypeDef(file, d.imported.name+"Params", t)
+		t := derefAnonRecord(decl.imported.params[0].typ)
+		g.declareTypeDef(file, decl.imported.name+"Params", t)
 		compoundParams.name = name
 		compoundParams.typ = t
 	}
 
 	var compoundResults param
 	var resultsRecord *wit.Record
-	if len(d.f.results) > 1 && derefAnonRecord(last(d.imported.params).typ) != nil {
-		name := d.f.scope.DeclareName("results")
+	if len(decl.f.results) > 1 && derefAnonRecord(last(decl.imported.params).typ) != nil {
+		name := decl.f.scope.DeclareName("results")
 		last(callParams).name = name
-		t := derefAnonRecord(last(d.imported.params).typ)
-		g.declareTypeDef(file, d.imported.name+"Results", t)
+		t := derefAnonRecord(last(decl.imported.params).typ)
+		g.declareTypeDef(file, decl.imported.name+"Results", t)
 		compoundResults.name = name
 		compoundResults.typ = t
 		resultsRecord = t.Kind.(*wit.Record)
@@ -849,15 +848,15 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 	var b bytes.Buffer
 
 	// Emit Go function
-	b.WriteString(g.functionDocs(owner, d.f.name, f))
+	b.WriteString(g.functionDocs(owner, decl.f.name, f))
 	b.WriteString("//go:nosplit\n")
-	stringio.Write(&b, "func ", g.functionSignature(file, d.f))
+	stringio.Write(&b, "func ", g.functionSignature(file, decl.f))
 
 	// Emit function body
 	b.WriteString(" {\n")
-	sameResults := slices.Equal(d.f.results, d.imported.results)
-	if len(d.f.results) == 1 && !sameResults {
-		for _, r := range d.f.results {
+	sameResults := slices.Equal(decl.f.results, decl.imported.results)
+	if len(decl.f.results) == 1 && !sameResults {
+		for _, r := range decl.f.results {
 			stringio.Write(&b, "var ", r.name, " ", g.typeRep(file, r.typ), "\n")
 		}
 	}
@@ -865,10 +864,10 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 	// Emit compound types
 	if compoundParams.typ != nil {
 		stringio.Write(&b, compoundParams.name, " := ", g.typeRep(file, compoundParams.typ), "{ ")
-		if d.f.receiver.name != "" {
-			stringio.Write(&b, d.f.receiver.name, ", ")
+		if decl.f.receiver.name != "" {
+			stringio.Write(&b, decl.f.receiver.name, ", ")
 		}
-		for i, p := range d.f.params {
+		for i, p := range decl.f.params {
 			if i > 0 {
 				b.WriteString(", ")
 			}
@@ -881,13 +880,13 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 	}
 
 	// Emit call to wasmimport function
-	if sameResults && len(d.imported.results) > 0 {
+	if sameResults && len(decl.imported.results) > 0 {
 		b.WriteString("return ")
 	}
-	if d.imported.isMethod() {
-		stringio.Write(&b, d.imported.receiver.name, ".")
+	if decl.imported.isMethod() {
+		stringio.Write(&b, decl.imported.receiver.name, ".")
 	}
-	stringio.Write(&b, d.imported.name, "(")
+	stringio.Write(&b, decl.imported.name, "(")
 	for i, p := range callParams {
 		if i > 0 {
 			b.WriteString(", ")
@@ -908,7 +907,7 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 				stringio.Write(&b, compoundResults.name, ".", fieldName(f.Name, false))
 			}
 		} else {
-			for i, r := range d.f.results {
+			for i, r := range decl.f.results {
 				if i > 0 {
 					b.WriteString(", ")
 				}
@@ -923,15 +922,15 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 	stringio.Write(&b, "//go:wasmimport ", owner.String(), " ", f.Name, "\n")
 	b.WriteString("//go:noescape\n")
 	b.WriteString("func ")
-	if d.imported.isMethod() {
-		stringio.Write(&b, "(", d.imported.receiver.name, " ", g.typeRep(file, d.imported.receiver.typ), ") ", d.imported.name)
+	if decl.imported.isMethod() {
+		stringio.Write(&b, "(", decl.imported.receiver.name, " ", g.typeRep(file, decl.imported.receiver.typ), ") ", decl.imported.name)
 	} else {
-		b.WriteString(d.imported.name)
+		b.WriteString(decl.imported.name)
 	}
 	b.WriteRune('(')
 
 	// Emit params
-	for i, p := range d.imported.params {
+	for i, p := range decl.imported.params {
 		if i > 0 {
 			b.WriteString(", ")
 		}
@@ -940,11 +939,11 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 	b.WriteString(") ")
 
 	// Emit results
-	if len(d.imported.results) == 1 {
-		b.WriteString(g.typeRep(file, d.imported.results[0].typ))
-	} else if len(d.imported.results) > 0 {
+	if len(decl.imported.results) == 1 {
+		b.WriteString(g.typeRep(file, decl.imported.results[0].typ))
+	} else if len(decl.imported.results) > 0 {
 		b.WriteRune('(')
-		for i, r := range d.imported.results {
+		for i, r := range decl.imported.results {
 			if i > 0 {
 				b.WriteString(", ")
 			}
@@ -957,14 +956,14 @@ func (g *generator) defineImportedFunction(f *wit.Function, owner wit.Ident) err
 	// Emit shared types
 	if t, ok := compoundParams.typ.(*wit.TypeDef); ok {
 		goName := g.typeDefs[t].name
-		stringio.Write(&b, "// ", goName, " represents the flattened function params for [", d.imported.name, "].\n")
+		stringio.Write(&b, "// ", goName, " represents the flattened function params for [", decl.imported.name, "].\n")
 		stringio.Write(&b, "// See the Canonical ABI flattening rules for more information.\n")
 		stringio.Write(&b, "type ", goName, " ", g.typeDefRep(file, goName, t), "\n\n")
 	}
 
 	if t, ok := compoundResults.typ.(*wit.TypeDef); ok {
 		goName := g.typeDefs[t].name
-		stringio.Write(&b, "// ", goName, " represents the flattened function results for [", d.imported.name, "].\n")
+		stringio.Write(&b, "// ", goName, " represents the flattened function results for [", decl.imported.name, "].\n")
 		stringio.Write(&b, "// See the Canonical ABI flattening rules for more information.\n")
 		stringio.Write(&b, "type ", goName, " ", g.typeDefRep(file, goName, t), "\n\n")
 	}
