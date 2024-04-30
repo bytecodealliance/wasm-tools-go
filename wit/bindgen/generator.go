@@ -490,13 +490,13 @@ func (g *generator) typeRep(file *gen.File, t wit.Type) string {
 		// TODO: add wit.Type.BuiltIn() method?
 		return g.typeDefRep(file, "", t)
 	case wit.Primitive:
-		return g.primitiveRep(file, t)
+		return g.primitiveRep(t)
 	default:
 		panic(fmt.Sprintf("BUG: unknown wit.Type %T", t)) // should never reach here
 	}
 }
 
-func (g *generator) primitiveRep(file *gen.File, p wit.Primitive) string {
+func (g *generator) primitiveRep(p wit.Primitive) string {
 	switch p := p.(type) {
 	case wit.Bool:
 		return "bool"
