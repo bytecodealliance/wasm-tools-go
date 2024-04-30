@@ -227,7 +227,7 @@ func (g *generator) defineWorld(w *wit.World) error {
 			err = g.defineTypeDef(v, name)
 		case *wit.Function:
 			if v.IsFreestanding() {
-				err = g.defineFunction(v, id)
+				err = g.defineFunction(id, v)
 			}
 		}
 		return err == nil
@@ -271,14 +271,14 @@ func (g *generator) defineInterface(i *wit.Interface, name string) error {
 
 	// Declare all functions
 	i.Functions.All()(func(_ string, f *wit.Function) bool {
-		g.declareFunction(f, id)
+		g.declareFunction(id, f)
 		return true
 	})
 
 	// Define standalone functions
 	i.Functions.All()(func(_ string, f *wit.Function) bool {
 		if f.IsFreestanding() {
-			g.defineFunction(f, id)
+			g.defineFunction(id, f)
 		}
 		return true
 	})
@@ -357,28 +357,28 @@ func (g *generator) defineTypeDef(t *wit.TypeDef, name string) error {
 
 	// Define any associated functions
 	if f := t.ResourceDrop(); f != nil {
-		err := g.defineFunction(f, owner)
+		err := g.defineFunction(owner, f)
 		if err != nil {
 			return nil
 		}
 	}
 
 	if f := t.Constructor(); f != nil {
-		err := g.defineFunction(f, owner)
+		err := g.defineFunction(owner, f)
 		if err != nil {
 			return nil
 		}
 	}
 
 	for _, f := range t.StaticFunctions() {
-		err := g.defineFunction(f, owner)
+		err := g.defineFunction(owner, f)
 		if err != nil {
 			return nil
 		}
 	}
 
 	for _, f := range t.Methods() {
-		err := g.defineFunction(f, owner)
+		err := g.defineFunction(owner, f)
 		if err != nil {
 			return nil
 		}
@@ -736,7 +736,7 @@ func (g *generator) borrowRep(file *gen.File, b *wit.Borrow) string {
 	return g.typeRep(file, b.Type)
 }
 
-func (g *generator) declareFunction(f *wit.Function, owner wit.Ident) (funcDecl, error) {
+func (g *generator) declareFunction(owner wit.Ident, f *wit.Function) (funcDecl, error) {
 	d, ok := g.functions[f]
 	if ok {
 		return d, nil
@@ -800,13 +800,13 @@ func (g *generator) declareFunction(f *wit.Function, owner wit.Ident) (funcDecl,
 	return d, nil
 }
 
-func (g *generator) defineFunction(f *wit.Function, owner wit.Ident) error {
+func (g *generator) defineFunction(owner wit.Ident, f *wit.Function) error {
 	if g.defined[f] {
 		return nil
 	}
 
 	// Setup
-	decl, err := g.declareFunction(f, owner)
+	decl, err := g.declareFunction(owner, f)
 	if err != nil {
 		return err
 	}
