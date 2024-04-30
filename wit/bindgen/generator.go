@@ -140,17 +140,10 @@ func newGenerator(res *wit.Resolve, opts ...Option) (*generator, error) {
 
 func (g *generator) generate() ([]*gen.Package, error) {
 	g.detectVersionedPackages()
-
-	err := g.declareTypeDefs()
+	err := g.defineWorlds()
 	if err != nil {
 		return nil, err
 	}
-
-	err = g.defineWorlds()
-	if err != nil {
-		return nil, err
-	}
-
 	var packages []*gen.Package
 	for _, path := range codec.SortedKeys(g.packages) {
 		packages = append(packages, g.packages[path])
@@ -180,34 +173,28 @@ func (g *generator) detectVersionedPackages() {
 	// }
 }
 
-// declareTypeDefs declares all type definitions in res.
-func (g *generator) declareTypeDefs() error {
-	for _, t := range g.res.TypeDefs {
-		err := g.declareTypeDef(nil, "", t)
-		if err != nil {
-			return err
-		}
+func (g *generator) declareTypeDef(file *gen.File, goName string, t *wit.TypeDef) (typeDecl, error) {
+	decl, ok := g.typeDefs[t]
+	if ok {
+		return decl, nil
 	}
-	return nil
-}
-
-func (g *generator) declareTypeDef(file *gen.File, goName string, t *wit.TypeDef) error {
 	if goName == "" {
 		if t.Name == nil {
-			return nil
+			return decl, nil
 		}
 		goName = GoName(*t.Name, true)
 	}
 	if file == nil {
 		file = g.fileFor(typeDefOwner(t))
 	}
-	g.typeDefs[t] = typeDecl{
+	decl = typeDecl{
 		file:  file,
 		name:  file.DeclareName(goName),
 		scope: gen.NewScope(nil),
 	}
+	g.typeDefs[t] = decl
 	// fmt.Fprintf(os.Stderr, "Type:\t%s.%s\n\t%s.%s\n", owner.String(), name, decl.Package.Path, decl.Name)
-	return nil
+	return decl, nil
 }
 
 func typeDefOwner(t *wit.TypeDef) wit.Ident {
@@ -373,13 +360,11 @@ func (g *generator) defineTypeDef(t *wit.TypeDef, name string) error {
 		name = *t.Name
 	}
 
-	pkg := g.typeDefs[t].file.Package
-	goName := g.typeDefs[t].name
-	if pkg == nil || goName == "" {
-		return fmt.Errorf("TypeDef %s not declared", name)
+	decl, err := g.declareTypeDef(nil, "", t)
+	if err != nil {
+		return err
 	}
 	owner := typeDefOwner(t)
-	file := g.fileFor(owner)
 
 	// If an alias, get root
 	root := t.Root()
@@ -391,20 +376,20 @@ func (g *generator) defineTypeDef(t *wit.TypeDef, name string) error {
 
 	// Define the type
 	var b bytes.Buffer
-	stringio.Write(&b, "// ", goName, " represents the ", root.WITKind(), " \"", rootOwner.String(), "#", rootName, "\".\n")
+	stringio.Write(&b, "// ", decl.name, " represents the ", root.WITKind(), " \"", rootOwner.String(), "#", rootName, "\".\n")
 	b.WriteString("//\n")
 	if root != t {
 		// Type alias
-		stringio.Write(&b, "// See [", g.typeRep(file, root), "] for more information.\n")
-		stringio.Write(&b, "type ", goName, " = ", g.typeRep(file, root), "\n\n")
+		stringio.Write(&b, "// See [", g.typeRep(decl.file, root), "] for more information.\n")
+		stringio.Write(&b, "type ", decl.name, " = ", g.typeRep(decl.file, root), "\n\n")
 	} else {
 		b.WriteString(formatDocComments(t.Docs.Contents, false))
 		b.WriteString("//\n")
 		b.WriteString(formatDocComments(t.WIT(nil, ""), true))
-		stringio.Write(&b, "type ", goName, " ", g.typeDefRep(file, goName, t), "\n\n")
+		stringio.Write(&b, "type ", decl.name, " ", g.typeDefRep(decl.file, decl.name, t), "\n\n")
 	}
 
-	_, err := file.Write(b.Bytes())
+	_, err = decl.file.Write(b.Bytes())
 	if err != nil {
 		return err
 	}
