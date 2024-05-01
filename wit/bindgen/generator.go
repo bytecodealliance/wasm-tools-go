@@ -319,7 +319,7 @@ func (g *generator) defineTypeDef(t *wit.TypeDef, name string) error {
 		name = *t.Name
 	}
 
-	decl, err := g.declareTypeDef(nil, "", t)
+	decl, err := g.declareTypeDef(nil, t, "")
 	if err != nil {
 		return err
 	}
@@ -345,7 +345,7 @@ func (g *generator) defineTypeDef(t *wit.TypeDef, name string) error {
 		b.WriteString(formatDocComments(t.Docs.Contents, false))
 		b.WriteString("//\n")
 		b.WriteString(formatDocComments(t.WIT(nil, ""), true))
-		stringio.Write(&b, "type ", decl.name, " ", g.typeDefRep(decl.file, decl.name, t), "\n\n")
+		stringio.Write(&b, "type ", decl.name, " ", g.typeDefRep(decl.file, t, decl.name), "\n\n")
 	}
 
 	_, err = decl.file.Write(b.Bytes())
@@ -387,7 +387,7 @@ func (g *generator) defineTypeDef(t *wit.TypeDef, name string) error {
 	return nil
 }
 
-func (g *generator) declareTypeDef(file *gen.File, goName string, t *wit.TypeDef) (typeDecl, error) {
+func (g *generator) declareTypeDef(file *gen.File, t *wit.TypeDef, goName string) (typeDecl, error) {
 	decl, ok := g.typeDefs[t]
 	if ok {
 		return decl, nil
@@ -428,26 +428,26 @@ func typeDefOwner(t *wit.TypeDef) wit.Ident {
 	return id
 }
 
-func (g *generator) typeDefRep(file *gen.File, goName string, t *wit.TypeDef) string {
-	return g.typeDefKindRep(file, goName, t.Kind)
+func (g *generator) typeDefRep(file *gen.File, t *wit.TypeDef, goName string) string {
+	return g.typeDefKindRep(file, t.Kind, goName)
 }
 
-func (g *generator) typeDefKindRep(file *gen.File, goName string, kind wit.TypeDefKind) string {
+func (g *generator) typeDefKindRep(file *gen.File, kind wit.TypeDefKind, goName string) string {
 	switch kind := kind.(type) {
 	case *wit.Pointer:
 		return g.pointerRep(file, kind)
 	case wit.Type:
 		return g.typeRep(file, kind)
 	case *wit.Record:
-		return g.recordRep(file, goName, kind)
+		return g.recordRep(file, kind, goName)
 	case *wit.Tuple:
 		return g.tupleRep(file, kind)
 	case *wit.Flags:
-		return g.flagsRep(file, goName, kind)
+		return g.flagsRep(file, kind, goName)
 	case *wit.Enum:
-		return g.enumRep(file, goName, kind)
+		return g.enumRep(file, kind, goName)
 	case *wit.Variant:
-		return g.variantRep(file, goName, kind)
+		return g.variantRep(file, kind, goName)
 	case *wit.Result:
 		return g.resultRep(file, kind)
 	case *wit.Option:
@@ -488,7 +488,7 @@ func (g *generator) typeRep(file *gen.File, t wit.Type) string {
 		// See https://component-model.bytecodealliance.org/design/wit.html#built-in-types
 		// and https://component-model.bytecodealliance.org/design/wit.html#user-defined-types.
 		// TODO: add wit.Type.BuiltIn() method?
-		return g.typeDefRep(file, "", t)
+		return g.typeDefRep(file, t, "")
 	case wit.Primitive:
 		return g.primitiveRep(t)
 	default:
@@ -529,7 +529,7 @@ func (g *generator) primitiveRep(p wit.Primitive) string {
 	}
 }
 
-func (g *generator) recordRep(file *gen.File, goName string, r *wit.Record) string {
+func (g *generator) recordRep(file *gen.File, r *wit.Record, goName string) string {
 	exported := token.IsExported(goName)
 	var b strings.Builder
 	b.WriteString("struct {")
@@ -562,7 +562,7 @@ func (g *generator) tupleRep(file *gen.File, t *wit.Tuple) string {
 		stringio.Write(&b, "[", strconv.Itoa(len(t.Types)), "]", g.typeRep(file, typ))
 	} else if len(t.Types) == 0 || len(t.Types) > cm.MaxTuple {
 		// Force struct representation
-		return g.typeDefKindRep(file, "", t.Despecialize())
+		return g.typeDefKindRep(file, t.Despecialize(), "")
 	} else {
 		stringio.Write(&b, file.Import(g.opts.cmPackage), ".Tuple")
 		if len(t.Types) > 2 {
@@ -580,7 +580,7 @@ func (g *generator) tupleRep(file *gen.File, t *wit.Tuple) string {
 	return b.String()
 }
 
-func (g *generator) flagsRep(file *gen.File, goName string, flags *wit.Flags) string {
+func (g *generator) flagsRep(file *gen.File, flags *wit.Flags, goName string) string {
 	var b strings.Builder
 
 	// FIXME: this isn't ideal
@@ -618,7 +618,7 @@ func (g *generator) flagsRep(file *gen.File, goName string, flags *wit.Flags) st
 	return b.String()
 }
 
-func (g *generator) enumRep(file *gen.File, goName string, e *wit.Enum) string {
+func (g *generator) enumRep(file *gen.File, e *wit.Enum, goName string) string {
 	var b strings.Builder
 	disc := wit.Discriminant(len(e.Cases))
 	b.WriteString(g.typeRep(file, disc))
@@ -641,10 +641,10 @@ func (g *generator) enumRep(file *gen.File, goName string, e *wit.Enum) string {
 	return b.String()
 }
 
-func (g *generator) variantRep(file *gen.File, goName string, v *wit.Variant) string {
+func (g *generator) variantRep(file *gen.File, v *wit.Variant, goName string) string {
 	// If the variant has no associated types, represent the variant as an enum.
 	if e := v.Enum(); e != nil {
-		return g.enumRep(file, goName, e)
+		return g.enumRep(file, e, goName)
 	}
 
 	disc := wit.Discriminant(len(v.Cases))
@@ -828,7 +828,7 @@ func (g *generator) defineFunction(owner wit.Ident, f *wit.Function) error {
 		name := decl.f.scope.DeclareName("params")
 		callParams[0].name = name
 		t := derefAnonRecord(decl.imported.params[0].typ)
-		g.declareTypeDef(file, decl.imported.name+"Params", t)
+		g.declareTypeDef(file, t, decl.imported.name+"Params")
 		compoundParams.name = name
 		compoundParams.typ = t
 	}
@@ -839,7 +839,7 @@ func (g *generator) defineFunction(owner wit.Ident, f *wit.Function) error {
 		name := decl.f.scope.DeclareName("results")
 		last(callParams).name = name
 		t := derefAnonRecord(last(decl.imported.params).typ)
-		g.declareTypeDef(file, decl.imported.name+"Results", t)
+		g.declareTypeDef(file, t, decl.imported.name+"Results")
 		compoundResults.name = name
 		compoundResults.typ = t
 		resultsRecord = t.Kind.(*wit.Record)
@@ -848,7 +848,7 @@ func (g *generator) defineFunction(owner wit.Ident, f *wit.Function) error {
 	var b bytes.Buffer
 
 	// Emit Go function
-	b.WriteString(g.functionDocs(owner, decl.f.name, f))
+	b.WriteString(g.functionDocs(owner, f, decl.f.name))
 	b.WriteString("//go:nosplit\n")
 	stringio.Write(&b, "func ", g.functionSignature(file, decl.f))
 
@@ -958,14 +958,14 @@ func (g *generator) defineFunction(owner wit.Ident, f *wit.Function) error {
 		goName := g.typeDefs[t].name
 		stringio.Write(&b, "// ", goName, " represents the flattened function params for [", decl.imported.name, "].\n")
 		stringio.Write(&b, "// See the Canonical ABI flattening rules for more information.\n")
-		stringio.Write(&b, "type ", goName, " ", g.typeDefRep(file, goName, t), "\n\n")
+		stringio.Write(&b, "type ", goName, " ", g.typeDefRep(file, t, goName), "\n\n")
 	}
 
 	if t, ok := compoundResults.typ.(*wit.TypeDef); ok {
 		goName := g.typeDefs[t].name
 		stringio.Write(&b, "// ", goName, " represents the flattened function results for [", decl.imported.name, "].\n")
 		stringio.Write(&b, "// See the Canonical ABI flattening rules for more information.\n")
-		stringio.Write(&b, "type ", goName, " ", g.typeDefRep(file, goName, t), "\n\n")
+		stringio.Write(&b, "type ", goName, " ", g.typeDefRep(file, t, goName), "\n\n")
 	}
 
 	// Write to file
@@ -1048,7 +1048,7 @@ func derefAnonRecord(t wit.Type) *wit.TypeDef {
 	return nil
 }
 
-func (g *generator) functionDocs(owner wit.Ident, goName string, f *wit.Function) string {
+func (g *generator) functionDocs(owner wit.Ident, f *wit.Function, goName string) string {
 	var b strings.Builder
 	kind := f.WITKind()
 	if f.IsAdmin() {
