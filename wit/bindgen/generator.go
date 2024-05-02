@@ -849,10 +849,12 @@ func (g *generator) defineFunction(owner wit.Ident, dir wit.Direction, f *wit.Fu
 
 	var b bytes.Buffer
 
+	// Emit docs
+	b.WriteString(g.functionDocs(owner, dir, f, decl.f.name))
+
 	switch dir {
 	case wit.Imported:
 		// Emit Go function
-		b.WriteString(g.functionDocs(owner, dir, f, decl.f.name))
 		b.WriteString("//go:nosplit\n")
 		b.WriteString("func ")
 		if decl.f.isMethod() {
@@ -937,37 +939,16 @@ func (g *generator) defineFunction(owner wit.Ident, dir wit.Direction, f *wit.Fu
 		} else {
 			b.WriteString(decl.wasm.name)
 		}
-		b.WriteRune('(')
-
-		// Emit params
-		for i, p := range decl.wasm.params {
-			if i > 0 {
-				b.WriteString(", ")
-			}
-			stringio.Write(&b, p.name, " ", g.typeRep(file, dir, p.typ))
-		}
-		b.WriteString(") ")
-
-		// Emit results
-		if len(decl.wasm.results) == 1 {
-			b.WriteString(g.typeRep(file, dir, decl.wasm.results[0].typ))
-		} else if len(decl.wasm.results) > 0 {
-			b.WriteRune('(')
-			for i, r := range decl.wasm.results {
-				if i > 0 {
-					b.WriteString(", ")
-				}
-				stringio.Write(&b, r.name, " ", g.typeRep(file, dir, r.typ))
-			}
-			b.WriteRune(')')
-		}
-		b.WriteString("\n\n")
+		b.WriteString(g.functionSignature(file, dir, decl.wasm))
 
 	case wit.Exported:
 		// TODO
+
 	default:
 		panic("BUG: unknown direction " + dir.String())
 	}
+
+	b.WriteString("\n\n")
 
 	// Emit shared types
 	if t, ok := compoundParams.typ.(*wit.TypeDef); ok {
