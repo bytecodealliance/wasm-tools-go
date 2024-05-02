@@ -311,29 +311,6 @@ func (g *generator) defineInterface(dir wit.Direction, i *wit.Interface, name st
 		return true
 	})
 
-	// Define export interface
-	if g.opts.exports {
-		var b bytes.Buffer
-		stringio.Write(&b, "type ", pkg.GetName("Interface"), " interface {\n")
-
-		i.Functions.All()(func(_ string, f *wit.Function) bool {
-			if !f.IsMethod() {
-				decl := g.functions[dir][f]
-				stringio.Write(&b, g.functionSignature(file, dir, decl.f), "\n")
-			}
-			return true
-		})
-
-		b.WriteString("}\n\n")
-		stringio.Write(&b, "var ", pkg.GetName("instance"), " ", pkg.GetName("Interface"), "\n\n")
-
-		// TODO: enable writing exports interface
-		_, err := file.Write(b.Bytes())
-		if err != nil {
-			return err
-		}
-	}
-
 	return nil
 }
 
