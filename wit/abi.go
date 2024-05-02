@@ -89,29 +89,29 @@ type Direction int
 // String implements the Stringer interface.
 func (dir Direction) String() string {
 	switch dir {
-	case Exported:
-		return "exported"
 	case Imported:
 		return "imported"
+	case Exported:
+		return "exported"
 	default:
 		return strconv.Itoa(int(dir))
 	}
 }
 
 const (
-	// Exported represents types and functions exported from a component to the host or another component.
-	// This corresponds to the Canonical ABI [lift] operation, lifting Component Model types out of linear memory.
-	// Used for exporting functions using //go:wasmexport.
-	//
-	// [lift]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#canon-lift
-	Exported Direction = 0
-
 	// Exported represents types and functions imported into a component from the host or another component.
 	// This corresponds to the the Canonical ABI [lower] operation, lowering Component Model types into linear memory.
 	// Used for calling functions imported using //go:wasmimport.
 	//
 	// [lower]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#canon-lower
-	Imported Direction = 1
+	Imported Direction = 0
+
+	// Exported represents types and functions exported from a component to the host or another component.
+	// This corresponds to the Canonical ABI [lift] operation, lifting Component Model types out of linear memory.
+	// Used for exporting functions using //go:wasmexport.
+	//
+	// [lift]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#canon-lift
+	Exported Direction = 1
 )
 
 // ResourceDrop returns the implied [resource-drop] method for t.
