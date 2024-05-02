@@ -5,6 +5,7 @@ package bindgen
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"go/token"
 	"path/filepath"
@@ -143,14 +144,6 @@ func newGenerator(res *wit.Resolve, opts ...Option) (*generator, error) {
 	return g, nil
 }
 
-func (g *generator) define(dir wit.Direction, v any) (defined bool) {
-	if g.defined[dir][v] {
-		return false
-	}
-	g.defined[dir][v] = true
-	return true
-}
-
 func (g *generator) generate() ([]*gen.Package, error) {
 	g.detectVersionedPackages()
 	err := g.defineWorlds()
@@ -184,6 +177,16 @@ func (g *generator) detectVersionedPackages() {
 	// if g.versioned {
 	// 	fmt.Fprintf(os.Stderr, "Multiple versions of package(s) detected\n")
 	// }
+}
+
+// define marks a world, interface, type, or function as defined.
+// It returns true if was newly defined.
+func (g *generator) define(dir wit.Direction, v any) (defined bool) {
+	if g.defined[dir][v] {
+		return false
+	}
+	g.defined[dir][v] = true
+	return true
 }
 
 // By default, each WIT interface and world maps to a single Go package.
@@ -241,6 +244,24 @@ func (g *generator) defineWorld(w *wit.World) error {
 		case *wit.Function:
 			if v.IsFreestanding() {
 				err = g.defineFunction(id, wit.Imported, v)
+			}
+		}
+		return err == nil
+	})
+	if err != nil {
+		return err
+	}
+
+	w.Exports.All()(func(name string, v wit.WorldItem) bool {
+		switch v := v.(type) {
+		case *wit.Interface:
+			err = g.defineInterface(wit.Exported, v, name)
+		case *wit.TypeDef:
+			// WIT does not currently allow worlds to export types.
+			err = errors.New("exported type in world " + w.Name)
+		case *wit.Function:
+			if v.IsFreestanding() {
+				err = g.defineFunction(id, wit.Exported, v)
 			}
 		}
 		return err == nil
@@ -415,6 +436,14 @@ func (g *generator) declareTypeDef(file *gen.File, dir wit.Direction, t *wit.Typ
 	return decl, nil
 }
 
+func (g *generator) typeDecl(dir wit.Direction, t *wit.TypeDef) (typeDecl, bool) {
+	decl, ok := g.types[dir][t]
+	if !ok && dir == wit.Exported {
+		decl, ok = g.types[wit.Imported][t]
+	}
+	return decl, ok
+}
+
 func typeDefOwner(t *wit.TypeDef) wit.Ident {
 	var id wit.Ident
 	switch owner := t.Owner.(type) {
@@ -484,7 +513,7 @@ func (g *generator) typeRep(file *gen.File, dir wit.Direction, t wit.Type) strin
 		return "struct{}"
 
 	case *wit.TypeDef:
-		if decl, ok := g.types[dir][t]; ok {
+		if decl, ok := g.typeDecl(dir, t); ok {
 			return file.RelativeName(decl.file.Package, decl.name)
 		}
 		// FIXME: this is only valid for built-in WIT types.
@@ -768,21 +797,21 @@ func (g *generator) declareFunction(owner wit.Ident, dir wit.Direction, f *wit.F
 
 	case *wit.Constructor:
 		t := f.Type().(*wit.TypeDef)
-		decl := g.types[dir][t]
+		decl, _ := g.typeDecl(dir, t)
 		funcName = file.DeclareName("New" + decl.name)
 		exportName = file.DeclareName(pfxExport + funcName)
 		importName = file.DeclareName(pfxImport + funcName)
 
 	case *wit.Static:
 		t := f.Type().(*wit.TypeDef)
-		decl := g.types[dir][t]
+		decl, _ := g.typeDecl(dir, t)
 		funcName = file.DeclareName(decl.name + GoName(f.BaseName(), true))
 		exportName = file.DeclareName(pfxExport + funcName)
 		importName = file.DeclareName(pfxImport + funcName)
 
 	case *wit.Method:
 		t := f.Type().(*wit.TypeDef)
-		decl := g.types[dir][t]
+		decl, _ := g.typeDecl(dir, t)
 		if t.Package().Name.Package != owner.Package {
 			return d, fmt.Errorf("cannot emit functions in package %s to type %s", owner.Package, t.Package().Name.String())
 		}
@@ -807,7 +836,7 @@ func (g *generator) declareFunction(owner wit.Ident, dir wit.Direction, f *wit.F
 }
 
 func (g *generator) defineFunction(owner wit.Ident, dir wit.Direction, f *wit.Function) error {
-	if g.defined[dir][f] {
+	if !g.define(dir, f) {
 		return nil
 	}
 
@@ -961,23 +990,21 @@ func (g *generator) defineFunction(owner wit.Ident, dir wit.Direction, f *wit.Fu
 
 	// Emit shared types
 	if t, ok := compoundParams.typ.(*wit.TypeDef); ok {
-		goName := g.types[dir][t].name
-		stringio.Write(&b, "// ", goName, " represents the flattened function params for [", decl.imported.name, "].\n")
+		td, _ := g.typeDecl(dir, t)
+		stringio.Write(&b, "// ", td.name, " represents the flattened function params for [", decl.imported.name, "].\n")
 		stringio.Write(&b, "// See the Canonical ABI flattening rules for more information.\n")
-		stringio.Write(&b, "type ", goName, " ", g.typeDefRep(file, dir, t, goName), "\n\n")
+		stringio.Write(&b, "type ", td.name, " ", g.typeDefRep(file, dir, t, td.name), "\n\n")
 	}
 
 	if t, ok := compoundResults.typ.(*wit.TypeDef); ok {
-		goName := g.types[dir][t].name
-		stringio.Write(&b, "// ", goName, " represents the flattened function results for [", decl.imported.name, "].\n")
+		td, _ := g.typeDecl(dir, t)
+		stringio.Write(&b, "// ", td.name, " represents the flattened function results for [", decl.imported.name, "].\n")
 		stringio.Write(&b, "// See the Canonical ABI flattening rules for more information.\n")
-		stringio.Write(&b, "type ", goName, " ", g.typeDefRep(file, dir, t, goName), "\n\n")
+		stringio.Write(&b, "type ", td.name, " ", g.typeDefRep(file, dir, t, td.name), "\n\n")
 	}
 
 	// Write to file
 	file.Write(b.Bytes())
-
-	g.defined[dir][f] = true
 
 	return g.ensureEmptyAsm(file.Package)
 }
