@@ -63,7 +63,7 @@ type param struct {
 	typ  wit.Type
 }
 
-func goFunction(file *gen.File, f *wit.Function, goName string) function {
+func goFunction(file *gen.File, dir wit.Direction, f *wit.Function, goName string) function {
 	scope := gen.NewScope(file)
 	out := function{
 		file:    file,
@@ -75,7 +75,7 @@ func goFunction(file *gen.File, f *wit.Function, goName string) function {
 	if len(out.results) == 1 && out.results[0].name == "" {
 		out.results[0].name = "result"
 	}
-	if f.IsMethod() {
+	if dir == wit.Imported && f.IsMethod() {
 		out.receiver = out.params[0]
 		out.params = out.params[1:]
 	}
@@ -404,12 +404,23 @@ func (g *generator) declareTypeDef(file *gen.File, dir wit.Direction, t *wit.Typ
 	}
 	decl = typeDecl{
 		file:  file,
-		name:  file.DeclareName(goName),
+		name:  g.declareDirectedName(file, dir, goName),
 		scope: gen.NewScope(nil),
 	}
 	g.types[dir][t] = decl
 	// fmt.Fprintf(os.Stderr, "Type:\t%s.%s\n\t%s.%s\n", owner.String(), name, decl.Package.Path, decl.Name)
 	return decl, nil
+}
+
+func (g *generator) declareDirectedName(file *gen.File, dir wit.Direction, name string) string {
+	if dir == wit.Exported && file.HasName(name) {
+		if token.IsExported(name) {
+			// Go exported, not WIT exported!
+			return file.DeclareName("Export" + name)
+		}
+		return file.DeclareName("export" + name)
+	}
+	return file.DeclareName(name)
 }
 
 func (g *generator) typeDecl(dir wit.Direction, t *wit.TypeDef) (typeDecl, bool) {
@@ -746,9 +757,9 @@ func (g *generator) borrowRep(file *gen.File, dir wit.Direction, b *wit.Borrow) 
 }
 
 func (g *generator) declareFunction(owner wit.Ident, dir wit.Direction, f *wit.Function) (funcDecl, error) {
-	d, ok := g.functions[dir][f]
+	fd, ok := g.functions[dir][f]
 	if ok {
-		return d, nil
+		return fd, nil
 	}
 
 	// Setup
@@ -763,43 +774,55 @@ func (g *generator) declareFunction(owner wit.Ident, dir wit.Direction, f *wit.F
 	var wasmName string
 	switch f.Kind.(type) {
 	case *wit.Freestanding:
-		funcName = file.DeclareName(GoName(f.BaseName(), true))
-		wasmName = file.DeclareName(pfx + funcName)
+		baseName := GoName(f.BaseName(), true)
+		funcName = g.declareDirectedName(file, dir, baseName)
+		wasmName = file.DeclareName(pfx + baseName)
 
 	case *wit.Constructor:
 		t := f.Type().(*wit.TypeDef)
-		decl, _ := g.typeDecl(dir, t)
-		funcName = file.DeclareName("New" + decl.name)
-		wasmName = file.DeclareName(pfx + funcName)
+		td, _ := g.typeDecl(dir, t)
+		baseName := "New" + td.name
+		funcName = g.declareDirectedName(file, dir, baseName)
+		wasmName = file.DeclareName(pfx + baseName)
 
 	case *wit.Static:
 		t := f.Type().(*wit.TypeDef)
-		decl, _ := g.typeDecl(dir, t)
-		funcName = file.DeclareName(decl.name + GoName(f.BaseName(), true))
-		wasmName = file.DeclareName(pfx + funcName)
+		td, _ := g.typeDecl(dir, t)
+		baseName := td.name + GoName(f.BaseName(), true)
+		funcName = g.declareDirectedName(file, dir, baseName)
+		wasmName = file.DeclareName(pfx + baseName)
 
 	case *wit.Method:
 		t := f.Type().(*wit.TypeDef)
-		decl, _ := g.typeDecl(dir, t)
+		td, _ := g.typeDecl(dir, t)
 		if t.Package().Name.Package != owner.Package {
-			return d, fmt.Errorf("cannot emit functions in package %s to type %s", owner.Package, t.Package().Name.String())
+			return fd, fmt.Errorf("cannot emit functions in package %s to type %s", owner.Package, t.Package().Name.String())
 		}
-		funcName = decl.scope.DeclareName(GoName(f.BaseName(), true))
-		if wasm.IsMethod() {
-			wasmName = decl.scope.DeclareName(pfx + funcName)
-		} else {
-			wasmName = file.DeclareName(pfx + decl.name + funcName)
+		switch dir {
+		case wit.Imported:
+			funcName = td.scope.DeclareName(GoName(f.BaseName(), true))
+			if wasm.IsMethod() {
+				wasmName = td.scope.DeclareName(pfx + funcName)
+			} else {
+				wasmName = file.DeclareName(pfx + td.name + funcName)
+			}
+		case wit.Exported:
+			baseName := td.name + GoName(f.BaseName(), true)
+			funcName = g.declareDirectedName(file, dir, baseName)
+			wasmName = file.DeclareName(pfx + baseName)
+		default:
+			panic("BUG: unknown direction " + dir.String())
 		}
 	}
 
-	d = funcDecl{
-		f:    goFunction(file, f, funcName),
-		wasm: goFunction(file, wasm, wasmName),
+	fd = funcDecl{
+		f:    goFunction(file, dir, f, funcName),
+		wasm: goFunction(file, dir, wasm, wasmName),
 	}
 
-	g.functions[dir][f] = d
+	g.functions[dir][f] = fd
 
-	return d, nil
+	return fd, nil
 }
 
 func (g *generator) defineFunction(owner wit.Ident, dir wit.Direction, f *wit.Function) error {
@@ -942,7 +965,10 @@ func (g *generator) defineFunction(owner wit.Ident, dir wit.Direction, f *wit.Fu
 		b.WriteString(g.functionSignature(file, dir, decl.wasm))
 
 	case wit.Exported:
-		// TODO
+		// Emit Go variable of type func
+		stringio.Write(&b, "var ", decl.f.name, " func", g.functionSignature(file, dir, decl.f), "\n\n")
+
+		// TODO: wasmexport function
 
 	default:
 		panic("BUG: unknown direction " + dir.String())
@@ -1042,7 +1068,7 @@ func (g *generator) functionDocs(owner wit.Ident, dir wit.Direction, f *wit.Func
 	var b strings.Builder
 	kind := f.WITKind()
 	if f.IsAdmin() {
-		kind = "the Canonical ABI function"
+		kind = "Canonical ABI function"
 	}
 	stringio.Write(&b, "// ", goName, " represents the ", dir.String(), " ", kind, " \"")
 	if f.IsFreestanding() {
