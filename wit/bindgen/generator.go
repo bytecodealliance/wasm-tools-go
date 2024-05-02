@@ -38,9 +38,8 @@ type typeDecl struct {
 }
 
 type funcDecl struct {
-	f        function // The exported Go function
-	imported function // The go:wasmimport function
-	exported function // The go:wasmexport function
+	f    function // The exported Go function
+	wasm function // The wasmimport or wasmexport function
 }
 
 // function represents a Go function created from a Component Model function
@@ -775,39 +774,32 @@ func (g *generator) declareFunction(owner wit.Ident, dir wit.Direction, f *wit.F
 		return d, nil
 	}
 
-	file := g.fileFor(owner)
-
 	// Setup
-	exported := f.CoreFunction(wit.Exported)
-	imported := f.CoreFunction(wit.Imported)
-
-	const (
-		pfxExport = "wasmexport_"
-		pfxImport = "wasmimport_"
-	)
+	file := g.fileFor(owner)
+	wasm := f.CoreFunction(dir)
+	pfx := "wasmimport_"
+	if dir == wit.Exported {
+		pfx = "wasmexport_"
+	}
 
 	var funcName string
-	var exportName string
-	var importName string
+	var wasmName string
 	switch f.Kind.(type) {
 	case *wit.Freestanding:
 		funcName = file.DeclareName(GoName(f.BaseName(), true))
-		exportName = file.DeclareName(pfxExport + funcName)
-		importName = file.DeclareName(pfxImport + funcName)
+		wasmName = file.DeclareName(pfx + funcName)
 
 	case *wit.Constructor:
 		t := f.Type().(*wit.TypeDef)
 		decl, _ := g.typeDecl(dir, t)
 		funcName = file.DeclareName("New" + decl.name)
-		exportName = file.DeclareName(pfxExport + funcName)
-		importName = file.DeclareName(pfxImport + funcName)
+		wasmName = file.DeclareName(pfx + funcName)
 
 	case *wit.Static:
 		t := f.Type().(*wit.TypeDef)
 		decl, _ := g.typeDecl(dir, t)
 		funcName = file.DeclareName(decl.name + GoName(f.BaseName(), true))
-		exportName = file.DeclareName(pfxExport + funcName)
-		importName = file.DeclareName(pfxImport + funcName)
+		wasmName = file.DeclareName(pfx + funcName)
 
 	case *wit.Method:
 		t := f.Type().(*wit.TypeDef)
@@ -816,18 +808,16 @@ func (g *generator) declareFunction(owner wit.Ident, dir wit.Direction, f *wit.F
 			return d, fmt.Errorf("cannot emit functions in package %s to type %s", owner.Package, t.Package().Name.String())
 		}
 		funcName = decl.scope.DeclareName(GoName(f.BaseName(), true))
-		exportName = file.DeclareName(pfxExport + decl.name + funcName)
-		if imported.IsMethod() {
-			importName = decl.scope.DeclareName(pfxImport + funcName)
+		if wasm.IsMethod() {
+			wasmName = decl.scope.DeclareName(pfx + funcName)
 		} else {
-			importName = file.DeclareName(pfxImport + decl.name + funcName)
+			wasmName = file.DeclareName(pfx + decl.name + funcName)
 		}
 	}
 
 	d = funcDecl{
-		f:        goFunction(file, f, funcName),
-		exported: goFunction(file, exported, exportName),
-		imported: goFunction(file, imported, importName),
+		f:    goFunction(file, f, funcName),
+		wasm: goFunction(file, wasm, wasmName),
 	}
 
 	g.functions[dir][f] = d
@@ -848,7 +838,7 @@ func (g *generator) defineFunction(owner wit.Ident, dir wit.Direction, f *wit.Fu
 	file := decl.f.file
 
 	// Bridging between Go and wasmimport function
-	callParams := slices.Clone(decl.imported.params)
+	callParams := slices.Clone(decl.wasm.params)
 	for i := range callParams {
 		j := i - len(decl.f.params)
 		if j < 0 {
@@ -859,22 +849,22 @@ func (g *generator) defineFunction(owner wit.Ident, dir wit.Direction, f *wit.Fu
 	}
 
 	var compoundParams param
-	if len(decl.f.params) > 0 && derefAnonRecord(decl.imported.params[0].typ) != nil {
+	if len(decl.f.params) > 0 && derefAnonRecord(decl.wasm.params[0].typ) != nil {
 		name := decl.f.scope.DeclareName("params")
 		callParams[0].name = name
-		t := derefAnonRecord(decl.imported.params[0].typ)
-		g.declareTypeDef(file, dir, t, decl.imported.name+"Params")
+		t := derefAnonRecord(decl.wasm.params[0].typ)
+		g.declareTypeDef(file, dir, t, decl.wasm.name+"Params")
 		compoundParams.name = name
 		compoundParams.typ = t
 	}
 
 	var compoundResults param
 	var resultsRecord *wit.Record
-	if len(decl.f.results) > 1 && derefAnonRecord(last(decl.imported.params).typ) != nil {
+	if len(decl.f.results) > 1 && derefAnonRecord(last(decl.wasm.params).typ) != nil {
 		name := decl.f.scope.DeclareName("results")
 		last(callParams).name = name
-		t := derefAnonRecord(last(decl.imported.params).typ)
-		g.declareTypeDef(file, dir, t, decl.imported.name+"Results")
+		t := derefAnonRecord(last(decl.wasm.params).typ)
+		g.declareTypeDef(file, dir, t, decl.wasm.name+"Results")
 		compoundResults.name = name
 		compoundResults.typ = t
 		resultsRecord = t.Kind.(*wit.Record)
@@ -889,7 +879,7 @@ func (g *generator) defineFunction(owner wit.Ident, dir wit.Direction, f *wit.Fu
 
 	// Emit function body
 	b.WriteString(" {\n")
-	sameResults := slices.Equal(decl.f.results, decl.imported.results)
+	sameResults := slices.Equal(decl.f.results, decl.wasm.results)
 	if len(decl.f.results) == 1 && !sameResults {
 		for _, r := range decl.f.results {
 			stringio.Write(&b, "var ", r.name, " ", g.typeRep(file, dir, r.typ), "\n")
@@ -915,13 +905,13 @@ func (g *generator) defineFunction(owner wit.Ident, dir wit.Direction, f *wit.Fu
 	}
 
 	// Emit call to wasmimport function
-	if sameResults && len(decl.imported.results) > 0 {
+	if sameResults && len(decl.wasm.results) > 0 {
 		b.WriteString("return ")
 	}
-	if decl.imported.isMethod() {
-		stringio.Write(&b, decl.imported.receiver.name, ".")
+	if decl.wasm.isMethod() {
+		stringio.Write(&b, decl.wasm.receiver.name, ".")
 	}
-	stringio.Write(&b, decl.imported.name, "(")
+	stringio.Write(&b, decl.wasm.name, "(")
 	for i, p := range callParams {
 		if i > 0 {
 			b.WriteString(", ")
@@ -953,19 +943,24 @@ func (g *generator) defineFunction(owner wit.Ident, dir wit.Direction, f *wit.Fu
 	}
 	b.WriteString("}\n\n")
 
-	// Emit wasmimport function
-	stringio.Write(&b, "//go:wasmimport ", owner.String(), " ", f.Name, "\n")
-	b.WriteString("//go:noescape\n")
+	// Emit wasmimport or wasmexport function
+	switch dir {
+	case wit.Imported:
+		stringio.Write(&b, "//go:wasmimport ", owner.String(), " ", f.Name, "\n")
+		b.WriteString("//go:noescape\n")
+	case wit.Exported:
+		stringio.Write(&b, "//go:wasmexport ", owner.String(), "#", f.Name, "\n")
+	}
 	b.WriteString("func ")
-	if decl.imported.isMethod() {
-		stringio.Write(&b, "(", decl.imported.receiver.name, " ", g.typeRep(file, dir, decl.imported.receiver.typ), ") ", decl.imported.name)
+	if decl.wasm.isMethod() {
+		stringio.Write(&b, "(", decl.wasm.receiver.name, " ", g.typeRep(file, dir, decl.wasm.receiver.typ), ") ", decl.wasm.name)
 	} else {
-		b.WriteString(decl.imported.name)
+		b.WriteString(decl.wasm.name)
 	}
 	b.WriteRune('(')
 
 	// Emit params
-	for i, p := range decl.imported.params {
+	for i, p := range decl.wasm.params {
 		if i > 0 {
 			b.WriteString(", ")
 		}
@@ -974,11 +969,11 @@ func (g *generator) defineFunction(owner wit.Ident, dir wit.Direction, f *wit.Fu
 	b.WriteString(") ")
 
 	// Emit results
-	if len(decl.imported.results) == 1 {
-		b.WriteString(g.typeRep(file, dir, decl.imported.results[0].typ))
-	} else if len(decl.imported.results) > 0 {
+	if len(decl.wasm.results) == 1 {
+		b.WriteString(g.typeRep(file, dir, decl.wasm.results[0].typ))
+	} else if len(decl.wasm.results) > 0 {
 		b.WriteRune('(')
-		for i, r := range decl.imported.results {
+		for i, r := range decl.wasm.results {
 			if i > 0 {
 				b.WriteString(", ")
 			}
@@ -991,14 +986,14 @@ func (g *generator) defineFunction(owner wit.Ident, dir wit.Direction, f *wit.Fu
 	// Emit shared types
 	if t, ok := compoundParams.typ.(*wit.TypeDef); ok {
 		td, _ := g.typeDecl(dir, t)
-		stringio.Write(&b, "// ", td.name, " represents the flattened function params for [", decl.imported.name, "].\n")
+		stringio.Write(&b, "// ", td.name, " represents the flattened function params for [", decl.wasm.name, "].\n")
 		stringio.Write(&b, "// See the Canonical ABI flattening rules for more information.\n")
 		stringio.Write(&b, "type ", td.name, " ", g.typeDefRep(file, dir, t, td.name), "\n\n")
 	}
 
 	if t, ok := compoundResults.typ.(*wit.TypeDef); ok {
 		td, _ := g.typeDecl(dir, t)
-		stringio.Write(&b, "// ", td.name, " represents the flattened function results for [", decl.imported.name, "].\n")
+		stringio.Write(&b, "// ", td.name, " represents the flattened function results for [", decl.wasm.name, "].\n")
 		stringio.Write(&b, "// See the Canonical ABI flattening rules for more information.\n")
 		stringio.Write(&b, "type ", td.name, " ", g.typeDefRep(file, dir, t, td.name), "\n\n")
 	}
