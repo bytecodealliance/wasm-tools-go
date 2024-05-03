@@ -830,11 +830,23 @@ func (g *generator) defineFunction(owner wit.Ident, dir wit.Direction, f *wit.Fu
 		return nil
 	}
 
-	// Setup
 	decl, err := g.declareFunction(owner, dir, f)
 	if err != nil {
 		return err
 	}
+
+	switch dir {
+	case wit.Imported:
+		return g.defineImportedFunction(owner, f, decl)
+	case wit.Exported:
+		return g.defineExportedFunction(owner, f, decl)
+	default:
+		return errors.New("BUG: unknown direction " + dir.String())
+	}
+}
+
+func (g *generator) defineImportedFunction(owner wit.Ident, f *wit.Function, decl funcDecl) error {
+	dir := wit.Imported
 	file := decl.f.file
 
 	// Bridging between Go and wasm function
@@ -875,106 +887,207 @@ func (g *generator) defineFunction(owner wit.Ident, dir wit.Direction, f *wit.Fu
 	// Emit docs
 	b.WriteString(g.functionDocs(owner, dir, f, decl.f.name))
 
-	switch dir {
-	case wit.Imported:
-		// Emit Go function
-		b.WriteString("//go:nosplit\n")
-		b.WriteString("func ")
-		if decl.f.isMethod() {
-			stringio.Write(&b, "(", decl.f.receiver.name, " ", g.typeRep(file, dir, decl.f.receiver.typ), ") ", decl.f.name)
-		} else {
-			b.WriteString(decl.f.name)
-		}
-		b.WriteString(g.functionSignature(file, dir, decl.f))
+	// Emit Go function
+	b.WriteString("//go:nosplit\n")
+	b.WriteString("func ")
+	if decl.f.isMethod() {
+		stringio.Write(&b, "(", decl.f.receiver.name, " ", g.typeRep(file, dir, decl.f.receiver.typ), ") ", decl.f.name)
+	} else {
+		b.WriteString(decl.f.name)
+	}
+	b.WriteString(g.functionSignature(file, dir, decl.f))
 
-		// Emit function body
-		b.WriteString(" {\n")
-		sameResults := slices.Equal(decl.f.results, decl.wasm.results)
-		if len(decl.f.results) == 1 && !sameResults {
-			for _, r := range decl.f.results {
-				stringio.Write(&b, "var ", r.name, " ", g.typeRep(file, dir, r.typ), "\n")
-			}
+	// Emit function body
+	b.WriteString(" {\n")
+	sameResults := slices.Equal(decl.f.results, decl.wasm.results)
+	if len(decl.f.results) == 1 && !sameResults {
+		for _, r := range decl.f.results {
+			stringio.Write(&b, "var ", r.name, " ", g.typeRep(file, dir, r.typ), "\n")
 		}
+	}
 
-		// Emit compound types
-		if compoundParams.typ != nil {
-			stringio.Write(&b, compoundParams.name, " := ", g.typeRep(file, dir, compoundParams.typ), "{ ")
-			if decl.f.receiver.name != "" {
-				stringio.Write(&b, decl.f.receiver.name, ", ")
-			}
-			for i, p := range decl.f.params {
-				if i > 0 {
-					b.WriteString(", ")
-				}
-				b.WriteString(p.name)
-			}
-			b.WriteString(" }\n")
+	// Emit compound types
+	if compoundParams.typ != nil {
+		stringio.Write(&b, compoundParams.name, " := ", g.typeRep(file, dir, compoundParams.typ), "{ ")
+		if decl.f.receiver.name != "" {
+			stringio.Write(&b, decl.f.receiver.name, ", ")
 		}
-		if compoundResults.typ != nil {
-			stringio.Write(&b, "var ", compoundResults.name, " ", g.typeRep(file, dir, compoundResults.typ), "\n")
-		}
-
-		// Emit call to wasmimport function
-		if sameResults && len(decl.wasm.results) > 0 {
-			b.WriteString("return ")
-		}
-		if decl.wasm.isMethod() {
-			stringio.Write(&b, decl.wasm.receiver.name, ".")
-		}
-		stringio.Write(&b, decl.wasm.name, "(")
-		for i, p := range callParams {
+		for i, p := range decl.f.params {
 			if i > 0 {
 				b.WriteString(", ")
 			}
-			if isPointer(p.typ) {
-				b.WriteRune('&')
-			}
-			b.WriteString(callParams[i].name)
+			b.WriteString(p.name)
 		}
-		b.WriteString(")\n")
-		if !sameResults {
-			b.WriteString("return ")
-			if resultsRecord != nil {
-				for i, f := range resultsRecord.Fields {
-					if i > 0 {
-						b.WriteString(", ")
-					}
-					stringio.Write(&b, compoundResults.name, ".", fieldName(f.Name, false))
-				}
-			} else {
-				for i, r := range decl.f.results {
-					if i > 0 {
-						b.WriteString(", ")
-					}
-					b.WriteString(r.name)
-				}
-			}
-			b.WriteRune('\n')
-		}
-		b.WriteString("}\n\n")
-
-		// Emit wasmimport function
-		stringio.Write(&b, "//go:wasmimport ", owner.String(), " ", f.Name, "\n")
-		b.WriteString("//go:noescape\n")
-		b.WriteString("func ")
-		if decl.wasm.isMethod() {
-			stringio.Write(&b, "(", decl.wasm.receiver.name, " ", g.typeRep(file, dir, decl.wasm.receiver.typ), ") ", decl.wasm.name)
-		} else {
-			b.WriteString(decl.wasm.name)
-		}
-		b.WriteString(g.functionSignature(file, dir, decl.wasm))
-
-	case wit.Exported:
-		// Emit Go variable of type func
-		stringio.Write(&b, "var ", decl.f.name, " func", g.functionSignature(file, dir, decl.f), "\n\n")
-
-		// TODO: wasmexport function
-
-	default:
-		panic("BUG: unknown direction " + dir.String())
+		b.WriteString(" }\n")
+	}
+	if compoundResults.typ != nil {
+		stringio.Write(&b, "var ", compoundResults.name, " ", g.typeRep(file, dir, compoundResults.typ), "\n")
 	}
 
+	// Emit call to wasmimport function
+	if sameResults && len(decl.wasm.results) > 0 {
+		b.WriteString("return ")
+	}
+	if decl.wasm.isMethod() {
+		stringio.Write(&b, decl.wasm.receiver.name, ".")
+	}
+	stringio.Write(&b, decl.wasm.name, "(")
+	for i, p := range callParams {
+		if i > 0 {
+			b.WriteString(", ")
+		}
+		if isPointer(p.typ) {
+			b.WriteRune('&')
+		}
+		b.WriteString(callParams[i].name)
+	}
+	b.WriteString(")\n")
+	if !sameResults {
+		b.WriteString("return ")
+		if resultsRecord != nil {
+			for i, f := range resultsRecord.Fields {
+				if i > 0 {
+					b.WriteString(", ")
+				}
+				stringio.Write(&b, compoundResults.name, ".", fieldName(f.Name, false))
+			}
+		} else {
+			for i, r := range decl.f.results {
+				if i > 0 {
+					b.WriteString(", ")
+				}
+				b.WriteString(r.name)
+			}
+		}
+		b.WriteRune('\n')
+	}
+	b.WriteString("}\n\n")
+
+	// Emit wasmimport function
+	stringio.Write(&b, "//go:wasmimport ", owner.String(), " ", f.Name, "\n")
+	b.WriteString("//go:noescape\n")
+	b.WriteString("func ")
+	if decl.wasm.isMethod() {
+		stringio.Write(&b, "(", decl.wasm.receiver.name, " ", g.typeRep(file, dir, decl.wasm.receiver.typ), ") ", decl.wasm.name)
+	} else {
+		b.WriteString(decl.wasm.name)
+	}
+	b.WriteString(g.functionSignature(file, dir, decl.wasm))
+
 	b.WriteString("\n\n")
+
+	// Emit shared types
+	if t, ok := compoundParams.typ.(*wit.TypeDef); ok {
+		td, _ := g.typeDecl(dir, t)
+		stringio.Write(&b, "// ", td.name, " represents the flattened function params for [", decl.wasm.name, "].\n")
+		stringio.Write(&b, "// See the Canonical ABI flattening rules for more information.\n")
+		stringio.Write(&b, "type ", td.name, " ", g.typeDefRep(file, dir, t, td.name), "\n\n")
+	}
+
+	if t, ok := compoundResults.typ.(*wit.TypeDef); ok {
+		td, _ := g.typeDecl(dir, t)
+		stringio.Write(&b, "// ", td.name, " represents the flattened function results for [", decl.wasm.name, "].\n")
+		stringio.Write(&b, "// See the Canonical ABI flattening rules for more information.\n")
+		stringio.Write(&b, "type ", td.name, " ", g.typeDefRep(file, dir, t, td.name), "\n\n")
+	}
+
+	// Write to file
+	file.Write(b.Bytes())
+
+	return g.ensureEmptyAsm(file.Package)
+}
+
+func (g *generator) defineExportedFunction(owner wit.Ident, f *wit.Function, decl funcDecl) error {
+	dir := wit.Exported
+	file := decl.f.file
+
+	var compoundParams param
+	if len(decl.f.params) > 0 && derefAnonRecord(decl.wasm.params[0].typ) != nil {
+		name := decl.f.scope.DeclareName("params")
+		t := derefAnonRecord(decl.wasm.params[0].typ)
+		g.declareTypeDef(file, dir, t, decl.wasm.name+"Params")
+		compoundParams.name = name
+		compoundParams.typ = t
+	}
+
+	var compoundResults param
+	var resultsRecord *wit.Record
+	if len(decl.f.results) > 1 && derefAnonRecord(last(decl.wasm.params).typ) != nil {
+		name := decl.f.scope.DeclareName("results")
+		t := derefAnonRecord(last(decl.wasm.params).typ)
+		g.declareTypeDef(file, dir, t, decl.wasm.name+"Results")
+		compoundResults.name = name
+		compoundResults.typ = t
+		resultsRecord = t.Kind.(*wit.Record)
+	}
+
+	var b bytes.Buffer
+
+	// Emit docs
+	b.WriteString(g.functionDocs(owner, dir, f, decl.f.name))
+
+	// Emit var for caller-defined Go func
+	stringio.Write(&b, "var ", decl.f.name, " func", g.functionSignature(file, dir, decl.f), "\n\n")
+
+	// Emit wasmexport function
+	stringio.Write(&b, "//go:wasmexport ", owner.String(), "#", f.Name, "\n")
+	stringio.Write(&b, "func ", decl.wasm.name, g.functionSignature(file, dir, decl.wasm))
+
+	// Emit function body
+	b.WriteString(" {\n")
+	sameResults := slices.Equal(decl.f.results, decl.wasm.results)
+
+	// Emit call to caller-defined Go function
+	if len(decl.f.results) > 0 {
+		if sameResults {
+			b.WriteString("return ")
+		} else {
+			for i, r := range decl.f.results {
+				if i > 0 {
+					b.WriteString(", ")
+				}
+				b.WriteString(r.name)
+			}
+			b.WriteString(" := ")
+		}
+	}
+	stringio.Write(&b, decl.f.name, "(")
+	for i, p := range decl.f.params {
+		if i > 0 {
+			b.WriteString(", ")
+		}
+		if isPointer(p.typ) {
+			b.WriteRune('&')
+		}
+		b.WriteString(decl.f.params[i].name)
+	}
+	b.WriteString(")\n")
+	if !sameResults {
+		b.WriteString("return ")
+		if resultsRecord != nil {
+			for i, f := range resultsRecord.Fields {
+				if i > 0 {
+					b.WriteString(", ")
+				}
+				stringio.Write(&b, compoundResults.name, ".", fieldName(f.Name, false))
+			}
+		} else {
+			for i, r := range decl.wasm.results {
+				if i > 0 {
+					b.WriteString(", ")
+				}
+				if isPointer(r.typ) {
+					b.WriteRune('&')
+				}
+				b.WriteString(r.name)
+			}
+		}
+		b.WriteRune('\n')
+	}
+
+	// TODO
+
+	b.WriteString("}\n\n")
 
 	// Emit shared types
 	if t, ok := compoundParams.typ.(*wit.TypeDef); ok {
