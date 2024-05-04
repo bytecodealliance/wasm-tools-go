@@ -291,6 +291,12 @@ func (g *generator) defineInterface(dir wit.Direction, i *wit.Interface, name st
 		file.PackageDocs = b.String()
 	}
 
+	// Declare types
+	i.TypeDefs.All()(func(name string, td *wit.TypeDef) bool {
+		g.declareTypeDef(nil, dir, td, "")
+		return true
+	})
+
 	// Define types
 	i.TypeDefs.All()(func(name string, td *wit.TypeDef) bool {
 		g.defineTypeDef(dir, td, name)
