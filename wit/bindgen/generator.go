@@ -1002,19 +1002,21 @@ func (g *generator) defineExportedFunction(owner wit.Ident, f *wit.Function, dec
 	file := decl.f.file
 
 	var compoundParams param
+	var paramsRecord *wit.Record
 	if len(decl.f.params) > 0 && derefAnonRecord(decl.wasm.params[0].typ) != nil {
 		name := decl.f.scope.DeclareName("params")
 		t := derefAnonRecord(decl.wasm.params[0].typ)
 		g.declareTypeDef(file, dir, t, decl.wasm.name+"Params")
 		compoundParams.name = name
 		compoundParams.typ = t
+		paramsRecord = t.Kind.(*wit.Record)
 	}
 
 	var compoundResults param
 	var resultsRecord *wit.Record
-	if len(decl.f.results) > 1 && derefAnonRecord(last(decl.wasm.params).typ) != nil {
+	if len(decl.f.results) > 1 && derefAnonRecord(decl.wasm.results[0].typ) != nil {
 		name := decl.f.scope.DeclareName("results")
-		t := derefAnonRecord(last(decl.wasm.params).typ)
+		t := derefAnonRecord(decl.wasm.results[0].typ)
 		g.declareTypeDef(file, dir, t, decl.wasm.name+"Results")
 		compoundResults.name = name
 		compoundResults.typ = t
@@ -1041,6 +1043,15 @@ func (g *generator) defineExportedFunction(owner wit.Ident, f *wit.Function, dec
 	if len(decl.f.results) > 0 {
 		if sameResults {
 			b.WriteString("return ")
+		} else if resultsRecord != nil {
+			stringio.Write(&b, "var ", compoundResults.name, " ", g.typeRep(file, dir, compoundResults.typ), "\n")
+			for i, f := range resultsRecord.Fields {
+				if i > 0 {
+					b.WriteString(", ")
+				}
+				stringio.Write(&b, compoundResults.name, ".", fieldName(f.Name, false))
+			}
+			b.WriteString(" = ")
 		} else {
 			for i, r := range decl.f.results {
 				if i > 0 {
@@ -1052,25 +1063,29 @@ func (g *generator) defineExportedFunction(owner wit.Ident, f *wit.Function, dec
 		}
 	}
 	stringio.Write(&b, decl.f.name, "(")
-	for i, p := range decl.f.params {
-		if i > 0 {
-			b.WriteString(", ")
+	if paramsRecord != nil {
+		for i, f := range paramsRecord.Fields {
+			if i > 0 {
+				b.WriteString(", ")
+			}
+			stringio.Write(&b, compoundParams.name, ".", fieldName(f.Name, false))
 		}
-		if isPointer(p.typ) {
-			b.WriteRune('&')
+	} else {
+		for i, p := range decl.wasm.params {
+			if i > 0 {
+				b.WriteString(", ")
+			}
+			if isPointer(p.typ) {
+				b.WriteRune('*')
+			}
+			b.WriteString(p.name)
 		}
-		b.WriteString(decl.f.params[i].name)
 	}
 	b.WriteString(")\n")
 	if !sameResults {
 		b.WriteString("return ")
 		if resultsRecord != nil {
-			for i, f := range resultsRecord.Fields {
-				if i > 0 {
-					b.WriteString(", ")
-				}
-				stringio.Write(&b, compoundResults.name, ".", fieldName(f.Name, false))
-			}
+			stringio.Write(&b, "&", compoundResults.name)
 		} else {
 			for i, r := range decl.wasm.results {
 				if i > 0 {
@@ -1190,6 +1205,9 @@ func (g *generator) functionDocs(owner wit.Ident, dir wit.Direction, f *wit.Func
 		stringio.Write(&b, f.BaseName())
 	}
 	b.WriteString("\".\n")
+	if dir == wit.Exported {
+		b.WriteString("// The implementation is caller-defined.\n")
+	}
 	if f.Docs.Contents != "" {
 		b.WriteString("//\n")
 		b.WriteString(formatDocComments(f.Docs.Contents, false))
