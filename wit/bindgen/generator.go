@@ -1033,6 +1033,7 @@ func (g *generator) defineExportedFunction(owner wit.Ident, f *wit.Function, dec
 
 	// Emit wasmexport function
 	stringio.Write(&b, "//go:wasmexport ", owner.String(), "#", f.Name, "\n")
+	stringio.Write(&b, "//export ", owner.String(), "#", f.Name, "\n") // TODO: remove this once TinyGo supports go:wasmexport.
 	stringio.Write(&b, "func ", decl.wasm.name, g.functionSignature(file, dir, decl.wasm))
 
 	// Emit function body
