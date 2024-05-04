@@ -44,4 +44,5 @@ interface corner-case {
 
 world imports {
 	import corner-case;
+	export corner-case;
 }
