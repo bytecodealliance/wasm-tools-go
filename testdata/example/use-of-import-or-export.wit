@@ -2,6 +2,7 @@ package example:uses;
 
 interface a {
 	resource res {
+		constructor();
 		do: func();
 	}
 }

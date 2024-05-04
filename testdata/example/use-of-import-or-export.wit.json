@@ -31,6 +31,18 @@
         "res": 0
       },
       "functions": {
+        "[constructor]res": {
+          "name": "[constructor]res",
+          "kind": {
+            "constructor": 0
+          },
+          "params": [],
+          "results": [
+            {
+              "type": 7
+            }
+          ]
+        },
         "[method]res.do": {
           "name": "[method]res.do",
           "kind": {
@@ -69,7 +81,7 @@
           "params": [
             {
               "name": "r",
-              "type": 7
+              "type": 8
             }
           ],
           "results": []
@@ -157,6 +169,15 @@
       "owner": {
         "interface": 2
       }
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "own": 0
+        }
+      },
+      "owner": null
     },
     {
       "name": null,
