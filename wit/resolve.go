@@ -411,7 +411,10 @@ type Handle interface {
 }
 
 // _handle is an embeddable type that conforms to the [Handle] interface.
-type _handle struct{ _typeDefKind }
+type _handle struct {
+	_typeDefKind
+	Type *TypeDef
+}
 
 func (_handle) isHandle() {}
 
@@ -430,23 +433,23 @@ func (_handle) Align() uintptr { return 4 }
 // [flattened]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
 func (_handle) Flat() []Type { return []Type{U32{}} }
 
+// HasResource returns whether h contains a resource.
+// This should always return true.
+func (h *_handle) HasResource() bool {
+	return HasResource(h.Type)
+}
+
 // Own represents an WIT [owned handle].
 // It implements the [Handle], [Node], [ABI], and [TypeDefKind] interfaces.
 //
 // [owned handle]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md#handles
-type Own struct {
-	_handle
-	Type *TypeDef
-}
+type Own struct{ _handle }
 
 // Borrow represents a WIT [borrowed handle].
 // It implements the [Handle], [Node], [ABI], and [TypeDefKind] interfaces.
 //
 // [borrowed handle]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md#handles
-type Borrow struct {
-	_handle
-	Type *TypeDef
-}
+type Borrow struct{ _handle }
 
 // HasBorrow returns whether t contains a [Borrow].
 // This always returns true.
