@@ -283,7 +283,7 @@ func (g *generator) defineInterface(dir wit.Direction, i *wit.Interface, name st
 
 	{
 		var b strings.Builder
-		stringio.Write(&b, "Package ", pkg.Name, " represents the ", i.WITKind(), " \"", id.String(), "\".\n")
+		stringio.Write(&b, "Package ", pkg.Name, " represents the ", dir.String(), " ", i.WITKind(), " \"", id.String(), "\".\n")
 		if i.Docs.Contents != "" {
 			b.WriteString("\n")
 			b.WriteString(i.Docs.Contents)
@@ -344,7 +344,7 @@ func (g *generator) defineTypeDef(dir wit.Direction, t *wit.TypeDef, name string
 
 	// Define the type
 	var b bytes.Buffer
-	stringio.Write(&b, "// ", decl.name, " represents the ", root.WITKind(), " \"", rootOwner.String(), "#", rootName, "\".\n")
+	stringio.Write(&b, "// ", decl.name, " represents the ", dir.String(), " ", root.WITKind(), " \"", rootOwner.String(), "#", rootName, "\".\n")
 	b.WriteString("//\n")
 	if root != t {
 		// Type alias
