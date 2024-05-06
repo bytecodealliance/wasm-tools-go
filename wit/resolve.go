@@ -256,7 +256,7 @@ func (t *TypeDef) HasBorrow() bool {
 	return HasBorrow(t.Kind)
 }
 
-// HasResource returns whether [TypeDef] t contains a resource.
+// HasResource returns whether [TypeDef] t contains a [Resource].
 func (t *TypeDef) HasResource() bool {
 	return HasResource(t.Kind)
 }
@@ -350,18 +350,6 @@ func (r *Record) Align() uintptr {
 	return a
 }
 
-// HasPointer returns whether the [ABI] representation of [Record] r contains a pointer.
-//
-// [ABI]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md
-func (r *Record) HasPointer() bool {
-	for _, f := range r.Fields {
-		if HasPointer(f.Type) {
-			return true
-		}
-	}
-	return false
-}
-
 // Flat returns the [flattened] ABI representation of [Record] r.
 //
 // [flattened]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
@@ -371,6 +359,37 @@ func (r *Record) Flat() []Type {
 		flat = append(flat, f.Type.Flat()...)
 	}
 	return flat
+}
+
+// HasPointer returns whether [Record] r has an associated type
+// that contains a pointer (e.g. string, list).
+func (r *Record) HasPointer() bool {
+	for _, f := range r.Fields {
+		if HasPointer(f.Type) {
+			return true
+		}
+	}
+	return false
+}
+
+// HasBorrow returns whether [Record] r has an associated type that contains a [Borrow].
+func (r *Record) HasBorrow() bool {
+	for _, f := range r.Fields {
+		if HasBorrow(f.Type) {
+			return true
+		}
+	}
+	return false
+}
+
+// HasResource returns whether [Record] r has an associated type that contains a [Resource].
+func (r *Record) HasResource() bool {
+	for _, f := range r.Fields {
+		if HasResource(f.Type) {
+			return true
+		}
+	}
+	return false
 }
 
 // Field represents a field in a [Record].
@@ -400,6 +419,9 @@ func (*Resource) Align() uintptr { return 4 }
 //
 // [flattened]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
 func (*Resource) Flat() []Type { return []Type{U32{}} }
+
+// HasResource always returns true.
+func (*Resource) HasResource() bool { return true }
 
 // Handle represents a WIT [handle type].
 // It conforms to the [Node], [ABI], and [TypeDefKind] interfaces.
@@ -444,7 +466,7 @@ type Own struct {
 	Type *TypeDef
 }
 
-// HasResource returns whether [Own] o contains a resource.
+// HasResource returns whether [Own] o contains a [Resource].
 // This should always return true.
 func (o *Own) HasResource() bool {
 	return HasResource(o.Type)
@@ -463,7 +485,7 @@ type Borrow struct {
 // This always returns true.
 func (b *Borrow) HasBorrow() bool { return true }
 
-// HasResource returns whether [Borrow] b contains a resource.
+// HasResource returns whether [Borrow] b contains a [Resource].
 // This should always return true.
 func (b *Borrow) HasResource() bool {
 	return HasResource(b.Type)
@@ -709,7 +731,7 @@ func (v *Variant) HasBorrow() bool {
 	return false
 }
 
-// HasResource returns whether [Variant] v contains a resource.
+// HasResource returns whether [Variant] v contains a [Resource].
 func (v *Variant) HasResource() bool {
 	for _, t := range v.Types() {
 		if HasResource(t) {
@@ -919,7 +941,7 @@ func (l *List) HasBorrow() bool {
 	return HasBorrow(l.Type)
 }
 
-// HasResource returns whether [List] l contains a resource.
+// HasResource returns whether [List] l contains a [Resource].
 func (l *List) HasResource() bool {
 	return HasResource(l.Type)
 }
@@ -962,7 +984,7 @@ func (f *Future) HasBorrow() bool {
 	return HasBorrow(f.Type)
 }
 
-// HasResource returns whether [Future] f contains a resource.
+// HasResource returns whether [Future] f contains a [Resource].
 func (f *Future) HasResource() bool {
 	return HasResource(f.Type)
 }
@@ -1006,7 +1028,7 @@ func (s *Stream) HasBorrow() bool {
 	return HasBorrow(s.Element) || HasBorrow(s.End)
 }
 
-// HasResource returns whether [Stream] s contains a resource.
+// HasResource returns whether [Stream] s contains a [Resource].
 func (s *Stream) HasResource() bool {
 	return HasResource(s.Element) || HasResource(s.End)
 }
