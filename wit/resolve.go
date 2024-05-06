@@ -256,6 +256,11 @@ func (t *TypeDef) HasBorrow() bool {
 	return HasBorrow(t.Kind)
 }
 
+// HasResource returns whether [TypeDef] t contains a resource.
+func (t *TypeDef) HasResource() bool {
+	return HasResource(t.Kind)
+}
+
 // TypeDefKind represents the underlying type in a [TypeDef], which can be one of
 // [Record], [Resource], [Handle], [Flags], [Tuple], [Variant], [Enum],
 // [Option], [Result], [List], [Future], [Stream], or [Type].
@@ -695,6 +700,16 @@ func (v *Variant) HasBorrow() bool {
 	return false
 }
 
+// HasResource returns whether [Variant] v contains a resource.
+func (v *Variant) HasResource() bool {
+	for _, t := range v.Types() {
+		if HasResource(t) {
+			return true
+		}
+	}
+	return false
+}
+
 // Case represents a single case in a [Variant].
 // It implements the [Node] interface.
 type Case struct {
@@ -895,6 +910,11 @@ func (l *List) HasBorrow() bool {
 	return HasBorrow(l.Type)
 }
 
+// HasResource returns whether [List] l contains a resource.
+func (l *List) HasResource() bool {
+	return HasResource(l.Type)
+}
+
 // Future represents a WIT [future type], expected to be part of [WASI Preview 3].
 // It implements the [Node], [ABI], and [TypeDefKind] interfaces.
 //
@@ -931,6 +951,11 @@ func (f *Future) HasPointer() bool {
 // HasBorrow returns whether [Future] f contains a [Borrow].
 func (f *Future) HasBorrow() bool {
 	return HasBorrow(f.Type)
+}
+
+// HasResource returns whether [Future] f contains a resource.
+func (f *Future) HasResource() bool {
+	return HasResource(f.Type)
 }
 
 // Stream represents a WIT [stream type], expected to be part of [WASI Preview 3].
@@ -970,6 +995,11 @@ func (s *Stream) HasPointer() bool {
 // HasBorrow returns whether [Stream] s contains a [Borrow].
 func (s *Stream) HasBorrow() bool {
 	return HasBorrow(s.Element) || HasBorrow(s.End)
+}
+
+// HasResource returns whether [Stream] s contains a resource.
+func (s *Stream) HasResource() bool {
+	return HasResource(s.Element) || HasResource(s.End)
 }
 
 // TypeOwner is the interface implemented by any type that can own a TypeDef,

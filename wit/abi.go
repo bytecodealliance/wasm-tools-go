@@ -64,6 +64,19 @@ type hasPointer interface {
 	HasPointer() bool
 }
 
+// HasResource returns whether or not t contains a resource type, typically an [Own] or [Borrow] handle.
+func HasResource(t TypeDefKind) bool {
+	t = Despecialize(t)
+	if p, ok := t.(hasResource); ok {
+		return p.HasResource()
+	}
+	return false
+}
+
+type hasResource interface {
+	HasResource() bool
+}
+
 // HasBorrow returns whether or not t contains a [Borrow] type.
 func HasBorrow(t TypeDefKind) bool {
 	t = Despecialize(t)
