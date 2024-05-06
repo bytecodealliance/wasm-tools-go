@@ -749,9 +749,7 @@ func (g *generator) listRep(file *gen.File, dir wit.Direction, l *wit.List) stri
 }
 
 func (g *generator) resourceRep(file *gen.File, dir wit.Direction, r *wit.Resource) string {
-	var b strings.Builder
-	stringio.Write(&b, file.Import(g.opts.cmPackage), ".Resource")
-	return b.String()
+	return file.Import(g.opts.cmPackage) + ".Resource"
 }
 
 func (g *generator) ownRep(file *gen.File, dir wit.Direction, o *wit.Own) string {
