@@ -413,7 +413,7 @@ func (g *generator) declareTypeDef(file *gen.File, dir wit.Direction, t *wit.Typ
 	}
 	if goName == "" {
 		if t.Name == nil {
-			return decl, nil
+			return typeDecl{}, errors.New("BUG: cannot declare unnamed wit.TypeDef")
 		}
 		goName = GoName(*t.Name, true)
 	}
