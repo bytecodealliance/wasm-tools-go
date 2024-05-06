@@ -29,6 +29,14 @@ const (
 // allowing empty function bodies with a //go:wasmimport directive.
 // See https://pkg.go.dev/cmd/compile for more information.
 `
+
+	// Create Go type aliases for WIT type aliases.
+	// This has issues with types that are simultaenously imported and exported in WIT.
+	experimentCreateTypeAliases = false
+
+	// Predeclare Go types for own<T> and borrow<T>.
+	// Currently broken.
+	experimentPredeclareHandles = false
 )
 
 type typeDecl struct {
@@ -321,6 +329,10 @@ func (g *generator) defineInterface(dir wit.Direction, i *wit.Interface, name st
 }
 
 func (g *generator) defineTypeDef(dir wit.Direction, t *wit.TypeDef, name string) error {
+	if !experimentCreateTypeAliases && t.Root() != t {
+		return nil
+	}
+
 	if !g.define(dir, t) {
 		return nil
 	}
@@ -506,6 +518,9 @@ func (g *generator) typeRep(file *gen.File, dir wit.Direction, t wit.Type) strin
 		return "struct{}"
 
 	case *wit.TypeDef:
+		if !experimentCreateTypeAliases {
+			t = t.Root()
+		}
 		if decl, ok := g.typeDecl(dir, t); ok {
 			return file.RelativeName(decl.file.Package, decl.name)
 		}
