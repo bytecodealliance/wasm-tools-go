@@ -426,7 +426,44 @@ func (g *generator) declareTypeDef(file *gen.File, dir wit.Direction, t *wit.Typ
 		scope: gen.NewScope(nil),
 	}
 	g.types[dir][t] = decl
+
+	// If an imported and exported version of a TypeDef are identical, declare the other.
+	otherDir := ^dir & 1
+	if _, ok := g.types[otherDir][t]; !ok && !wit.HasResource(t) {
+		g.types[otherDir][t] = decl
+		g.define(otherDir, t) // Mark this type as defined
+	}
 	// fmt.Fprintf(os.Stderr, "Type:\t%s.%s\n\t%s.%s\n", owner.String(), name, decl.Package.Path, decl.Name)
+
+	// Predeclare own<T> and borrow<T> for resource types.
+	if experimentPredeclareHandles {
+		switch t.Kind.(type) {
+		case *wit.Resource:
+			var count int
+			for _, t2 := range g.res.TypeDefs {
+				var err error
+				switch kind := t2.Kind.(type) {
+				case *wit.Own:
+					if kind.Type == t {
+						_, err = g.declareTypeDef(file, dir, t2, "Own"+decl.name)
+						count++
+					}
+				case *wit.Borrow:
+					if kind.Type == t {
+						_, err = g.declareTypeDef(file, dir, t2, "Borrow"+decl.name)
+						count++
+					}
+				}
+				if err != nil {
+					return typeDecl{}, err
+				}
+				if count >= 2 {
+					break
+				}
+			}
+		}
+	}
+
 	return decl, nil
 }
 
