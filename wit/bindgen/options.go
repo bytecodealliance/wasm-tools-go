@@ -28,9 +28,6 @@ type options struct {
 
 	// versioned determines if Go packages are generated with version numbers.
 	versioned bool
-
-	// exports determines if export bindings are generated.
-	exports bool
 }
 
 func (opts *options) apply(o ...Option) error {
@@ -82,14 +79,6 @@ func CMPackage(path string) Option {
 func Versioned(versioned bool) Option {
 	return optionFunc(func(opts *options) error {
 		opts.versioned = versioned
-		return nil
-	})
-}
-
-// GenerateExports returns an [Option] that specifies whether to generate export bindings.
-func GenerateExports(exports bool) Option {
-	return optionFunc(func(opts *options) error {
-		opts.exports = exports
 		return nil
 	})
 }
