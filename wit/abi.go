@@ -41,53 +41,37 @@ type ABI interface {
 // [despecializes]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#despecialization
 // [canonical ABI documentation]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#despecialization
 func Despecialize(k TypeDefKind) TypeDefKind {
-	if d, ok := k.(despecialize); ok {
+	if d, ok := k.(interface{ Despecialize() TypeDefKind }); ok {
 		return d.Despecialize()
 	}
 	return k
 }
 
-type despecialize interface {
-	Despecialize() TypeDefKind
-}
-
 // HasPointer returns whether or not t contains a [Type] with a pointer, e.g. [String] or [List].
 func HasPointer(t TypeDefKind) bool {
 	t = Despecialize(t)
-	if p, ok := t.(hasPointer); ok {
-		return p.HasPointer()
+	if p, ok := t.(interface{ hasPointer() bool }); ok {
+		return p.hasPointer()
 	}
 	return false
-}
-
-type hasPointer interface {
-	HasPointer() bool
 }
 
 // HasResource returns whether or not t contains a resource type, typically an [Own] or [Borrow] handle.
 func HasResource(t TypeDefKind) bool {
 	t = Despecialize(t)
-	if p, ok := t.(hasResource); ok {
-		return p.HasResource()
+	if p, ok := t.(interface{ hasResource() bool }); ok {
+		return p.hasResource()
 	}
 	return false
-}
-
-type hasResource interface {
-	HasResource() bool
 }
 
 // HasBorrow returns whether or not t contains a [Borrow] type.
 func HasBorrow(t TypeDefKind) bool {
 	t = Despecialize(t)
-	if p, ok := t.(hasBorrow); ok {
-		return p.HasBorrow()
+	if p, ok := t.(interface{ hasBorrow() bool }); ok {
+		return p.hasBorrow()
 	}
 	return false
-}
-
-type hasBorrow interface {
-	HasBorrow() bool
 }
 
 // Direction represents the direction a type or function is represented within a component,

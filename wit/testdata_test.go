@@ -460,15 +460,15 @@ func TestNoExportedTypeDefs(t *testing.T) {
 	}
 }
 
-// TestHasPointer verifies that the HasPointer method and HasPointer function return the same result.
+// TestHasPointer verifies that the hasPointer method and HasPointer function return the same result.
 func TestHasPointer(t *testing.T) {
 	err := loadTestdata(func(path string, res *Resolve) error {
 		t.Run(path, func(t *testing.T) {
 			for _, td := range res.TypeDefs {
-				a := td.HasPointer()
+				a := td.hasPointer()
 				b := HasPointer(td)
 				if a != b {
-					t.Errorf("td.HasPointer(): %t != HasPointer(td): %t (%s)", a, b, td.WIT(nil, td.TypeName()))
+					t.Errorf("td.hasPointer(): %t != HasPointer(td): %t (%s)", a, b, td.WIT(nil, td.TypeName()))
 				}
 			}
 		})

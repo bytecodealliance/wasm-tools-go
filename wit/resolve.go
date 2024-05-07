@@ -244,22 +244,9 @@ func (t *TypeDef) Flat() []Type {
 	return t.Kind.Flat()
 }
 
-// HasPointer returns whether the [ABI] representation of [TypeDef] t contains a pointer.
-//
-// [ABI]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md
-func (t *TypeDef) HasPointer() bool {
-	return HasPointer(t.Kind)
-}
-
-// HasBorrow returns whether [TypeDef] t contains a [Borrow].
-func (t *TypeDef) HasBorrow() bool {
-	return HasBorrow(t.Kind)
-}
-
-// HasResource returns whether [TypeDef] t contains a [Resource].
-func (t *TypeDef) HasResource() bool {
-	return HasResource(t.Kind)
-}
+func (t *TypeDef) hasPointer() bool  { return HasPointer(t.Kind) }
+func (t *TypeDef) hasBorrow() bool   { return HasBorrow(t.Kind) }
+func (t *TypeDef) hasResource() bool { return HasResource(t.Kind) }
 
 // TypeDefKind represents the underlying type in a [TypeDef], which can be one of
 // [Record], [Resource], [Handle], [Flags], [Tuple], [Variant], [Enum],
@@ -312,11 +299,10 @@ func (*Pointer) Align() uintptr { return 4 }
 // [flattened]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
 func (*Pointer) Flat() []Type { return []Type{U32{}} }
 
-// HasPointer returns whether the [ABI] representation of [Pointer] contains a pointer.
-// This always returns true.
-//
-// [ABI]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md
-func (*Pointer) HasPointer() bool { return true }
+// hasPointer always returns true.
+func (*Pointer) hasPointer() bool    { return true }
+func (p *Pointer) hasBorrow() bool   { return HasBorrow(p.Type) }
+func (p *Pointer) hasResource() bool { return HasResource(p.Type) }
 
 // Record represents a WIT [record type], akin to a struct.
 // It implements the [Node], [ABI], and [TypeDefKind] interfaces.
@@ -361,9 +347,7 @@ func (r *Record) Flat() []Type {
 	return flat
 }
 
-// HasPointer returns whether [Record] r has an associated type
-// that contains a pointer (e.g. string, list).
-func (r *Record) HasPointer() bool {
+func (r *Record) hasPointer() bool {
 	for _, f := range r.Fields {
 		if HasPointer(f.Type) {
 			return true
@@ -372,8 +356,7 @@ func (r *Record) HasPointer() bool {
 	return false
 }
 
-// HasBorrow returns whether [Record] r has an associated type that contains a [Borrow].
-func (r *Record) HasBorrow() bool {
+func (r *Record) hasBorrow() bool {
 	for _, f := range r.Fields {
 		if HasBorrow(f.Type) {
 			return true
@@ -382,8 +365,7 @@ func (r *Record) HasBorrow() bool {
 	return false
 }
 
-// HasResource returns whether [Record] r has an associated type that contains a [Resource].
-func (r *Record) HasResource() bool {
+func (r *Record) hasResource() bool {
 	for _, f := range r.Fields {
 		if HasResource(f.Type) {
 			return true
@@ -420,8 +402,8 @@ func (*Resource) Align() uintptr { return 4 }
 // [flattened]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
 func (*Resource) Flat() []Type { return []Type{U32{}} }
 
-// HasResource always returns true.
-func (*Resource) HasResource() bool { return true }
+// hasResource always returns true.
+func (*Resource) hasResource() bool { return true }
 
 // Handle represents a WIT [handle type].
 // It conforms to the [Node], [ABI], and [TypeDefKind] interfaces.
@@ -466,11 +448,7 @@ type Own struct {
 	Type *TypeDef
 }
 
-// HasResource returns whether [Own] o contains a [Resource].
-// This should always return true.
-func (o *Own) HasResource() bool {
-	return HasResource(o.Type)
-}
+func (o *Own) hasResource() bool { return HasResource(o.Type) }
 
 // Borrow represents a WIT [borrowed handle].
 // It implements the [Handle], [Node], [ABI], and [TypeDefKind] interfaces.
@@ -481,15 +459,8 @@ type Borrow struct {
 	Type *TypeDef
 }
 
-// HasBorrow returns whether t contains a [Borrow].
-// This always returns true.
-func (b *Borrow) HasBorrow() bool { return true }
-
-// HasResource returns whether [Borrow] b contains a [Resource].
-// This should always return true.
-func (b *Borrow) HasResource() bool {
-	return HasResource(b.Type)
-}
+func (b *Borrow) hasBorrow() bool   { return true }
+func (b *Borrow) hasResource() bool { return HasResource(b.Type) }
 
 // Flags represents a WIT [flags type], stored as a bitfield.
 // It implements the [Node], [ABI], and [TypeDefKind] interfaces.
@@ -710,9 +681,7 @@ func (v *Variant) maxCaseAlign() uintptr {
 	return a
 }
 
-// HasPointer returns true if [Variant] v has an associated type
-// that contains a pointer (e.g. string, list).
-func (v *Variant) HasPointer() bool {
+func (v *Variant) hasPointer() bool {
 	for _, t := range v.Types() {
 		if HasPointer(t) {
 			return true
@@ -721,8 +690,7 @@ func (v *Variant) HasPointer() bool {
 	return false
 }
 
-// HasBorrow returns whether [Variant] v contains a [Borrow].
-func (v *Variant) HasBorrow() bool {
+func (v *Variant) hasBorrow() bool {
 	for _, t := range v.Types() {
 		if HasBorrow(t) {
 			return true
@@ -731,8 +699,7 @@ func (v *Variant) HasBorrow() bool {
 	return false
 }
 
-// HasResource returns whether [Variant] v contains a [Resource].
-func (v *Variant) HasResource() bool {
+func (v *Variant) hasResource() bool {
 	for _, t := range v.Types() {
 		if HasResource(t) {
 			return true
@@ -930,21 +897,9 @@ func (*List) Align() uintptr { return 8 } // [2]int32
 // [flattened]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
 func (*List) Flat() []Type { return []Type{U32{}, U32{}} }
 
-// HasPointer returns whether the [ABI] representation of a [List] contains a pointer.
-// This always returns true.
-//
-// [ABI]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md
-func (*List) HasPointer() bool { return true }
-
-// HasBorrow returns whether [List] l contains a [Borrow].
-func (l *List) HasBorrow() bool {
-	return HasBorrow(l.Type)
-}
-
-// HasResource returns whether [List] l contains a [Resource].
-func (l *List) HasResource() bool {
-	return HasResource(l.Type)
-}
+func (*List) hasPointer() bool    { return true }
+func (l *List) hasBorrow() bool   { return HasBorrow(l.Type) }
+func (l *List) hasResource() bool { return HasResource(l.Type) }
 
 // Future represents a WIT [future type], expected to be part of [WASI Preview 3].
 // It implements the [Node], [ABI], and [TypeDefKind] interfaces.
@@ -974,20 +929,9 @@ func (*Future) Align() uintptr { return 0 }
 // [flattened]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
 func (*Future) Flat() []Type { return nil }
 
-// HasPointer returns whether the [ABI] representation of [Future] f contains a pointer.
-func (f *Future) HasPointer() bool {
-	return HasPointer(f.Type)
-}
-
-// HasBorrow returns whether [Future] f contains a [Borrow].
-func (f *Future) HasBorrow() bool {
-	return HasBorrow(f.Type)
-}
-
-// HasResource returns whether [Future] f contains a [Resource].
-func (f *Future) HasResource() bool {
-	return HasResource(f.Type)
-}
+func (f *Future) hasPointer() bool  { return HasPointer(f.Type) }
+func (f *Future) hasBorrow() bool   { return HasBorrow(f.Type) }
+func (f *Future) hasResource() bool { return HasResource(f.Type) }
 
 // Stream represents a WIT [stream type], expected to be part of [WASI Preview 3].
 // It implements the [Node], [ABI], and [TypeDefKind] interfaces.
@@ -1018,20 +962,9 @@ func (*Stream) Align() uintptr { return 0 }
 // [flattened]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
 func (*Stream) Flat() []Type { return nil }
 
-// HasPointer returns whether the [ABI] representation of [Stream] s contains a pointer.
-func (s *Stream) HasPointer() bool {
-	return HasPointer(s.Element) || HasPointer(s.End)
-}
-
-// HasBorrow returns whether [Stream] s contains a [Borrow].
-func (s *Stream) HasBorrow() bool {
-	return HasBorrow(s.Element) || HasBorrow(s.End)
-}
-
-// HasResource returns whether [Stream] s contains a [Resource].
-func (s *Stream) HasResource() bool {
-	return HasResource(s.Element) || HasResource(s.End)
-}
+func (s *Stream) hasPointer() bool  { return HasPointer(s.Element) || HasPointer(s.End) }
+func (s *Stream) hasBorrow() bool   { return HasBorrow(s.Element) || HasBorrow(s.End) }
+func (s *Stream) hasResource() bool { return HasResource(s.Element) || HasResource(s.End) }
 
 // TypeOwner is the interface implemented by any type that can own a TypeDef,
 // currently [World] and [Interface].
@@ -1149,9 +1082,9 @@ func (_primitive[T]) Align() uintptr {
 	}
 }
 
-// HasPointer returns whether the ABI representation of this type contains a pointer.
+// hasPointer returns whether the ABI representation of this type contains a pointer.
 // This will only return true for [String].
-func (_primitive[T]) HasPointer() bool {
+func (_primitive[T]) hasPointer() bool {
 	var v T
 	switch any(v).(type) {
 	case string:
