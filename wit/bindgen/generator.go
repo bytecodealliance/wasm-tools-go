@@ -814,7 +814,15 @@ func (g *generator) ownRep(file *gen.File, dir wit.Direction, o *wit.Own) string
 }
 
 func (g *generator) borrowRep(file *gen.File, dir wit.Direction, b *wit.Borrow) string {
-	return g.typeRep(file, dir, b.Type)
+	switch dir {
+	case wit.Imported:
+		return g.typeRep(file, dir, b.Type)
+	case wit.Exported:
+		// Exported borrow<T> are represented by a concrete i32 rep.
+		return file.Import(g.opts.cmPackage) + ".Rep"
+	default:
+		panic("BUG: unknown direction " + dir.String())
+	}
 }
 
 func (g *generator) declareFunction(owner wit.Ident, dir wit.Direction, f *wit.Function) (funcDecl, error) {
