@@ -376,9 +376,8 @@ func (g *generator) defineTypeDef(dir wit.Direction, t *wit.TypeDef, name string
 
 	// Define any associated functions
 	if f := t.ResourceDrop(); f != nil {
-		// TODO: resource.drop is always imported, never exported
-		// err := g.defineFunction(owner, wit.Imported, f)
-		err := g.defineFunction(owner, dir, f)
+		// resource.drop is always imported, never exported
+		err := g.defineFunction(owner, wit.Imported, f)
 		if err != nil {
 			return nil
 		}
