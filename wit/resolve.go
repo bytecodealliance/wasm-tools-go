@@ -1279,7 +1279,12 @@ type Function struct {
 // For methods, this removes the [method] and type prefix.
 // For special functions like [resource-drop], it will return a well-known value.
 func (f *Function) BaseName() string {
-	if strings.HasPrefix(f.Name, "[resource-drop]") {
+	switch {
+	case strings.HasPrefix(f.Name, "[resource-new]"):
+		return "resource-new"
+	case strings.HasPrefix(f.Name, "[resource-rep]"):
+		return "resource-rep"
+	case strings.HasPrefix(f.Name, "[resource-drop]"):
 		return "resource-drop"
 	}
 	if _, after, found := strings.Cut(f.Name, "."); found {
@@ -1305,10 +1310,15 @@ func (f *Function) Type() Type {
 
 // IsAdmin returns true if [Function] f is an administrative function in the Canonical ABI.
 func (f *Function) IsAdmin() bool {
-	if f.IsMethod() && strings.HasPrefix(f.Name, "[resource-drop]") {
+	switch {
+	case f.IsStatic() && strings.HasPrefix(f.Name, "[resource-new]"):
+		return true
+	case f.IsMethod() && strings.HasPrefix(f.Name, "[resource-rep]"):
+		return true
+	case f.IsMethod() && strings.HasPrefix(f.Name, "[resource-drop]"):
 		return true
 	}
-	// TODO: add other administrative functions, like resource-rep, dtor, etc.
+	// TODO: add other administrative functions, like post-return, dtor, etc.
 	return false
 }
 

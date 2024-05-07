@@ -111,6 +111,42 @@ const (
 	Exported Direction = 1
 )
 
+// ResourceNew returns the implied [resource-new] function for t.
+// If t is not a [Resource], this returns nil.
+//
+// [resource-new]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#canon-resourcenew
+func (t *TypeDef) ResourceNew() *Function {
+	if _, ok := t.Kind.(*Resource); !ok {
+		return nil
+	}
+	f := &Function{
+		Name:    "[resource-new]" + t.TypeName(),
+		Kind:    &Static{Type: t},
+		Params:  []Param{{Name: "rep", Type: &TypeDef{Kind: &Borrow{Type: t}}}},
+		Results: []Param{{Type: t}},
+		Docs:    Docs{Contents: "Creates a new resource handle."},
+	}
+	return f
+}
+
+// ResourceRep returns the implied [resource-rep] method for t.
+// If t is not a [Resource], this returns nil.
+//
+// [resource-rep]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#canon-resourcerep
+func (t *TypeDef) ResourceRep() *Function {
+	if _, ok := t.Kind.(*Resource); !ok {
+		return nil
+	}
+	f := &Function{
+		Name:    "[resource-rep]" + t.TypeName(),
+		Kind:    &Method{Type: t},
+		Params:  []Param{{Name: "self", Type: t}},
+		Results: []Param{{Type: &TypeDef{Kind: &Borrow{Type: t}}}},
+		Docs:    Docs{Contents: "Returns the underlying resource representation."},
+	}
+	return f
+}
+
 // ResourceDrop returns the implied [resource-drop] method for t.
 // If t is not a [Resource], this returns nil.
 //
