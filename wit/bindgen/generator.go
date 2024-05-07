@@ -375,8 +375,29 @@ func (g *generator) defineTypeDef(dir wit.Direction, t *wit.TypeDef, name string
 	}
 
 	// Define any associated functions
+	if dir == wit.Exported {
+		if f := t.ResourceNew(); f != nil {
+			// resource.new is always imported
+			// https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#canon-resourcenew
+			err := g.defineFunction(owner, wit.Imported, f)
+			if err != nil {
+				return nil
+			}
+		}
+
+		if f := t.ResourceRep(); f != nil {
+			// resource.rep is always imported
+			// https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#canon-resourcerep
+			err := g.defineFunction(owner, wit.Imported, f)
+			if err != nil {
+				return nil
+			}
+		}
+	}
+
 	if f := t.ResourceDrop(); f != nil {
-		// resource.drop is always imported, never exported
+		// resource.drop is always imported
+		// https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#canon-resourcedrop
 		err := g.defineFunction(owner, wit.Imported, f)
 		if err != nil {
 			return nil
