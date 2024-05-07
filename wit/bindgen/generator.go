@@ -376,6 +376,8 @@ func (g *generator) defineTypeDef(dir wit.Direction, t *wit.TypeDef, name string
 
 	// Define any associated functions
 	if f := t.ResourceDrop(); f != nil {
+		// TODO: resource.drop is always imported, never exported
+		// err := g.defineFunction(owner, wit.Imported, f)
 		err := g.defineFunction(owner, dir, f)
 		if err != nil {
 			return nil
@@ -479,10 +481,13 @@ func (g *generator) declareDirectedName(file *gen.File, dir wit.Direction, name 
 }
 
 func (g *generator) typeDecl(dir wit.Direction, t *wit.TypeDef) (typeDecl, bool) {
-	decl, ok := g.types[dir][t]
-	if !ok && dir == wit.Exported {
-		decl, ok = g.types[wit.Imported][t]
+	if decl, ok := g.types[dir][t]; ok {
+		return decl, true
 	}
+	// This may return an exported type used by an imported function, which is disallowed,
+	// except for Component Model administrative functions like resource.drop.
+	// TODO: figure out a way to enforce that constraint here.
+	decl, ok := g.types[^dir&1][t]
 	return decl, ok
 }
 
