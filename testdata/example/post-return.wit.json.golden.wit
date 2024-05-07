@@ -1,0 +1,9 @@
+package example:cleanup;
+
+interface a {
+	f: func() -> string;
+}
+
+world exports {
+	export a;
+}

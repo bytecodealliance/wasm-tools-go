@@ -1,0 +1,45 @@
+{
+  "worlds": [
+    {
+      "name": "exports",
+      "imports": {},
+      "exports": {
+        "interface-0": {
+          "interface": 0
+        }
+      },
+      "package": 0
+    }
+  ],
+  "interfaces": [
+    {
+      "name": "a",
+      "types": {},
+      "functions": {
+        "f": {
+          "name": "f",
+          "kind": "freestanding",
+          "params": [],
+          "results": [
+            {
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "package": 0
+    }
+  ],
+  "types": [],
+  "packages": [
+    {
+      "name": "example:cleanup",
+      "interfaces": {
+        "a": 0
+      },
+      "worlds": {
+        "exports": 0
+      }
+    }
+  ]
+}
