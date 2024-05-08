@@ -7,7 +7,7 @@
 
 ## About
 
-This repository contains code to generate Go bindings for [Component Model](https://component-model.bytecodealliance.org/) interfaces defined in [WIT](https://component-model.bytecodealliance.org/design/wit.html) (WebAssembly Interface Type) files. The goal of this project is to accelerate adoption of the Component Model and development of [WASI Preview 2](https://bytecodealliance.org/articles/WASI-0.2) in Go.
+This repository contains code to generate Go bindings for [Component Model](https://component-model.bytecodealliance.org/) interfaces defined in [WIT](https://component-model.bytecodealliance.org/design/wit.html) (WebAssembly Interface Type) files. The goal of this project is to accelerate adoption of the Component Model and development of [WASI 0.2+](https://bytecodealliance.org/articles/WASI-0.2) in Go.
 
 ### Component Model
 
