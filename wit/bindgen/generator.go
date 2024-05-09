@@ -1332,17 +1332,18 @@ func derefAnonRecord(t wit.Type) *wit.TypeDef {
 func (g *generator) functionDocs(dir wit.Direction, f *wit.Function, goName string) string {
 	var b strings.Builder
 	kind := f.WITKind()
-	if f.IsAdmin() {
-		stringio.Write(&b, "// ", goName, " represents the ", dir.String(), " ", f.BaseName(), " for ", f.Type().WITKind(), " \"", f.Type().TypeName(), "\".\n")
-	} else if f.IsConstructor() {
-		stringio.Write(&b, "// ", goName, " represents the ", dir.String(), " constructor for ", f.Type().WITKind(), " \"", f.Type().TypeName(), "\".\n")
-	} else if f.IsFreestanding() {
-		stringio.Write(&b, "// ", goName, " represents the ", dir.String(), " ", kind, " \"", f.Name, "\".\n")
-	} else {
-		stringio.Write(&b, "// ", goName, " represents the ", dir.String(), " ", kind, " \"", f.BaseName(), "\".\n")
-	}
+	dirString := "the " + dir.String()
 	if dir == wit.Exported {
-		b.WriteString("// The implementation is caller-defined.\n")
+		dirString = "a caller-defined, exported"
+	}
+	if f.IsAdmin() {
+		stringio.Write(&b, "// ", goName, " represents ", dirString, " ", f.BaseName(), " for ", f.Type().WITKind(), " \"", f.Type().TypeName(), "\".\n")
+	} else if f.IsConstructor() {
+		stringio.Write(&b, "// ", goName, " represents ", dirString, " constructor for ", f.Type().WITKind(), " \"", f.Type().TypeName(), "\".\n")
+	} else if f.IsFreestanding() {
+		stringio.Write(&b, "// ", goName, " represents ", dirString, " ", kind, " \"", f.Name, "\".\n")
+	} else {
+		stringio.Write(&b, "// ", goName, " represents ", dirString, " ", kind, " \"", f.BaseName(), "\".\n")
 	}
 	if f.Docs.Contents != "" {
 		b.WriteString("//\n")
