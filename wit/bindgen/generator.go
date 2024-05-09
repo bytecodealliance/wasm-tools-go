@@ -879,6 +879,10 @@ func (g *generator) declareFunction(owner wit.Ident, dir wit.Direction, f *wit.F
 		return funcDecl{}, errors.New("BUG: unknown direction " + dir.String())
 	}
 
+	if fdecl, ok := g.functions[dir][f]; ok {
+		return fdecl, nil
+	}
+
 	var funcName, wasmName string
 	switch f.Kind.(type) {
 	case *wit.Freestanding:
@@ -923,11 +927,13 @@ func (g *generator) declareFunction(owner wit.Ident, dir wit.Direction, f *wit.F
 		}
 	}
 
-	return funcDecl{
+	fdecl := funcDecl{
 		f:          goFunction(file, tdir, dir, f, funcName),
 		wasm:       goFunction(file, tdir, dir, wasm, wasmName),
 		linkerName: linkerName,
-	}, nil
+	}
+	g.functions[dir][f] = fdecl
+	return fdecl, nil
 }
 
 // FIXME: this is a fun hack
