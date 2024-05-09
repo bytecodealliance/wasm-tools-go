@@ -194,6 +194,9 @@ func TestFunctionBaseName(t *testing.T) {
 					if found {
 						want = after
 					}
+					if f.IsConstructor() {
+						want = "constructor"
+					}
 					got := f.BaseName()
 					if got != want {
 						t.Errorf("(*Function).BaseName(): got %s, expected %s", got, want)
