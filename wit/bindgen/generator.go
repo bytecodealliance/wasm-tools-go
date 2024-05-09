@@ -314,11 +314,12 @@ func (g *generator) defineInterface(dir wit.Direction, i *wit.Interface, name st
 		return true
 	})
 
+	// TODO: delete this
 	// Declare all functions
-	i.Functions.All()(func(_ string, f *wit.Function) bool {
-		g.declareFunction(id, dir, f)
-		return true
-	})
+	// i.Functions.All()(func(_ string, f *wit.Function) bool {
+	// 	g.declareFunction(id, dir, f)
+	// 	return true
+	// })
 
 	// Define standalone functions
 	i.Functions.All()(func(_ string, f *wit.Function) bool {
