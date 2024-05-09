@@ -1336,7 +1336,7 @@ func (f *Function) IsFreestanding() bool {
 }
 
 // IsConstructor returns true if [Function] f is a constructor.
-// To qualify, it must have a *[Static] Kind with a non-nil type.
+// To qualify, it must have a *[Constructor] Kind with a non-nil type.
 func (f *Function) IsConstructor() bool {
 	kind, ok := f.Kind.(*Constructor)
 	return ok && kind.Type != nil
