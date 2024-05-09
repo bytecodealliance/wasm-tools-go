@@ -1151,7 +1151,11 @@ func (g *generator) defineExportedFunction(_ wit.Ident, f *wit.Function, decl fu
 	b.WriteString(g.functionDocs(dir, f, decl.f.name))
 
 	// Emit var for caller-defined Go func
-	stringio.Write(&b, "var ", decl.f.name, " func", g.functionSignature(file, decl.f), "\n\n")
+	stringio.Write(&b, "var ", decl.f.name, " = func", g.functionSignature(file, decl.f), " {\n")
+
+	// Emit default function body with panic
+	stringio.Write(&b, "panic(\"unimplemented export: ", decl.linkerName, "\")\n")
+	b.WriteString("}\n\n")
 
 	// Emit wasmexport function
 	stringio.Write(&b, "//go:wasmexport ", decl.linkerName, "\n")
