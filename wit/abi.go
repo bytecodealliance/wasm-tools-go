@@ -164,6 +164,23 @@ func (t *TypeDef) ResourceDrop() *Function {
 	return f
 }
 
+// Destructor returns the implied destructor ([dtor]) method for t.
+// If t is not a [Resource], this returns nil.
+//
+// [dtor]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#canon-resourcedrop
+func (t *TypeDef) Destructor() *Function {
+	if _, ok := t.Kind.(*Resource); !ok {
+		return nil
+	}
+	f := &Function{
+		Name:   "[dtor]" + t.TypeName(),
+		Kind:   &Method{Type: t},
+		Params: []Param{{Name: "self", Type: &TypeDef{Kind: &Borrow{Type: t}}}},
+		Docs:   Docs{Contents: "Resource destructor."},
+	}
+	return f
+}
+
 // ReturnsBorrow reports whether [Function] f returns a [Borrow] handle,
 // which is not permitted by the Component Model specification.
 func (f *Function) ReturnsBorrow() bool {

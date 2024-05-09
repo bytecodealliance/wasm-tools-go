@@ -1280,12 +1280,16 @@ type Function struct {
 // For special functions like [resource-drop], it will return a well-known value.
 func (f *Function) BaseName() string {
 	switch {
+	case strings.HasPrefix(f.Name, "[constructor]"):
+		return "constructor"
 	case strings.HasPrefix(f.Name, "[resource-new]"):
 		return "resource-new"
 	case strings.HasPrefix(f.Name, "[resource-rep]"):
 		return "resource-rep"
 	case strings.HasPrefix(f.Name, "[resource-drop]"):
 		return "resource-drop"
+	case strings.HasPrefix(f.Name, "[dtor]"):
+		return "destructor"
 	}
 	if _, after, found := strings.Cut(f.Name, "."); found {
 		return after
@@ -1317,8 +1321,10 @@ func (f *Function) IsAdmin() bool {
 		return true
 	case f.IsMethod() && strings.HasPrefix(f.Name, "[resource-drop]"):
 		return true
+	case f.IsMethod() && strings.HasPrefix(f.Name, "[dtor]"):
+		return true
 	}
-	// TODO: add other administrative functions, like post-return, dtor, etc.
+	// TODO: are post-return and dtor administrative functions?
 	return false
 }
 

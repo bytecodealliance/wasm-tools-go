@@ -410,6 +410,13 @@ func (g *generator) defineTypeDef(dir wit.Direction, t *wit.TypeDef, name string
 			}
 		}
 
+		if f := t.Destructor(); f != nil {
+			err := g.defineFunction(owner, dir, f)
+			if err != nil {
+				return nil
+			}
+		}
+
 	default:
 		return errors.New("BUG: unknown direction " + dir.String())
 	}
@@ -1323,15 +1330,14 @@ func (g *generator) functionDocs(dir wit.Direction, f *wit.Function, goName stri
 	var b strings.Builder
 	kind := f.WITKind()
 	if f.IsAdmin() {
-		kind = "Canonical ABI function"
-	}
-	stringio.Write(&b, "// ", goName, " represents the ", dir.String(), " ", kind, " \"")
-	if f.IsFreestanding() {
-		stringio.Write(&b, f.Name)
+		stringio.Write(&b, "// ", goName, " represents the ", dir.String(), " ", f.BaseName(), " for ", f.Type().WITKind(), " \"", f.Type().TypeName(), "\".\n")
+	} else if f.IsConstructor() {
+		stringio.Write(&b, "// ", goName, " represents the ", dir.String(), " constructor for ", f.Type().WITKind(), " \"", f.Type().TypeName(), "\".\n")
+	} else if f.IsFreestanding() {
+		stringio.Write(&b, "// ", goName, " represents the ", dir.String(), " ", kind, " \"", f.Name, "\".\n")
 	} else {
-		stringio.Write(&b, f.BaseName())
+		stringio.Write(&b, "// ", goName, " represents the ", dir.String(), " ", kind, " \"", f.BaseName(), "\".\n")
 	}
-	b.WriteString("\".\n")
 	if dir == wit.Exported {
 		b.WriteString("// The implementation is caller-defined.\n")
 	}
