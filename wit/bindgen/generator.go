@@ -1415,10 +1415,5 @@ func (g *generator) packageFor(id wit.Ident) *gen.Package {
 	g.packages[pkg.Path] = pkg
 	g.witPackages[id.String()] = pkg
 
-	// Predeclare a few names
-	pkg.DeclareName("Interface")
-	pkg.DeclareName("instance")
-	pkg.DeclareName("Export")
-
 	return pkg
 }
