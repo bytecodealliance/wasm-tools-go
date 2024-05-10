@@ -1340,7 +1340,7 @@ func (g *generator) functionDocs(dir wit.Direction, f *wit.Function, goName stri
 	kind := f.WITKind()
 	dirString := "the " + dir.String()
 	if dir == wit.Exported {
-		dirString = "a caller-defined, exported"
+		dirString = "the caller-defined, exported"
 	}
 	if f.IsAdmin() {
 		stringio.Write(&b, "// ", goName, " represents ", dirString, " ", f.BaseName(), " for ", f.Type().WITKind(), " \"", f.Type().TypeName(), "\".\n")
