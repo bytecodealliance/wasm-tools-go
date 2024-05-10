@@ -1245,8 +1245,6 @@ func (g *generator) defineExportedFunction(_ wit.Ident, f *wit.Function, decl fu
 		b.WriteRune('\n')
 	}
 
-	// TODO
-
 	b.WriteString("}\n\n")
 
 	// Emit shared types

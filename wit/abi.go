@@ -122,14 +122,13 @@ func (t *TypeDef) ResourceNew() *Function {
 	if _, ok := t.Kind.(*Resource); !ok {
 		return nil
 	}
-	f := &Function{
+	return &Function{
 		Name:    "[resource-new]" + t.TypeName(),
 		Kind:    &Static{Type: t},
 		Params:  []Param{{Name: "rep", Type: &TypeDef{Kind: &Borrow{Type: t}}}},
 		Results: []Param{{Type: t}},
 		Docs:    Docs{Contents: "Creates a new resource handle."},
 	}
-	return f
 }
 
 // ResourceRep returns the implied [resource-rep] method for t.
@@ -140,14 +139,13 @@ func (t *TypeDef) ResourceRep() *Function {
 	if _, ok := t.Kind.(*Resource); !ok {
 		return nil
 	}
-	f := &Function{
+	return &Function{
 		Name:    "[resource-rep]" + t.TypeName(),
 		Kind:    &Method{Type: t},
 		Params:  []Param{{Name: "self", Type: t}},
 		Results: []Param{{Type: &TypeDef{Kind: &Borrow{Type: t}}}},
 		Docs:    Docs{Contents: "Returns the underlying resource representation."},
 	}
-	return f
 }
 
 // ResourceDrop returns the implied [resource-drop] method for t.
@@ -158,13 +156,12 @@ func (t *TypeDef) ResourceDrop() *Function {
 	if _, ok := t.Kind.(*Resource); !ok {
 		return nil
 	}
-	f := &Function{
+	return &Function{
 		Name:   "[resource-drop]" + t.TypeName(),
 		Kind:   &Method{Type: t},
 		Params: []Param{{Name: "self", Type: t}},
 		Docs:   Docs{Contents: "Drops a resource handle."},
 	}
-	return f
 }
 
 // Destructor returns the implied destructor ([dtor]) method for t.
