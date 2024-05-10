@@ -1,6 +1,9 @@
 package wit
 
-import "strconv"
+import (
+	"slices"
+	"strconv"
+)
 
 // Align aligns ptr with alignment align.
 func Align(ptr, align uintptr) uintptr {
@@ -172,13 +175,47 @@ func (t *TypeDef) Destructor() *Function {
 	if _, ok := t.Kind.(*Resource); !ok {
 		return nil
 	}
-	f := &Function{
+	return &Function{
 		Name:   "[dtor]" + t.TypeName(),
 		Kind:   &Method{Type: t},
 		Params: []Param{{Name: "self", Type: &TypeDef{Kind: &Borrow{Type: t}}}},
 		Docs:   Docs{Contents: "Resource destructor."},
 	}
-	return f
+}
+
+// PostReturn returns a [post-return] function for f, which is part of the
+// Component Model machinery that allows the caller of f to call back into the component to clean up results.
+// Returns nil if f has no results, therefore does not require cleanup.
+//
+// [post-return]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#canon-lift
+func (f *Function) PostReturn() *Function {
+	if !f.ReturnsPointer() {
+		return nil
+	}
+
+	var kind FunctionKind
+	switch k := f.Kind.(type) {
+	case *Method:
+		kind = &Static{Type: k.Type}
+	case *Constructor:
+		kind = &Static{Type: k.Type}
+	case *Static:
+		kind = &Static{Type: k.Type}
+	case *Freestanding:
+		kind = &Freestanding{}
+	}
+
+	params := slices.Clone(f.Results)
+	if params[0].Name == "" {
+		params[0].Name = "result"
+	}
+
+	return &Function{
+		Name:   "cabi_post_" + f.Name,
+		Kind:   kind,
+		Params: params,
+		Docs:   Docs{Contents: "Post-return cleanup function."},
+	}
 }
 
 // ReturnsBorrow reports whether [Function] f returns a [Borrow] handle,
@@ -186,6 +223,17 @@ func (t *TypeDef) Destructor() *Function {
 func (f *Function) ReturnsBorrow() bool {
 	for _, r := range f.Results {
 		if HasBorrow(r.Type) {
+			return true
+		}
+	}
+	return false
+}
+
+// ReturnsPointer reports whether [Function] f returns a value containing a pointer,
+// which would require a post-return cleanup function if exported.
+func (f *Function) ReturnsPointer() bool {
+	for _, r := range f.Results {
+		if HasPointer(r.Type) {
 			return true
 		}
 	}

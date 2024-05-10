@@ -1291,10 +1291,15 @@ func (f *Function) BaseName() string {
 	case strings.HasPrefix(f.Name, "[dtor]"):
 		return "destructor"
 	}
-	if _, after, found := strings.Cut(f.Name, "."); found {
-		return after
+	name, after, found := strings.Cut(f.Name, ".")
+	if found {
+		name = after
 	}
-	return f.Name
+	after, found = strings.CutPrefix(f.Name, "cabi_post_")
+	if found {
+		name = after + "-post-return"
+	}
+	return name
 }
 
 // Type returns the associated (self) [Type] for [Function] f, if f is a constructor, method, or static function.

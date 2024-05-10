@@ -957,10 +957,18 @@ func (g *generator) defineFunction(owner wit.Ident, dir wit.Direction, f *wit.Fu
 	case wit.Imported, importedWithExportedTypes:
 		return g.defineImportedFunction(owner, f, decl)
 	case wit.Exported:
-		return g.defineExportedFunction(owner, f, decl)
+		err := g.defineExportedFunction(owner, f, decl)
+		if err != nil {
+			return err
+		}
+		if pf := f.PostReturn(); pf != nil {
+			return g.defineFunction(owner, dir, pf)
+		}
 	default:
 		return errors.New("BUG: unknown direction " + dir.String())
 	}
+
+	return nil
 }
 
 func (g *generator) defineImportedFunction(_ wit.Ident, f *wit.Function, decl funcDecl) error {
@@ -1161,7 +1169,7 @@ func (g *generator) defineExportedFunction(_ wit.Ident, f *wit.Function, decl fu
 	stringio.Write(&b, "var ", decl.f.name, " = func", g.functionSignature(file, decl.f), " {")
 
 	// Emit default function body with panic
-	if !strings.HasPrefix(f.Name, "[dtor]") {
+	if !strings.HasPrefix(f.Name, "[dtor]") && !strings.HasPrefix(f.Name, "cabi_post_") {
 		b.WriteRune('\n')
 		stringio.Write(&b, "panic(\"unimplemented export: ", decl.linkerName, "\")\n")
 	}
