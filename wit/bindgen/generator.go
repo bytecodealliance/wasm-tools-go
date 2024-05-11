@@ -1342,7 +1342,7 @@ func (g *generator) functionDocs(dir wit.Direction, f *wit.Function, goName stri
 	if dir == wit.Exported {
 		dirString = "the caller-defined, exported"
 	}
-	if f.IsAdmin() {
+	if f.IsAdmin() && f.Type() != nil {
 		stringio.Write(&b, "// ", goName, " represents ", dirString, " ", f.BaseName(), " for ", f.Type().WITKind(), " \"", f.Type().TypeName(), "\".\n")
 	} else if f.IsConstructor() {
 		stringio.Write(&b, "// ", goName, " represents ", dirString, " constructor for ", f.Type().WITKind(), " \"", f.Type().TypeName(), "\".\n")

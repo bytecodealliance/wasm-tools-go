@@ -1320,16 +1320,20 @@ func (f *Function) Type() Type {
 // IsAdmin returns true if [Function] f is an administrative function in the Canonical ABI.
 func (f *Function) IsAdmin() bool {
 	switch {
+	// Imported
 	case f.IsStatic() && strings.HasPrefix(f.Name, "[resource-new]"):
 		return true
 	case f.IsMethod() && strings.HasPrefix(f.Name, "[resource-rep]"):
 		return true
 	case f.IsMethod() && strings.HasPrefix(f.Name, "[resource-drop]"):
 		return true
+
+	// Exported
 	case f.IsMethod() && strings.HasPrefix(f.Name, "[dtor]"):
 		return true
+	case strings.HasPrefix(f.Name, "cabi_post_"):
+		return true
 	}
-	// TODO: are post-return and dtor administrative functions?
 	return false
 }
 
