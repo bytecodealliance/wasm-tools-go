@@ -4,13 +4,21 @@ This directory contains design notes and prototypes of Go bindings for Component
 
 ## Exports
 
+### Post-Return
+
+For each exported function that returns allocated memory, there is a [post-return](https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#canon-lift) function called by the Canonical ABI machinery to allow the component to free the allocation(s).
+
+The post-return function name is `cabi_post_` followed by the fully-qualified function name. For example, the WIT function `example:foo/bar#echo` returning a `string` would have a post-return function named `cabi_post_example:foo/bar#echo`.
+
+The post-return function has the form of `(func (param flatten_functype($ft).results))`, where the arguments is a flattened representation of the function results.
+
 ### Export Bindings for Resource Types
 
 For each exported resource type, in addition to constructors, methods, and static functions, a component must import and export a number of functions to manage the resource lifecycle.
 
 ### Example
 
-For a hypothetical WIT resource `water` in package/interface `example:foo/bar`, a component _imports_ the following administrative functions:
+For an exported resource `water` in package/interface `example:foo/bar`, a component _imports_ the following administrative functions:
 
 - **resource-new**: initialize a resource handle for a given `rep` (concrete representation). Called by the component before a resource value is returned by an exported function.
 	- Import: `[export]example:foo/bar [resource-new]water`

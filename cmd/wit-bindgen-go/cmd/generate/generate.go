@@ -50,10 +50,6 @@ var Command = &cli.Command{
 			Usage: "emit versioned Go package(s) for each WIT version",
 		},
 		&cli.BoolFlag{
-			Name:  "exports",
-			Usage: "emit export bindings (WIP)",
-		},
-		&cli.BoolFlag{
 			Name:  "dry-run",
 			Usage: "do not write files; print to stdout",
 		},
@@ -94,7 +90,6 @@ func action(ctx context.Context, cmd *cli.Command) error {
 		bindgen.World(cmd.String("world")),
 		bindgen.PackageRoot(pkgRoot),
 		bindgen.Versioned(cmd.Bool("versioned")),
-		bindgen.GenerateExports(cmd.Bool("exports")),
 	)
 	if err != nil {
 		return err

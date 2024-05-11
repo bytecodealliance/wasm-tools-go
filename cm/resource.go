@@ -7,6 +7,13 @@ package cm
 // [Canonical ABI]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md
 type Resource uint32
 
+// Rep represents a Component Model [resource rep], the core representation type of a resource.
+// It is represented in the [Canonical ABI] as an 32-bit integer.
+//
+// [resource rep]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#canon-resourcerep
+// [Canonical ABI]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md
+type Rep uint32
+
 // ResourceNone is a sentinel value indicating a null or uninitialized resource.
 // This is a reserved value specified in the [Canonical ABI runtime state].
 //

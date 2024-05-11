@@ -9,4 +9,5 @@ interface types {
 
 world imports {
     import types;
+	export types;
 }
