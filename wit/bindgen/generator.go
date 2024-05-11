@@ -1243,11 +1243,11 @@ func (g *generator) defineExportedFunction(owner wit.Ident, f *wit.Function, dec
 	}
 
 	// Emit caller-defined function name
-	stringio.Write(&b, file.GetName("Exports"), ".")
+	fqName := file.GetName("Exports") + "." + decl.f.name
 	if t := f.Type(); t != nil {
-		stringio.Write(&b, scope.GetName(GoName(t.TypeName(), true)), ".")
+		fqName = file.GetName("Exports") + "." + scope.GetName(GoName(t.TypeName(), true)) + "." + decl.f.name
 	}
-	stringio.Write(&b, decl.f.name, "(")
+	stringio.Write(&b, fqName, "(")
 
 	// Emit call params
 	if paramsRecord != nil {
@@ -1288,6 +1288,13 @@ func (g *generator) defineExportedFunction(owner wit.Ident, f *wit.Function, dec
 	}
 
 	b.WriteString("}\n\n")
+
+	// Emit default function body
+	if strings.HasPrefix(f.Name, "[dtor]") || strings.HasPrefix(f.Name, "cabi_post_") {
+		stringio.Write(&b, "func init() {")
+		stringio.Write(&b, fqName, " = func", g.functionSignature(file, decl.f), " {}\n")
+		b.WriteString("}\n\n")
+	}
 
 	// Emit shared types
 	if t, ok := compoundParams.typ.(*wit.TypeDef); ok {
