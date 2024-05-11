@@ -22,7 +22,7 @@ type Package struct {
 func NewPackage(path string) *Package {
 	p := &Package{
 		Files: make(map[string]*File),
-		Scope: NewScope(Reserved()),
+		Scope: NewScope(nil),
 	}
 	p.Path, p.Name = ParseSelector(path)
 	return p
