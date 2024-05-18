@@ -36,7 +36,8 @@ const (
 
 	// Predeclare Go types for own<T> and borrow<T>.
 	// Currently broken.
-	experimentPredeclareHandles = false
+	experimentPredeclareOwnHandles    = false
+	experimentPredeclareBorrowHandles = true
 )
 
 type typeDecl struct {
@@ -505,20 +506,24 @@ func (g *generator) declareTypeDef(file *gen.File, dir wit.Direction, t *wit.Typ
 	// fmt.Fprintf(os.Stderr, "Type:\t%s.%s\n\t%s.%s\n", owner.String(), name, decl.Package.Path, decl.Name)
 
 	// Predeclare own<T> and borrow<T> for resource types.
-	if experimentPredeclareHandles {
+	if dir == wit.Exported && experimentPredeclareOwnHandles || experimentPredeclareBorrowHandles {
 		switch t.Kind.(type) {
 		case *wit.Resource:
-			var count int
+			count := 0
+			threshold := 1
+			if experimentPredeclareOwnHandles && experimentPredeclareBorrowHandles {
+				threshold = 2
+			}
 			for _, t2 := range g.res.TypeDefs {
 				var err error
 				switch kind := t2.Kind.(type) {
 				case *wit.Own:
-					if kind.Type == t {
+					if kind.Type == t && experimentPredeclareOwnHandles {
 						_, err = g.declareTypeDef(file, dir, t2, "Own"+decl.name)
 						count++
 					}
 				case *wit.Borrow:
-					if kind.Type == t {
+					if kind.Type == t && experimentPredeclareBorrowHandles {
 						_, err = g.declareTypeDef(file, dir, t2, "Borrow"+decl.name)
 						count++
 					}
@@ -526,7 +531,7 @@ func (g *generator) declareTypeDef(file *gen.File, dir wit.Direction, t *wit.Typ
 				if err != nil {
 					return typeDecl{}, err
 				}
-				if count >= 2 {
+				if count >= threshold {
 					break
 				}
 			}
