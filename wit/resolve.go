@@ -652,7 +652,7 @@ func (v *Variant) Flat() []Type {
 	for _, t := range v.Types() {
 		for i, f := range t.Flat() {
 			if i >= len(flat) {
-				flat = append(flat, t)
+				flat = append(flat, f)
 			} else if f.Size() > flat[i].Size() {
 				flat[i] = f
 			}
