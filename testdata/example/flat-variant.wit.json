@@ -1,0 +1,95 @@
+{
+  "worlds": [
+    {
+      "name": "imports",
+      "imports": {
+        "interface-0": {
+          "interface": 0
+        }
+      },
+      "exports": {},
+      "package": 0
+    }
+  ],
+  "interfaces": [
+    {
+      "name": "a",
+      "types": {
+        "numbers": 1
+      },
+      "functions": {
+        "f0": {
+          "name": "f0",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "f",
+              "type": "f64"
+            }
+          ],
+          "results": []
+        },
+        "f1": {
+          "name": "f1",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "v",
+              "type": 1
+            }
+          ],
+          "results": []
+        }
+      },
+      "package": 0
+    }
+  ],
+  "types": [
+    {
+      "name": null,
+      "kind": {
+        "option": "string"
+      },
+      "owner": null
+    },
+    {
+      "name": "numbers",
+      "kind": {
+        "variant": {
+          "cases": [
+            {
+              "name": "one",
+              "type": null
+            },
+            {
+              "name": "two",
+              "type": "string"
+            },
+            {
+              "name": "three",
+              "type": "f64"
+            },
+            {
+              "name": "four",
+              "type": 0
+            }
+          ]
+        }
+      },
+      "owner": {
+        "interface": 0
+      }
+    }
+  ],
+  "packages": [
+    {
+      "name": "example:flat-variant",
+      "interfaces": {
+        "a": 0
+      },
+      "worlds": {
+        "imports": 0
+      }
+    }
+  ]
+}
