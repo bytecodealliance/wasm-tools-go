@@ -267,12 +267,14 @@ func (f *Function) CoreFunction(op Direction) *Function {
 	cf := *f
 
 	// Max 16 params
-	if len(flatParams(f.Params)) > MaxFlatParams {
+	cf.Params = flatParams(f.Params)
+	if len(cf.Params) > MaxFlatParams {
 		cf.Params = []Param{compoundParam("param", "params", f.Params)}
 	}
 
 	// Max 1 result
-	if len(flatParams(f.Results)) > MaxFlatResults {
+	cf.Results = flatParams(f.Results)
+	if len(cf.Results) > MaxFlatResults {
 		p := compoundParam("result", "results", f.Results)
 		if op == Exported {
 			cf.Results = []Param{p}
@@ -285,12 +287,22 @@ func (f *Function) CoreFunction(op Direction) *Function {
 	return &cf
 }
 
-func flatParams(params []Param) []Type {
-	flat := make([]Type, 0, len(params))
+func flatParams(params []Param) []Param {
+	var out []Param
 	for _, p := range params {
-		flat = append(flat, p.Type.Flat()...)
+		flat := p.Type.Flat()
+		if len(flat) == 1 {
+			if p.Name == "" {
+				p.Name = "result"
+			}
+			out = append(out, Param{Name: p.Name + "0", Type: flat[0]})
+		} else {
+			for i, t := range flat {
+				out = append(out, Param{Name: p.Name + strconv.Itoa(i), Type: t})
+			}
+		}
 	}
-	return flat
+	return out
 }
 
 // compoundParam returns a single param that represents
