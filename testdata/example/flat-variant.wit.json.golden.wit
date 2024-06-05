@@ -1,0 +1,17 @@
+package example:flat-variant;
+
+interface a {
+	variant numbers {
+		one,
+		two(string),
+		three(f64),
+		four(option<string>),
+	}
+	type optional-float = option<f64>;
+	f0: func(f: f64);
+	f1: func(v: numbers);
+}
+
+world imports {
+	import a;
+}

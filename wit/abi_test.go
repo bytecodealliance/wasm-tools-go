@@ -3,6 +3,7 @@ package wit
 import (
 	"fmt"
 	"math"
+	"reflect"
 	"testing"
 )
 
@@ -123,11 +124,44 @@ func TestTypeSize(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			size := tt.v.Size()
 			if size != tt.size {
-				t.Errorf("(Type).Size(): expected %d, got %d", tt.size, size)
+				t.Errorf("(Type).Size(): %d, expected %d", size, tt.size)
 			}
 			align := tt.v.Align()
 			if align != tt.align {
-				t.Errorf("(Type).Align(): expected %d, got %d", tt.align, align)
+				t.Errorf("(Type).Align(): %d, expected %d", align, tt.align)
+			}
+		})
+	}
+}
+
+func TestTypeFlat(t *testing.T) {
+	tests := []struct {
+		name string
+		v    Type
+		want []Type
+	}{
+		{"bool", Bool{}, []Type{U32{}}},
+		{"s8", S8{}, []Type{U32{}}},
+		{"u8", U8{}, []Type{U32{}}},
+		{"s16", S16{}, []Type{U32{}}},
+		{"u16", U16{}, []Type{U32{}}},
+		{"s32", S32{}, []Type{U32{}}},
+		{"u32", U32{}, []Type{U32{}}},
+		{"s64", S64{}, []Type{U64{}}},
+		{"u64", U64{}, []Type{U64{}}},
+		{"f32", F32{}, []Type{F32{}}},
+		{"f64", F64{}, []Type{F64{}}},
+		{"char", Char{}, []Type{U32{}}},
+		{"string", String{}, []Type{U32{}, U32{}}},
+		{"option<string>", &TypeDef{Kind: &Option{Type: String{}}}, []Type{U32{}, U32{}, U32{}}},
+		{"option<f32>", &TypeDef{Kind: &Option{Type: F32{}}}, []Type{U32{}, F32{}}},
+		{"variant", &TypeDef{Kind: &Variant{Cases: []Case{{Type: String{}}, {Type: F64{}}}}}, []Type{U32{}, U64{}, U32{}}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := tt.v.Flat()
+			if !reflect.DeepEqual(tt.want, got) {
+				t.Errorf("(Type).Flat(): %v, expected %v", got, tt.want)
 			}
 		})
 	}
