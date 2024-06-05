@@ -15,7 +15,8 @@
     {
       "name": "a",
       "types": {
-        "numbers": 1
+        "numbers": 1,
+        "optional-float": 2
       },
       "functions": {
         "f0": {
@@ -75,6 +76,15 @@
             }
           ]
         }
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": "optional-float",
+      "kind": {
+        "option": "f64"
       },
       "owner": {
         "interface": 0

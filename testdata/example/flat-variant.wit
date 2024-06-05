@@ -11,6 +11,8 @@ interface a {
 	f0: func(f: float64);
 
 	f1: func(v: numbers);
+
+	type optional-float = option<float64>;
 }
 
 world imports {
