@@ -87,7 +87,7 @@ func goFunction(file *gen.File, tdir, dir wit.Direction, f *wit.Function, goName
 	}
 	if dir == wit.Imported && f.IsMethod() {
 		out.receiver = out.params[0]
-		out.params = out.params[1:]
+		// out.params = out.params[1:]
 	}
 	return out
 }
@@ -898,6 +898,95 @@ func (g *generator) borrowRep(file *gen.File, dir wit.Direction, b *wit.Borrow) 
 	}
 }
 
+func (g *generator) lowerType(file *gen.File, into []wit.Type, t wit.Type, name string) string {
+	// flat := t.Flat()
+	// if len(flat) != len(into) {
+	// 	return "", fmt.Errorf("cannot lower type %s: len(into) (%d) != len(flat) (%d)",
+	// 		t.TypeName(), len(into), len(flat))
+	// }
+	switch t := t.(type) {
+	case nil:
+		// TODO: should this exist?
+		return ""
+	case *wit.TypeDef:
+		t = t.Root()
+		return g.lowerTypeDef(file, into, t, name)
+	case wit.Primitive:
+		return g.lowerPrimitive(file, into, t, name)
+	default:
+		panic(fmt.Sprintf("BUG: unknown type %T", t)) // should never reach here
+	}
+}
+
+func (g *generator) lowerTypeDef(file *gen.File, into []wit.Type, t *wit.TypeDef, name string) string {
+	return g.lowerTypeDefKind(file, into, t.Kind, name)
+}
+
+func (g *generator) lowerTypeDefKind(file *gen.File, into []wit.Type, kind wit.TypeDefKind, name string) string {
+	switch kind := kind.(type) {
+	case *wit.Pointer:
+		return file.Import(g.opts.cmPackage) + ".PointerTo" + goTypeName(into[0]) + "(" + name + ")"
+	case wit.Type:
+		return g.lowerType(file, into, kind, name)
+	// case *wit.Record:
+	// 	return g.recordRep(file, dir, kind, goName)
+	// case *wit.Tuple:
+	// 	return g.tupleRep(file, dir, kind)
+	// case *wit.Flags:
+	// 	return g.flagsRep(file, dir, kind, goName)
+	// case *wit.Enum:
+	// 	return g.enumRep(file, dir, kind, goName)
+	// case *wit.Variant:
+	// 	return g.variantRep(file, dir, kind, goName)
+	// case *wit.Result:
+	// 	return g.resultRep(file, dir, kind)
+	// case *wit.Option:
+	// 	return g.optionRep(file, dir, kind)
+	// case *wit.List:
+	// 	return g.listRep(file, dir, kind)
+	case *wit.Resource, *wit.Own, *wit.Borrow:
+		return g.cmCast(file, into[0], wit.U32{}, g.cmAnyToU32(file, name))
+		// case *wit.Future:
+		// 	return "any /* TODO: *wit.Future */"
+		// case *wit.Stream:
+		// 	return "any /* TODO: *wit.Stream */"
+		// default:
+		// 	panic(fmt.Sprintf("BUG: unknown wit.TypeDefKind %T", kind)) // should never reach here
+	}
+	return "/* TODO */"
+}
+
+func (g *generator) lowerPrimitive(file *gen.File, into []wit.Type, p wit.Primitive, name string) string {
+	switch p := p.(type) {
+	case wit.String:
+		return g.cmCast(file, into[0], p, g.cmStringData(file, name)) + ", " + g.cmCast(file, into[1], p, "len("+name+")")
+	default:
+		if into[0] == p {
+			return name
+		}
+		return g.cmCast(file, into[0], p, name)
+	}
+}
+
+func (g *generator) cmStringData(file *gen.File, name string) string {
+	return file.Import(g.opts.cmPackage) + ".StringData(" + name + ")"
+}
+
+func (g *generator) cmAnyToU32(file *gen.File, name string) string {
+	return file.Import(g.opts.cmPackage) + ".AnyToU32(" + name + ")"
+}
+
+func (g *generator) cmCast(file *gen.File, to wit.Type, from wit.Type, name string) string {
+	if to == from {
+		return name
+	}
+	return file.Import(g.opts.cmPackage) + "." + goTypeName(from) + "To" + goTypeName(to) + "(" + name + ")"
+}
+
+func goTypeName(t wit.Type) string {
+	return strings.ToTitle(t.TypeName())
+}
+
 func (g *generator) declareFunction(owner wit.Ident, dir wit.Direction, f *wit.Function) (funcDecl, error) {
 	// Setup
 	file := g.fileFor(owner)
@@ -1024,38 +1113,42 @@ func (g *generator) defineImportedFunction(_ wit.Ident, f *wit.Function, decl fu
 
 	file := decl.f.file
 
+	// for i := range callParams {
+	// 	j := i - len(decl.f.params)
+	// 	if j < 0 {
+	// 		callParams[i].name = decl.f.params[i].name
+	// 	} else {
+	// 		callParams[i].name = decl.f.results[j].name
+	// 	}
+	// }
+
+	// params := anonRecord(decl.wasm.params)
+
 	// Bridging between Go and wasm function
 	callParams := slices.Clone(decl.wasm.params)
 	for i := range callParams {
-		j := i - len(decl.f.params)
-		if j < 0 {
-			callParams[i].name = decl.f.params[i].name
-		} else {
-			callParams[i].name = decl.f.results[j].name
-		}
+		callParams[i].name = decl.f.scope.DeclareName(callParams[i].name)
+	}
+	callResults := slices.Clone(decl.wasm.results)
+	for i := range callResults {
+		callResults[i].name = decl.f.scope.DeclareName(callResults[i].name)
 	}
 
 	var compoundParams param
-	if len(decl.f.params) > 0 && derefAnonRecord(decl.wasm.params[0].typ) != nil {
-		name := decl.f.scope.DeclareName("params")
-		callParams[0].name = name
-		t := derefAnonRecord(decl.wasm.params[0].typ)
+	if len(decl.f.params) > 0 && derefAnonRecord(callParams[0].typ) != nil {
+		compoundParams = callParams[0]
+		t := derefAnonRecord(compoundParams.typ)
 		g.declareTypeDef(file, dir, t, decl.wasm.name+"Params")
-		compoundParams.name = name
 		compoundParams.typ = t
-		compoundParams.dir = decl.wasm.params[0].dir
 	}
 
 	var compoundResults param
 	var resultsRecord *wit.Record
-	if len(decl.f.results) > 1 && derefAnonRecord(last(decl.wasm.params).typ) != nil {
-		name := decl.f.scope.DeclareName("results")
-		last(callParams).name = name
-		t := derefAnonRecord(last(decl.wasm.params).typ)
+	if len(decl.f.results) > 1 && derefAnonRecord(last(callParams).typ) != nil {
+		compoundResults = *last(callParams)
+		t := derefAnonRecord(last(callParams).typ)
 		g.declareTypeDef(file, dir, t, decl.wasm.name+"Results")
-		compoundResults.name = name
 		compoundResults.typ = t
-		compoundResults.dir = last(decl.wasm.params).dir
 		resultsRecord = t.Kind.(*wit.Record)
 	}
 
@@ -1076,16 +1169,28 @@ func (g *generator) defineImportedFunction(_ wit.Ident, f *wit.Function, decl fu
 
 	// Emit function body
 	b.WriteString(" {\n")
-	sameResults := slices.Equal(decl.f.results, decl.wasm.results)
-	if len(decl.f.results) == 1 && !sameResults {
-		for _, r := range decl.f.results {
-			stringio.Write(&b, "var ", r.name, " ", g.typeRep(file, r.dir, r.typ), "\n")
-		}
-	}
+	// sameResults := slices.Equal(decl.f.results, decl.wasm.results)
+	// if len(decl.f.results) == 1 && !sameResults {
+	// }
 
-	// Emit compound types
+	// for _, p := range callParams {
+	// 	t := p.typ
+	// 	if td := derefTypeDef(p.typ); td != nil {
+	// 		t = td
+	// 	}
+	// 	stringio.Write(&b, "var ", p.name, " ", g.typeRep(file, p.dir, t), "\n")
+	// }
+	// for _, r := range callResults {
+	// 	t := r.typ
+	// 	if td := derefTypeDef(r.typ); td != nil {
+	// 		t = td
+	// 	}
+	// 	stringio.Write(&b, "var ", r.name, " ", g.typeRep(file, r.dir, t), "\n")
+	// }
+
+	// Lower into wasmimport variables
 	if compoundParams.typ != nil {
-		stringio.Write(&b, compoundParams.name, " := ", g.typeRep(file, compoundParams.dir, compoundParams.typ), "{ ")
+		stringio.Write(&b, compoundParams.name, " = ", g.typeRep(file, compoundParams.dir, compoundParams.typ), "{ ")
 		if decl.f.receiver.name != "" {
 			stringio.Write(&b, decl.f.receiver.name, ", ")
 		}
@@ -1096,17 +1201,35 @@ func (g *generator) defineImportedFunction(_ wit.Ident, f *wit.Function, decl fu
 			b.WriteString(p.name)
 		}
 		b.WriteString(" }\n")
+	} else if len(callParams) > 0 && !isPointer(callParams[0].typ) {
+		i := 0
+		for _, p := range decl.f.params {
+			flat := p.typ.Flat()
+			for j := range flat {
+				if j > 0 {
+					b.WriteString(", ")
+				}
+				stringio.Write(&b, callParams[i].name)
+				i++
+			}
+			stringio.Write(&b, " := ", g.lowerType(file, flat, p.typ, p.name), "\n")
+		}
 	}
-	if compoundResults.typ != nil {
-		stringio.Write(&b, "var ", compoundResults.name, " ", g.typeRep(file, compoundResults.dir, compoundResults.typ), "\n")
+
+	// Declare result variables
+	for _, r := range decl.f.results {
+		stringio.Write(&b, "var ", r.name, " ", g.typeRep(file, r.dir, r.typ), "\n")
 	}
 
 	// Emit call to wasmimport function
-	if sameResults && len(decl.wasm.results) > 0 {
-		b.WriteString("return ")
-	}
-	if decl.wasm.isMethod() {
-		stringio.Write(&b, decl.wasm.receiver.name, ".")
+	if len(callResults) > 0 {
+		for i, r := range callResults {
+			if i > 0 {
+				b.WriteString(", ")
+			}
+			stringio.Write(&b, r.name)
+		}
+		b.WriteString(" := ")
 	}
 	stringio.Write(&b, decl.wasm.name, "(")
 	for i, p := range callParams {
@@ -1119,25 +1242,23 @@ func (g *generator) defineImportedFunction(_ wit.Ident, f *wit.Function, decl fu
 		b.WriteString(callParams[i].name)
 	}
 	b.WriteString(")\n")
-	if !sameResults {
-		b.WriteString("return ")
-		if resultsRecord != nil {
-			for i, f := range resultsRecord.Fields {
-				if i > 0 {
-					b.WriteString(", ")
-				}
-				stringio.Write(&b, compoundResults.name, ".", fieldName(f.Name, false))
+	b.WriteString("return ")
+	if resultsRecord != nil {
+		for i, f := range resultsRecord.Fields {
+			if i > 0 {
+				b.WriteString(", ")
 			}
-		} else {
-			for i, r := range decl.f.results {
-				if i > 0 {
-					b.WriteString(", ")
-				}
-				b.WriteString(r.name)
-			}
+			stringio.Write(&b, compoundResults.name, ".", fieldName(f.Name, false))
 		}
-		b.WriteRune('\n')
+	} else {
+		for i, r := range decl.f.results {
+			if i > 0 {
+				b.WriteString(", ")
+			}
+			b.WriteString(r.name)
+		}
 	}
+	b.WriteRune('\n')
 	b.WriteString("}\n\n")
 
 	// Emit wasmimport function
@@ -1329,7 +1450,11 @@ func (g *generator) functionSignature(file *gen.File, f function) string {
 	b.WriteRune('(')
 
 	// Emit params
-	for i, p := range f.params {
+	params := f.params
+	if f.isMethod() {
+		params = params[1:]
+	}
+	for i, p := range params {
 		if i > 0 {
 			b.WriteString(", ")
 		}
@@ -1379,6 +1504,18 @@ func derefTypeDef(t wit.Type) *wit.TypeDef {
 		}
 	}
 	return nil
+}
+
+func anonRecord(params []param) *wit.TypeDef {
+	r := &wit.Record{}
+	for _, p := range params {
+		r.Fields = append(r.Fields,
+			wit.Field{
+				Name: p.name,
+				Type: p.typ,
+			})
+	}
+	return &wit.TypeDef{Kind: r}
 }
 
 func derefAnonRecord(t wit.Type) *wit.TypeDef {
