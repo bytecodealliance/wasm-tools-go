@@ -284,6 +284,12 @@ type Pointer struct {
 	Type Type
 }
 
+// TypeName returns the type name for [Pointer].
+// This is somewhat of a fiction, since [WIT] does not have pointer types.
+//
+// [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
+func (*Pointer) TypeName() string { return "pointer" }
+
 // Size returns the [ABI byte size] for [Pointer].
 //
 // [ABI byte size]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#size
