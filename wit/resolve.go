@@ -653,12 +653,22 @@ func (v *Variant) Flat() []Type {
 		for i, f := range t.Flat() {
 			if i >= len(flat) {
 				flat = append(flat, f)
-			} else if f.Size() > flat[i].Size() {
-				flat[i] = f
+			} else {
+				flat[i] = flatJoin(flat[i], f)
 			}
 		}
 	}
 	return append(Discriminant(len(v.Cases)).Flat(), flat...)
+}
+
+func flatJoin(a, b Type) Type {
+	if a == b {
+		return a
+	}
+	if a.Size() == 4 && b.Size() == 4 {
+		return U32{}
+	}
+	return U64{}
 }
 
 func (v *Variant) maxCaseSize() uintptr {
@@ -1152,6 +1162,9 @@ func (_primitive[T]) TypeName() string {
 		panic(fmt.Sprintf("BUG: unknown primitive type %T", v)) // should never reach here
 	}
 }
+
+// String implements the [io.Stringer] interface. Used for debugging.
+func (p _primitive[T]) String() string { return p.TypeName() }
 
 // Bool represents the WIT [primitive type] bool, a boolean value either true or false.
 // It is equivalent to the Go type [bool].
