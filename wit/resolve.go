@@ -910,7 +910,7 @@ func (*List) Align() uintptr { return 8 } // [2]int32
 // Flat returns the [flattened] ABI representation of [List].
 //
 // [flattened]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
-func (*List) Flat() []Type { return []Type{U32{}, U32{}} }
+func (l *List) Flat() []Type { return []Type{PointerTo(l.Type), U32{}} }
 
 func (*List) hasPointer() bool    { return true }
 func (l *List) hasBorrow() bool   { return HasBorrow(l.Type) }
@@ -1124,7 +1124,7 @@ func (_primitive[T]) Flat() []Type {
 	case float64:
 		return []Type{F64{}}
 	case string:
-		return []Type{U32{}, U32{}}
+		return []Type{PointerTo(U8{}), U32{}}
 	default:
 		panic(fmt.Sprintf("BUG: unknown primitive type %T", v)) // should never reach here
 	}
