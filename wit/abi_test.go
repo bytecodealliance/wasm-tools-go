@@ -161,8 +161,16 @@ func TestTypeFlat(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got := tt.v.Flat()
 			if !reflect.DeepEqual(tt.want, got) {
-				t.Errorf("(Type).Flat(): %v, expected %v", got, tt.want)
+				t.Errorf("(Type).Flat(): %v, expected %v", witFor(got...), witFor(tt.want...))
 			}
 		})
 	}
+}
+
+func witFor[T Node](nodes ...T) []string {
+	out := make([]string, len(nodes))
+	for i, node := range nodes {
+		out[i] = node.WIT(nil, "")
+	}
+	return out
 }
