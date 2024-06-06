@@ -277,6 +277,11 @@ func KindOf[K TypeDefKind](t Type) (kind K) {
 	return zero
 }
 
+// PointerTo returns a [Pointer] to [Type] t.
+func PointerTo(t Type) *TypeDef {
+	return &TypeDef{Kind: &Pointer{Type: t}}
+}
+
 // Pointer represents a pointer to a WIT type.
 // It is only used for ABI representation, e.g. pointers to function parameters or return values.
 type Pointer struct {
