@@ -397,8 +397,9 @@ func (p *Pointer) WIT(_ Node, name string) string {
 		b.WriteString(escape(name))
 		b.WriteString(" = ")
 	}
-	b.WriteRune('*')
+	b.WriteString("pointer<")
 	b.WriteString(p.Type.WIT(p, ""))
+	b.WriteRune('>')
 	return b.String()
 }
 

@@ -152,8 +152,8 @@ func TestTypeFlat(t *testing.T) {
 		{"f32", F32{}, []Type{F32{}}},
 		{"f64", F64{}, []Type{F64{}}},
 		{"char", Char{}, []Type{U32{}}},
-		{"string", String{}, []Type{U32{}, U32{}}},
-		{"option<string>", &TypeDef{Kind: &Option{Type: String{}}}, []Type{U32{}, U32{}, U32{}}},
+		{"string", String{}, []Type{PointerTo(U8{}), U32{}}},
+		{"option<string>", &TypeDef{Kind: &Option{Type: String{}}}, []Type{U32{}, PointerTo(U8{}), U32{}}},
 		{"option<f32>", &TypeDef{Kind: &Option{Type: F32{}}}, []Type{U32{}, F32{}}},
 		{"variant", &TypeDef{Kind: &Variant{Cases: []Case{{Type: String{}}, {Type: F64{}}}}}, []Type{U32{}, U64{}, U32{}}},
 	}
@@ -161,8 +161,16 @@ func TestTypeFlat(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got := tt.v.Flat()
 			if !reflect.DeepEqual(tt.want, got) {
-				t.Errorf("(Type).Flat(): %v, expected %v", got, tt.want)
+				t.Errorf("(Type).Flat(): %v, expected %v", witFor(got...), witFor(tt.want...))
 			}
 		})
 	}
+}
+
+func witFor[T Node](nodes ...T) []string {
+	out := make([]string, len(nodes))
+	for i, node := range nodes {
+		out[i] = node.WIT(nil, "")
+	}
+	return out
 }

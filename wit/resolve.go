@@ -277,6 +277,11 @@ func KindOf[K TypeDefKind](t Type) (kind K) {
 	return zero
 }
 
+// PointerTo returns a [Pointer] to [Type] t.
+func PointerTo(t Type) *TypeDef {
+	return &TypeDef{Kind: &Pointer{Type: t}}
+}
+
 // Pointer represents a pointer to a WIT type.
 // It is only used for ABI representation, e.g. pointers to function parameters or return values.
 type Pointer struct {
@@ -905,7 +910,7 @@ func (*List) Align() uintptr { return 8 } // [2]int32
 // Flat returns the [flattened] ABI representation of [List].
 //
 // [flattened]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
-func (*List) Flat() []Type { return []Type{U32{}, U32{}} }
+func (l *List) Flat() []Type { return []Type{PointerTo(l.Type), U32{}} }
 
 func (*List) hasPointer() bool    { return true }
 func (l *List) hasBorrow() bool   { return HasBorrow(l.Type) }
@@ -1119,7 +1124,7 @@ func (_primitive[T]) Flat() []Type {
 	case float64:
 		return []Type{F64{}}
 	case string:
-		return []Type{U32{}, U32{}}
+		return []Type{PointerTo(U8{}), U32{}}
 	default:
 		panic(fmt.Sprintf("BUG: unknown primitive type %T", v)) // should never reach here
 	}
@@ -1162,9 +1167,6 @@ func (_primitive[T]) TypeName() string {
 		panic(fmt.Sprintf("BUG: unknown primitive type %T", v)) // should never reach here
 	}
 }
-
-// String implements the [io.Stringer] interface. Used for debugging.
-func (p _primitive[T]) String() string { return p.TypeName() }
 
 // Bool represents the WIT [primitive type] bool, a boolean value either true or false.
 // It is equivalent to the Go type [bool].
