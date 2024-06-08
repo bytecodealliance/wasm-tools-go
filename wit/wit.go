@@ -55,8 +55,12 @@ func (*Resolve) WITKind() string { return "resolve" }
 //
 // [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
 func (r *Resolve) WIT(_ Node, _ string) string {
+	packages := slices.Clone(r.Packages)
+	slices.SortFunc(packages, func(a, b *Package) int {
+		return strings.Compare(a.Name.String(), b.Name.String())
+	})
 	var b strings.Builder
-	for i, p := range r.Packages {
+	for i, p := range packages {
 		if i > 0 {
 			b.WriteRune('\n')
 			b.WriteRune('\n')
