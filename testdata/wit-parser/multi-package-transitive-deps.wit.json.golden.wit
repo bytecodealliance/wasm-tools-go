@@ -1,7 +1,8 @@
-package foo:dep2;
+package foo:bar;
 
-interface types {
-	resource a;
+world w-bar {
+	import foo:dep2/types;
+	import foo:dep1/types;
 }
 
 
@@ -13,11 +14,10 @@ interface types {
 }
 
 
-package foo:bar;
+package foo:dep2;
 
-world w-bar {
-	import foo:dep2/types;
-	import foo:dep1/types;
+interface types {
+	resource a;
 }
 
 

@@ -20,32 +20,6 @@ interface the-default {
 }
 
 
-package foo:some-pkg;
-
-interface the-default {
-	type from-default = string;
-}
-
-interface some-interface {
-	type another-type = u32;
-}
-
-interface another-interface {
-	type yet-another-type = u8;
-}
-
-
-package foo:wasi;
-
-interface clocks {
-	type timestamp = u64;
-}
-
-interface filesystem {
-	record stat { ino: u64 }
-}
-
-
 package foo:root;
 
 interface foo {
@@ -83,4 +57,30 @@ world my-world2 {
 world bars-world {
 	import foo:some-pkg/the-default;
 	import foo:another-pkg/other-interface;
+}
+
+
+package foo:some-pkg;
+
+interface the-default {
+	type from-default = string;
+}
+
+interface some-interface {
+	type another-type = u32;
+}
+
+interface another-interface {
+	type yet-another-type = u8;
+}
+
+
+package foo:wasi;
+
+interface clocks {
+	type timestamp = u64;
+}
+
+interface filesystem {
+	record stat { ino: u64 }
 }

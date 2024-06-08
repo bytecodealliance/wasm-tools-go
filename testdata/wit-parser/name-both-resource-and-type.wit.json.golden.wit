@@ -1,10 +1,3 @@
-package some:dep;
-
-interface foo {
-	resource a;
-}
-
-
 package foo:bar;
 
 interface foo {
@@ -12,4 +5,11 @@ interface foo {
 	type t1 = a;
 	type t2 = borrow<a>;
 	type t3 = borrow<t1>;
+}
+
+
+package some:dep;
+
+interface foo {
+	resource a;
 }
