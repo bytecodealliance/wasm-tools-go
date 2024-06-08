@@ -343,6 +343,7 @@ var witKeywords = map[string]bool{
 	"export":    true,
 	"flags":     true,
 	"func":      true,
+	"future":    true,
 	"import":    true,
 	"include":   true,
 	"interface": true,
@@ -351,6 +352,7 @@ var witKeywords = map[string]bool{
 	"resource":  true,
 	"result":    true,
 	"static":    true,
+	"stream":    true,
 	"type":      true,
 	"variant":   true,
 	"world":     true,
@@ -861,7 +863,7 @@ func (p *Param) WIT(_ Node, _ string) string {
 	if p.Name == "" {
 		return p.Type.WIT(p, "")
 	}
-	return p.Name + ": " + p.Type.WIT(p, "")
+	return escape(p.Name) + ": " + p.Type.WIT(p, "")
 }
 
 // WITKind returns the WIT kind.
@@ -898,6 +900,7 @@ func (p *Package) WIT(ctx Node, _ string) string {
 			}
 			b.WriteString(w.WIT(p, name))
 			b.WriteRune('\n')
+			i++
 			return true
 		})
 	}

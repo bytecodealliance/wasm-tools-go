@@ -77,16 +77,19 @@ world my-world {
 	import foo:wasi/clocks;
 	export foo:corp/saas;
 }
+
 world my-world2 {
 	import foo:wasi/filesystem;
 	import foo:wasi/clocks;
 	export foo;
 	export foo:corp/saas;
 }
+
 world bars-world {
 	import foo:some-pkg/the-default;
 	import foo:another-pkg/other-interface;
 }
+
 world unionw-world {
 	import foo:wasi/filesystem;
 	import foo:wasi/clocks;

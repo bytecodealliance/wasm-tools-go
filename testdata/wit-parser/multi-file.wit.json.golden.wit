@@ -48,6 +48,7 @@ world more-depends-on-later-things {
 	import later-interface;
 	export later-interface;
 }
+
 world the-world {
 	import depend-on-me;
 	use depend-on-me.{x};

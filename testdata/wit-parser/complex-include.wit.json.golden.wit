@@ -32,14 +32,17 @@ world a {
 	import ai;
 	import bi;
 }
+
 world b {
 	import foo:bar/a;
 	import foo:bar/b;
 }
+
 world c {
 	import foo:bar/a;
 	import foo:bar/b;
 }
+
 world union-world {
 	import ai;
 	import bi;

@@ -786,7 +786,7 @@ interface types {
 		/// `error-code::read-only`.
 		///
 		/// Note: This is similar to `openat` in POSIX.
-		open-at: func(path-flags: path-flags, path: string, open-flags: open-flags, flags: descriptor-flags) -> result<descriptor, error-code>;
+		open-at: func(path-flags: path-flags, path: string, open-flags: open-flags, %flags: descriptor-flags) -> result<descriptor, error-code>;
 
 		/// Read from a descriptor, without using and updating the descriptor's offset.
 		///
@@ -1844,7 +1844,7 @@ interface udp {
 		/// - <https://man7.org/linux/man-pages/man2/connect.2.html>
 		/// - <https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-connect>
 		/// - <https://man.freebsd.org/cgi/man.cgi?connect>
-		stream: func(remote-address: option<ip-socket-address>) -> result<tuple<incoming-datagram-stream, outgoing-datagram-stream>, error-code>;
+		%stream: func(remote-address: option<ip-socket-address>) -> result<tuple<incoming-datagram-stream, outgoing-datagram-stream>, error-code>;
 
 		/// Create a `pollable` which will resolve once the socket is ready for I/O.
 		///
@@ -2142,6 +2142,7 @@ world imports {
 	import wasi:random/insecure@0.2.0;
 	import wasi:random/insecure-seed@0.2.0;
 }
+
 world command {
 	import environment;
 	import exit;

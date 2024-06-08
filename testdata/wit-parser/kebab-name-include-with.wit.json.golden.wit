@@ -3,9 +3,11 @@ package foo:foo;
 world foo {
 	import a: func();
 }
+
 world bar {
 	import a: func();
 }
+
 world baz {
 	import b: func();
 	import a: func();

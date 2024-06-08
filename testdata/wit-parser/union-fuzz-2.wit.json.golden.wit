@@ -3,6 +3,7 @@ package foo:bar;
 world foo {
 	export foo: func() -> (name2: f32);
 }
+
 world bar {
 	record foo {}
 	export foo: func() -> (name2: f32);
