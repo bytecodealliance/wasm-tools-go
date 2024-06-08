@@ -900,6 +900,7 @@ func (p *Package) WIT(ctx Node, _ string) string {
 			}
 			b.WriteString(w.WIT(p, name))
 			b.WriteRune('\n')
+			i++
 			return true
 		})
 	}
