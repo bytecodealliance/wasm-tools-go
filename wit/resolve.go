@@ -736,7 +736,7 @@ func (v *Variant) hasResource() bool {
 // It implements the [Node] interface.
 type Case struct {
 	Name string
-	Type Type // optional associated Type (can be nil)
+	Type Type // optional associated [Type] (can be nil)
 	Docs Docs
 }
 
@@ -855,8 +855,8 @@ func (o *Option) Flat() []Type {
 // [result type]: https://component-model.bytecodealliance.org/design/wit.html#results
 type Result struct {
 	_typeDefKind
-	OK  Type // optional associated Type (can be nil)
-	Err Type // optional associated Type (can be nil)
+	OK  Type // optional associated [Type] (can be nil)
+	Err Type // optional associated [Type] (can be nil)
 }
 
 // Despecialize despecializes [Result] o into a [Variant] with two cases, "ok" and "error".
