@@ -863,7 +863,7 @@ func (p *Param) WIT(_ Node, _ string) string {
 	if p.Name == "" {
 		return p.Type.WIT(p, "")
 	}
-	return p.Name + ": " + p.Type.WIT(p, "")
+	return escape(p.Name) + ": " + p.Type.WIT(p, "")
 }
 
 // WITKind returns the WIT kind.
