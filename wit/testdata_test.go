@@ -80,9 +80,6 @@ func TestGoldenWITRoundTrip(t *testing.T) {
 	}
 	err := loadTestdata(func(path string, res *Resolve) error {
 		data := res.WIT(nil, "")
-		if strings.Count(data, "package ") > 1 {
-			return nil
-		}
 		t.Run(path, func(t *testing.T) {
 			// Run the generated WIT through wasm-tools to generate JSON.
 			cmd := exec.Command("wasm-tools", "component", "wit", "-j", "--all-features")

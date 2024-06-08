@@ -50,8 +50,7 @@ func unwrap(s string) string {
 // WITKind returns the WIT kind.
 func (*Resolve) WITKind() string { return "resolve" }
 
-// WIT returns the [WIT] text format for [Resolve] r. Note that the return value could
-// represent multiple files, so may not be precisely valid WIT text.
+// WIT returns the [WIT] text format for [Resolve] r.
 //
 // [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
 func (r *Resolve) WIT(_ Node, _ string) string {
@@ -975,32 +974,31 @@ func (p *Package) WIT(ctx Node, _ string) string {
 	b.WriteString(p.Docs.WIT(ctx, ""))
 	b.WriteString("package ")
 	b.WriteString(p.Name.String())
-	b.WriteString(";\n")
+	b.WriteString(" {\n")
 	if p.Interfaces.Len() > 0 {
-		b.WriteRune('\n')
 		i := 0
 		p.Interfaces.All()(func(name string, face *Interface) bool {
 			if i > 0 {
 				b.WriteRune('\n')
 			}
-			b.WriteString(face.WIT(p, name))
+			b.WriteString(indent(face.WIT(p, name)))
 			b.WriteRune('\n')
 			i++
 			return true
 		})
 	}
 	if p.Worlds.Len() > 0 {
-		b.WriteRune('\n')
 		i := 0
 		p.Worlds.All()(func(name string, w *World) bool {
 			if i > 0 {
 				b.WriteRune('\n')
 			}
-			b.WriteString(w.WIT(p, name))
+			b.WriteString(indent(w.WIT(p, name)))
 			b.WriteRune('\n')
 			i++
 			return true
 		})
 	}
+	b.WriteRune('}')
 	return b.String()
 }
