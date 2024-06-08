@@ -123,10 +123,9 @@ type Interface struct {
 	Name      *string
 	TypeDefs  ordered.Map[string, *TypeDef]
 	Functions ordered.Map[string, *Function]
-
-	// The [Package] that this Interface belongs to. It must be non-nil when fully resolved.
-	Package *Package
-	Docs    Docs
+	Package   *Package  // the Package this Interface belongs to
+	Stability Stability // WIT @since or @unstable (nil if unknown)
+	Docs      Docs
 }
 
 // AllFunctions returns a [sequence] that yields each [Function] in an [Interface].
@@ -147,10 +146,11 @@ func (i *Interface) AllFunctions() iterate.Seq[*Function] {
 type TypeDef struct {
 	_type
 	_worldItem
-	Name  *string
-	Kind  TypeDefKind
-	Owner TypeOwner
-	Docs  Docs
+	Name      *string
+	Kind      TypeDefKind
+	Owner     TypeOwner
+	Stability Stability // WIT @since or @unstable (nil if unknown)
+	Docs      Docs
 }
 
 // TypeName returns the [WIT] type name for t.
@@ -1289,11 +1289,12 @@ type String struct{ _primitive[string] }
 // [function]: https://component-model.bytecodealliance.org/design/wit.html#functions
 type Function struct {
 	_worldItem
-	Name    string
-	Kind    FunctionKind
-	Params  []Param // arguments to the function
-	Results []Param // a function can have a single anonymous result, or > 1 named results
-	Docs    Docs
+	Name      string
+	Kind      FunctionKind
+	Params    []Param   // arguments to the function
+	Results   []Param   // a function can have a single anonymous result, or > 1 named results
+	Stability Stability // WIT @since or @unstable (nil if unknown)
+	Docs      Docs
 }
 
 // BaseName returns the base name of [Function] f.
