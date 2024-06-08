@@ -251,7 +251,7 @@ func (g *generator) defineWorld(w *wit.World) error {
 	var err error
 	w.Imports.All()(func(name string, v wit.WorldItem) bool {
 		switch v := v.(type) {
-		case *wit.InterfaceStability:
+		case *wit.InterfaceRef:
 			// TODO: handle Stability
 			err = g.defineInterface(wit.Imported, v.Interface, name)
 		case *wit.TypeDef:
@@ -269,7 +269,7 @@ func (g *generator) defineWorld(w *wit.World) error {
 
 	w.Exports.All()(func(name string, v wit.WorldItem) bool {
 		switch v := v.(type) {
-		case *wit.InterfaceStability:
+		case *wit.InterfaceRef:
 			// TODO: handle Stability
 			err = g.defineInterface(wit.Exported, v.Interface, name)
 		case *wit.TypeDef:

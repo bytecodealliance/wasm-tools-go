@@ -195,7 +195,7 @@ func (w *World) WIT(ctx Node, name string) string {
 
 func (w *World) itemWIT(motion, name string, v WorldItem) string {
 	switch v := v.(type) {
-	case *InterfaceStability, *Function:
+	case *InterfaceRef, *Function:
 		return motion + " " + v.WIT(w, name) // TODO: handle resource methods?
 	case *TypeDef:
 		return v.WIT(w, name) // no motion, in Imports only
@@ -204,16 +204,16 @@ func (w *World) itemWIT(motion, name string, v WorldItem) string {
 }
 
 // WITKind returns the WIT kind.
-func (*InterfaceStability) WITKind() string { return "interface stability" }
+func (*InterfaceRef) WITKind() string { return "interface ref" }
 
-// WIT returns the [WIT] text format for [InterfaceStability] i.
+// WIT returns the [WIT] text format for [InterfaceRef] i.
 //
 // [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
-func (i *InterfaceStability) WIT(ctx Node, name string) string {
-	if i.Stability == nil {
-		return i.Interface.WIT(ctx, name)
+func (ref *InterfaceRef) WIT(ctx Node, name string) string {
+	if ref.Stability == nil {
+		return ref.Interface.WIT(ctx, name)
 	}
-	return i.Stability.WIT(ctx, "") + "\n" + i.Interface.WIT(ctx, name)
+	return ref.Stability.WIT(ctx, "") + "\n" + ref.Interface.WIT(ctx, name)
 }
 
 // WITKind returns the WIT kind.

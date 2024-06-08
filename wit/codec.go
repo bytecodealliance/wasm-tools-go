@@ -204,7 +204,7 @@ func (pn *Ident) DecodeString(s string) error {
 
 // DecodeField implements the [codec.FieldDecoder] interface
 // to decode a struct or JSON object.
-func (i *InterfaceStability) DecodeField(dec codec.Decoder, name string) error {
+func (i *InterfaceRef) DecodeField(dec codec.Decoder, name string) error {
 	switch name {
 	case "id":
 		return dec.Decode(&i.Interface)
@@ -234,7 +234,7 @@ func (c *worldItemCodec) DecodeField(dec codec.Decoder, name string) error {
 	var err error
 	switch name {
 	case "interface":
-		v := &InterfaceStability{}
+		v := &InterfaceRef{}
 		err = dec.Decode(v)
 		*c.v = v
 	case "function":

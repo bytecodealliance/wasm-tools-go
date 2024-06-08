@@ -90,7 +90,7 @@ func (w *World) AllFunctions() iterate.Seq[*Function] {
 }
 
 // A WorldItem is any item that can be exported from or imported into a [World],
-// currently either an [InterfaceStability], [TypeDef], or [Function].
+// currently either an [InterfaceRef], [TypeDef], or [Function].
 // Any WorldItem is also a [Node].
 type WorldItem interface {
 	Node
@@ -102,9 +102,9 @@ type _worldItem struct{}
 
 func (_worldItem) isWorldItem() {}
 
-// An InterfaceStability represents a reference to an [Interface] with a [Stability] attribute.
+// An InterfaceRef represents a reference to an [Interface] with a [Stability] attribute.
 // It implements the [Node] and [WorldItem] interfaces.
-type InterfaceStability struct {
+type InterfaceRef struct {
 	_worldItem
 
 	Interface *Interface

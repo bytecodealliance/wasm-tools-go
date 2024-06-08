@@ -10,7 +10,7 @@
 //
 // Types that are represented as Rust enums are implemented via sealed Go interfaces, implemented by other types
 // in this package. An example is [WorldItem], which is the set of types that a [World] may
-// import or export, currently [InterfaceStability], [TypeDef], and [Function].
+// import or export, currently [InterfaceRef], [TypeDef], and [Function].
 //
 // # JSON
 //
