@@ -54,13 +54,12 @@ func (r *Resolve) AllFunctions() iterate.Seq[*Function] {
 type World struct {
 	_typeOwner
 
-	Name    string
-	Imports ordered.Map[string, WorldItem]
-	Exports ordered.Map[string, WorldItem]
-
-	// The [Package] that this World belongs to. It must be non-nil when fully resolved.
-	Package *Package
-	Docs    Docs
+	Name      string
+	Imports   ordered.Map[string, WorldItem]
+	Exports   ordered.Map[string, WorldItem]
+	Package   *Package  // the Package this World belongs to (must be non-nil)
+	Stability Stability // WIT @since or @unstable (nil if unknown)
+	Docs      Docs
 }
 
 // AllFunctions returns a [sequence] that yields each [Function] in a [World].

@@ -39,7 +39,7 @@ func LoadWIT(path string) (*Resolve, error) {
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
 
-	cmd := exec.Command(wasmTools, "component", "wit", "-j")
+	cmd := exec.Command(wasmTools, "component", "wit", "-j", "--features", "active")
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
 	if path == "" || path == "-" {

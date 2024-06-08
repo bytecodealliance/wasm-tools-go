@@ -63,7 +63,7 @@ func TestGoldenWITFiles(t *testing.T) {
 }
 
 var canWasmTools = sync.OnceValue[bool](func() bool {
-	err := exec.Command("wasm-tools", "--version").Run()
+	_, err := exec.LookPath("wasm-tools")
 	return err == nil
 })
 
@@ -83,7 +83,7 @@ func TestGoldenWITRoundTrip(t *testing.T) {
 		}
 		t.Run(path, func(t *testing.T) {
 			// Run the generated WIT through wasm-tools to generate JSON.
-			cmd := exec.Command("wasm-tools", "component", "wit", "-j")
+			cmd := exec.Command("wasm-tools", "component", "wit", "-j", "--features", "active")
 			cmd.Stdin = strings.NewReader(data)
 			stdout := &bytes.Buffer{}
 			stderr := &bytes.Buffer{}

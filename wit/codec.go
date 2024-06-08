@@ -3,6 +3,7 @@ package wit
 import (
 	"io"
 
+	"github.com/coreos/go-semver/semver"
 	"github.com/ydnar/wasm-tools-go/internal/codec"
 	"github.com/ydnar/wasm-tools-go/internal/codec/json"
 )
@@ -40,7 +41,7 @@ func (res *Resolve) ResolveCodec(v any) codec.Codec {
 	case *Handle:
 		return &handleCodec{v}
 	case *Stability:
-		return &stabilityCodec{v}
+		return &stabilityCodec{v: v}
 	case *Type:
 		return &typeCodec{v, res}
 	case *TypeDefKind:
@@ -49,6 +50,12 @@ func (res *Resolve) ResolveCodec(v any) codec.Codec {
 		return &typeOwnerCodec{v}
 	case *WorldItem:
 		return &worldItemCodec{v}
+
+	// Imported
+	case *semver.Version:
+		return &semverCodec{&v}
+	case **semver.Version:
+		return &semverCodec{v}
 	}
 
 	return nil
@@ -108,6 +115,8 @@ func (c *worldCodec) DecodeField(dec codec.Decoder, name string) error {
 		return dec.Decode(&w.Exports)
 	case "package":
 		return dec.Decode(&w.Package)
+	case "stability":
+		return dec.Decode(&w.Stability)
 	case "docs":
 		return dec.Decode(&w.Docs)
 	}
@@ -136,6 +145,8 @@ func (c *interfaceCodec) DecodeField(dec codec.Decoder, name string) error {
 		return dec.Decode(&i.Functions)
 	case "package":
 		return dec.Decode(&i.Package)
+	case "stability":
+		return dec.Decode(&i.Stability)
 	case "docs":
 		return dec.Decode(&i.Docs)
 	}
@@ -162,6 +173,8 @@ func (c *typeDefCodec) DecodeField(dec codec.Decoder, name string) error {
 		return dec.Decode(&t.Name)
 	case "owner":
 		return dec.Decode(&t.Owner)
+	case "stability":
+		return dec.Decode(&t.Stability)
 	case "docs":
 		return dec.Decode(&t.Docs)
 	}
@@ -459,7 +472,9 @@ func (c *handleCodec) DecodeField(dec codec.Decoder, name string) error {
 }
 
 type stabilityCodec struct {
-	v *Stability
+	v       *Stability
+	since   semver.Version
+	feature string
 }
 
 func (c *stabilityCodec) DecodeField(dec codec.Decoder, name string) error {
@@ -473,8 +488,43 @@ func (c *stabilityCodec) DecodeField(dec codec.Decoder, name string) error {
 		v := &Unstable{}
 		err = dec.Decode(v)
 		*c.v = v
+
+	// Additional fields for serde tag="type" representation.
+	// TODO: remove this if the JSON format changes.
+	case "type":
+		var typ string
+		err = dec.Decode(&typ)
+		switch typ {
+		case "stable":
+			*c.v = &Stable{Since: c.since, Feature: c.feature}
+		case "unstable":
+			*c.v = &Unstable{Feature: c.feature}
+		}
+	case "since":
+		err = dec.Decode(&c.since)
+		switch v := (*c.v).(type) {
+		case *Stable:
+			v.Since = c.since
+		}
+	case "feature":
+		err = dec.Decode(&c.feature)
+		switch v := (*c.v).(type) {
+		case *Stable:
+			v.Feature = c.feature
+		case *Unstable:
+			v.Feature = c.feature
+		}
 	}
 	return err
+}
+
+type semverCodec struct {
+	v **semver.Version
+}
+
+func (c *semverCodec) DecodeString(s string) error {
+	codec.Must(c.v)
+	return (*c.v).Set(s)
 }
 
 // DecodeField implements the [codec.FieldDecoder] interface
@@ -535,6 +585,8 @@ func (f *Function) DecodeField(dec codec.Decoder, name string) error {
 		return codec.DecodeSlice(dec, &f.Params)
 	case "results":
 		return codec.DecodeSlice(dec, &f.Results)
+	case "stability":
+		return dec.Decode(&f.Stability)
 	case "docs":
 		return dec.Decode(&f.Docs)
 	}

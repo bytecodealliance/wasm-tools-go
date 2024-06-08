@@ -162,6 +162,10 @@ func (w *World) WIT(ctx Node, name string) string {
 	}
 	var b strings.Builder
 	b.WriteString(w.Docs.WIT(ctx, ""))
+	if w.Stability != nil {
+		b.WriteString(w.Stability.WIT(ctx, ""))
+		b.WriteRune('\n')
+	}
 	b.WriteString("world ")
 	b.WriteString(escape(name)) // TODO: compare to w.Name?
 	b.WriteString(" {")
@@ -175,7 +179,8 @@ func (w *World) WIT(ctx Node, name string) string {
 		if n == 0 {
 			b.WriteRune('\n')
 		}
-		b.WriteString(indent(w.itemWIT("import", name, i)))
+		// b.WriteString(indent(w.itemWIT("import", name, i)))
+		b.WriteString(indent(i.WIT(worldImport{w}, name)))
 		b.WriteRune('\n')
 		n++
 		return true
@@ -184,7 +189,8 @@ func (w *World) WIT(ctx Node, name string) string {
 		if n == 0 {
 			b.WriteRune('\n')
 		}
-		b.WriteString(indent(w.itemWIT("export", name, i)))
+		// b.WriteString(indent(w.itemWIT("export", name, i)))
+		b.WriteString(indent(i.WIT(worldExport{w}, name)))
 		b.WriteRune('\n')
 		n++
 		return true
@@ -192,6 +198,11 @@ func (w *World) WIT(ctx Node, name string) string {
 	b.WriteRune('}')
 	return b.String()
 }
+
+type (
+	worldImport struct{ *World }
+	worldExport struct{ *World }
+)
 
 func (w *World) itemWIT(motion, name string, v WorldItem) string {
 	switch v := v.(type) {
@@ -232,17 +243,35 @@ func (i *Interface) WIT(ctx Node, name string) string {
 	switch ctx := ctx.(type) {
 	case *Package:
 		b.WriteString(i.Docs.WIT(ctx, ""))
+		if i.Stability != nil {
+			b.WriteString(i.Stability.WIT(ctx, ""))
+			b.WriteRune('\n')
+		}
 		b.WriteString("interface ")
 		b.WriteString(escape(name))
 		b.WriteRune(' ')
-	case *World:
+
+	case worldImport:
 		rname := relativeName(i, ctx.Package)
 		if rname != "" {
-			return escape(rname) + ";"
+			return "import " + escape(rname) + ";"
 		}
 
 		// Otherwise, this is an inline interface decl.
 		b.WriteString(i.Docs.WIT(ctx, ""))
+		b.WriteString("import ")
+		b.WriteString(escape(name))
+		b.WriteString(": interface ")
+
+	case worldExport:
+		rname := relativeName(i, ctx.Package)
+		if rname != "" {
+			return "export " + escape(rname) + ";"
+		}
+
+		// Otherwise, this is an inline interface decl.
+		b.WriteString(i.Docs.WIT(ctx, ""))
+		b.WriteString("export ")
 		b.WriteString(escape(name))
 		b.WriteString(": interface ")
 	}
@@ -325,9 +354,19 @@ func (t *TypeDef) WIT(ctx Node, name string) string {
 		}
 		return fmt.Sprintf("use %s.{%s};", ownerName, escape(name))
 
-	case *World, *Interface:
+	case worldImport, worldExport, *Interface:
 		var b strings.Builder
 		b.WriteString(t.Docs.WIT(ctx, ""))
+		if t.Stability != nil {
+			b.WriteString(t.Stability.WIT(ctx, ""))
+			b.WriteRune('\n')
+		}
+		switch ctx.(type) {
+		case *worldImport:
+			b.WriteString("import ")
+		case *worldExport:
+			b.WriteString("import ")
+		}
 		b.WriteString(t.Kind.WIT(t, name))
 		constructor := t.Constructor()
 		methods := t.Methods()
@@ -852,6 +891,16 @@ func (f *Function) WIT(ctx Node, name string) string {
 	var b strings.Builder
 	if ctx != nil {
 		b.WriteString(f.Docs.WIT(ctx, ""))
+		if f.Stability != nil {
+			b.WriteString(f.Stability.WIT(ctx, ""))
+			b.WriteRune('\n')
+		}
+	}
+	switch ctx.(type) {
+	case worldImport:
+		b.WriteString("import ")
+	case worldExport:
+		b.WriteString("export ")
 	}
 	b.WriteString(escape(name))
 	var isConstructor, isMethod bool
