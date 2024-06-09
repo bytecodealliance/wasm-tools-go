@@ -1,15 +1,14 @@
-package foo:bar;
-
-interface foo {
-	use some:dep/foo.{a};
-	type t1 = a;
-	type t2 = borrow<a>;
-	type t3 = borrow<t1>;
+package foo:bar {
+	interface foo {
+		use some:dep/foo.{a};
+		type t1 = a;
+		type t2 = borrow<a>;
+		type t3 = borrow<t1>;
+	}
 }
 
-
-package some:dep;
-
-interface foo {
-	resource a;
+package some:dep {
+	interface foo {
+		resource a;
+	}
 }

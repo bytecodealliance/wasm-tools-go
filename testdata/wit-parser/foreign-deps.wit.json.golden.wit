@@ -1,86 +1,80 @@
-package foo:another-pkg;
-
-interface other-interface {}
-
-
-package foo:corp;
-
-interface saas {}
-
-
-package foo:different-pkg;
-
-interface i {}
-
-
-package foo:foreign-pkg;
-
-interface the-default {
-	type some-type = u32;
+package foo:another-pkg {
+	interface other-interface {}
 }
 
-
-package foo:root;
-
-interface foo {
-	use foo:wasi/clocks.{timestamp};
-	use foo:wasi/filesystem.{stat};
+package foo:corp {
+	interface saas {}
 }
 
-interface bar {
-	use foo:some-pkg/the-default.{from-default};
-	use foo:some-pkg/some-interface.{another-type};
-	use foo:some-pkg/another-interface.{yet-another-type};
+package foo:different-pkg {
+	interface i {}
 }
 
-interface use1 {
-	use foo:foreign-pkg/the-default.{some-type};
+package foo:foreign-pkg {
+	interface the-default {
+		type some-type = u32;
+	}
 }
 
-interface use2 {
-	use foo:foreign-pkg/the-default.{some-type};
+package foo:root {
+	interface foo {
+		use foo:wasi/clocks.{timestamp};
+		use foo:wasi/filesystem.{stat};
+	}
+
+	interface bar {
+		use foo:some-pkg/the-default.{from-default};
+		use foo:some-pkg/some-interface.{another-type};
+		use foo:some-pkg/another-interface.{yet-another-type};
+	}
+
+	interface use1 {
+		use foo:foreign-pkg/the-default.{some-type};
+	}
+
+	interface use2 {
+		use foo:foreign-pkg/the-default.{some-type};
+	}
+
+	world my-world {
+		import foo:wasi/filesystem;
+		import foo:wasi/clocks;
+		export foo:corp/saas;
+	}
+
+	world my-world2 {
+		import foo:wasi/filesystem;
+		import foo:wasi/clocks;
+		export foo;
+		export foo:corp/saas;
+	}
+
+	world bars-world {
+		import foo:some-pkg/the-default;
+		import foo:another-pkg/other-interface;
+	}
 }
 
-world my-world {
-	import foo:wasi/filesystem;
-	import foo:wasi/clocks;
-	export foo:corp/saas;
+package foo:some-pkg {
+	interface the-default {
+		type from-default = string;
+	}
+
+	interface some-interface {
+		type another-type = u32;
+	}
+
+	interface another-interface {
+		type yet-another-type = u8;
+	}
 }
 
-world my-world2 {
-	import foo:wasi/filesystem;
-	import foo:wasi/clocks;
-	export foo;
-	export foo:corp/saas;
-}
+package foo:wasi {
+	interface clocks {
+		type timestamp = u64;
+	}
 
-world bars-world {
-	import foo:some-pkg/the-default;
-	import foo:another-pkg/other-interface;
-}
-
-
-package foo:some-pkg;
-
-interface the-default {
-	type from-default = string;
-}
-
-interface some-interface {
-	type another-type = u32;
-}
-
-interface another-interface {
-	type yet-another-type = u8;
-}
-
-
-package foo:wasi;
-
-interface clocks {
-	type timestamp = u64;
-}
-
-interface filesystem {
-	record stat { ino: u64 }
+	interface filesystem {
+		record stat { ino: u64 }
+	}
 }

@@ -1,26 +1,25 @@
-package bar:name;
+package bar:name {
+	interface i {
+		type a = u32;
+	}
 
-interface i {
-	type a = u32;
-}
-
-world w {
-	import i;
-	import imp: interface {
-		use i.{a};
+	world w {
+		import i;
+		import imp: interface {
+			use i.{a};
+		}
 	}
 }
 
+package foo:name {
+	interface i {
+		type a = u32;
+	}
 
-package foo:name;
-
-interface i {
-	type a = u32;
-}
-
-world w {
-	import i;
-	import imp: interface {
-		use i.{a};
+	world w {
+		import i;
+		import imp: interface {
+			use i.{a};
+		}
 	}
 }

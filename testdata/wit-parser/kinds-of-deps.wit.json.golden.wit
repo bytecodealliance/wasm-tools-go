@@ -1,28 +1,24 @@
-package a:a;
-
-world a {
-	import b:b/b;
-	import c:c/c;
-	import d:d/d;
-	import e:e/e;
+package a:a {
+	world a {
+		import b:b/b;
+		import c:c/c;
+		import d:d/d;
+		import e:e/e;
+	}
 }
 
+package b:b {
+	interface b {}
+}
 
-package b:b;
+package c:c {
+	interface c {}
+}
 
-interface b {}
+package d:d {
+	interface d {}
+}
 
-
-package c:c;
-
-interface c {}
-
-
-package d:d;
-
-interface d {}
-
-
-package e:e;
-
-interface e {}
+package e:e {
+	interface e {}
+}
