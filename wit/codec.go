@@ -41,7 +41,7 @@ func (res *Resolve) ResolveCodec(v any) codec.Codec {
 	case *Handle:
 		return &handleCodec{v}
 	case *Stability:
-		return &stabilityCodec{v: v}
+		return &stabilityCodec{v}
 	case *Type:
 		return &typeCodec{v, res}
 	case *TypeDefKind:
@@ -472,9 +472,7 @@ func (c *handleCodec) DecodeField(dec codec.Decoder, name string) error {
 }
 
 type stabilityCodec struct {
-	v       *Stability
-	since   semver.Version
-	feature string
+	v *Stability
 }
 
 func (c *stabilityCodec) DecodeField(dec codec.Decoder, name string) error {
@@ -488,34 +486,26 @@ func (c *stabilityCodec) DecodeField(dec codec.Decoder, name string) error {
 		v := &Unstable{}
 		err = dec.Decode(v)
 		*c.v = v
-
-	// Additional fields for serde tag="type" representation.
-	// TODO: remove this if the JSON format changes.
-	case "type":
-		var typ string
-		err = dec.Decode(&typ)
-		switch typ {
-		case "stable":
-			*c.v = &Stable{Since: c.since, Feature: c.feature}
-		case "unstable":
-			*c.v = &Unstable{Feature: c.feature}
-		}
-	case "since":
-		err = dec.Decode(&c.since)
-		switch v := (*c.v).(type) {
-		case *Stable:
-			v.Since = c.since
-		}
-	case "feature":
-		err = dec.Decode(&c.feature)
-		switch v := (*c.v).(type) {
-		case *Stable:
-			v.Feature = c.feature
-		case *Unstable:
-			v.Feature = c.feature
-		}
 	}
 	return err
+}
+
+func (s *Stable) DecodeField(dec codec.Decoder, name string) error {
+	switch name {
+	case "since":
+		return dec.Decode(&s.Since)
+	case "feature":
+		return dec.Decode(&s.Feature)
+	}
+	return nil
+}
+
+func (u *Unstable) DecodeField(dec codec.Decoder, name string) error {
+	switch name {
+	case "feature":
+		return dec.Decode(&u.Feature)
+	}
+	return nil
 }
 
 type semverCodec struct {

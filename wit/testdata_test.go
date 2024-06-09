@@ -85,7 +85,7 @@ func TestGoldenWITRoundTrip(t *testing.T) {
 		}
 		t.Run(path, func(t *testing.T) {
 			// Run the generated WIT through wasm-tools to generate JSON.
-			cmd := exec.Command("wasm-tools", "component", "wit", "-j", "--features", "active")
+			cmd := exec.Command("wasm-tools", "component", "wit", "-j", "--all-features")
 			cmd.Stdin = strings.NewReader(data)
 			stdout := &bytes.Buffer{}
 			stderr := &bytes.Buffer{}

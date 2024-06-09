@@ -5,4 +5,4 @@ json: $(wit_files)
 
 .PHONY: $(wit_files)
 $(wit_files):
-	wasm-tools component wit -j --features active $@ > $@.json
+	wasm-tools component wit -j --all-features $@ > $@.json
