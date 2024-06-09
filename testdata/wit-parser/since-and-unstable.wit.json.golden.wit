@@ -9,6 +9,9 @@ interface foo2 {}
 @since(version = 1.0.0, feature = foo-bar)
 interface foo3 {}
 
+@unstable(feature = foo2)
+interface foo4 {}
+
 interface in-an-interface {
 	@since(version = 1.0.0)
 	resource r1;
