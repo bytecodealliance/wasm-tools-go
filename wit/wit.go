@@ -50,8 +50,7 @@ func unwrap(s string) string {
 // WITKind returns the WIT kind.
 func (*Resolve) WITKind() string { return "resolve" }
 
-// WIT returns the [WIT] text format for [Resolve] r. Note that the return value could
-// represent multiple files, so may not be precisely valid WIT text.
+// WIT returns the [WIT] text format for [Resolve] r.
 //
 // [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
 func (r *Resolve) WIT(_ Node, _ string) string {
@@ -59,6 +58,13 @@ func (r *Resolve) WIT(_ Node, _ string) string {
 	slices.SortFunc(packages, func(a, b *Package) int {
 		return strings.Compare(a.Name.String(), b.Name.String())
 	})
+	// Special case if only single package.
+	if len(packages) == 1 {
+		return packages[0].WIT(nil, "")
+	}
+	// Use single-file, multi-package style:
+	// https://github.com/WebAssembly/component-model/pull/340
+	// https://github.com/bytecodealliance/wasm-tools/pull/1577
 	var b strings.Builder
 	for i, p := range packages {
 		if i > 0 {
@@ -971,36 +977,49 @@ func (*Package) WITKind() string { return "package" }
 //
 // [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
 func (p *Package) WIT(ctx Node, _ string) string {
+	_, multi := ctx.(*Resolve)
 	var b strings.Builder
 	b.WriteString(p.Docs.WIT(ctx, ""))
 	b.WriteString("package ")
 	b.WriteString(p.Name.String())
-	b.WriteString(";\n")
+	if multi {
+		b.WriteString(" {\n")
+	} else {
+		b.WriteString(";\n\n")
+	}
+	i := 0
 	if p.Interfaces.Len() > 0 {
-		b.WriteRune('\n')
-		i := 0
 		p.Interfaces.All()(func(name string, face *Interface) bool {
 			if i > 0 {
 				b.WriteRune('\n')
 			}
-			b.WriteString(face.WIT(p, name))
+			if multi {
+				b.WriteString(indent(face.WIT(p, name)))
+			} else {
+				b.WriteString(face.WIT(p, name))
+			}
 			b.WriteRune('\n')
 			i++
 			return true
 		})
 	}
 	if p.Worlds.Len() > 0 {
-		b.WriteRune('\n')
-		i := 0
 		p.Worlds.All()(func(name string, w *World) bool {
 			if i > 0 {
 				b.WriteRune('\n')
 			}
-			b.WriteString(w.WIT(p, name))
+			if multi {
+				b.WriteString(indent(w.WIT(p, name)))
+			} else {
+				b.WriteString(w.WIT(p, name))
+			}
 			b.WriteRune('\n')
 			i++
 			return true
 		})
+	}
+	if multi {
+		b.WriteRune('}')
 	}
 	return b.String()
 }
