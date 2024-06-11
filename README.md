@@ -36,7 +36,7 @@ wit-bindgen-go generate wasi-cli.wit.json
 Or pipe via `stdin`:
 
 ```sh
-wasm-tools component wit -j ../wasi-cli/wit | wit-bindgen-go generate
+wasm-tools component wit -j --all-features ../wasi-cli/wit | wit-bindgen-go generate
 ```
 
 ### JSON → WIT
@@ -49,16 +49,16 @@ wit-bindgen-go wit example.wit.json
 
 ### WIT → JSON
 
-The [wit](./wit) package can decode a JSON representation of a fully-resolved WIT file. Serializing WIT into JSON requires [wasm-tools](https://crates.io/crates/wasm-tools) v1.0.42 or higher. To convert a WIT file into JSON, run `wasm-tools` with the `-j` argument:
+The [wit](./wit) package can decode a JSON representation of a fully-resolved WIT file. Serializing WIT into JSON requires [wasm-tools](https://crates.io/crates/wasm-tools) v1.210.0 or higher. To convert a WIT file into JSON, run `wasm-tools` with the `-j` argument:
 
 ```sh
-wasm-tools component wit -j example.wit
+wasm-tools component wit -j --all-features example.wit
 ```
 
 This will emit JSON on `stdout`, which can be piped to a file or another program.
 
 ```sh
-wasm-tools component wit -j example.wit > example.wit.json
+wasm-tools component wit -j --all-features example.wit > example.wit.json
 ```
 
 ## License
