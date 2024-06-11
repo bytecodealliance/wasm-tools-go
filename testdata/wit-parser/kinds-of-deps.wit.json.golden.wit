@@ -1,11 +1,11 @@
-package d:d;
+package a:a;
 
-interface d {}
-
-
-package e:e;
-
-interface e {}
+world a {
+	import b:b/b;
+	import c:c/c;
+	import d:d/d;
+	import e:e/e;
+}
 
 
 package b:b;
@@ -18,11 +18,11 @@ package c:c;
 interface c {}
 
 
-package a:a;
+package d:d;
 
-world a {
-	import b:b/b;
-	import c:c/c;
-	import d:d/d;
-	import e:e/e;
-}
+interface d {}
+
+
+package e:e;
+
+interface e {}

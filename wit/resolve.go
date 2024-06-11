@@ -8,6 +8,7 @@ import (
 	"strings"
 	"unsafe"
 
+	"github.com/coreos/go-semver/semver"
 	"github.com/ydnar/wasm-tools-go/wit/iterate"
 	"github.com/ydnar/wasm-tools-go/wit/ordered"
 )
@@ -53,13 +54,12 @@ func (r *Resolve) AllFunctions() iterate.Seq[*Function] {
 type World struct {
 	_typeOwner
 
-	Name    string
-	Imports ordered.Map[string, WorldItem]
-	Exports ordered.Map[string, WorldItem]
-
-	// The [Package] that this World belongs to. It must be non-nil when fully resolved.
-	Package *Package
-	Docs    Docs
+	Name      string
+	Imports   ordered.Map[string, WorldItem]
+	Exports   ordered.Map[string, WorldItem]
+	Package   *Package  // the Package this World belongs to (must be non-nil)
+	Stability Stability // WIT @since or @unstable (nil if unknown)
+	Docs      Docs
 }
 
 // AllFunctions returns a [sequence] that yields each [Function] in a [World].
@@ -89,7 +89,7 @@ func (w *World) AllFunctions() iterate.Seq[*Function] {
 }
 
 // A WorldItem is any item that can be exported from or imported into a [World],
-// currently either an [Interface], [TypeDef], or [Function].
+// currently either an [InterfaceRef], [TypeDef], or [Function].
 // Any WorldItem is also a [Node].
 type WorldItem interface {
 	Node
@@ -101,23 +101,30 @@ type _worldItem struct{}
 
 func (_worldItem) isWorldItem() {}
 
+// An InterfaceRef represents a reference to an [Interface] with a [Stability] attribute.
+// It implements the [Node] and [WorldItem] interfaces.
+type InterfaceRef struct {
+	_worldItem
+
+	Interface *Interface
+	Stability Stability
+}
+
 // An Interface represents a [collection of types and functions], which are imported into
 // or exported from a [WebAssembly component].
-// It implements the [Node], [TypeOwner], and [WorldItem] interfaces.
+// It implements the [Node], and [TypeOwner] interfaces.
 //
 // [collection of types and functions]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md#wit-interfaces.
 // [WebAssembly component]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md#wit-worlds
 type Interface struct {
 	_typeOwner
-	_worldItem
 
 	Name      *string
 	TypeDefs  ordered.Map[string, *TypeDef]
 	Functions ordered.Map[string, *Function]
-
-	// The [Package] that this Interface belongs to. It must be non-nil when fully resolved.
-	Package *Package
-	Docs    Docs
+	Package   *Package  // the Package this Interface belongs to
+	Stability Stability // WIT @since or @unstable (nil if unknown)
+	Docs      Docs
 }
 
 // AllFunctions returns a [sequence] that yields each [Function] in an [Interface].
@@ -138,10 +145,11 @@ func (i *Interface) AllFunctions() iterate.Seq[*Function] {
 type TypeDef struct {
 	_type
 	_worldItem
-	Name  *string
-	Kind  TypeDefKind
-	Owner TypeOwner
-	Docs  Docs
+	Name      *string
+	Kind      TypeDefKind
+	Owner     TypeOwner
+	Stability Stability // WIT @since or @unstable (nil if unknown)
+	Docs      Docs
 }
 
 // TypeName returns the [WIT] type name for t.
@@ -727,7 +735,7 @@ func (v *Variant) hasResource() bool {
 // It implements the [Node] interface.
 type Case struct {
 	Name string
-	Type Type // optional associated Type (can be nil)
+	Type Type // optional associated [Type] (can be nil)
 	Docs Docs
 }
 
@@ -846,8 +854,8 @@ func (o *Option) Flat() []Type {
 // [result type]: https://component-model.bytecodealliance.org/design/wit.html#results
 type Result struct {
 	_typeDefKind
-	OK  Type // optional associated Type (can be nil)
-	Err Type // optional associated Type (can be nil)
+	OK  Type // optional associated [Type] (can be nil)
+	Err Type // optional associated [Type] (can be nil)
 }
 
 // Despecialize despecializes [Result] o into a [Variant] with two cases, "ok" and "error".
@@ -1280,11 +1288,12 @@ type String struct{ _primitive[string] }
 // [function]: https://component-model.bytecodealliance.org/design/wit.html#functions
 type Function struct {
 	_worldItem
-	Name    string
-	Kind    FunctionKind
-	Params  []Param // arguments to the function
-	Results []Param // a function can have a single anonymous result, or > 1 named results
-	Docs    Docs
+	Name      string
+	Kind      FunctionKind
+	Params    []Param   // arguments to the function
+	Results   []Param   // a function can have a single anonymous result, or > 1 named results
+	Stability Stability // WIT @since or @unstable (nil if unknown)
+	Docs      Docs
 }
 
 // BaseName returns the base name of [Function] f.
@@ -1443,6 +1452,32 @@ type Package struct {
 	Interfaces ordered.Map[string, *Interface]
 	Worlds     ordered.Map[string, *World]
 	Docs       Docs
+}
+
+// Stability represents the version or feature-gated stability of a given feature.
+type Stability interface {
+	Node
+	isStability()
+}
+
+// _stability is an embeddable type that conforms to the [Stability] interface.
+type _stability struct{}
+
+func (_stability) isStability() {}
+
+// Stable represents a stable WIT feature, for example: @since(version = 1.2.3)
+//
+// Stable features have an explicit since version and an optional feature name.
+type Stable struct {
+	_stability
+	Since   semver.Version
+	Feature string
+}
+
+// Unstable represents an unstable WIT feature defined by name.
+type Unstable struct {
+	_stability
+	Feature string
 }
 
 // Docs represent WIT documentation text extracted from comments.

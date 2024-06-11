@@ -55,14 +55,50 @@ func (*Resolve) WITKind() string { return "resolve" }
 //
 // [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
 func (r *Resolve) WIT(_ Node, _ string) string {
+	packages := slices.Clone(r.Packages)
+	slices.SortFunc(packages, func(a, b *Package) int {
+		return strings.Compare(a.Name.String(), b.Name.String())
+	})
 	var b strings.Builder
-	for i, p := range r.Packages {
+	for i, p := range packages {
 		if i > 0 {
 			b.WriteRune('\n')
 			b.WriteRune('\n')
 		}
 		b.WriteString(p.WIT(r, ""))
 	}
+	return b.String()
+}
+
+// WITKind returns the WIT kind.
+func (*Stable) WITKind() string { return "@since" }
+
+// WIT returns the [WIT] text format for [Stable] s.
+//
+// [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
+func (s *Stable) WIT(_ Node, _ string) string {
+	var b strings.Builder
+	b.WriteString("@since(version = ")
+	b.WriteString(s.Since.String())
+	if s.Feature != "" {
+		b.WriteString(", feature = ")
+		b.WriteString(s.Feature)
+	}
+	b.WriteRune(')')
+	return b.String()
+}
+
+// WITKind returns the WIT kind.
+func (*Unstable) WITKind() string { return "@unstable" }
+
+// WIT returns the [WIT] text format for [Unstable] u.
+//
+// [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
+func (u *Unstable) WIT(_ Node, _ string) string {
+	var b strings.Builder
+	b.WriteString("@unstable(feature = ")
+	b.WriteString(u.Feature)
+	b.WriteRune(')')
 	return b.String()
 }
 
@@ -130,6 +166,10 @@ func (w *World) WIT(ctx Node, name string) string {
 	}
 	var b strings.Builder
 	b.WriteString(w.Docs.WIT(ctx, ""))
+	if w.Stability != nil {
+		b.WriteString(w.Stability.WIT(ctx, ""))
+		b.WriteRune('\n')
+	}
 	b.WriteString("world ")
 	b.WriteString(escape(name)) // TODO: compare to w.Name?
 	b.WriteString(" {")
@@ -143,7 +183,8 @@ func (w *World) WIT(ctx Node, name string) string {
 		if n == 0 {
 			b.WriteRune('\n')
 		}
-		b.WriteString(indent(w.itemWIT("import", name, i)))
+		// b.WriteString(indent(w.itemWIT("import", name, i)))
+		b.WriteString(indent(i.WIT(worldImport{w}, name)))
 		b.WriteRune('\n')
 		n++
 		return true
@@ -152,7 +193,8 @@ func (w *World) WIT(ctx Node, name string) string {
 		if n == 0 {
 			b.WriteRune('\n')
 		}
-		b.WriteString(indent(w.itemWIT("export", name, i)))
+		// b.WriteString(indent(w.itemWIT("export", name, i)))
+		b.WriteString(indent(i.WIT(worldExport{w}, name)))
 		b.WriteRune('\n')
 		n++
 		return true
@@ -161,14 +203,32 @@ func (w *World) WIT(ctx Node, name string) string {
 	return b.String()
 }
 
+type (
+	worldImport struct{ *World }
+	worldExport struct{ *World }
+)
+
 func (w *World) itemWIT(motion, name string, v WorldItem) string {
 	switch v := v.(type) {
-	case *Interface, *Function:
+	case *InterfaceRef, *Function:
 		return motion + " " + v.WIT(w, name) // TODO: handle resource methods?
 	case *TypeDef:
 		return v.WIT(w, name) // no motion, in Imports only
 	}
 	panic("BUG: unknown WorldItem")
+}
+
+// WITKind returns the WIT kind.
+func (*InterfaceRef) WITKind() string { return "interface ref" }
+
+// WIT returns the [WIT] text format for [InterfaceRef] i.
+//
+// [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
+func (ref *InterfaceRef) WIT(ctx Node, name string) string {
+	if ref.Stability == nil {
+		return ref.Interface.WIT(ctx, name)
+	}
+	return ref.Stability.WIT(ctx, "") + "\n" + ref.Interface.WIT(ctx, name)
 }
 
 // WITKind returns the WIT kind.
@@ -187,17 +247,35 @@ func (i *Interface) WIT(ctx Node, name string) string {
 	switch ctx := ctx.(type) {
 	case *Package:
 		b.WriteString(i.Docs.WIT(ctx, ""))
+		if i.Stability != nil {
+			b.WriteString(i.Stability.WIT(ctx, ""))
+			b.WriteRune('\n')
+		}
 		b.WriteString("interface ")
 		b.WriteString(escape(name))
 		b.WriteRune(' ')
-	case *World:
+
+	case worldImport:
 		rname := relativeName(i, ctx.Package)
 		if rname != "" {
-			return escape(rname) + ";"
+			return "import " + escape(rname) + ";"
 		}
 
 		// Otherwise, this is an inline interface decl.
 		b.WriteString(i.Docs.WIT(ctx, ""))
+		b.WriteString("import ")
+		b.WriteString(escape(name))
+		b.WriteString(": interface ")
+
+	case worldExport:
+		rname := relativeName(i, ctx.Package)
+		if rname != "" {
+			return "export " + escape(rname) + ";"
+		}
+
+		// Otherwise, this is an inline interface decl.
+		b.WriteString(i.Docs.WIT(ctx, ""))
+		b.WriteString("export ")
 		b.WriteString(escape(name))
 		b.WriteString(": interface ")
 	}
@@ -280,9 +358,19 @@ func (t *TypeDef) WIT(ctx Node, name string) string {
 		}
 		return fmt.Sprintf("use %s.{%s};", ownerName, escape(name))
 
-	case *World, *Interface:
+	case worldImport, worldExport, *Interface:
 		var b strings.Builder
 		b.WriteString(t.Docs.WIT(ctx, ""))
+		if t.Stability != nil {
+			b.WriteString(t.Stability.WIT(ctx, ""))
+			b.WriteRune('\n')
+		}
+		switch ctx.(type) {
+		case *worldImport:
+			b.WriteString("import ")
+		case *worldExport:
+			b.WriteString("import ")
+		}
 		b.WriteString(t.Kind.WIT(t, name))
 		constructor := t.Constructor()
 		methods := t.Methods()
@@ -807,6 +895,16 @@ func (f *Function) WIT(ctx Node, name string) string {
 	var b strings.Builder
 	if ctx != nil {
 		b.WriteString(f.Docs.WIT(ctx, ""))
+		if f.Stability != nil {
+			b.WriteString(f.Stability.WIT(ctx, ""))
+			b.WriteRune('\n')
+		}
+	}
+	switch ctx.(type) {
+	case worldImport:
+		b.WriteString("import ")
+	case worldExport:
+		b.WriteString("export ")
 	}
 	b.WriteString(escape(name))
 	var isConstructor, isMethod bool

@@ -20,37 +20,6 @@ interface the-default {
 }
 
 
-package foo:some-pkg;
-
-interface the-default {
-	type from-default = string;
-}
-
-interface some-interface {
-	type another-type = u32;
-}
-
-interface another-interface {
-	type yet-another-type = u8;
-}
-
-
-package foo:wasi;
-
-interface clocks {
-	type timestamp = u64;
-}
-
-interface filesystem {
-	record stat { ino: u64 }
-}
-
-world wasi {
-	import filesystem;
-	import clocks;
-}
-
-
 package foo:root;
 
 interface foo {
@@ -95,4 +64,35 @@ world unionw-world {
 	import foo:wasi/clocks;
 	export foo:corp/saas;
 	export foo;
+}
+
+
+package foo:some-pkg;
+
+interface the-default {
+	type from-default = string;
+}
+
+interface some-interface {
+	type another-type = u32;
+}
+
+interface another-interface {
+	type yet-another-type = u8;
+}
+
+
+package foo:wasi;
+
+interface clocks {
+	type timestamp = u64;
+}
+
+interface filesystem {
+	record stat { ino: u64 }
+}
+
+world wasi {
+	import filesystem;
+	import clocks;
 }

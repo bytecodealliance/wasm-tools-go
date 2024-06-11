@@ -3,6 +3,7 @@ package wit
 import (
 	"io"
 
+	"github.com/coreos/go-semver/semver"
 	"github.com/ydnar/wasm-tools-go/internal/codec"
 	"github.com/ydnar/wasm-tools-go/internal/codec/json"
 )
@@ -39,6 +40,8 @@ func (res *Resolve) ResolveCodec(v any) codec.Codec {
 		return &functionKindCodec{v}
 	case *Handle:
 		return &handleCodec{v}
+	case *Stability:
+		return &stabilityCodec{v}
 	case *Type:
 		return &typeCodec{v, res}
 	case *TypeDefKind:
@@ -47,6 +50,12 @@ func (res *Resolve) ResolveCodec(v any) codec.Codec {
 		return &typeOwnerCodec{v}
 	case *WorldItem:
 		return &worldItemCodec{v}
+
+	// Imported
+	case *semver.Version:
+		return &semverCodec{&v}
+	case **semver.Version:
+		return &semverCodec{v}
 	}
 
 	return nil
@@ -106,6 +115,8 @@ func (c *worldCodec) DecodeField(dec codec.Decoder, name string) error {
 		return dec.Decode(&w.Exports)
 	case "package":
 		return dec.Decode(&w.Package)
+	case "stability":
+		return dec.Decode(&w.Stability)
 	case "docs":
 		return dec.Decode(&w.Docs)
 	}
@@ -134,6 +145,8 @@ func (c *interfaceCodec) DecodeField(dec codec.Decoder, name string) error {
 		return dec.Decode(&i.Functions)
 	case "package":
 		return dec.Decode(&i.Package)
+	case "stability":
+		return dec.Decode(&i.Stability)
 	case "docs":
 		return dec.Decode(&i.Docs)
 	}
@@ -160,6 +173,8 @@ func (c *typeDefCodec) DecodeField(dec codec.Decoder, name string) error {
 		return dec.Decode(&t.Name)
 	case "owner":
 		return dec.Decode(&t.Owner)
+	case "stability":
+		return dec.Decode(&t.Stability)
 	case "docs":
 		return dec.Decode(&t.Docs)
 	}
@@ -202,6 +217,18 @@ func (pn *Ident) DecodeString(s string) error {
 
 // DecodeField implements the [codec.FieldDecoder] interface
 // to decode a struct or JSON object.
+func (i *InterfaceRef) DecodeField(dec codec.Decoder, name string) error {
+	switch name {
+	case "id":
+		return dec.Decode(&i.Interface)
+	case "stability":
+		return dec.Decode(&i.Stability)
+	}
+	return nil
+}
+
+// DecodeField implements the [codec.FieldDecoder] interface
+// to decode a struct or JSON object.
 func (d *Docs) DecodeField(dec codec.Decoder, name string) error {
 	switch name {
 	case "contents":
@@ -220,8 +247,8 @@ func (c *worldItemCodec) DecodeField(dec codec.Decoder, name string) error {
 	var err error
 	switch name {
 	case "interface":
-		var v *Interface
-		err = dec.Decode(&v)
+		v := &InterfaceRef{}
+		err = dec.Decode(v)
 		*c.v = v
 	case "function":
 		var v *Function
@@ -444,6 +471,52 @@ func (c *handleCodec) DecodeField(dec codec.Decoder, name string) error {
 	return err
 }
 
+type stabilityCodec struct {
+	v *Stability
+}
+
+func (c *stabilityCodec) DecodeField(dec codec.Decoder, name string) error {
+	var err error
+	switch name {
+	case "stable":
+		v := &Stable{}
+		err = dec.Decode(v)
+		*c.v = v
+	case "unstable":
+		v := &Unstable{}
+		err = dec.Decode(v)
+		*c.v = v
+	}
+	return err
+}
+
+func (s *Stable) DecodeField(dec codec.Decoder, name string) error {
+	switch name {
+	case "since":
+		return dec.Decode(&s.Since)
+	case "feature":
+		return dec.Decode(&s.Feature)
+	}
+	return nil
+}
+
+func (u *Unstable) DecodeField(dec codec.Decoder, name string) error {
+	switch name {
+	case "feature":
+		return dec.Decode(&u.Feature)
+	}
+	return nil
+}
+
+type semverCodec struct {
+	v **semver.Version
+}
+
+func (c *semverCodec) DecodeString(s string) error {
+	codec.Must(c.v)
+	return (*c.v).Set(s)
+}
+
 // DecodeField implements the [codec.FieldDecoder] interface
 // to decode a struct or JSON object.
 func (e *Enum) DecodeField(dec codec.Decoder, name string) error {
@@ -502,6 +575,8 @@ func (f *Function) DecodeField(dec codec.Decoder, name string) error {
 		return codec.DecodeSlice(dec, &f.Params)
 	case "results":
 		return codec.DecodeSlice(dec, &f.Results)
+	case "stability":
+		return dec.Decode(&f.Stability)
 	case "docs":
 		return dec.Decode(&f.Docs)
 	}

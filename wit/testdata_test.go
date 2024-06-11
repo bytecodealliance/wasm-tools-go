@@ -63,6 +63,8 @@ func TestGoldenWITFiles(t *testing.T) {
 }
 
 var canWasmTools = sync.OnceValue[bool](func() bool {
+	// This is explicitly NOT using exec.LookPath so itfails to run on WebAssembly.
+	// This disables tests that require wasm-tools.
 	err := exec.Command("wasm-tools", "--version").Run()
 	return err == nil
 })
@@ -83,7 +85,7 @@ func TestGoldenWITRoundTrip(t *testing.T) {
 		}
 		t.Run(path, func(t *testing.T) {
 			// Run the generated WIT through wasm-tools to generate JSON.
-			cmd := exec.Command("wasm-tools", "component", "wit", "-j")
+			cmd := exec.Command("wasm-tools", "component", "wit", "-j", "--all-features")
 			cmd.Stdin = strings.NewReader(data)
 			stdout := &bytes.Buffer{}
 			stderr := &bytes.Buffer{}
