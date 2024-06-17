@@ -923,7 +923,7 @@ func (g *generator) lowerTypeDef(file *gen.File, t *wit.TypeDef, input string) s
 }
 
 func (g *generator) lowerTypeDefKind(file *gen.File, kind wit.TypeDefKind, input string) string {
-	flat := kind.Flat()
+	// flat := kind.Flat()
 	switch kind := kind.(type) {
 	case *wit.Pointer:
 		// TODO: convert pointer to unsafe.Pointer or uintptr?
@@ -945,9 +945,10 @@ func (g *generator) lowerTypeDefKind(file *gen.File, kind wit.TypeDefKind, input
 	// case *wit.Option:
 	// 	return g.optionRep(file, dir, kind)
 	case *wit.List:
-		return input + ".Lower()"
+		return g.cmCall(file, "LowerList", input)
 	case *wit.Resource, *wit.Own, *wit.Borrow:
-		return g.cmCast(file, kind, flat[0], input)
+		return g.cmCall(file, "LowerHandle", input)
+		// return g.cmCast(file, kind, flat[0], input)
 
 		// case *wit.Future:
 		// 	return "any /* TODO: *wit.Future */"
@@ -1135,21 +1136,25 @@ func (g *generator) defineImportedFunction(_ wit.Ident, f *wit.Function, decl fu
 	}
 
 	var compoundParams param
-	if len(decl.f.params) > 0 && derefAnonRecord(callParams[0].typ) != nil {
-		compoundParams = callParams[0]
-		t := derefAnonRecord(compoundParams.typ)
-		g.declareTypeDef(file, dir, t, decl.wasm.name+"Params")
-		compoundParams.typ = t
-	}
-
 	var compoundResults param
-	var resultsRecord *wit.Record
-	if len(decl.f.results) > 1 && derefAnonRecord(last(callParams).typ) != nil {
-		compoundResults = *last(callParams)
-		t := derefAnonRecord(last(callParams).typ)
-		g.declareTypeDef(file, dir, t, decl.wasm.name+"Results")
-		compoundResults.typ = t
-		resultsRecord = t.Kind.(*wit.Record)
+	var resultsRecord *wit.Record // TODO: delete this variable and extract below
+	if len(callParams) > 0 {
+		p := callParams[0]
+		t := derefAnonRecord(p.typ)
+		if len(decl.f.params) > 0 && t != nil {
+			compoundParams = p
+			g.declareTypeDef(file, dir, t, decl.wasm.name+"_params")
+			compoundParams.typ = t
+		}
+
+		p = *last(callParams)
+		t = derefAnonRecord(p.typ)
+		if len(decl.f.results) > 0 && t != nil && t != compoundParams.typ {
+			compoundResults = p
+			g.declareTypeDef(file, dir, t, decl.wasm.name+"_results")
+			compoundResults.typ = t
+			resultsRecord = t.Kind.(*wit.Record)
+		}
 	}
 
 	var b bytes.Buffer
@@ -1190,10 +1195,7 @@ func (g *generator) defineImportedFunction(_ wit.Ident, f *wit.Function, decl fu
 
 	// Lower into wasmimport variables
 	if compoundParams.typ != nil {
-		stringio.Write(&b, compoundParams.name, " = ", g.typeRep(file, compoundParams.dir, compoundParams.typ), "{ ")
-		if decl.f.receiver.name != "" {
-			stringio.Write(&b, decl.f.receiver.name, ", ")
-		}
+		stringio.Write(&b, compoundParams.name, " := ", g.typeRep(file, compoundParams.dir, compoundParams.typ), "{ ")
 		for i, p := range decl.f.params {
 			if i > 0 {
 				b.WriteString(", ")
@@ -1217,8 +1219,12 @@ func (g *generator) defineImportedFunction(_ wit.Ident, f *wit.Function, decl fu
 	}
 
 	// Declare result variables
-	for _, r := range decl.f.results {
-		stringio.Write(&b, "var ", r.name, " ", g.typeRep(file, r.dir, r.typ), "\n")
+	if compoundResults.typ != nil {
+		stringio.Write(&b, "var ", compoundResults.name, " ", g.typeRep(file, compoundResults.dir, compoundResults.typ), "\n")
+	} else {
+		for _, r := range decl.f.results {
+			stringio.Write(&b, "var ", r.name, " ", g.typeRep(file, r.dir, r.typ), "\n")
+		}
 	}
 
 	// Emit call to wasmimport function
@@ -1236,7 +1242,8 @@ func (g *generator) defineImportedFunction(_ wit.Ident, f *wit.Function, decl fu
 		if i > 0 {
 			b.WriteString(", ")
 		}
-		if isPointer(p.typ) {
+		td := derefTypeDef(p.typ)
+		if td != nil && (td == compoundParams.typ || i == len(callParams)-1) {
 			b.WriteRune('&')
 		}
 		b.WriteString(callParams[i].name)
@@ -1248,7 +1255,7 @@ func (g *generator) defineImportedFunction(_ wit.Ident, f *wit.Function, decl fu
 			if i > 0 {
 				b.WriteString(", ")
 			}
-			stringio.Write(&b, compoundResults.name, ".", fieldName(f.Name, false))
+			stringio.Write(&b, compoundResults.name, ".", fieldName(f.Name, false), "/* 😂 */")
 		}
 	} else {
 		for i, r := range decl.f.results {
@@ -1308,7 +1315,7 @@ func (g *generator) defineExportedFunction(owner wit.Ident, f *wit.Function, dec
 	if len(decl.f.params) > 0 && derefAnonRecord(decl.wasm.params[0].typ) != nil {
 		name := decl.f.scope.DeclareName("params")
 		t := derefAnonRecord(decl.wasm.params[0].typ)
-		g.declareTypeDef(file, dir, t, decl.wasm.name+"Params")
+		g.declareTypeDef(file, dir, t, decl.wasm.name+"_params")
 		compoundParams.name = name
 		compoundParams.typ = t
 		compoundParams.dir = decl.wasm.params[0].dir
@@ -1316,11 +1323,11 @@ func (g *generator) defineExportedFunction(owner wit.Ident, f *wit.Function, dec
 	}
 
 	var compoundResults param
-	var resultsRecord *wit.Record
+	var resultsRecord *wit.Record // TODO: delete this variable and extract below
 	if len(decl.f.results) > 1 && derefAnonRecord(decl.wasm.results[0].typ) != nil {
 		name := decl.f.scope.DeclareName("results")
 		t := derefAnonRecord(decl.wasm.results[0].typ)
-		g.declareTypeDef(file, dir, t, decl.wasm.name+"Results")
+		g.declareTypeDef(file, dir, t, decl.wasm.name+"_results")
 		compoundResults.name = name
 		compoundResults.typ = t
 		compoundParams.dir = decl.wasm.results[0].dir
