@@ -12,8 +12,21 @@ type CorePointers[T any] interface {
 	*T | unsafe.Pointer | uintptr
 }
 
-func OwnToU32[T any](v T) uint32    { return *(*uint32)(unsafe.Pointer(&v)) }
-func BorrowToU32[T any](v T) uint32 { return *(*uint32)(unsafe.Pointer(&v)) }
+// LowerHandle lowers a handle ([cm.Resource], [cm.Rep]) into a Core WebAssembly I32.
+func LowerHandle[T any](v T) uint32 { return *(*uint32)(unsafe.Pointer(&v)) }
+
+// LowerList lowers a [List] into a pair of Core WebAssembly types.
+func LowerList[T any](list List[T]) (*T, uint) {
+	return list.Data(), list.Len()
+}
+
+// LiftList lifts Core WebAssembly types into a [List].
+func LiftList[L List[T], T any, Data unsafe.Pointer | uintptr | *T, Len uint | uintptr | uint32 | uint64](data Data, len Len) L {
+	return L{
+		data: (*T)(unsafe.Pointer(data)),
+		len:  uint(len),
+	}
+}
 
 // Lower functions
 func BoolToS32(v bool) int32  { return int32(*(*int8)(unsafe.Pointer(&v))) }

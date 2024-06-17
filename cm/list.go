@@ -44,16 +44,3 @@ func (list List[T]) Len() uint {
 func (list List[T]) Slice() []T {
 	return unsafe.Slice(list.data, list.len)
 }
-
-// Lower lowers a List[T] into a tuple of Core WebAssembly types.
-func (list List[T]) Lower() (*T, uint) {
-	return list.data, list.len
-}
-
-// LiftList lifts Core WebAssembly types into a List[T].
-func LiftList[T any, P unsafe.Pointer | uintptr | *T, L uint | uintptr | uint32 | uint64](data P, len L) List[T] {
-	return List[T]{
-		data: (*T)(unsafe.Pointer(data)),
-		len:  uint(len),
-	}
-}
