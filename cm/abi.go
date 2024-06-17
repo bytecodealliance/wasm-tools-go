@@ -1,7 +1,6 @@
 package cm
 
 import (
-	"fmt"
 	"unsafe"
 )
 
@@ -13,41 +12,8 @@ type CorePointers[T any] interface {
 	*T | unsafe.Pointer | uintptr
 }
 
-func Lower[To CoreTypes, From any](from From) To {
-	var to To
-	to -= 1
-	fmt.Printf("%x\t", uint64(to))
-
-	switch unsafe.Sizeof(to) {
-	case 4:
-		if to > 0 {
-			fmt.Printf("%x\n", *(*uint32)(unsafe.Pointer(&to)))
-		} else {
-			fmt.Printf("%x\n", *(*int32)(unsafe.Pointer(&to)))
-		}
-	case 8:
-		if to > 0 {
-			fmt.Printf("%x\n", *(*uint64)(unsafe.Pointer(&to)))
-		} else {
-			fmt.Printf("%x\n", *(*int64)(unsafe.Pointer(&to)))
-		}
-	}
-	switch (*uint32)(unsafe.Pointer(&to)) {
-	}
-
-	// switch unsafe.Sizeof(from) {
-	// case 1:
-	// 	return To((*uint8)(unsafe.Pointer(&from)))
-	// }
-
-	return to
-}
-
-func StringData(s string) uintptr {
-	return uintptr(unsafe.Pointer(unsafe.StringData(s)))
-}
-
-func AnyToU32[T any](v T) uint32 { return *(*uint32)(unsafe.Pointer(&v)) }
+func OwnToU32[T any](v T) uint32    { return *(*uint32)(unsafe.Pointer(&v)) }
+func BorrowToU32[T any](v T) uint32 { return *(*uint32)(unsafe.Pointer(&v)) }
 
 // Lower functions
 func BoolToS32(v bool) int32  { return int32(*(*int8)(unsafe.Pointer(&v))) }
