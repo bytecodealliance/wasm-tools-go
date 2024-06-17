@@ -976,15 +976,15 @@ func (g *generator) cmCast(file *gen.File, to wit.TypeDefKind, from wit.TypeDefK
 	if to == from {
 		return input
 	}
-	return g.cmCall(file, goTypeKind(from)+"To"+goTypeKind(to), input)
+	return g.cmCall(file, goKind(from)+"To"+goKind(to), input)
 }
 
 func (g *generator) cmCall(file *gen.File, f string, input string) string {
 	return file.Import(g.opts.cmPackage) + "." + f + "(" + input + ")"
 }
 
-func goTypeKind(t wit.TypeDefKind) string {
-	return strings.ToTitle(t.TypeKind())
+func goKind(t wit.TypeDefKind) string {
+	return strings.ToTitle(t.WITKind())
 }
 
 func (g *generator) declareFunction(owner wit.Ident, dir wit.Direction, f *wit.Function) (funcDecl, error) {
