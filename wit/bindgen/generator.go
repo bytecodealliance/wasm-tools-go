@@ -968,11 +968,11 @@ func (g *generator) lowerPrimitive(file *gen.File, p wit.Primitive, input string
 		if flat[0] == p {
 			return input
 		}
-		return g.cmCast(file, flat[0], p, input)
+		return g.cmCast(file, p, flat[0], input)
 	}
 }
 
-func (g *generator) cmCast(file *gen.File, to wit.TypeDefKind, from wit.TypeDefKind, input string) string {
+func (g *generator) cmCast(file *gen.File, from, to wit.TypeDefKind, input string) string {
 	if to == from {
 		return input
 	}
@@ -984,7 +984,7 @@ func (g *generator) cmCall(file *gen.File, f string, input string) string {
 }
 
 func goKind(t wit.TypeDefKind) string {
-	return strings.ToTitle(t.WITKind())
+	return GoName(t.WITKind(), true)
 }
 
 func (g *generator) declareFunction(owner wit.Ident, dir wit.Direction, f *wit.Function) (funcDecl, error) {
