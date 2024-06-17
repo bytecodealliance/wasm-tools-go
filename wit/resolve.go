@@ -160,7 +160,7 @@ func (t *TypeDef) TypeName() string {
 	if t.Name != nil {
 		return *t.Name
 	}
-	return t.Kind.TypeName()
+	return ""
 }
 
 // Root returns the root [TypeDef] of [type alias] t.
@@ -263,14 +263,14 @@ func (t *TypeDef) hasResource() bool { return HasResource(t.Kind) }
 type TypeDefKind interface {
 	Node
 	ABI
-	TypeName() string
+	TypeKind() string
 	isTypeDefKind()
 }
 
 // _typeDefKind is an embeddable type that conforms to the [TypeDefKind] interface.
 type _typeDefKind struct{}
 
-func (_typeDefKind) TypeName() string { return "" }
+func (_typeDefKind) TypeKind() string { return "" }
 func (_typeDefKind) isTypeDefKind()   {}
 
 // KindOf probes [Type] t to determine if it is a [TypeDef] with [TypeDefKind] K.
@@ -418,6 +418,11 @@ func (*Resource) Flat() []Type { return []Type{U32{}} }
 // hasResource always returns true.
 func (*Resource) hasResource() bool { return true }
 
+// TypeKind returns the canonical [WIT] type kind.
+//
+// [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
+func (*Resource) TypeKind() string { return "resource" }
+
 // Handle represents a WIT [handle type].
 // It conforms to the [Node], [ABI], and [TypeDefKind] interfaces.
 // Handles represent the passing of unique ownership of a resource between
@@ -463,6 +468,11 @@ type Own struct {
 
 func (o *Own) hasResource() bool { return HasResource(o.Type) }
 
+// TypeKind returns the canonical [WIT] type kind.
+//
+// [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
+func (*Own) TypeKind() string { return "own" }
+
 // Borrow represents a WIT [borrowed handle].
 // It implements the [Handle], [Node], [ABI], and [TypeDefKind] interfaces.
 //
@@ -474,6 +484,11 @@ type Borrow struct {
 
 func (b *Borrow) hasBorrow() bool   { return true }
 func (b *Borrow) hasResource() bool { return HasResource(b.Type) }
+
+// TypeKind returns the canonical [WIT] type kind.
+//
+// [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
+func (*Borrow) TypeKind() string { return "borrow" }
 
 // Flags represents a WIT [flags type], stored as a bitfield.
 // It implements the [Node], [ABI], and [TypeDefKind] interfaces.
@@ -1008,6 +1023,7 @@ func (_typeOwner) isTypeOwner() {}
 // [primitive type]: https://component-model.bytecodealliance.org/design/wit.html#primitive-types
 type Type interface {
 	TypeDefKind
+	TypeName() string
 	isType()
 }
 
@@ -1015,7 +1031,8 @@ type Type interface {
 // It also implements the [Node], [ABI], and [TypeDefKind] interfaces.
 type _type struct{ _typeDefKind }
 
-func (_type) isType() {}
+func (_type) TypeName() string { return "" }
+func (_type) isType()          {}
 
 // ParseType parses a WIT [primitive type] string into
 // the associated Type implementation from this package.
@@ -1138,11 +1155,11 @@ func (_primitive[T]) Flat() []Type {
 	}
 }
 
-// TypeName returns the canonical [primitive type] name in [WIT] text format.
+// TypeKind returns the canonical [primitive type] kind in [WIT] text format.
 //
 // [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
 // [primitive type]: https://component-model.bytecodealliance.org/design/wit.html#primitive-types
-func (_primitive[T]) TypeName() string {
+func (_primitive[T]) TypeKind() string {
 	var v T
 	switch any(v).(type) {
 	case bool:
