@@ -263,15 +263,13 @@ func (t *TypeDef) hasResource() bool { return HasResource(t.Kind) }
 type TypeDefKind interface {
 	Node
 	ABI
-	TypeKind() string
 	isTypeDefKind()
 }
 
 // _typeDefKind is an embeddable type that conforms to the [TypeDefKind] interface.
 type _typeDefKind struct{}
 
-func (_typeDefKind) TypeKind() string { return "" }
-func (_typeDefKind) isTypeDefKind()   {}
+func (_typeDefKind) isTypeDefKind() {}
 
 // KindOf probes [Type] t to determine if it is a [TypeDef] with [TypeDefKind] K.
 // It returns the underlying Kind if present.
@@ -418,11 +416,6 @@ func (*Resource) Flat() []Type { return []Type{U32{}} }
 // hasResource always returns true.
 func (*Resource) hasResource() bool { return true }
 
-// TypeKind returns the canonical [WIT] type kind.
-//
-// [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
-func (*Resource) TypeKind() string { return "resource" }
-
 // Handle represents a WIT [handle type].
 // It conforms to the [Node], [ABI], and [TypeDefKind] interfaces.
 // Handles represent the passing of unique ownership of a resource between
@@ -468,11 +461,6 @@ type Own struct {
 
 func (o *Own) hasResource() bool { return HasResource(o.Type) }
 
-// TypeKind returns the canonical [WIT] type kind.
-//
-// [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
-func (*Own) TypeKind() string { return "own" }
-
 // Borrow represents a WIT [borrowed handle].
 // It implements the [Handle], [Node], [ABI], and [TypeDefKind] interfaces.
 //
@@ -484,11 +472,6 @@ type Borrow struct {
 
 func (b *Borrow) hasBorrow() bool   { return true }
 func (b *Borrow) hasResource() bool { return HasResource(b.Type) }
-
-// TypeKind returns the canonical [WIT] type kind.
-//
-// [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
-func (*Borrow) TypeKind() string { return "borrow" }
 
 // Flags represents a WIT [flags type], stored as a bitfield.
 // It implements the [Node], [ABI], and [TypeDefKind] interfaces.
@@ -1150,44 +1133,6 @@ func (_primitive[T]) Flat() []Type {
 		return []Type{F64{}}
 	case string:
 		return []Type{PointerTo(U8{}), U32{}}
-	default:
-		panic(fmt.Sprintf("BUG: unknown primitive type %T", v)) // should never reach here
-	}
-}
-
-// TypeKind returns the canonical [primitive type] kind in [WIT] text format.
-//
-// [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
-// [primitive type]: https://component-model.bytecodealliance.org/design/wit.html#primitive-types
-func (_primitive[T]) TypeKind() string {
-	var v T
-	switch any(v).(type) {
-	case bool:
-		return "bool"
-	case int8:
-		return "s8"
-	case uint8:
-		return "u8"
-	case int16:
-		return "s16"
-	case uint16:
-		return "u16"
-	case int32:
-		return "s32"
-	case uint32:
-		return "u32"
-	case int64:
-		return "s64"
-	case uint64:
-		return "u64"
-	case float32:
-		return "f32"
-	case float64:
-		return "f64"
-	case char:
-		return "char"
-	case string:
-		return "string"
 	default:
 		panic(fmt.Sprintf("BUG: unknown primitive type %T", v)) // should never reach here
 	}

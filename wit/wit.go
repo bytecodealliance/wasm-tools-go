@@ -549,7 +549,7 @@ func (r *Resource) WIT(ctx Node, name string) string {
 }
 
 // WITKind returns the WIT kind.
-func (*Own) WITKind() string { return "owned handle" }
+func (*Own) WITKind() string { return "own" }
 
 // WIT returns the [WIT] text format for [Own] h.
 //
@@ -570,7 +570,7 @@ func (o *Own) WIT(ctx Node, name string) string {
 }
 
 // WITKind returns the WIT kind.
-func (*Borrow) WITKind() string { return "borrowed handle" }
+func (*Borrow) WITKind() string { return "borrow" }
 
 // WIT returns the [WIT] text format for [Borrow] h.
 //
@@ -676,7 +676,7 @@ func (v *Variant) WIT(ctx Node, name string) string {
 }
 
 // WITKind returns the WIT kind.
-func (*Case) WITKind() string { return "variant case" }
+func (*Case) WITKind() string { return "case" }
 
 // WIT returns the [WIT] text format for [Variant] [Case] c.
 //
@@ -724,7 +724,7 @@ func (e *Enum) WIT(ctx Node, name string) string {
 }
 
 // WITKind returns the WIT kind.
-func (*EnumCase) WITKind() string { return "enum case" }
+func (*EnumCase) WITKind() string { return "enum-case" }
 
 // WIT returns the [WIT] text format for [EnumCase] c.
 //
@@ -859,17 +859,52 @@ func (s *Stream) WIT(_ Node, name string) string {
 	return b.String()
 }
 
-// WITKind returns the WIT kind.
-func (_primitive[T]) WITKind() string { return "type" }
+// WITKind returns the canonical [primitive type] kind in [WIT] text format.
+//
+// [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
+// [primitive type]: https://component-model.bytecodealliance.org/design/wit.html#primitive-types
+func (_primitive[T]) WITKind() string {
+	var v T
+	switch any(v).(type) {
+	case bool:
+		return "bool"
+	case int8:
+		return "s8"
+	case uint8:
+		return "u8"
+	case int16:
+		return "s16"
+	case uint16:
+		return "u16"
+	case int32:
+		return "s32"
+	case uint32:
+		return "u32"
+	case int64:
+		return "s64"
+	case uint64:
+		return "u64"
+	case float32:
+		return "f32"
+	case float64:
+		return "f64"
+	case char:
+		return "char"
+	case string:
+		return "string"
+	default:
+		panic(fmt.Sprintf("BUG: unknown primitive type %T", v)) // should never reach here
+	}
+}
 
 // WIT returns the [WIT] text format for this [_primitive].
 //
 // [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
 func (p _primitive[T]) WIT(_ Node, name string) string {
 	if name != "" {
-		return "type " + name + " = " + p.TypeKind()
+		return "type " + name + " = " + p.WITKind()
 	}
-	return p.TypeKind()
+	return p.WITKind()
 }
 
 // WITKind returns the WIT kind for [Function] f.
