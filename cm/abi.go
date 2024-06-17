@@ -6,7 +6,11 @@ import (
 )
 
 type CoreTypes interface {
-	int32 | uint32 | int64 | uint64 | float32 | float64
+	uint32 | uint64 | float32 | float64
+}
+
+type CorePointers[T any] interface {
+	*T | unsafe.Pointer | uintptr
 }
 
 func Lower[To CoreTypes, From any](from From) To {
