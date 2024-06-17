@@ -898,7 +898,7 @@ func (g *generator) borrowRep(file *gen.File, dir wit.Direction, b *wit.Borrow) 
 	}
 }
 
-func (g *generator) lowerType(file *gen.File, into []wit.Type, t wit.Type, name string) string {
+func (g *generator) lowerType(file *gen.File, t wit.Type, input string) string {
 	// flat := t.Flat()
 	// if len(flat) != len(into) {
 	// 	return "", fmt.Errorf("cannot lower type %s: len(into) (%d) != len(flat) (%d)",
@@ -910,24 +910,26 @@ func (g *generator) lowerType(file *gen.File, into []wit.Type, t wit.Type, name 
 		return ""
 	case *wit.TypeDef:
 		t = t.Root()
-		return g.lowerTypeDef(file, into, t, name)
+		return g.lowerTypeDef(file, t, input)
 	case wit.Primitive:
-		return g.lowerPrimitive(file, into, t, name)
+		return g.lowerPrimitive(file, t, input)
 	default:
 		panic(fmt.Sprintf("BUG: unknown type %T", t)) // should never reach here
 	}
 }
 
-func (g *generator) lowerTypeDef(file *gen.File, into []wit.Type, t *wit.TypeDef, name string) string {
-	return g.lowerTypeDefKind(file, into, t.Kind, name)
+func (g *generator) lowerTypeDef(file *gen.File, t *wit.TypeDef, input string) string {
+	return g.lowerTypeDefKind(file, t.Kind, input)
 }
 
-func (g *generator) lowerTypeDefKind(file *gen.File, into []wit.Type, kind wit.TypeDefKind, name string) string {
+func (g *generator) lowerTypeDefKind(file *gen.File, kind wit.TypeDefKind, input string) string {
+	flat := kind.Flat()
 	switch kind := kind.(type) {
 	case *wit.Pointer:
-		return file.Import(g.opts.cmPackage) + ".PointerTo" + goTypeName(into[0]) + "(" + name + ")"
+		// TODO: convert pointer to unsafe.Pointer or uintptr?
+		return input
 	case wit.Type:
-		return g.lowerType(file, into, kind, name)
+		return g.lowerType(file, kind, input)
 	// case *wit.Record:
 	// 	return g.recordRep(file, dir, kind, goName)
 	// case *wit.Tuple:
@@ -942,10 +944,11 @@ func (g *generator) lowerTypeDefKind(file *gen.File, into []wit.Type, kind wit.T
 	// 	return g.resultRep(file, dir, kind)
 	// case *wit.Option:
 	// 	return g.optionRep(file, dir, kind)
-	// case *wit.List:
-	// 	return g.listRep(file, dir, kind)
+	case *wit.List:
+		return input + ".Lower()"
 	case *wit.Resource, *wit.Own, *wit.Borrow:
-		return g.cmCast(file, into[0], wit.U32{}, g.cmAnyToU32(file, name))
+		return g.cmCast(file, kind, flat[0], input)
+
 		// case *wit.Future:
 		// 	return "any /* TODO: *wit.Future */"
 		// case *wit.Stream:
@@ -956,35 +959,32 @@ func (g *generator) lowerTypeDefKind(file *gen.File, into []wit.Type, kind wit.T
 	return "/* TODO */"
 }
 
-func (g *generator) lowerPrimitive(file *gen.File, into []wit.Type, p wit.Primitive, name string) string {
+func (g *generator) lowerPrimitive(file *gen.File, p wit.Primitive, input string) string {
+	flat := p.Flat()
 	switch p := p.(type) {
 	case wit.String:
-		return g.cmCast(file, into[0], p, g.cmStringData(file, name)) + ", " + g.cmCast(file, into[1], p, "len("+name+")")
+		return g.cmCall(file, "LowerString", input)
 	default:
-		if into[0] == p {
-			return name
+		if flat[0] == p {
+			return input
 		}
-		return g.cmCast(file, into[0], p, name)
+		return g.cmCast(file, flat[0], p, input)
 	}
 }
 
-func (g *generator) cmStringData(file *gen.File, name string) string {
-	return file.Import(g.opts.cmPackage) + ".StringData(" + name + ")"
-}
-
-func (g *generator) cmAnyToU32(file *gen.File, name string) string {
-	return file.Import(g.opts.cmPackage) + ".AnyToU32(" + name + ")"
-}
-
-func (g *generator) cmCast(file *gen.File, to wit.Type, from wit.Type, name string) string {
+func (g *generator) cmCast(file *gen.File, to wit.TypeDefKind, from wit.TypeDefKind, input string) string {
 	if to == from {
-		return name
+		return input
 	}
-	return file.Import(g.opts.cmPackage) + "." + goTypeName(from) + "To" + goTypeName(to) + "(" + name + ")"
+	return g.cmCall(file, goTypeKind(from)+"To"+goTypeKind(to), input)
 }
 
-func goTypeName(t wit.Type) string {
-	return strings.ToTitle(t.TypeName())
+func (g *generator) cmCall(file *gen.File, f string, input string) string {
+	return file.Import(g.opts.cmPackage) + "." + f + "(" + input + ")"
+}
+
+func goTypeKind(t wit.TypeDefKind) string {
+	return strings.ToTitle(t.TypeKind())
 }
 
 func (g *generator) declareFunction(owner wit.Ident, dir wit.Direction, f *wit.Function) (funcDecl, error) {
@@ -1212,7 +1212,7 @@ func (g *generator) defineImportedFunction(_ wit.Ident, f *wit.Function, decl fu
 				stringio.Write(&b, callParams[i].name)
 				i++
 			}
-			stringio.Write(&b, " := ", g.lowerType(file, flat, p.typ, p.name), "\n")
+			stringio.Write(&b, " := ", g.lowerType(file, p.typ, p.name), "\n")
 		}
 	}
 
