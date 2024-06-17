@@ -969,23 +969,52 @@ func (g *generator) lowerPrimitive(file *gen.File, p wit.Primitive, input string
 		if flat[0] == p {
 			return input
 		}
-		return g.cmCast(file, p, flat[0], input)
+		return g.cast(file, p, flat[0], input)
 	}
 }
 
-func (g *generator) cmCast(file *gen.File, from, to wit.TypeDefKind, input string) string {
+func (g *generator) cast(file *gen.File, from, to wit.Type, input string) string {
 	if to == from {
 		return input
+	}
+	if castable(from, to) {
+		return g.typeRep(file, wit.Imported, to) + "(" + input + ")"
 	}
 	return g.cmCall(file, goKind(from)+"To"+goKind(to), input)
 }
 
-func (g *generator) cmCall(file *gen.File, f string, input string) string {
-	return file.Import(g.opts.cmPackage) + "." + f + "(" + input + ")"
+func goKind(t wit.Node) string {
+	return GoName(t.WITKind(), true)
 }
 
-func goKind(t wit.TypeDefKind) string {
-	return GoName(t.WITKind(), true)
+func castable(from, to wit.Type) bool {
+	if to == from {
+		return true
+	}
+
+	var fromInt, fromFloat bool
+
+	switch from.(type) {
+	case wit.S8, wit.U8, wit.S16, wit.U16, wit.S32, wit.U32, wit.S64, wit.U64:
+		fromInt = true
+	case wit.F32, wit.F64:
+		fromFloat = true
+	default:
+		return false
+	}
+
+	switch to.(type) {
+	case wit.S8, wit.U8, wit.S16, wit.U16, wit.S32, wit.U32, wit.S64, wit.U64:
+		return fromInt
+	case wit.F32, wit.F64:
+		return fromFloat
+	default:
+		return false
+	}
+}
+
+func (g *generator) cmCall(file *gen.File, f string, input string) string {
+	return file.Import(g.opts.cmPackage) + "." + f + "(" + input + ")"
 }
 
 func (g *generator) declareFunction(owner wit.Ident, dir wit.Direction, f *wit.Function) (funcDecl, error) {
