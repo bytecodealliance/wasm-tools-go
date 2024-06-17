@@ -867,9 +867,9 @@ func (_primitive[T]) WITKind() string { return "type" }
 // [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
 func (p _primitive[T]) WIT(_ Node, name string) string {
 	if name != "" {
-		return "type " + name + " = " + p.TypeName()
+		return "type " + name + " = " + p.TypeKind()
 	}
-	return p.TypeName()
+	return p.TypeKind()
 }
 
 // WITKind returns the WIT kind for [Function] f.
