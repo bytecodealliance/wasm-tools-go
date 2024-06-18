@@ -375,7 +375,7 @@ func (t *TypeDef) WIT(ctx Node, name string) string {
 		case *worldImport:
 			b.WriteString("import ")
 		case *worldExport:
-			b.WriteString("import ")
+			b.WriteString("export ")
 		}
 		b.WriteString(t.Kind.WIT(t, name))
 		constructor := t.Constructor()
