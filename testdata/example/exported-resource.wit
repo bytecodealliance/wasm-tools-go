@@ -1,12 +1,12 @@
 package example:exported-resource@0.2.0;
 
 interface example {
-    resource example-resource {
-        foo: func();
-        bar: func(arg: u32);
-    }
+	resource example-resource {
+		foo: func();
+		bar: func(arg: u32);
+	}
 }
 
 world exports {
-    export example;
+	export example;
 }

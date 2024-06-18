@@ -1,15 +1,15 @@
 package example:tuples;
 
 interface tuples {
-    type t0 = tuple<>;
-    type t1 = tuple<string>;
-    type t2 = tuple<string, bool>;
-    type t3 = tuple<string, bool, u8>;
-    type t4 = tuple<string, bool, u8, u16>;
-    type t5 = tuple<string, bool, u8, u16, u32>;
-    type t6 = tuple<string, bool, u8, u16, u32, u64>;
-    type t7 = tuple<string, bool, u8, u16, u32, u64, f32>;
-    type t8 = tuple<string, bool, u8, u16, u32, u64, f32, f64>;
-    type t9 = tuple<string, bool, u8, u16, u32, u64, f32, f64, s8>;
-    type t10 = tuple<string, bool, u8, u16, u32, u64, f32, f64, s8, s16>;
+	type t0 = tuple<>;
+	type t1 = tuple<string>;
+	type t2 = tuple<string, bool>;
+	type t3 = tuple<string, bool, u8>;
+	type t4 = tuple<string, bool, u8, u16>;
+	type t5 = tuple<string, bool, u8, u16, u32>;
+	type t6 = tuple<string, bool, u8, u16, u32, u64>;
+	type t7 = tuple<string, bool, u8, u16, u32, u64, f32>;
+	type t8 = tuple<string, bool, u8, u16, u32, u64, f32, f64>;
+	type t9 = tuple<string, bool, u8, u16, u32, u64, f32, f64, s8>;
+	type t10 = tuple<string, bool, u8, u16, u32, u64, f32, f64, s8, s16>;
 }

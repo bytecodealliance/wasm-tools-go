@@ -1,59 +1,59 @@
 package example:escaped-names;
 
 interface %interface {
-    record %record {
-        %enum: %enum,
-        %result: result<string, error>,
-    }
+	record %record {
+		%enum: %enum,
+		%result: result<string, error>,
+	}
 
-    enum error {
-        ok,
-        fail
-    }
+	enum error {
+		ok,
+		fail
+	}
 
-    record %export {
-        headers: list<tuple<list<u8>, list<u8>>>,
-        body: list<u8>
-    }
+	record %export {
+		headers: list<tuple<list<u8>, list<u8>>>,
+		body: list<u8>
+	}
 
-    enum %enum {
-        %enum,
-        %export,
-        %flags,
-        %func,
-        %import,
-        %include,
-        %interface,
-        %package,
-        %record,
-        %resource,
-        %static,
-        %type,
-        %variant,
-        %world,
-    }
+	enum %enum {
+		%enum,
+		%export,
+		%flags,
+		%func,
+		%import,
+		%include,
+		%interface,
+		%package,
+		%record,
+		%resource,
+		%static,
+		%type,
+		%variant,
+		%world,
+	}
 
-    variant %variant {
-        %enum(%record),
-        %export(%record),
-        %flags(%record),
-        %func(%record),
-        %import(%record),
-        %include(%record),
-        %interface(%record),
-        %package(%record),
-        %record(%record),
-        %resource(%record),
-        %static(%record),
-        %type(%record),
-        %variant(%record),
-        %world(%record),
-    }
+	variant %variant {
+		%enum(%record),
+		%export(%record),
+		%flags(%record),
+		%func(%record),
+		%import(%record),
+		%include(%record),
+		%interface(%record),
+		%package(%record),
+		%record(%record),
+		%resource(%record),
+		%static(%record),
+		%type(%record),
+		%variant(%record),
+		%world(%record),
+	}
 
-    %func: func(rec: %record) -> result<%export, error>;
+	%func: func(rec: %record) -> result<%export, error>;
 }
 
 world %world {
-    import %interface;
-    export %interface;
+	import %interface;
+	export %interface;
 }
