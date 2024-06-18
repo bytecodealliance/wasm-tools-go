@@ -1,13 +1,13 @@
 package example:resources-in-world;
 
 interface types {
-    resource foo {
-        foo: func();
-        bar: func(arg: u32);
-    }
+	resource foo {
+		foo: func();
+		bar: func(arg: u32);
+	}
 }
 
 world imports {
-    import types;
+	import types;
 	export types;
 }

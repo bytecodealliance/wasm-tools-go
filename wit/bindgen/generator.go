@@ -379,7 +379,7 @@ func (g *generator) defineTypeDef(dir wit.Direction, t *wit.TypeDef, name string
 	} else {
 		b.WriteString(formatDocComments(t.Docs.Contents, false))
 		b.WriteString("//\n")
-		b.WriteString(formatDocComments(t.WIT(nil, ""), true))
+		b.WriteString(formatDocComments(t.Kind.WIT(nil, t.TypeName()), true))
 		stringio.Write(&b, "type ", decl.name, " ", g.typeDefRep(decl.file, dir, t, decl.name), "\n\n")
 	}
 

@@ -349,9 +349,6 @@ func (t *TypeDef) WIT(ctx Node, name string) string {
 		name = *t.Name
 	}
 	switch ctx := ctx.(type) {
-	case nil:
-		return t.Kind.WIT(nil, name)
-
 	// If context is another TypeDef, then this is an imported type.
 	case *TypeDef:
 		// Emit an type alias if same Owner.
@@ -370,12 +367,6 @@ func (t *TypeDef) WIT(ctx Node, name string) string {
 		if t.Stability != nil {
 			b.WriteString(t.Stability.WIT(ctx, ""))
 			b.WriteRune('\n')
-		}
-		switch ctx.(type) {
-		case *worldImport:
-			b.WriteString("import ")
-		case *worldExport:
-			b.WriteString("import ")
 		}
 		b.WriteString(t.Kind.WIT(t, name))
 		constructor := t.Constructor()

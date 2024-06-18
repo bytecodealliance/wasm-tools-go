@@ -1,11 +1,11 @@
 package example:aqua;
 
 interface ocean {
-    resource water {
-        drink: func();
-    }
+	resource water {
+		drink: func();
+	}
 }
 
 world earth {
-    export ocean;
+	export ocean;
 }
