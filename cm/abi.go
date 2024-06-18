@@ -13,7 +13,14 @@ type CorePointers[T any] interface {
 }
 
 // LowerHandle lowers a handle ([cm.Resource], [cm.Rep]) into a Core WebAssembly I32.
-func LowerHandle[T any](v T) uint32 { return *(*uint32)(unsafe.Pointer(&v)) }
+func LowerHandle[T any](v T) uint32 {
+	return *(*uint32)(unsafe.Pointer(&v))
+}
+
+// LowerEnum lowers an enum into a Core WebAssembly I32.
+func LowerEnum[E ~uint8 | ~uint16 | ~uint32](e E) uint32 {
+	return uint32(e)
+}
 
 // LowerString lowers a [string] into a pair of Core WebAssembly types.
 func LowerString[S ~string](s S) (*byte, uint) {

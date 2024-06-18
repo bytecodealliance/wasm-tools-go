@@ -914,6 +914,8 @@ func (g *generator) lowerType(file *gen.File, dir wit.Direction, t wit.Type, inp
 }
 
 func (g *generator) lowerTypeDef(file *gen.File, dir wit.Direction, t *wit.TypeDef, input string) string {
+	flat := t.Flat()
+
 	switch kind := t.Kind.(type) {
 	case *wit.Pointer:
 		// TODO: convert pointer to unsafe.Pointer or uintptr?
@@ -926,8 +928,9 @@ func (g *generator) lowerTypeDef(file *gen.File, dir wit.Direction, t *wit.TypeD
 	// 	return g.tupleRep(file, dir, kind)
 	// case *wit.Flags:
 	// 	return g.flagsRep(file, dir, kind, goName)
-	// case *wit.Enum:
-	// 	return g.enumRep(file, dir, kind, goName)
+	case *wit.Enum:
+		// return g.cast(file, wit.Discriminant(len(kind.Cases)), flat[0], input)
+		return g.cmCall(file, "LowerEnum", input)
 	// case *wit.Variant:
 	// 	return g.variantRep(file, dir, kind, goName)
 	// case *wit.Result:
@@ -949,7 +952,7 @@ func (g *generator) lowerTypeDef(file *gen.File, dir wit.Direction, t *wit.TypeD
 
 	// TODO: remove this default path
 	var b strings.Builder
-	for i, t := range t.Flat() {
+	for i, t := range flat {
 		if i > 0 {
 			b.WriteString(", ")
 		}
