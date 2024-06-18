@@ -486,7 +486,7 @@ func TestHasBorrow(t *testing.T) {
 	err := loadTestdata(func(path string, res *Resolve) error {
 		t.Run(path, func(t *testing.T) {
 			for _, td := range res.TypeDefs {
-				wit := td.WIT(nil, td.TypeName())
+				wit := td.Kind.WIT(nil, "")
 				a := strings.Contains(wit, "borrow<")
 				b := HasBorrow(td)
 				if a != b {
