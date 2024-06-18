@@ -898,14 +898,14 @@ func (g *generator) borrowRep(file *gen.File, dir wit.Direction, b *wit.Borrow) 
 	}
 }
 
-func (g *generator) lowerType(file *gen.File, t wit.Type, input string) string {
+func (g *generator) lowerType(file *gen.File, dir wit.Direction, t wit.Type, input string) string {
 	switch t := t.(type) {
 	case nil:
 		// TODO: should this exist?
 		return ""
 	case *wit.TypeDef:
 		t = t.Root()
-		return g.lowerTypeDef(file, t, input)
+		return g.lowerTypeDef(file, dir, t, input)
 	case wit.Primitive:
 		return g.lowerPrimitive(file, t, input)
 	default:
@@ -913,13 +913,13 @@ func (g *generator) lowerType(file *gen.File, t wit.Type, input string) string {
 	}
 }
 
-func (g *generator) lowerTypeDef(file *gen.File, t *wit.TypeDef, input string) string {
+func (g *generator) lowerTypeDef(file *gen.File, dir wit.Direction, t *wit.TypeDef, input string) string {
 	switch kind := t.Kind.(type) {
 	case *wit.Pointer:
 		// TODO: convert pointer to unsafe.Pointer or uintptr?
 		return input
 	case wit.Type:
-		return g.lowerType(file, kind, input)
+		return g.lowerType(file, dir, kind, input)
 	// case *wit.Record:
 	// 	return g.recordRep(file, dir, kind, goName)
 	// case *wit.Tuple:
@@ -946,6 +946,7 @@ func (g *generator) lowerTypeDef(file *gen.File, t *wit.TypeDef, input string) s
 		// default:
 		// 	panic(fmt.Sprintf("BUG: unknown wit.TypeDefKind %T", kind)) // should never reach here
 	}
+
 	// TODO: remove this default path
 	var b strings.Builder
 	for i, t := range t.Flat() {
@@ -1251,7 +1252,7 @@ func (g *generator) defineImportedFunction(_ wit.Ident, f *wit.Function, decl fu
 				stringio.Write(&b, callParams[i].name)
 				i++
 			}
-			stringio.Write(&b, " := ", g.lowerType(file, p.typ, p.name), "\n")
+			stringio.Write(&b, " := ", g.lowerType(file, p.dir, p.typ, p.name), "\n")
 		}
 	}
 
