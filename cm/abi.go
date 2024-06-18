@@ -15,6 +15,11 @@ type CorePointers[T any] interface {
 // LowerHandle lowers a handle ([cm.Resource], [cm.Rep]) into a Core WebAssembly I32.
 func LowerHandle[T any](v T) uint32 { return *(*uint32)(unsafe.Pointer(&v)) }
 
+// LowerString lowers a [string] into a pair of Core WebAssembly types.
+func LowerString[S ~string](s S) (*byte, uint) {
+	return unsafe.StringData(string(s)), uint(len(s))
+}
+
 // LowerList lowers a [List] into a pair of Core WebAssembly types.
 func LowerList[T any](list List[T]) (*T, uint) {
 	return list.Data(), list.Len()

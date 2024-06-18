@@ -271,6 +271,15 @@ type _typeDefKind struct{}
 
 func (_typeDefKind) isTypeDefKind() {}
 
+// TypeRoot probes [Type] t to determine if it is a [TypeDef] referencing another underlying [Type].
+// Returns t by default.
+func TypeRoot(t Type) Type {
+	if td, ok := t.(*TypeDef); ok {
+		return td.Root()
+	}
+	return t
+}
+
 // KindOf probes [Type] t to determine if it is a [TypeDef] with [TypeDefKind] K.
 // It returns the underlying Kind if present.
 func KindOf[K TypeDefKind](t Type) (kind K) {

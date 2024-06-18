@@ -923,7 +923,7 @@ func (g *generator) lowerTypeDef(file *gen.File, t *wit.TypeDef, input string) s
 }
 
 func (g *generator) lowerTypeDefKind(file *gen.File, kind wit.TypeDefKind, input string) string {
-	// flat := kind.Flat()
+	flat := kind.Flat()
 	switch kind := kind.(type) {
 	case *wit.Pointer:
 		// TODO: convert pointer to unsafe.Pointer or uintptr?
@@ -957,7 +957,16 @@ func (g *generator) lowerTypeDefKind(file *gen.File, kind wit.TypeDefKind, input
 		// default:
 		// 	panic(fmt.Sprintf("BUG: unknown wit.TypeDefKind %T", kind)) // should never reach here
 	}
-	return "/* TODO */"
+	// TODO: remove this default path
+	var b strings.Builder
+	for i, t := range flat {
+		if i > 0 {
+			b.WriteString(", ")
+		}
+		stringio.Write(&b, g.cast(file, t, t, "0"))
+	}
+	stringio.Write(&b, " // TODO: lower support for ", kind.WITKind())
+	return b.String()
 }
 
 func (g *generator) lowerPrimitive(file *gen.File, p wit.Primitive, input string) string {
@@ -966,17 +975,11 @@ func (g *generator) lowerPrimitive(file *gen.File, p wit.Primitive, input string
 	case wit.String:
 		return g.cmCall(file, "LowerString", input)
 	default:
-		if flat[0] == p {
-			return input
-		}
 		return g.cast(file, p, flat[0], input)
 	}
 }
 
 func (g *generator) cast(file *gen.File, from, to wit.Type, input string) string {
-	if to == from {
-		return input
-	}
 	if castable(from, to) {
 		return g.typeRep(file, wit.Imported, to) + "(" + input + ")"
 	}
@@ -992,22 +995,30 @@ func castable(from, to wit.Type) bool {
 		return true
 	}
 
-	var fromInt, fromFloat bool
+	var fromBool, fromInt, fromFloat, fromString bool
 
 	switch from.(type) {
-	case wit.S8, wit.U8, wit.S16, wit.U16, wit.S32, wit.U32, wit.S64, wit.U64:
+	case wit.Bool:
+		fromBool = true
+	case wit.S8, wit.U8, wit.S16, wit.U16, wit.S32, wit.U32, wit.S64, wit.U64, wit.Char:
 		fromInt = true
 	case wit.F32, wit.F64:
 		fromFloat = true
+	case wit.String:
+		fromString = true
 	default:
 		return false
 	}
 
 	switch to.(type) {
-	case wit.S8, wit.U8, wit.S16, wit.U16, wit.S32, wit.U32, wit.S64, wit.U64:
+	case wit.Bool:
+		return fromBool
+	case wit.S8, wit.U8, wit.S16, wit.U16, wit.S32, wit.U32, wit.S64, wit.U64, wit.Char:
 		return fromInt
 	case wit.F32, wit.F64:
 		return fromFloat
+	case wit.String:
+		return fromString
 	default:
 		return false
 	}
@@ -1275,7 +1286,7 @@ func (g *generator) defineImportedFunction(_ wit.Ident, f *wit.Function, decl fu
 		if td != nil && (td == compoundParams.typ || i == len(callParams)-1) {
 			b.WriteRune('&')
 		}
-		b.WriteString(callParams[i].name)
+		b.WriteString(callParams[i].name) // TODO: type cast
 	}
 	b.WriteString(")\n")
 	b.WriteString("return ")
