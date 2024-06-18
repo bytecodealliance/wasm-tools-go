@@ -981,7 +981,7 @@ func (g *generator) lowerPrimitive(file *gen.File, p wit.Primitive, input string
 
 func (g *generator) cast(file *gen.File, from, to wit.Type, input string) string {
 	if castable(from, to) {
-		return g.typeRep(file, wit.Imported, to) + "(" + input + ")"
+		return "(" + g.typeRep(file, wit.Imported, to) + ")(" + input + ")"
 	}
 	return g.cmCall(file, goKind(from)+"To"+goKind(to), input)
 }
@@ -1285,8 +1285,10 @@ func (g *generator) defineImportedFunction(_ wit.Ident, f *wit.Function, decl fu
 		td := derefTypeDef(p.typ)
 		if td != nil && (td == compoundParams.typ || i == len(callParams)-1) {
 			b.WriteRune('&')
+			b.WriteString(p.name)
+		} else {
+			b.WriteString(g.cast(file, p.typ, p.typ, p.name))
 		}
-		b.WriteString(callParams[i].name) // TODO: type cast
 	}
 	b.WriteString(")\n")
 	b.WriteString("return ")
