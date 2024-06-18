@@ -899,11 +899,6 @@ func (g *generator) borrowRep(file *gen.File, dir wit.Direction, b *wit.Borrow) 
 }
 
 func (g *generator) lowerType(file *gen.File, t wit.Type, input string) string {
-	// flat := t.Flat()
-	// if len(flat) != len(into) {
-	// 	return "", fmt.Errorf("cannot lower type %s: len(into) (%d) != len(flat) (%d)",
-	// 		t.TypeName(), len(into), len(flat))
-	// }
 	switch t := t.(type) {
 	case nil:
 		// TODO: should this exist?
@@ -919,12 +914,7 @@ func (g *generator) lowerType(file *gen.File, t wit.Type, input string) string {
 }
 
 func (g *generator) lowerTypeDef(file *gen.File, t *wit.TypeDef, input string) string {
-	return g.lowerTypeDefKind(file, t.Kind, input)
-}
-
-func (g *generator) lowerTypeDefKind(file *gen.File, kind wit.TypeDefKind, input string) string {
-	flat := kind.Flat()
-	switch kind := kind.(type) {
+	switch kind := t.Kind.(type) {
 	case *wit.Pointer:
 		// TODO: convert pointer to unsafe.Pointer or uintptr?
 		return input
@@ -948,7 +938,6 @@ func (g *generator) lowerTypeDefKind(file *gen.File, kind wit.TypeDefKind, input
 		return g.cmCall(file, "LowerList", input)
 	case *wit.Resource, *wit.Own, *wit.Borrow:
 		return g.cmCall(file, "LowerHandle", input)
-		// return g.cmCast(file, kind, flat[0], input)
 
 		// case *wit.Future:
 		// 	return "any /* TODO: *wit.Future */"
@@ -959,13 +948,13 @@ func (g *generator) lowerTypeDefKind(file *gen.File, kind wit.TypeDefKind, input
 	}
 	// TODO: remove this default path
 	var b strings.Builder
-	for i, t := range flat {
+	for i, t := range t.Flat() {
 		if i > 0 {
 			b.WriteString(", ")
 		}
 		stringio.Write(&b, g.cast(file, t, t, "0"))
 	}
-	stringio.Write(&b, " // TODO: lower support for ", kind.WITKind())
+	stringio.Write(&b, " // TODO: lower support for ", t.WITKind())
 	return b.String()
 }
 
