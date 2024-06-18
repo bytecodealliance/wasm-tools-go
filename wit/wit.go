@@ -368,12 +368,6 @@ func (t *TypeDef) WIT(ctx Node, name string) string {
 			b.WriteString(t.Stability.WIT(ctx, ""))
 			b.WriteRune('\n')
 		}
-		switch ctx.(type) {
-		case *worldImport:
-			b.WriteString("import ")
-		case *worldExport:
-			b.WriteString("export ")
-		}
 		b.WriteString(t.Kind.WIT(t, name))
 		constructor := t.Constructor()
 		methods := t.Methods()
