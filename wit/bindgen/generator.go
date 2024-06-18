@@ -955,16 +955,17 @@ func (g *generator) lowerTypeDef(file *gen.File, dir wit.Direction, t *wit.TypeD
 		}
 		stringio.Write(&b, g.cast(file, t, t, "0"))
 	}
-	tname := g.goTypeName(file, t)
+	tname := g.typeDefGoName(dir, t)
 	stringio.Write(&b, " // TODO: lower support for ", t.WITKind(), " ", tname)
 	return b.String()
 }
 
-// goTypeName returns a mangled Go name for t.
-// TODO: direction
-func (g *generator) goTypeName(file *gen.File, t wit.Type) string {
-	// return GoName(g.typeRep(file, wit.Imported, t), true)
-	return GoName(t.WIT(nil, t.TypeName()), true) // TODO: direction
+// typeDefGoName returns a mangled Go name for t.
+func (g *generator) typeDefGoName(dir wit.Direction, t *wit.TypeDef) string {
+	if decl, ok := g.types[dir][t]; ok {
+		return decl.name
+	}
+	return GoName(t.WIT(nil, t.TypeName()), true)
 }
 
 func (g *generator) lowerPrimitive(file *gen.File, p wit.Primitive, input string) string {
