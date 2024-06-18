@@ -22,7 +22,6 @@ import (
 )
 
 const (
-	GoSuffix     = ".wit.go"
 	BuildDefault = "!wasip1"
 	cmPackage    = "github.com/ydnar/wasm-tools-go/cm"
 	emptyAsm     = `// This file exists for testing this package without WebAssembly,
@@ -926,8 +925,8 @@ func (g *generator) lowerTypeDef(file *gen.File, dir wit.Direction, t *wit.TypeD
 	// 	return g.recordRep(file, dir, kind, goName)
 	// case *wit.Tuple:
 	// 	return g.tupleRep(file, dir, kind)
-	// case *wit.Flags:
-	// 	return g.flagsRep(file, dir, kind, goName)
+	case *wit.Flags:
+		return g.lowerFlags(file, dir, t, input)
 	case *wit.Enum:
 		// return g.cast(file, wit.Discriminant(len(kind.Cases)), flat[0], input)
 		return g.cmCall(file, "LowerEnum", input)
@@ -969,6 +968,16 @@ func (g *generator) typeDefGoName(dir wit.Direction, t *wit.TypeDef) string {
 		return decl.name
 	}
 	return GoName(t.WIT(nil, t.TypeName()), true)
+}
+
+func (g *generator) lowerFlags(file *gen.File, dir wit.Direction, t *wit.TypeDef, input string) string {
+	name := "lower_" + g.typeDefGoName(dir, t)
+	afile := g.abiFile(file.Package)
+	if afile.GetName(name) == "" {
+		name = afile.DeclareName(name)
+		// TODO: declare rest of function
+	}
+	return name + "(" + input + ")"
 }
 
 func (g *generator) lowerPrimitive(file *gen.File, p wit.Primitive, input string) string {
@@ -1615,9 +1624,16 @@ func (g *generator) ensureEmptyAsm(pkg *gen.Package) error {
 	return err
 }
 
+func (g *generator) abiFile(pkg *gen.Package) *gen.File {
+	file := pkg.File("abi.go")
+	file.GeneratedBy = g.opts.generatedBy
+	file.Build = BuildDefault
+	return file
+}
+
 func (g *generator) fileFor(id wit.Ident) *gen.File {
 	pkg := g.packageFor(id)
-	file := pkg.File(id.Extension + GoSuffix)
+	file := pkg.File(id.Extension + ".wit.go")
 	file.GeneratedBy = g.opts.generatedBy
 	file.Build = BuildDefault
 	return file
@@ -1625,7 +1641,7 @@ func (g *generator) fileFor(id wit.Ident) *gen.File {
 
 func (g *generator) exportsFileFor(id wit.Ident) *gen.File {
 	pkg := g.packageFor(id)
-	file := pkg.File(id.Extension + ".exports" + GoSuffix)
+	file := pkg.File(id.Extension + ".exports.go")
 	file.GeneratedBy = g.opts.generatedBy
 	file.Build = BuildDefault
 	if len(file.Header) == 0 {
