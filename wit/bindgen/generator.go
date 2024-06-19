@@ -935,8 +935,8 @@ func (g *generator) lowerTypeDef(file *gen.File, dir wit.Direction, t *wit.TypeD
 		return g.lowerType(file, dir, kind, input)
 	case *wit.Record:
 		return g.lowerRecord(file, dir, t, input)
-	// case *wit.Tuple:
-	// 	return g.tupleRep(file, dir, kind)
+	case *wit.Tuple:
+		return g.lowerTuple(file, dir, t, input)
 	case *wit.Flags:
 		return g.lowerFlags(file, dir, t, input)
 	case *wit.Enum:
@@ -1007,6 +1007,28 @@ func (g *generator) lowerRecord(file *gen.File, dir wit.Direction, t *wit.TypeDe
 			stringio.Write(&b, "f"+strconv.Itoa(i+j))
 		}
 		stringio.Write(&b, " = ", g.lowerType(afile, dir, f.Type, "v."+fieldName(f.Name, true)), "\n")
+	}
+	b.WriteString("return")
+	return g.typeDefLowerFunction(afile, dir, t, input, b.String())
+}
+
+func (g *generator) lowerTuple(file *gen.File, dir wit.Direction, t *wit.TypeDef, input string) string {
+	afile := g.abiFile(file.Package)
+	tup := t.Kind.(*wit.Tuple)
+	mono := tup.Type()
+	var b strings.Builder
+	for i, tt := range tup.Types {
+		for j := range tt.Flat() {
+			if j > 0 {
+				b.WriteString(", ")
+			}
+			stringio.Write(&b, "f"+strconv.Itoa(i+j))
+		}
+		field := "v.F" + strconv.Itoa(i)
+		if mono != nil {
+			field = "v[" + strconv.Itoa(i) + "]" // Monotypic tuples are represented as a fixed-length Go array
+		}
+		stringio.Write(&b, " = ", g.lowerType(afile, dir, tt, field), "\n")
 	}
 	b.WriteString("return")
 	return g.typeDefLowerFunction(afile, dir, t, input, b.String())
