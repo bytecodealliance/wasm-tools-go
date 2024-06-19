@@ -363,6 +363,6 @@ func compoundParam(singular, plural string, params []Param) Param {
 
 	return Param{
 		Name: name,
-		Type: &TypeDef{Kind: &Pointer{Type: t}},
+		Type: PointerTo(t),
 	}
 }
