@@ -12,6 +12,11 @@ type CorePointers[T any] interface {
 	*T | unsafe.Pointer | uintptr
 }
 
+// LowerResult lowers an untyped result into Core WebAssembly I32.
+func LowerResult[T ~bool](v T) uint32 {
+	return uint32(*(*uint8)(unsafe.Pointer(&v)))
+}
+
 // LowerHandle lowers a handle ([cm.Resource], [cm.Rep]) into a Core WebAssembly I32.
 func LowerHandle[T any](v T) uint32 {
 	return *(*uint32)(unsafe.Pointer(&v))
@@ -41,10 +46,17 @@ func LiftList[L List[T], T any, Data unsafe.Pointer | uintptr | *T, Len uint | u
 }
 
 // Lower functions
-func BoolToS32(v bool) int32  { return int32(*(*int8)(unsafe.Pointer(&v))) }
-func BoolToU32(v bool) uint32 { return uint32(*(*uint8)(unsafe.Pointer(&v))) }
-func BoolToS64(v bool) int64  { return int64(*(*int8)(unsafe.Pointer(&v))) }
-func BoolToU64(v bool) uint64 { return uint64(*(*uint8)(unsafe.Pointer(&v))) }
+// func BoolToS32[B ~bool](v B) int32  { return int32(*(*int8)(unsafe.Pointer(&v))) }
+func BoolToU32[B ~bool](v B) uint32 {
+	return uint32(*(*uint8)(unsafe.Pointer(&v)))
+}
+
+func LowerBool[B ~bool](v B) uint32 {
+	return uint32(*(*uint8)(unsafe.Pointer(&v)))
+}
+
+// func BoolToS64[B ~bool](v B) int64  { return int64(*(*int8)(unsafe.Pointer(&v))) }
+func BoolToU64[B ~bool](v B) uint64 { return uint64(*(*uint8)(unsafe.Pointer(&v))) }
 
 // func BoolToF32(v bool) float32 { return U32ToF32(BoolToU32(v)) }
 // func BoolToF64(v bool) float64 { return U32ToF64(BoolToU32(v)) }

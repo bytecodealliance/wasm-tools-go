@@ -940,12 +940,12 @@ func (g *generator) lowerTypeDef(file *gen.File, dir wit.Direction, t *wit.TypeD
 	case *wit.Flags:
 		return g.lowerFlags(file, dir, t, input)
 	case *wit.Enum:
-		// return g.cast(file, wit.Discriminant(len(kind.Cases)), flat[0], input)
-		return g.cmCall(file, "LowerEnum", input)
+		return g.cast(file, wit.Discriminant(len(kind.Cases)), flat[0], input)
+		// return g.cmCall(file, "LowerEnum", input)
 	// case *wit.Variant:
 	// 	return g.variantRep(file, dir, kind, goName)
-	// case *wit.Result:
-	// 	return g.resultRep(file, dir, kind)
+	case *wit.Result:
+		return g.lowerResult(file, dir, t, input)
 	// case *wit.Option:
 	// 	return g.optionRep(file, dir, kind)
 	case *wit.List:
@@ -1047,6 +1047,39 @@ func (g *generator) lowerFlags(file *gen.File, dir wit.Direction, t *wit.TypeDef
 		body = "// TODO: lower flags with > 64 values"
 	}
 	return g.typeDefLowerFunction(file, dir, t, input, body)
+}
+
+func (g *generator) lowerResult(file *gen.File, dir wit.Direction, t *wit.TypeDef, input string) string {
+	afile := g.abiFile(file.Package)
+	r := t.Kind.(*wit.Result)
+	if r.OK == nil && r.Err == nil {
+		return g.cmCall(file, "LowerResult", input)
+	}
+	var b strings.Builder
+	b.WriteString("if !v.IsErr() {\n")
+	if r.OK != nil {
+		for i := range r.OK.Flat() {
+			if i > 0 {
+				b.WriteString(", ")
+			}
+			stringio.Write(&b, "f"+strconv.Itoa(i+1))
+		}
+		stringio.Write(&b, " = ", g.lowerType(afile, dir, r.OK, "*v.OK()"), "\n")
+	}
+	b.WriteString("} else {\n")
+	b.WriteString("f0 = 1\n")
+	if r.Err != nil {
+		for i := range r.Err.Flat() {
+			if i > 0 {
+				b.WriteString(", ")
+			}
+			stringio.Write(&b, "f"+strconv.Itoa(i+1))
+		}
+		stringio.Write(&b, " = ", g.lowerType(afile, dir, r.Err, "*v.Err()"), "\n")
+	}
+	b.WriteString("}\n")
+	b.WriteString("return")
+	return g.typeDefLowerFunction(afile, dir, t, input, b.String())
 }
 
 func (g *generator) lowerPrimitive(file *gen.File, p wit.Primitive, input string) string {
