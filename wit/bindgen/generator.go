@@ -1057,38 +1057,32 @@ func (g *generator) lowerResult(file *gen.File, dir wit.Direction, t *wit.TypeDe
 	}
 	flat := t.Flat()
 	var b strings.Builder
-	b.WriteString("if !v.IsErr() {\n")
-	if r.OK != nil {
-		cflat := r.OK.Flat()
-		for i := range cflat {
-			if i > 0 {
-				b.WriteString(", ")
-			}
-			stringio.Write(&b, "v"+strconv.Itoa(i+1))
-		}
-		stringio.Write(&b, " := ", g.lowerType(afile, dir, r.OK, "*v.OK()"), "\n")
-		for i, from := range cflat {
-			stringio.Write(&b, "f"+strconv.Itoa(i+1), " = ", g.cast(afile, from, flat[i+1], "v"+strconv.Itoa(i+1)), "\n")
-		}
-	}
-	b.WriteString("} else {\n")
-	b.WriteString("f0 = 1\n")
-	if r.Err != nil {
-		cflat := r.Err.Flat()
-		for i := range cflat {
-			if i > 0 {
-				b.WriteString(", ")
-			}
-			stringio.Write(&b, "v"+strconv.Itoa(i+1))
-		}
-		stringio.Write(&b, " := ", g.lowerType(afile, dir, r.Err, "*v.Err()"), "\n")
-		for i, from := range cflat {
-			stringio.Write(&b, "f"+strconv.Itoa(i+1), " = ", g.cast(afile, from, flat[i+1], "v"+strconv.Itoa(i+1)), "\n")
-		}
-	}
+	stringio.Write(&b, "switch ", g.cmCall(afile, "IsErr", "&v"), " {\n")
+	b.WriteString("case false:\n")
+	b.WriteString(g.lowerVariantCaseInto(afile, dir, r.OK, 0, flat[1:], "*"+g.cmCall(afile, "GetOK", "&v")))
+	b.WriteString(" case true:\n")
+	b.WriteString(g.lowerVariantCaseInto(afile, dir, r.Err, 1, flat[1:], "*"+g.cmCall(afile, "GetErr", "&v")))
 	b.WriteString("}\n")
 	b.WriteString("return\n")
 	return g.typeDefLowerFunction(afile, dir, t, input, b.String())
+}
+
+func (g *generator) lowerVariantCaseInto(file *gen.File, dir wit.Direction, t wit.Type, variantCase int, into []wit.Type, input string) string {
+	var b strings.Builder
+	stringio.Write(&b, "f0 = ", strconv.Itoa(variantCase), "\n")
+	if t != nil {
+		for i := range t.Flat() {
+			if i > 0 {
+				b.WriteString(", ")
+			}
+			stringio.Write(&b, "v"+strconv.Itoa(i+1))
+		}
+		stringio.Write(&b, " := ", g.lowerType(file, dir, t, input), "\n")
+		for i, from := range t.Flat() {
+			stringio.Write(&b, "f"+strconv.Itoa(i+1), " = ", g.cast(file, from, into[i], "v"+strconv.Itoa(i+1)), "\n")
+		}
+	}
+	return b.String()
 }
 
 func (g *generator) lowerPrimitive(file *gen.File, p wit.Primitive, input string) string {
