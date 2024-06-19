@@ -933,8 +933,8 @@ func (g *generator) lowerTypeDef(file *gen.File, dir wit.Direction, t *wit.TypeD
 		return input
 	case wit.Type:
 		return g.lowerType(file, dir, kind, input)
-	// case *wit.Record:
-	// 	return g.recordRep(file, dir, kind, goName)
+	case *wit.Record:
+		return g.lowerRecord(file, dir, t, input)
 	// case *wit.Tuple:
 	// 	return g.tupleRep(file, dir, kind)
 	case *wit.Flags:
@@ -993,6 +993,23 @@ func (g *generator) typeDefGoName(dir wit.Direction, t *wit.TypeDef) string {
 		return decl.name
 	}
 	return GoName(t.WIT(nil, t.TypeName()), true)
+}
+
+func (g *generator) lowerRecord(file *gen.File, dir wit.Direction, t *wit.TypeDef, input string) string {
+	afile := g.abiFile(file.Package)
+	r := t.Kind.(*wit.Record)
+	var b strings.Builder
+	for i, f := range r.Fields {
+		for j := range f.Type.Flat() {
+			if j > 0 {
+				b.WriteString(", ")
+			}
+			stringio.Write(&b, "f"+strconv.Itoa(i+j))
+		}
+		stringio.Write(&b, " = ", g.lowerType(afile, dir, f.Type, "v."+fieldName(f.Name, true)), "\n")
+	}
+	b.WriteString("return")
+	return g.typeDefLowerFunction(afile, dir, t, input, b.String())
 }
 
 func (g *generator) lowerFlags(file *gen.File, dir wit.Direction, t *wit.TypeDef, input string) string {
