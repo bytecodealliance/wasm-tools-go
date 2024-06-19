@@ -5,6 +5,19 @@ import (
 	"strconv"
 )
 
+// ABI is the interface implemented by any type that can report its
+// [Canonical ABI] [size], [alignment], and [flat] representation.
+//
+// [Canonical ABI]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md
+// [size]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#size
+// [alignment]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#alignment
+// [flat]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
+type ABI interface {
+	Size() uintptr
+	Align() uintptr
+	Flat() []Type
+}
+
 // Align aligns ptr with alignment align.
 func Align(ptr, align uintptr) uintptr {
 	return (ptr + align - 1) &^ (align - 1)
@@ -22,19 +35,6 @@ func Discriminant(n int) Type {
 		return U16{}
 	}
 	return U32{}
-}
-
-// ABI is the interface implemented by any type that can report its
-// [Canonical ABI] [size], [alignment], and [flat] representation.
-//
-// [Canonical ABI]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md
-// [size]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#size
-// [alignment]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#alignment
-// [flat]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
-type ABI interface {
-	Size() uintptr
-	Align() uintptr
-	Flat() []Type
 }
 
 // Despecialize [despecializes] k if k implements [Despecializer].
@@ -75,6 +75,26 @@ func HasBorrow(t TypeDefKind) bool {
 		return p.hasBorrow()
 	}
 	return false
+}
+
+// LowerFunction returns a [Function] signature for lowering [Type] t.
+func LowerFunction(t Type) *Function {
+	return &Function{
+		Name:    "[lower]" + t.TypeName(),
+		Kind:    &Freestanding{},
+		Params:  []Param{{Name: "v", Type: t}},
+		Results: flatParams("f", t.Flat()),
+	}
+}
+
+// LiftFunction returns a [Function] signature for lifting [Type] t.
+func LiftFunction(t Type) *Function {
+	return &Function{
+		Name:    "[lift]" + t.TypeName(),
+		Kind:    &Freestanding{},
+		Params:  flatParams("f", t.Flat()),
+		Results: []Param{{Name: "v", Type: t}},
+	}
 }
 
 // Direction represents the direction a type or function is represented within a component,
@@ -267,13 +287,13 @@ func (f *Function) CoreFunction(op Direction) *Function {
 	cf := *f
 
 	// Max 16 params
-	cf.Params = flatParams(f.Params)
+	cf.Params = flattenParams(f.Params)
 	if len(cf.Params) > MaxFlatParams {
 		cf.Params = []Param{compoundParam("param", "params", f.Params)}
 	}
 
 	// Max 1 result
-	cf.Results = flatParams(f.Results)
+	cf.Results = flattenParams(f.Results)
 	if len(cf.Results) > MaxFlatResults {
 		p := compoundParam("result", "results", f.Results)
 		if op == Exported {
@@ -287,7 +307,15 @@ func (f *Function) CoreFunction(op Direction) *Function {
 	return &cf
 }
 
-func flatParams(params []Param) []Param {
+func flatParams(pfx string, flat []Type) []Param {
+	out := make([]Param, len(flat))
+	for i, t := range flat {
+		out[i] = Param{Name: pfx + strconv.Itoa(i), Type: t}
+	}
+	return out
+}
+
+func flattenParams(params []Param) []Param {
 	var out []Param
 	for _, p := range params {
 		flat := p.Type.Flat()

@@ -101,6 +101,12 @@ func goParams(scope gen.Scope, dir wit.Direction, params []wit.Param) []param {
 	return out
 }
 
+type typeUse struct {
+	pkg *gen.Package
+	dir wit.Direction
+	td  *wit.TypeDef
+}
+
 type generator struct {
 	opts options
 	res  *wit.Resolve
@@ -118,24 +124,30 @@ type generator struct {
 	// exportScopes map WIT identifier paths to export scopes.
 	exportScopes map[string]gen.Scope
 
-	// types map [wit.TypeDef] to their Go equivalent.
-	// It is indexed on [wit.Direction], either [Imported] or [Exported].
+	// types map wit.TypeDef to their Go equivalent.
+	// It is indexed on wit.Direction, either Imported or Exported.
 	types [2]map[*wit.TypeDef]typeDecl
 
-	// functions map [wit.Function] to their Go equivalent.
-	// It is indexed on [wit.Direction], either [Imported] or [Exported].
+	// functions map wit.Function to their Go equivalent.
+	// It is indexed on wit.Direction, either Imported or Exported.
 	functions [2]map[*wit.Function]funcDecl
 
 	// defined represent whether a world, interface, type, or function has been defined.
-	// It is indexed on [wit.Direction], either [Imported] or [Exported].
+	// It is indexed on wit.Direction, either Imported or Exported.
 	defined [2]map[any]bool
+
+	// lower and lift represents lowering and lifting functions for defined types.
+	lowerFunctions map[typeUse]function
+	liftFunctions  map[typeUse]function
 }
 
 func newGenerator(res *wit.Resolve, opts ...Option) (*generator, error) {
 	g := &generator{
-		packages:     make(map[string]*gen.Package),
-		witPackages:  make(map[string]*gen.Package),
-		exportScopes: make(map[string]gen.Scope),
+		packages:       make(map[string]*gen.Package),
+		witPackages:    make(map[string]*gen.Package),
+		exportScopes:   make(map[string]gen.Scope),
+		lowerFunctions: make(map[typeUse]function),
+		liftFunctions:  make(map[typeUse]function),
 	}
 	for i := 0; i < 2; i++ {
 		g.types[i] = make(map[*wit.TypeDef]typeDecl)
@@ -962,6 +974,19 @@ func (g *generator) lowerTypeDef(file *gen.File, dir wit.Direction, t *wit.TypeD
 	return b.String()
 }
 
+func (g *generator) typeDefLowerFunction(file *gen.File, dir wit.Direction, t *wit.TypeDef, input string, body string) string {
+	use := typeUse{file.Package, dir, t}
+	f, ok := g.lowerFunctions[use]
+	if !ok {
+		afile := g.abiFile(file.Package)
+		name := afile.DeclareName("lower_" + g.typeDefGoName(dir, t))
+		f = goFunction(afile, dir, wit.Imported, wit.LowerFunction(t), name)
+		g.lowerFunctions[use] = f
+		stringio.Write(afile, "func ", name, g.functionSignature(afile, f), " {\n", body, "\n}\n\n")
+	}
+	return f.name + "(" + input + ")"
+}
+
 // typeDefGoName returns a mangled Go name for t.
 func (g *generator) typeDefGoName(dir wit.Direction, t *wit.TypeDef) string {
 	if decl, ok := g.types[dir][t]; ok {
@@ -971,13 +996,18 @@ func (g *generator) typeDefGoName(dir wit.Direction, t *wit.TypeDef) string {
 }
 
 func (g *generator) lowerFlags(file *gen.File, dir wit.Direction, t *wit.TypeDef, input string) string {
-	name := "lower_" + g.typeDefGoName(dir, t)
-	afile := g.abiFile(file.Package)
-	if afile.GetName(name) == "" {
-		name = afile.DeclareName(name)
-		// TODO: declare rest of function
+	flags := t.Kind.(*wit.Flags)
+	flat := t.Flat()
+	if len(flat) == 1 {
+		return g.cast(file, wit.Discriminant(len(flags.Flags)), flat[0], input)
 	}
-	return name + "(" + input + ")"
+	// The following line is moot because of the above check, which replaces a function call with an inline cast.
+	// It is here for completeness.
+	body := "return uint32(v)"
+	if len(flat) > 1 {
+		body = "// TODO: figure out how to lower flags"
+	}
+	return g.typeDefLowerFunction(file, dir, t, input, body)
 }
 
 func (g *generator) lowerPrimitive(file *gen.File, p wit.Primitive, input string) string {
