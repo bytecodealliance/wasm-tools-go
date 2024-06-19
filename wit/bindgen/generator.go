@@ -1005,7 +1005,7 @@ func (g *generator) lowerFlags(file *gen.File, dir wit.Direction, t *wit.TypeDef
 	// It is here for completeness.
 	body := "return uint32(v)"
 	if len(flat) > 1 {
-		body = "// TODO: figure out how to lower flags"
+		body = "// TODO: lower flags with > 64 values"
 	}
 	return g.typeDefLowerFunction(file, dir, t, input, body)
 }
