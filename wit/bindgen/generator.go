@@ -953,10 +953,10 @@ func (g *generator) lowerTypeDef(file *gen.File, dir wit.Direction, t *wit.TypeD
 	case *wit.Resource, *wit.Own, *wit.Borrow:
 		return g.cmCall(file, "LowerHandle", input)
 
-		// case *wit.Future:
-		// 	return "any /* TODO: *wit.Future */"
-		// case *wit.Stream:
-		// 	return "any /* TODO: *wit.Stream */"
+	case *wit.Future:
+		return "/* TODO: lower *wit.Future */"
+	case *wit.Stream:
+		return "/* TODO: lower *wit.Stream */"
 		// default:
 		// 	panic(fmt.Sprintf("BUG: unknown wit.TypeDefKind %T", kind)) // should never reach here
 	}

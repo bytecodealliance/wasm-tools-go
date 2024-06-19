@@ -73,4 +73,18 @@ func PointerToU32[T any](v *T) uint32 { return uint32(Uptr(v)) }
 
 func Uptr[T any](v *T) uintptr { return uintptr(unsafe.Pointer(v)) }
 
-// Lift functions
+// Experimental lowering functions
+func Lower1[T0, F0 CoreTypes, T any](v *T) F0 {
+	p := (*struct {
+		F0 T0
+	})(unsafe.Pointer(v))
+	return F0(p.F0)
+}
+
+func Lower2[T0, F0, T1, F1 CoreTypes, T any](v *T) (F0, F1) {
+	p := (*struct {
+		F0 T0
+		F1 T1
+	})(unsafe.Pointer(v))
+	return F0(p.F0), F1(p.F1)
+}
