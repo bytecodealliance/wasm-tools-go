@@ -1303,9 +1303,10 @@ func (g *generator) defineImportedFunction(_ wit.Ident, f *wit.Function, decl fu
 	if compoundResults.typ != nil {
 		stringio.Write(&b, "var ", compoundResults.name, " ", g.typeRep(file, compoundResults.dir, compoundResults.typ), "\n")
 	} else {
-		for _, r := range decl.f.results {
-			stringio.Write(&b, "var ", r.name, " ", g.typeRep(file, r.dir, r.typ), "\n")
-		}
+		// FIXME: disabled this because goFunction defaults a single unnamed result to "result".
+		// for _, r := range decl.f.results {
+		// 	stringio.Write(&b, "var ", r.name, " ", g.typeRep(file, r.dir, r.typ), "\n")
+		// }
 	}
 
 	// Emit call to wasmimport function
@@ -1553,7 +1554,7 @@ func (g *generator) functionSignature(file *gen.File, f function) string {
 	b.WriteString(") ")
 
 	// Emit results
-	if len(f.results) == 1 {
+	if len(f.results) == 1 && f.results[0].name == "" {
 		b.WriteString(g.typeRep(file, f.results[0].dir, f.results[0].typ))
 	} else if len(f.results) > 0 {
 		b.WriteRune('(')
