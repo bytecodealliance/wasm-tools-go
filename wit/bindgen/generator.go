@@ -982,7 +982,7 @@ func (g *generator) typeDefLowerFunction(file *gen.File, dir wit.Direction, t *w
 		name := afile.DeclareName("lower_" + g.typeDefGoName(dir, t))
 		f = goFunction(afile, dir, wit.Imported, wit.LowerFunction(t), name)
 		g.lowerFunctions[use] = f
-		stringio.Write(afile, "func ", name, g.functionSignature(afile, f), " {\n", body, "\n}\n\n")
+		stringio.Write(afile, "func ", name, g.functionSignature(afile, f), " {\n", body, "}\n\n")
 	}
 	return f.name + "(" + input + ")"
 }
@@ -1008,7 +1008,7 @@ func (g *generator) lowerRecord(file *gen.File, dir wit.Direction, t *wit.TypeDe
 		}
 		stringio.Write(&b, " = ", g.lowerType(afile, dir, f.Type, "v."+fieldName(f.Name, true)), "\n")
 	}
-	b.WriteString("return")
+	b.WriteString("return\n")
 	return g.typeDefLowerFunction(afile, dir, t, input, b.String())
 }
 
@@ -1030,7 +1030,7 @@ func (g *generator) lowerTuple(file *gen.File, dir wit.Direction, t *wit.TypeDef
 		}
 		stringio.Write(&b, " = ", g.lowerType(afile, dir, tt, field), "\n")
 	}
-	b.WriteString("return")
+	b.WriteString("return\n")
 	return g.typeDefLowerFunction(afile, dir, t, input, b.String())
 }
 
@@ -1042,9 +1042,9 @@ func (g *generator) lowerFlags(file *gen.File, dir wit.Direction, t *wit.TypeDef
 	}
 	// The following line is moot because of the above check, which replaces a function call with an inline cast.
 	// It is here for completeness.
-	body := "return uint32(v)"
+	body := "return uint32(v)\n"
 	if len(flat) > 1 {
-		body = "// TODO: lower flags with > 64 values"
+		body = "// TODO: lower flags with > 64 values\n"
 	}
 	return g.typeDefLowerFunction(file, dir, t, input, body)
 }
@@ -1055,30 +1055,39 @@ func (g *generator) lowerResult(file *gen.File, dir wit.Direction, t *wit.TypeDe
 	if r.OK == nil && r.Err == nil {
 		return g.cmCall(file, "LowerResult", input)
 	}
+	flat := t.Flat()
 	var b strings.Builder
 	b.WriteString("if !v.IsErr() {\n")
 	if r.OK != nil {
-		for i := range r.OK.Flat() {
+		cflat := r.OK.Flat()
+		for i := range cflat {
 			if i > 0 {
 				b.WriteString(", ")
 			}
-			stringio.Write(&b, "f"+strconv.Itoa(i+1))
+			stringio.Write(&b, "v"+strconv.Itoa(i+1))
 		}
-		stringio.Write(&b, " = ", g.lowerType(afile, dir, r.OK, "*v.OK()"), "\n")
+		stringio.Write(&b, " := ", g.lowerType(afile, dir, r.OK, "*v.OK()"), "\n")
+		for i, from := range cflat {
+			stringio.Write(&b, "f"+strconv.Itoa(i+1), " = ", g.cast(afile, from, flat[i+1], "v"+strconv.Itoa(i+1)), "\n")
+		}
 	}
 	b.WriteString("} else {\n")
 	b.WriteString("f0 = 1\n")
 	if r.Err != nil {
-		for i := range r.Err.Flat() {
+		cflat := r.Err.Flat()
+		for i := range cflat {
 			if i > 0 {
 				b.WriteString(", ")
 			}
-			stringio.Write(&b, "f"+strconv.Itoa(i+1))
+			stringio.Write(&b, "v"+strconv.Itoa(i+1))
 		}
-		stringio.Write(&b, " = ", g.lowerType(afile, dir, r.Err, "*v.Err()"), "\n")
+		stringio.Write(&b, " := ", g.lowerType(afile, dir, r.Err, "*v.Err()"), "\n")
+		for i, from := range cflat {
+			stringio.Write(&b, "f"+strconv.Itoa(i+1), " = ", g.cast(afile, from, flat[i+1], "v"+strconv.Itoa(i+1)), "\n")
+		}
 	}
 	b.WriteString("}\n")
-	b.WriteString("return")
+	b.WriteString("return\n")
 	return g.typeDefLowerFunction(afile, dir, t, input, b.String())
 }
 
@@ -1108,7 +1117,7 @@ func castable(from, to wit.Type) bool {
 		return true
 	}
 
-	var fromBool, fromInt, fromFloat, fromString bool
+	var fromBool, fromInt, fromFloat, fromString, fromPointer bool
 
 	switch from.(type) {
 	case wit.Bool:
@@ -1120,7 +1129,11 @@ func castable(from, to wit.Type) bool {
 	case wit.String:
 		fromString = true
 	default:
-		return false
+		if isPointer(from) {
+			fromPointer = true
+		} else {
+			return false
+		}
 	}
 
 	switch to.(type) {
@@ -1133,6 +1146,9 @@ func castable(from, to wit.Type) bool {
 	case wit.String:
 		return fromString
 	default:
+		if isPointer(to) {
+			return fromPointer
+		}
 		return false
 	}
 }
