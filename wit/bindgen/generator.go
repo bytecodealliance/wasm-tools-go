@@ -999,12 +999,14 @@ func (g *generator) lowerRecord(file *gen.File, dir wit.Direction, t *wit.TypeDe
 	afile := g.abiFile(file.Package)
 	r := t.Kind.(*wit.Record)
 	var b strings.Builder
-	for i, f := range r.Fields {
+	i := 0
+	for _, f := range r.Fields {
 		for j := range f.Type.Flat() {
 			if j > 0 {
 				b.WriteString(", ")
 			}
-			stringio.Write(&b, "f"+strconv.Itoa(i+j))
+			stringio.Write(&b, "f"+strconv.Itoa(i))
+			i++
 		}
 		stringio.Write(&b, " = ", g.lowerType(afile, dir, f.Type, "v."+fieldName(f.Name, true)), "\n")
 	}
