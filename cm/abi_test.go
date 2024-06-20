@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestConversions(t *testing.T) {
+func TestIntConversions(t *testing.T) {
 	for i := int8(math.MinInt8); i < math.MaxInt8; i++ {
 		testIntRoundTrip[uint32](t, i)
 		testIntRoundTrip[uint64](t, i)

@@ -4,14 +4,6 @@ import (
 	"unsafe"
 )
 
-type CoreTypes interface {
-	uint32 | uint64 | float32 | float64
-}
-
-type CorePointers[T any] interface {
-	*T | unsafe.Pointer | uintptr
-}
-
 // LowerResult lowers an untyped result into Core WebAssembly I32.
 func LowerResult[T ~bool](v T) uint32 {
 	return uint32(*(*uint8)(unsafe.Pointer(&v)))
@@ -45,36 +37,16 @@ func LiftList[L List[T], T any, Data unsafe.Pointer | uintptr | *T, Len uint | u
 	}
 }
 
-// Lower functions
-// func BoolToS32[B ~bool](v B) int32  { return int32(*(*int8)(unsafe.Pointer(&v))) }
-func BoolToU32[B ~bool](v B) uint32 { return uint32(*(*uint8)(unsafe.Pointer(&v))) }
 func LowerBool[B ~bool](v B) uint32 { return uint32(*(*uint8)(unsafe.Pointer(&v))) }
 
+func BoolToU32[B ~bool](v B) uint32 { return uint32(*(*uint8)(unsafe.Pointer(&v))) }
 func BoolToU64[B ~bool](v B) uint64 { return uint64(*(*uint8)(unsafe.Pointer(&v))) }
+func S32ToF32(v int32) float32      { return *(*float32)(unsafe.Pointer(&v)) }
+func S64ToF64(v int64) float64      { return *(*float64)(unsafe.Pointer(&v)) }
+func F64ToU64(v float64) uint64     { return *(*uint64)(unsafe.Pointer(&v)) }
+func U32ToF32(v uint32) float32     { return *(*float32)(unsafe.Pointer(&v)) }
+func U64ToF64(v uint64) float64     { return *(*float64)(unsafe.Pointer(&v)) }
+func F32ToF64(v float32) float64    { return float64(v) }
 
-func S32ToF32(v int32) float32   { return *(*float32)(unsafe.Pointer(&v)) }
-func S64ToF64(v int64) float64   { return *(*float64)(unsafe.Pointer(&v)) }
-func F64ToU64(v float64) uint64  { return *(*uint64)(unsafe.Pointer(&v)) }
-func U32ToF32(v uint32) float32  { return *(*float32)(unsafe.Pointer(&v)) }
-func U64ToF64(v uint64) float64  { return *(*float64)(unsafe.Pointer(&v)) }
-func F32ToF64(v float32) float64 { return float64(v) }
-
-func PointerToPointer[T any](v *T) *T { return v }
 func PointerToU32[T any](v *T) uint32 { return uint32(uintptr(unsafe.Pointer(v))) }
 func PointerToU64[T any](v *T) uint64 { return uint64(uintptr(unsafe.Pointer(v))) }
-
-// Experimental lowering functions
-func Lower1[T0, F0 CoreTypes, T any](v *T) F0 {
-	p := (*struct {
-		F0 T0
-	})(unsafe.Pointer(v))
-	return F0(p.F0)
-}
-
-func Lower2[T0, F0, T1, F1 CoreTypes, T any](v *T) (F0, F1) {
-	p := (*struct {
-		F0 T0
-		F1 T1
-	})(unsafe.Pointer(v))
-	return F0(p.F0), F1(p.F1)
-}
