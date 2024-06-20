@@ -925,8 +925,6 @@ func (g *generator) lowerType(file *gen.File, dir wit.Direction, t wit.Type, inp
 }
 
 func (g *generator) lowerTypeDef(file *gen.File, dir wit.Direction, t *wit.TypeDef, input string) string {
-	flat := t.Flat()
-
 	switch kind := t.Kind.(type) {
 	case *wit.Pointer:
 		// TODO: convert pointer to unsafe.Pointer or uintptr?
@@ -952,26 +950,13 @@ func (g *generator) lowerTypeDef(file *gen.File, dir wit.Direction, t *wit.TypeD
 		return g.cmCall(file, "LowerList", input)
 	case *wit.Resource, *wit.Own, *wit.Borrow:
 		return g.cmCall(file, "LowerHandle", input)
-
 	case *wit.Future:
 		return "/* TODO: lower *wit.Future */"
 	case *wit.Stream:
 		return "/* TODO: lower *wit.Stream */"
-		// default:
-		// 	panic(fmt.Sprintf("BUG: unknown wit.TypeDefKind %T", kind)) // should never reach here
+	default:
+		panic(fmt.Sprintf("BUG: unknown wit.TypeDef %T", kind)) // should never reach here
 	}
-
-	// TODO: remove this default path
-	var b strings.Builder
-	for i, t := range flat {
-		if i > 0 {
-			b.WriteString(", ")
-		}
-		stringio.Write(&b, g.cast(file, t, t, "0"))
-	}
-	tname := g.typeDefGoName(dir, t)
-	stringio.Write(&b, " // TODO: lower support for ", t.WITKind(), " ", tname)
-	return b.String()
 }
 
 func (g *generator) typeDefLowerFunction(file *gen.File, dir wit.Direction, t *wit.TypeDef, input string, body string) string {
