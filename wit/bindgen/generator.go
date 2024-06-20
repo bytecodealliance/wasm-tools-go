@@ -946,8 +946,8 @@ func (g *generator) lowerTypeDef(file *gen.File, dir wit.Direction, t *wit.TypeD
 	// 	return g.variantRep(file, dir, kind, goName)
 	case *wit.Result:
 		return g.lowerResult(file, dir, t, input)
-	// case *wit.Option:
-	// 	return g.optionRep(file, dir, kind)
+	case *wit.Option:
+		return g.lowerOption(file, dir, t, input)
 	case *wit.List:
 		return g.cmCall(file, "LowerList", input)
 	case *wit.Resource, *wit.Own, *wit.Borrow:
@@ -1064,7 +1064,20 @@ func (g *generator) lowerResult(file *gen.File, dir wit.Direction, t *wit.TypeDe
 	b.WriteString(g.lowerVariantCaseInto(afile, dir, r.Err, 1, flat[1:], "*"+g.cmCall(afile, "GetErr", "&v")))
 	b.WriteString("}\n")
 	b.WriteString("return\n")
-	return g.typeDefLowerFunction(afile, dir, t, input, b.String())
+	return g.typeDefLowerFunction(file, dir, t, input, b.String())
+}
+
+func (g *generator) lowerOption(file *gen.File, dir wit.Direction, t *wit.TypeDef, input string) string {
+	afile := g.abiFile(file.Package)
+	o := t.Kind.(*wit.Option)
+	flat := t.Flat()
+	var b strings.Builder
+	stringio.Write(&b, "some := v.Some()\n")
+	b.WriteString("if some != nil {\n")
+	b.WriteString(g.lowerVariantCaseInto(afile, dir, o.Type, 1, flat[1:], "*some"))
+	b.WriteString("}\n")
+	b.WriteString("return\n")
+	return g.typeDefLowerFunction(file, dir, t, input, b.String())
 }
 
 func (g *generator) lowerVariantCaseInto(file *gen.File, dir wit.Direction, t wit.Type, variantCase int, into []wit.Type, input string) string {
