@@ -925,6 +925,7 @@ func (g *generator) lowerType(file *gen.File, dir wit.Direction, t wit.Type, inp
 }
 
 func (g *generator) lowerTypeDef(file *gen.File, dir wit.Direction, t *wit.TypeDef, input string) string {
+	flat := t.Flat()
 	switch kind := t.Kind.(type) {
 	case *wit.Pointer:
 		// TODO: convert pointer to unsafe.Pointer or uintptr?
@@ -938,8 +939,9 @@ func (g *generator) lowerTypeDef(file *gen.File, dir wit.Direction, t *wit.TypeD
 	case *wit.Flags:
 		return g.lowerFlags(file, dir, t, input)
 	case *wit.Enum:
+		return g.cast(file, t, flat[0], input)
 		// return g.cast(file, wit.Discriminant(len(kind.Cases)), flat[0], input)
-		return g.cmCall(file, "LowerEnum", input)
+		// return g.cmCall(file, "LowerEnum", input)
 	case *wit.Variant:
 		return g.lowerVariant(file, dir, t, input)
 	case *wit.Result:
@@ -1148,7 +1150,9 @@ func castable(from, to wit.Type) bool {
 	case wit.String:
 		fromString = true
 	default:
-		if isPointer(from) {
+		if wit.KindOf[*wit.Enum](from) != nil {
+			fromInt = true
+		} else if isPointer(from) {
 			fromPointer = true
 		} else {
 			return false
@@ -1165,7 +1169,9 @@ func castable(from, to wit.Type) bool {
 	case wit.String:
 		return fromString
 	default:
-		if isPointer(to) {
+		if wit.KindOf[*wit.Enum](to) != nil {
+			return fromInt
+		} else if isPointer(to) {
 			return fromPointer
 		}
 		return false
