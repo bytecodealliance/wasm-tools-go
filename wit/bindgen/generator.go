@@ -1059,11 +1059,15 @@ func (g *generator) lowerVariant(file *gen.File, dir wit.Direction, t *wit.TypeD
 	}
 	flat := t.Flat()
 	var b strings.Builder
-	stringio.Write(&b, "switch ", g.cmCall(afile, "Tag", "&v"), " {\n")
+	stringio.Write(&b, "f0 = ", g.cast(afile, wit.Discriminant(len(v.Cases)), flat[0], g.cmCall(afile, "Tag", "&v")), "\n")
+	stringio.Write(&b, "switch f0 {\n")
 	for i, c := range v.Cases {
+		if c.Type == nil {
+			continue
+		}
 		caseNum := strconv.Itoa(i)
 		caseName := GoName(c.Name, true)
-		stringio.Write(&b, "case ", caseNum, ":\n")
+		stringio.Write(&b, "case ", caseNum, ": // ", c.Name, "\n")
 		b.WriteString(g.lowerVariantCaseInto(afile, dir, c.Type, i, flat[1:], "*v."+caseName+"()"))
 	}
 	b.WriteString("}\n")
@@ -1083,6 +1087,7 @@ func (g *generator) lowerResult(file *gen.File, dir wit.Direction, t *wit.TypeDe
 	b.WriteString("case false:\n")
 	b.WriteString(g.lowerVariantCaseInto(afile, dir, r.OK, 0, flat[1:], "*"+g.cmCall(afile, "GetOK", "&v")))
 	b.WriteString(" case true:\n")
+	b.WriteString("f0 = 1\n")
 	b.WriteString(g.lowerVariantCaseInto(afile, dir, r.Err, 1, flat[1:], "*"+g.cmCall(afile, "GetErr", "&v")))
 	b.WriteString("}\n")
 	b.WriteString("return\n")
@@ -1096,6 +1101,7 @@ func (g *generator) lowerOption(file *gen.File, dir wit.Direction, t *wit.TypeDe
 	var b strings.Builder
 	stringio.Write(&b, "some := v.Some()\n")
 	b.WriteString("if some != nil {\n")
+	b.WriteString("f0 = 1\n")
 	b.WriteString(g.lowerVariantCaseInto(afile, dir, o.Type, 1, flat[1:], "*some"))
 	b.WriteString("}\n")
 	b.WriteString("return\n")
@@ -1104,7 +1110,6 @@ func (g *generator) lowerOption(file *gen.File, dir wit.Direction, t *wit.TypeDe
 
 func (g *generator) lowerVariantCaseInto(file *gen.File, dir wit.Direction, t wit.Type, tag int, into []wit.Type, input string) string {
 	var b strings.Builder
-	stringio.Write(&b, "f0 = ", strconv.Itoa(tag), "\n")
 	if t != nil {
 		for i := range t.Flat() {
 			if i > 0 {
