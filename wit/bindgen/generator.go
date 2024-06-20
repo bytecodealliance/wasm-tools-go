@@ -1122,6 +1122,68 @@ func (g *generator) lowerPrimitive(file *gen.File, p wit.Primitive, input string
 	}
 }
 
+func (g *generator) liftType(file *gen.File, dir wit.Direction, t wit.Type, input string) string {
+	switch t := t.(type) {
+	case nil:
+		// TODO: should this exist?
+		return ""
+	case *wit.TypeDef:
+		t = t.Root()
+		return g.liftTypeDef(file, dir, t, input)
+	case wit.Primitive:
+		return g.liftPrimitive(file, t, input)
+	default:
+		panic(fmt.Sprintf("BUG: unknown type %T", t)) // should never reach here
+	}
+}
+
+func (g *generator) liftTypeDef(file *gen.File, dir wit.Direction, t *wit.TypeDef, input string) string {
+	flat := t.Flat()
+	switch kind := t.Kind.(type) {
+	case *wit.Pointer:
+		// TODO: convert pointer to unsafe.Pointer or uintptr?
+		return input
+	case wit.Type:
+		return g.liftType(file, dir, kind, input)
+	case *wit.Record:
+		return "// TODO: g.liftRecord(file, dir, t, input)"
+	case *wit.Tuple:
+		return "// TODO: g.liftTuple(file, dir, t, input)"
+	case *wit.Flags:
+		return "// TODO: g.liftFlags(file, dir, t, input)"
+	case *wit.Enum:
+		return g.cast(file, flat[0], t, input)
+		// return g.cmCall(file, "LiftEnum", input)
+	case *wit.Variant:
+		return "// TODO: g.liftVariant(file, dir, t, input)"
+	case *wit.Result:
+		return "// TODO: g.liftResult(file, dir, t, input)"
+	case *wit.Option:
+		return "// TODO: g.liftOption(file, dir, t, input)"
+	case *wit.List:
+		return g.cmCall(file, "LiftList", input)
+	case *wit.Resource, *wit.Own, *wit.Borrow:
+		return g.cmCall(file, "LiftHandle", input)
+	case *wit.Future:
+		return "// TODO: lift *wit.Future */"
+	case *wit.Stream:
+		return "// TODO: lift *wit.Stream */"
+	default:
+		panic(fmt.Sprintf("BUG: unknown wit.TypeDef %T", kind)) // should never reach here
+	}
+}
+
+func (g *generator) liftPrimitive(file *gen.File, p wit.Primitive, input string) string {
+	flat := p.Flat()
+	switch p := p.(type) {
+	case wit.String:
+		return g.cmCall(file, "LiftString", input)
+	default:
+		return g.cast(file, flat[0], p, input)
+	}
+}
+
+// TODO: add direction
 func (g *generator) cast(file *gen.File, from, to wit.Type, input string) string {
 	if castable(from, to) {
 		return "(" + g.typeRep(file, wit.Imported, to) + ")(" + input + ")"
@@ -1446,21 +1508,43 @@ func (g *generator) defineImportedFunction(_ wit.Ident, f *wit.Function, decl fu
 		}
 	}
 	b.WriteString(")\n")
-	b.WriteString("return ")
 	if resultsRecord != nil {
+		b.WriteString("return ")
 		for i, f := range resultsRecord.Fields {
 			if i > 0 {
 				b.WriteString(", ")
 			}
 			stringio.Write(&b, compoundResults.name, ".", fieldName(f.Name, false), "/* 😂 */")
 		}
-	} else {
+	} else if len(callResults) > 0 {
+		i := 0
+		for _, r := range decl.f.results {
+			stringio.Write(&b, r.name, " = ")
+			var input strings.Builder
+			for j, t := range r.typ.Flat() {
+				if j > 0 {
+					input.WriteString(", ")
+				}
+				if i >= len(callResults) {
+					println("!")
+					continue
+				}
+				cr := callResults[i]
+				input.WriteString(g.cast(file, cr.typ, t, cr.name))
+				i++
+			}
+			stringio.Write(&b, g.liftType(file, r.dir, r.typ, input.String()))
+		}
+		b.WriteString("\n")
+		b.WriteString("return ")
 		for i, r := range decl.f.results {
 			if i > 0 {
 				b.WriteString(", ")
 			}
 			b.WriteString(r.name)
 		}
+	} else {
+		b.WriteString("return")
 	}
 	b.WriteRune('\n')
 	b.WriteString("}\n\n")
