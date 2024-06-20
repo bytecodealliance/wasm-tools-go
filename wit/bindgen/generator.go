@@ -940,10 +940,10 @@ func (g *generator) lowerTypeDef(file *gen.File, dir wit.Direction, t *wit.TypeD
 	case *wit.Flags:
 		return g.lowerFlags(file, dir, t, input)
 	case *wit.Enum:
-		return g.cast(file, wit.Discriminant(len(kind.Cases)), flat[0], input)
-		// return g.cmCall(file, "LowerEnum", input)
-	// case *wit.Variant:
-	// 	return g.variantRep(file, dir, kind, goName)
+		// return g.cast(file, wit.Discriminant(len(kind.Cases)), flat[0], input)
+		return g.cmCall(file, "LowerEnum", input)
+	case *wit.Variant:
+		return g.lowerVariant(file, dir, t, input)
 	case *wit.Result:
 		return g.lowerResult(file, dir, t, input)
 	case *wit.Option:
@@ -1049,6 +1049,26 @@ func (g *generator) lowerFlags(file *gen.File, dir wit.Direction, t *wit.TypeDef
 	return g.typeDefLowerFunction(file, dir, t, input, body)
 }
 
+func (g *generator) lowerVariant(file *gen.File, dir wit.Direction, t *wit.TypeDef, input string) string {
+	afile := g.abiFile(file.Package)
+	v := t.Kind.(*wit.Variant)
+	if v.Enum() != nil {
+		return g.cmCall(file, "LowerEnum", input)
+	}
+	flat := t.Flat()
+	var b strings.Builder
+	stringio.Write(&b, "switch ", g.cmCall(afile, "Tag", "&v"), " {\n")
+	for i, c := range v.Cases {
+		caseNum := strconv.Itoa(i)
+		caseName := GoName(c.Name, true)
+		stringio.Write(&b, "case ", caseNum, ":\n")
+		b.WriteString(g.lowerVariantCaseInto(afile, dir, c.Type, i, flat[1:], "*v."+caseName+"()"))
+	}
+	b.WriteString("}\n")
+	b.WriteString("return\n")
+	return g.typeDefLowerFunction(file, dir, t, input, b.String())
+}
+
 func (g *generator) lowerResult(file *gen.File, dir wit.Direction, t *wit.TypeDef, input string) string {
 	afile := g.abiFile(file.Package)
 	r := t.Kind.(*wit.Result)
@@ -1080,9 +1100,9 @@ func (g *generator) lowerOption(file *gen.File, dir wit.Direction, t *wit.TypeDe
 	return g.typeDefLowerFunction(file, dir, t, input, b.String())
 }
 
-func (g *generator) lowerVariantCaseInto(file *gen.File, dir wit.Direction, t wit.Type, variantCase int, into []wit.Type, input string) string {
+func (g *generator) lowerVariantCaseInto(file *gen.File, dir wit.Direction, t wit.Type, tag int, into []wit.Type, input string) string {
 	var b strings.Builder
-	stringio.Write(&b, "f0 = ", strconv.Itoa(variantCase), "\n")
+	stringio.Write(&b, "f0 = ", strconv.Itoa(tag), "\n")
 	if t != nil {
 		for i := range t.Flat() {
 			if i > 0 {
