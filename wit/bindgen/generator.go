@@ -1489,7 +1489,6 @@ func (g *generator) defineImportedFunction(_ wit.Ident, f *wit.Function, decl fu
 
 	var compoundParams param
 	var compoundResults param
-	var resultsRecord *wit.Record // TODO: delete this variable and extract below
 	if len(callParams) > 0 {
 		p := callParams[0]
 		t := derefAnonRecord(p.typ)
@@ -1505,7 +1504,6 @@ func (g *generator) defineImportedFunction(_ wit.Ident, f *wit.Function, decl fu
 			compoundResults = p
 			g.declareTypeDef(file, dir, t, decl.wasm.name+"_results")
 			compoundResults.typ = t
-			resultsRecord = t.Kind.(*wit.Record)
 		}
 	}
 
@@ -1581,9 +1579,10 @@ func (g *generator) defineImportedFunction(_ wit.Ident, f *wit.Function, decl fu
 		}
 	}
 	b.WriteString(")\n")
-	if resultsRecord != nil {
+	if compoundResults.typ != nil {
+		rec := wit.KindOf[*wit.Record](compoundResults.typ)
 		b.WriteString("return ")
-		for i, f := range resultsRecord.Fields {
+		for i, f := range rec.Fields {
 			if i > 0 {
 				b.WriteString(", ")
 			}
