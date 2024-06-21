@@ -1054,7 +1054,7 @@ func (g *generator) lowerVariant(file *gen.File, dir wit.Direction, t *wit.TypeD
 		caseNum := strconv.Itoa(i)
 		caseName := GoName(c.Name, true)
 		stringio.Write(&b, "case ", caseNum, ": // ", c.Name, "\n")
-		b.WriteString(g.lowerVariantCaseInto(afile, dir, c.Type, i, flat[1:], "*v."+caseName+"()"))
+		b.WriteString(g.lowerVariantCaseInto(afile, dir, c.Type, flat[1:], "*v."+caseName+"()"))
 	}
 	b.WriteString("}\n")
 	b.WriteString("return\n")
@@ -1071,10 +1071,10 @@ func (g *generator) lowerResult(file *gen.File, dir wit.Direction, t *wit.TypeDe
 	var b strings.Builder
 	stringio.Write(&b, "switch ", g.cmCall(afile, "IsErr", "&v"), " {\n")
 	b.WriteString("case false:\n")
-	b.WriteString(g.lowerVariantCaseInto(afile, dir, r.OK, 0, flat[1:], "*"+g.cmCall(afile, "GetOK", "&v")))
+	b.WriteString(g.lowerVariantCaseInto(afile, dir, r.OK, flat[1:], "*"+g.cmCall(afile, "GetOK", "&v")))
 	b.WriteString(" case true:\n")
 	b.WriteString("f0 = 1\n")
-	b.WriteString(g.lowerVariantCaseInto(afile, dir, r.Err, 1, flat[1:], "*"+g.cmCall(afile, "GetErr", "&v")))
+	b.WriteString(g.lowerVariantCaseInto(afile, dir, r.Err, flat[1:], "*"+g.cmCall(afile, "GetErr", "&v")))
 	b.WriteString("}\n")
 	b.WriteString("return\n")
 	return g.typeDefLowerFunction(file, dir, t, input, b.String())
@@ -1088,25 +1088,26 @@ func (g *generator) lowerOption(file *gen.File, dir wit.Direction, t *wit.TypeDe
 	stringio.Write(&b, "some := v.Some()\n")
 	b.WriteString("if some != nil {\n")
 	b.WriteString("f0 = 1\n")
-	b.WriteString(g.lowerVariantCaseInto(afile, dir, o.Type, 1, flat[1:], "*some"))
+	b.WriteString(g.lowerVariantCaseInto(afile, dir, o.Type, flat[1:], "*some"))
 	b.WriteString("}\n")
 	b.WriteString("return\n")
 	return g.typeDefLowerFunction(file, dir, t, input, b.String())
 }
 
-func (g *generator) lowerVariantCaseInto(file *gen.File, dir wit.Direction, t wit.Type, tag int, into []wit.Type, input string) string {
+func (g *generator) lowerVariantCaseInto(file *gen.File, dir wit.Direction, t wit.Type, into []wit.Type, input string) string {
+	if t == nil {
+		return ""
+	}
 	var b strings.Builder
-	if t != nil {
-		for i := range t.Flat() {
-			if i > 0 {
-				b.WriteString(", ")
-			}
-			stringio.Write(&b, "v"+strconv.Itoa(i+1))
+	for i := range t.Flat() {
+		if i > 0 {
+			b.WriteString(", ")
 		}
-		stringio.Write(&b, " := ", g.lowerType(file, dir, t, input), "\n")
-		for i, from := range t.Flat() {
-			stringio.Write(&b, "f"+strconv.Itoa(i+1), " = ", g.cast(file, from, into[i], "v"+strconv.Itoa(i+1)), "\n")
-		}
+		stringio.Write(&b, "v"+strconv.Itoa(i+1))
+	}
+	stringio.Write(&b, " := ", g.lowerType(file, dir, t, input), "\n")
+	for i, from := range t.Flat() {
+		stringio.Write(&b, "f"+strconv.Itoa(i+1), " = ", g.cast(file, from, into[i], "v"+strconv.Itoa(i+1)), "\n")
 	}
 	return b.String()
 }
