@@ -1477,17 +1477,6 @@ func (g *generator) defineImportedFunction(_ wit.Ident, f *wit.Function, decl fu
 
 	file := decl.f.file
 
-	// for i := range callParams {
-	// 	j := i - len(decl.f.params)
-	// 	if j < 0 {
-	// 		callParams[i].name = decl.f.params[i].name
-	// 	} else {
-	// 		callParams[i].name = decl.f.results[j].name
-	// 	}
-	// }
-
-	// params := anonRecord(decl.wasm.params)
-
 	// Bridging between Go and wasm function
 	callParams := slices.Clone(decl.wasm.params)
 	for i := range callParams {
