@@ -951,7 +951,7 @@ func (g *generator) lowerTypeDef(file *gen.File, dir wit.Direction, t *wit.TypeD
 	case *wit.List:
 		return g.cmCall(file, "LowerList", input)
 	case *wit.Resource, *wit.Own, *wit.Borrow:
-		return g.cmCall(file, "LowerHandle", input)
+		return g.cmCall(file, "Reinterpret["+g.typeRep(file, dir, t)+"]", input)
 	case *wit.Future:
 		return "/* TODO: lower *wit.Future */"
 	case *wit.Stream:
