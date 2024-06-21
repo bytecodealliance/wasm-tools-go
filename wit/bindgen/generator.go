@@ -1519,21 +1519,15 @@ func (g *generator) defineImportedFunction(_ wit.Ident, f *wit.Function, decl fu
 	} else if len(callResults) > 0 {
 		i := 0
 		for _, r := range decl.f.results {
-			stringio.Write(&b, r.name, " = ")
 			var input strings.Builder
 			for j, t := range r.typ.Flat() {
 				if j > 0 {
 					input.WriteString(", ")
 				}
-				if i >= len(callResults) {
-					println("!")
-					continue
-				}
-				cr := callResults[i]
-				input.WriteString(g.cast(file, cr.typ, t, cr.name))
+				input.WriteString(g.cast(file, callResults[i].typ, t, callResults[i].name))
 				i++
 			}
-			stringio.Write(&b, g.liftType(file, r.dir, r.typ, input.String()))
+			stringio.Write(&b, r.name, " = ", g.liftType(file, r.dir, r.typ, input.String()))
 		}
 		b.WriteString("\n")
 		b.WriteString("return ")
