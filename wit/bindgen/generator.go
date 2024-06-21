@@ -1537,24 +1537,6 @@ func (g *generator) defineImportedFunction(_ wit.Ident, f *wit.Function, decl fu
 
 	// Emit function body
 	b.WriteString(" {\n")
-	// sameResults := slices.Equal(decl.f.results, decl.wasm.results)
-	// if len(decl.f.results) == 1 && !sameResults {
-	// }
-
-	// for _, p := range callParams {
-	// 	t := p.typ
-	// 	if td := derefTypeDef(p.typ); td != nil {
-	// 		t = td
-	// 	}
-	// 	stringio.Write(&b, "var ", p.name, " ", g.typeRep(file, p.dir, t), "\n")
-	// }
-	// for _, r := range callResults {
-	// 	t := r.typ
-	// 	if td := derefTypeDef(r.typ); td != nil {
-	// 		t = td
-	// 	}
-	// 	stringio.Write(&b, "var ", r.name, " ", g.typeRep(file, r.dir, t), "\n")
-	// }
 
 	// Lower into wasmimport variables
 	if compoundParams.typ != nil {
@@ -1584,11 +1566,6 @@ func (g *generator) defineImportedFunction(_ wit.Ident, f *wit.Function, decl fu
 	// Declare result variables
 	if compoundResults.typ != nil {
 		stringio.Write(&b, "var ", compoundResults.name, " ", g.typeRep(file, compoundResults.dir, compoundResults.typ), "\n")
-	} else {
-		// FIXME: disabled this because goFunction defaults a single unnamed result to "result".
-		// for _, r := range decl.f.results {
-		// 	stringio.Write(&b, "var ", r.name, " ", g.typeRep(file, r.dir, r.typ), "\n")
-		// }
 	}
 
 	// Emit call to wasmimport function
