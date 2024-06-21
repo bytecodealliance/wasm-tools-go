@@ -1146,9 +1146,9 @@ func (g *generator) liftTypeDef(file *gen.File, dir wit.Direction, t *wit.TypeDe
 	case wit.Type:
 		return g.liftType(file, dir, kind, input)
 	case *wit.Record:
-		return "// TODO: g.liftRecord(file, dir, t, input)"
+		return g.liftRecord(file, dir, t, input)
 	case *wit.Tuple:
-		return "// TODO: g.liftTuple(file, dir, t, input)"
+		return g.liftTuple(file, dir, t, input)
 	case *wit.Flags:
 		return "// TODO: g.liftFlags(file, dir, t, input)"
 	case *wit.Enum:
@@ -1157,11 +1157,11 @@ func (g *generator) liftTypeDef(file *gen.File, dir wit.Direction, t *wit.TypeDe
 	case *wit.Variant:
 		return "// TODO: g.liftVariant(file, dir, t, input)"
 	case *wit.Result:
-		return "// TODO: g.liftResult(file, dir, t, input)"
+		return g.liftResult(file, dir, t, input)
 	case *wit.Option:
-		return "// TODO: g.liftOption(file, dir, t, input)"
+		return g.liftOption(file, dir, t, input)
 	case *wit.List:
-		return g.cmCall(file, "LiftList", input)
+		return g.cmCall(file, "LiftList["+g.typeRep(file, dir, t)+"]", input)
 	case *wit.Resource, *wit.Own, *wit.Borrow:
 		return g.cmCall(file, "Reinterpret["+g.typeRep(file, dir, t)+"]", input)
 	case *wit.Future:
@@ -1171,6 +1171,113 @@ func (g *generator) liftTypeDef(file *gen.File, dir wit.Direction, t *wit.TypeDe
 	default:
 		panic(fmt.Sprintf("BUG: unknown wit.TypeDef %T", kind)) // should never reach here
 	}
+}
+
+func (g *generator) typeDefLiftFunction(file *gen.File, dir wit.Direction, t *wit.TypeDef, input string, body string) string {
+	use := typeUse{file.Package, dir, t}
+	f, ok := g.liftFunctions[use]
+	if !ok {
+		afile := g.abiFile(file.Package)
+		name := afile.DeclareName("lift_" + g.typeDefGoName(dir, t))
+		f = goFunction(afile, dir, wit.Imported, wit.LiftFunction(t), name)
+		g.liftFunctions[use] = f
+		stringio.Write(afile, "func ", name, g.functionSignature(afile, f), " {\n", body, "}\n\n")
+	}
+	return f.name + "(" + input + ")"
+}
+
+func (g *generator) liftRecord(file *gen.File, dir wit.Direction, t *wit.TypeDef, input string) string {
+	afile := g.abiFile(file.Package)
+	r := t.Kind.(*wit.Record)
+	var b strings.Builder
+	i := 0
+	for _, f := range r.Fields {
+		var b2 strings.Builder
+		for j := range f.Type.Flat() {
+			if j > 0 {
+				b.WriteString(", ")
+			}
+			stringio.Write(&b2, "f"+strconv.Itoa(i))
+			i++
+		}
+		stringio.Write(&b, "v."+fieldName(f.Name, true), " = ", g.liftType(afile, dir, f.Type, b2.String()), "\n")
+	}
+	b.WriteString("return\n")
+	return g.typeDefLiftFunction(afile, dir, t, input, b.String())
+}
+
+func (g *generator) liftTuple(file *gen.File, dir wit.Direction, t *wit.TypeDef, input string) string {
+	afile := g.abiFile(file.Package)
+	tup := t.Kind.(*wit.Tuple)
+	mono := tup.Type()
+	var b strings.Builder
+	for i, tt := range tup.Types {
+		var b2 strings.Builder
+		for j := range tt.Flat() {
+			if j > 0 {
+				b.WriteString(", ")
+			}
+			stringio.Write(&b2, "f"+strconv.Itoa(i))
+		}
+		field := "v.F" + strconv.Itoa(i)
+		if mono != nil {
+			field = "v[" + strconv.Itoa(i) + "]" // Monotypic tuples are represented as a fixed-length Go array
+		}
+		stringio.Write(&b, field, " = ", g.liftType(afile, dir, tt, b2.String()), "\n")
+	}
+	b.WriteString("return\n")
+	return g.typeDefLiftFunction(afile, dir, t, input, b.String())
+}
+
+func (g *generator) liftResult(file *gen.File, dir wit.Direction, t *wit.TypeDef, input string) string {
+	afile := g.abiFile(file.Package)
+	r := t.Kind.(*wit.Result)
+	if r.OK == nil && r.Err == nil {
+		return g.cmCall(file, "Reinterpret["+g.typeRep(file, dir, t)+"]", input)
+	}
+	flat := t.Flat()
+	var b strings.Builder
+	stringio.Write(&b, "switch f0 {\n")
+	if r.OK != nil {
+		b.WriteString("case 0:\n")
+		stringio.Write(&b, "return ", g.liftVariantCaseFrom(afile, dir, r.OK, flat[1:]), "\n")
+	}
+	if r.Err != nil {
+		b.WriteString(" case 1:\n")
+		b.WriteString("f0 = 1\n")
+		stringio.Write(&b, "return ", g.liftVariantCaseFrom(afile, dir, r.Err, flat[1:]), "\n")
+	}
+	b.WriteString("}\n")
+	b.WriteString("return\n")
+	return g.typeDefLiftFunction(file, dir, t, input, b.String())
+}
+
+func (g *generator) liftOption(file *gen.File, dir wit.Direction, t *wit.TypeDef, input string) string {
+	afile := g.abiFile(file.Package)
+	o := t.Kind.(*wit.Option)
+	flat := t.Flat()
+	var b strings.Builder
+	b.WriteString("if f0 == 0 {\n")
+	b.WriteString("return")
+	b.WriteString("}\n")
+	stringio.Write(&b, "return ", g.liftVariantCaseFrom(afile, dir, o.Type, flat[1:]), "\n")
+	return g.typeDefLiftFunction(file, dir, t, input, b.String())
+}
+
+func (g *generator) liftVariantCaseFrom(file *gen.File, dir wit.Direction, t wit.Type, from []wit.Type) string {
+	if t == nil {
+		return ""
+	}
+	flat := t.Flat()
+	var b strings.Builder
+	for i, t := range flat {
+		if i > 0 {
+			b.WriteString(", ")
+		}
+		stringio.Write(&b, g.cast(file, t, from[i], "f"+strconv.Itoa(i+1)))
+	}
+	stringio.Write(&b, g.cmCall(file, "Some["+g.typeRep(file, dir, t)+"]", b.String()))
+	return b.String()
 }
 
 func (g *generator) liftPrimitive(file *gen.File, p wit.Primitive, input string) string {
@@ -1519,15 +1626,15 @@ func (g *generator) defineImportedFunction(_ wit.Ident, f *wit.Function, decl fu
 	} else if len(callResults) > 0 {
 		i := 0
 		for _, r := range decl.f.results {
-			var input strings.Builder
+			var b2 strings.Builder
 			for j, t := range r.typ.Flat() {
 				if j > 0 {
-					input.WriteString(", ")
+					b2.WriteString(", ")
 				}
-				input.WriteString(g.cast(file, callResults[i].typ, t, callResults[i].name))
+				b2.WriteString(g.cast(file, callResults[i].typ, t, callResults[i].name))
 				i++
 			}
-			stringio.Write(&b, r.name, " = ", g.liftType(file, r.dir, r.typ, input.String()))
+			stringio.Write(&b, r.name, " = ", g.liftType(file, r.dir, r.typ, b2.String()))
 		}
 		b.WriteString("\n")
 		b.WriteString("return ")
