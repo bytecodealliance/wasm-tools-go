@@ -509,7 +509,6 @@ func (g *generator) declareTypeDef(file *gen.File, dir wit.Direction, t *wit.Typ
 	g.types[dir][t] = decl
 
 	if dir == wit.Exported && g.exportScopes[owner.String()] != nil {
-		println(owner.String())
 		g.exportScopes[owner.String()].DeclareName(goName)
 	}
 
