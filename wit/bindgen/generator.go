@@ -591,6 +591,14 @@ func typeDefOwner(t *wit.TypeDef) wit.Ident {
 	return id
 }
 
+// typeDefGoName returns a mangled Go name for t.
+func (g *generator) typeDefGoName(dir wit.Direction, t *wit.TypeDef) string {
+	if decl, ok := g.types[dir][t]; ok {
+		return decl.name
+	}
+	return GoName(t.WIT(nil, t.TypeName()), true)
+}
+
 func (g *generator) typeDefRep(file *gen.File, dir wit.Direction, t *wit.TypeDef, goName string) string {
 	return g.typeDefKindRep(file, dir, t.Kind, goName)
 }
@@ -971,14 +979,6 @@ func (g *generator) typeDefLowerFunction(file *gen.File, dir wit.Direction, t *w
 		stringio.Write(afile, "func ", name, g.functionSignature(afile, f), " {\n", body, "}\n\n")
 	}
 	return f.name + "(" + input + ")"
-}
-
-// typeDefGoName returns a mangled Go name for t.
-func (g *generator) typeDefGoName(dir wit.Direction, t *wit.TypeDef) string {
-	if decl, ok := g.types[dir][t]; ok {
-		return decl.name
-	}
-	return GoName(t.WIT(nil, t.TypeName()), true)
 }
 
 func (g *generator) lowerRecord(file *gen.File, dir wit.Direction, t *wit.TypeDef, input string) string {
