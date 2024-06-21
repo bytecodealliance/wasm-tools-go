@@ -4,6 +4,15 @@ import (
 	"unsafe"
 )
 
+// Reinterpret reinterprets the bits of type From into type To.
+// Will panic if the size of From is smaller than To.
+func Reinterpret[To, From any](from From) (to To) {
+	if unsafe.Sizeof(to) > unsafe.Sizeof(from) {
+		panic("reinterpret: size of to > from")
+	}
+	return *(*To)(unsafe.Pointer(&from))
+}
+
 // LowerResult lowers an untyped result into Core WebAssembly I32.
 func LowerResult[T ~bool](v T) uint32 {
 	return uint32(*(*uint8)(unsafe.Pointer(&v)))
@@ -12,6 +21,11 @@ func LowerResult[T ~bool](v T) uint32 {
 // LowerHandle lowers a handle ([cm.Resource], [cm.Rep]) into a Core WebAssembly I32.
 func LowerHandle[T any](v T) uint32 {
 	return *(*uint32)(unsafe.Pointer(&v))
+}
+
+// LiftHandle lifts Core WebAssembly I32 into a handle ([cm.Resource], [cm.Rep]).
+func LiftHandle[H any](v uint32) H {
+	return *(*H)(unsafe.Pointer(&v))
 }
 
 // LowerEnum lowers an enum into a Core WebAssembly I32.

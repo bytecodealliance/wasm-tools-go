@@ -1163,7 +1163,7 @@ func (g *generator) liftTypeDef(file *gen.File, dir wit.Direction, t *wit.TypeDe
 	case *wit.List:
 		return g.cmCall(file, "LiftList", input)
 	case *wit.Resource, *wit.Own, *wit.Borrow:
-		return g.cmCall(file, "LiftHandle", input)
+		return g.cmCall(file, "Reinterpret["+g.typeRep(file, dir, t)+"]", input)
 	case *wit.Future:
 		return "// TODO: lift *wit.Future */"
 	case *wit.Stream:
