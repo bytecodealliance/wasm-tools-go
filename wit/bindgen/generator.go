@@ -1144,7 +1144,7 @@ func (g *generator) liftType(file *gen.File, dir wit.Direction, t wit.Type, inpu
 		t = t.Root()
 		return g.liftTypeDef(file, dir, t, input)
 	case wit.Primitive:
-		return g.liftPrimitive(file, t, input)
+		return g.liftPrimitive(file, dir, t, input)
 	default:
 		panic(fmt.Sprintf("BUG: unknown type %T", t)) // should never reach here
 	}
@@ -1153,6 +1153,8 @@ func (g *generator) liftType(file *gen.File, dir wit.Direction, t wit.Type, inpu
 func (g *generator) liftTypeDef(file *gen.File, dir wit.Direction, t *wit.TypeDef, input string) string {
 	flat := t.Flat()
 	switch kind := t.Kind.(type) {
+	case wit.Primitive:
+		return g.liftPrimitive(file, dir, t, input)
 	case *wit.Pointer:
 		// TODO: convert pointer to unsafe.Pointer or uintptr?
 		return input
@@ -1289,13 +1291,20 @@ func (g *generator) liftVariantCase(file *gen.File, dir wit.Direction, t wit.Typ
 	return g.liftType(file, dir, t, b.String())
 }
 
-func (g *generator) liftPrimitive(file *gen.File, p wit.Primitive, input string) string {
+func (g *generator) liftPrimitive(file *gen.File, dir wit.Direction, t wit.Type, input string) string {
+	p, ok := t.(wit.Primitive)
+	if !ok {
+		p = wit.KindOf[wit.Primitive](t)
+		if p == nil {
+			panic("BUG: cannot lift non-primitive type")
+		}
+	}
 	flat := p.Flat()
-	switch p := p.(type) {
+	switch p.(type) {
 	case wit.String:
 		return g.cmCall(file, "LiftString", input)
 	default:
-		return g.cast(file, flat[0], p, input)
+		return g.cast(file, flat[0], t, input)
 	}
 }
 
@@ -1312,6 +1321,14 @@ func goKind(t wit.Node) string {
 }
 
 func castable(from, to wit.Type) bool {
+	// Downcast to primitive types if possible
+	if p := wit.KindOf[wit.Primitive](from); p != nil {
+		from = p
+	}
+	if p := wit.KindOf[wit.Primitive](to); p != nil {
+		to = p
+	}
+
 	if to == from {
 		return true
 	}
@@ -1595,7 +1612,7 @@ func (g *generator) defineImportedFunction(_ wit.Ident, f *wit.Function, decl fu
 			if i > 0 {
 				b.WriteString(", ")
 			}
-			stringio.Write(&b, compoundResults.name, ".", fieldName(f.Name, false), "/* 😂 */")
+			stringio.Write(&b, compoundResults.name, ".", fieldName(f.Name, false))
 		}
 	} else if len(callResults) > 0 {
 		i := 0
@@ -1606,12 +1623,12 @@ func (g *generator) defineImportedFunction(_ wit.Ident, f *wit.Function, decl fu
 		}
 		b.WriteString("\n")
 		b.WriteString("return ")
-		for i, r := range decl.f.results {
-			if i > 0 {
-				b.WriteString(", ")
-			}
-			b.WriteString(r.name)
-		}
+		// for i, r := range decl.f.results {
+		// 	if i > 0 {
+		// 		b.WriteString(", ")
+		// 	}
+		// 	b.WriteString(r.name)
+		// }
 	} else {
 		b.WriteString("return")
 	}
