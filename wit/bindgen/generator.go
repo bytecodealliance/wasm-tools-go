@@ -1513,6 +1513,7 @@ func (g *generator) defineImportedFunction(_ wit.Ident, f *wit.Function, decl fu
 		callResults[i].name = decl.f.scope.DeclareName(callResults[i].name)
 	}
 
+	var simplePointerParam bool
 	var compoundParams param
 	var compoundResults param
 	if len(callParams) > 0 {
@@ -1522,6 +1523,10 @@ func (g *generator) defineImportedFunction(_ wit.Ident, f *wit.Function, decl fu
 			compoundParams = p
 			g.declareTypeDef(file, dir, t, decl.wasm.name+"_params")
 			compoundParams.typ = t
+		}
+
+		if len(decl.f.params) > 0 && derefTypeDef(callParams[0].typ) == decl.f.params[0].typ {
+			simplePointerParam = true
 		}
 
 		p = *last(callParams)
@@ -1561,7 +1566,7 @@ func (g *generator) defineImportedFunction(_ wit.Ident, f *wit.Function, decl fu
 			b.WriteString(p.name)
 		}
 		b.WriteString(" }\n")
-	} else if len(callParams) > 0 && !isPointer(callParams[0].typ) {
+	} else if len(callParams) > 0 && !simplePointerParam {
 		i := 0
 		for _, p := range decl.f.params {
 			flat := p.typ.Flat()
