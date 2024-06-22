@@ -1224,13 +1224,15 @@ func (g *generator) liftTuple(file *gen.File, dir wit.Direction, t *wit.TypeDef,
 	tup := t.Kind.(*wit.Tuple)
 	mono := tup.Type()
 	var b strings.Builder
+	k := 0
 	for i, tt := range tup.Types {
 		var b2 strings.Builder
 		for j := range tt.Flat() {
 			if j > 0 {
-				b.WriteString(", ")
+				b2.WriteString(", ")
 			}
-			stringio.Write(&b2, "f"+strconv.Itoa(i))
+			stringio.Write(&b2, "f"+strconv.Itoa(k))
+			k++
 		}
 		field := "v.F" + strconv.Itoa(i)
 		if mono != nil {
@@ -1706,7 +1708,6 @@ func (g *generator) defineExportedFunction(owner wit.Ident, f *wit.Function, dec
 
 	// Emit function body
 	b.WriteString(" {\n")
-	sameResults := slices.Equal(decl.f.results, decl.wasm.results)
 
 	// Lift arguments
 	if compoundParams.typ == nil {
@@ -1773,22 +1774,27 @@ func (g *generator) defineExportedFunction(owner wit.Ident, f *wit.Function, dec
 	b.WriteString(")\n")
 
 	// TODO: lower results
-	if !sameResults && false {
-		if compoundResults.typ != nil {
-			stringio.Write(&b, "&", compoundResults.name)
-		} else {
-			for i, r := range decl.wasm.results {
-				if i > 0 {
-					b.WriteString(", ")
-				}
-				if isPointer(r.typ) {
-					b.WriteRune('&')
-				}
-				b.WriteString(r.name)
+	if compoundResults.typ != nil {
+		stringio.Write(&b, "&", compoundResults.name, " // TODO: correctly handle compound")
+	} else if len(callResults) > 0 {
+		for i, r := range decl.wasm.results {
+			if callResults[i].typ == derefTypeDef(r.typ) {
+				stringio.Write(&b, r.name, " = &", callResults[i].name, "\n")
+				continue
 			}
 		}
-		b.WriteRune('\n')
+
+		// for i, r := range decl.wasm.results {
+		// 	if i > 0 {
+		// 		b.WriteString(", ")
+		// 	}
+		// 	if isPointer(r.typ) {
+		// 		b.WriteRune('&')
+		// 	}
+		// 	b.WriteString(r.name)
+		// }
 	}
+
 	b.WriteString("return\n")
 	b.WriteString("}\n\n")
 
