@@ -1072,7 +1072,7 @@ func (g *generator) lowerResult(file *gen.File, dir wit.Direction, t *wit.TypeDe
 	stringio.Write(&b, "switch ", g.cmCall(afile, "IsErr", "&v"), " {\n")
 	b.WriteString("case false:\n")
 	b.WriteString(g.lowerVariantCaseInto(afile, dir, r.OK, flat[1:], "*"+g.cmCall(afile, "GetOK", "&v")))
-	b.WriteString(" case true:\n")
+	b.WriteString("case true:\n")
 	b.WriteString("f0 = 1\n")
 	b.WriteString(g.lowerVariantCaseInto(afile, dir, r.Err, flat[1:], "*"+g.cmCall(afile, "GetErr", "&v")))
 	b.WriteString("}\n")
@@ -1195,7 +1195,7 @@ func (g *generator) liftRecord(file *gen.File, dir wit.Direction, t *wit.TypeDef
 		var b2 strings.Builder
 		for j := range f.Type.Flat() {
 			if j > 0 {
-				b.WriteString(", ")
+				b2.WriteString(", ")
 			}
 			stringio.Write(&b2, "f"+strconv.Itoa(i))
 			i++
@@ -1240,12 +1240,11 @@ func (g *generator) liftResult(file *gen.File, dir wit.Direction, t *wit.TypeDef
 	stringio.Write(&b, "switch f0 {\n")
 	if r.OK != nil {
 		b.WriteString("case 0:\n")
-		stringio.Write(&b, "return ", g.liftVariantCaseFrom(afile, dir, r.OK, flat[1:]), "\n")
+		stringio.Write(&b, "return ", g.cmCall(afile, "OK["+g.typeRep(afile, dir, t)+"]", g.liftVariantCase(afile, dir, r.OK, flat[1:])), "\n")
 	}
 	if r.Err != nil {
-		b.WriteString(" case 1:\n")
-		b.WriteString("f0 = 1\n")
-		stringio.Write(&b, "return ", g.liftVariantCaseFrom(afile, dir, r.Err, flat[1:]), "\n")
+		b.WriteString("case 1:\n")
+		stringio.Write(&b, "return ", g.cmCall(afile, "Err["+g.typeRep(afile, dir, t)+"]", g.liftVariantCase(afile, dir, r.Err, flat[1:])), "\n")
 	}
 	b.WriteString("}\n")
 	b.WriteString("return\n")
@@ -1260,24 +1259,19 @@ func (g *generator) liftOption(file *gen.File, dir wit.Direction, t *wit.TypeDef
 	b.WriteString("if f0 == 0 {\n")
 	b.WriteString("return")
 	b.WriteString("}\n")
-	stringio.Write(&b, "return ", g.liftVariantCaseFrom(afile, dir, o.Type, flat[1:]), "\n")
+	stringio.Write(&b, "return ", g.cmCall(afile, "Some["+g.typeRep(afile, dir, t)+"]", g.liftVariantCase(afile, dir, o.Type, flat[1:])), "\n")
 	return g.typeDefLiftFunction(file, dir, t, input, b.String())
 }
 
-func (g *generator) liftVariantCaseFrom(file *gen.File, dir wit.Direction, t wit.Type, from []wit.Type) string {
-	if t == nil {
-		return ""
-	}
-	flat := t.Flat()
+func (g *generator) liftVariantCase(file *gen.File, dir wit.Direction, t wit.Type, from []wit.Type) string {
 	var b strings.Builder
-	for i, t := range flat {
+	for i, f := range t.Flat() {
 		if i > 0 {
 			b.WriteString(", ")
 		}
-		stringio.Write(&b, g.cast(file, t, from[i], "f"+strconv.Itoa(i+1)))
+		stringio.Write(&b, g.cast(file, from[i], f, "f"+strconv.Itoa(i+1)))
 	}
-	stringio.Write(&b, g.cmCall(file, "Some["+g.typeRep(file, dir, t)+"]", b.String()))
-	return b.String()
+	return g.liftType(file, dir, t, b.String())
 }
 
 func (g *generator) liftPrimitive(file *gen.File, p wit.Primitive, input string) string {
@@ -1657,28 +1651,36 @@ func (g *generator) defineExportedFunction(owner wit.Ident, f *wit.Function, dec
 	file := decl.f.file
 	scope := g.exportScopes[owner.String()]
 
-	var compoundParams param
-	var paramsRecord *wit.Record
-	if len(decl.f.params) > 0 && derefAnonRecord(decl.wasm.params[0].typ) != nil {
-		name := decl.f.scope.DeclareName("params")
-		t := derefAnonRecord(decl.wasm.params[0].typ)
-		g.declareTypeDef(file, dir, t, decl.wasm.name+"_params")
-		compoundParams.name = name
-		compoundParams.typ = t
-		compoundParams.dir = decl.wasm.params[0].dir
-		paramsRecord = t.Kind.(*wit.Record)
+	// Bridging between wasm and Go function
+	callParams := slices.Clone(decl.f.params)
+	for i := range callParams {
+		callParams[i].name = decl.wasm.scope.DeclareName(callParams[i].name)
+	}
+	callResults := slices.Clone(decl.f.results)
+	for i := range callResults {
+		callResults[i].name = decl.wasm.scope.DeclareName(callResults[i].name)
 	}
 
+	var compoundParams param
 	var compoundResults param
-	var resultsRecord *wit.Record // TODO: delete this variable and extract below
-	if len(decl.f.results) > 1 && derefAnonRecord(decl.wasm.results[0].typ) != nil {
-		name := decl.f.scope.DeclareName("results")
-		t := derefAnonRecord(decl.wasm.results[0].typ)
-		g.declareTypeDef(file, dir, t, decl.wasm.name+"_results")
-		compoundResults.name = name
-		compoundResults.typ = t
-		compoundParams.dir = decl.wasm.results[0].dir
-		resultsRecord = t.Kind.(*wit.Record)
+	if len(decl.wasm.params) > 0 {
+		p := decl.wasm.params[0]
+		t := derefAnonRecord(p.typ)
+		if len(callParams) > 0 && t != nil {
+			compoundParams = p
+			g.declareTypeDef(file, dir, t, decl.wasm.name+"_params")
+			compoundParams.typ = t
+		}
+	}
+
+	if len(decl.wasm.results) > 0 {
+		r := decl.wasm.results[0]
+		t := derefAnonRecord(r.typ)
+		if len(callResults) > 0 && t != nil {
+			compoundResults = r
+			g.declareTypeDef(file, dir, t, decl.wasm.name+"_results")
+			compoundResults.typ = t
+		}
 	}
 
 	// Emit exports declaration in exports file
@@ -1699,28 +1701,46 @@ func (g *generator) defineExportedFunction(owner wit.Ident, f *wit.Function, dec
 	b.WriteString(" {\n")
 	sameResults := slices.Equal(decl.f.results, decl.wasm.results)
 
-	// Emit call to caller-defined Go function
-	if len(decl.f.results) > 0 {
-		if sameResults {
-			b.WriteString("return ")
-		} else if resultsRecord != nil {
-			stringio.Write(&b, "var ", compoundResults.name, " ", g.typeRep(file, compoundResults.dir, compoundResults.typ), "\n")
-			for i, f := range resultsRecord.Fields {
-				if i > 0 {
-					b.WriteString(", ")
-				}
-				stringio.Write(&b, compoundResults.name, ".", fieldName(f.Name, false))
+	// Lift arguments
+	if compoundParams.typ == nil {
+		i := 0
+		for _, p := range callParams {
+			if p.typ == derefTypeDef(decl.wasm.params[i].typ) {
+				stringio.Write(&b, p.name, " := *", decl.wasm.params[i].name, "\n")
+				continue
 			}
-			b.WriteString(" = ")
-		} else {
-			for i, r := range decl.f.results {
-				if i > 0 {
-					b.WriteString(", ")
+			var b2 strings.Builder
+			for j, f := range p.typ.Flat() {
+				if j > 0 {
+					b2.WriteString(", ")
 				}
-				b.WriteString(r.name)
+				wp := decl.wasm.params[i]
+				stringio.Write(&b2, g.cast(file, wp.typ, f, wp.name))
+				i++
 			}
-			b.WriteString(" := ")
+			stringio.Write(&b, p.name, " := ", g.liftType(file, dir, p.typ, b2.String()), "\n")
 		}
+	}
+
+	// Emit call to caller-defined Go function
+	if compoundResults.typ != nil {
+		rec := wit.KindOf[*wit.Record](compoundResults.typ)
+		stringio.Write(&b, compoundResults.name, " = new(", g.typeRep(file, compoundResults.dir, compoundResults.typ), ")\n")
+		for i, f := range rec.Fields {
+			if i > 0 {
+				b.WriteString(", ")
+			}
+			stringio.Write(&b, compoundResults.name, ".", fieldName(f.Name, false))
+		}
+		b.WriteString(" = ")
+	} else if len(callResults) > 0 {
+		for i, r := range callResults {
+			if i > 0 {
+				b.WriteString(", ")
+			}
+			b.WriteString(r.name)
+		}
+		b.WriteString(" := ")
 	}
 
 	// Emit caller-defined function name
@@ -1731,15 +1751,16 @@ func (g *generator) defineExportedFunction(owner wit.Ident, f *wit.Function, dec
 	stringio.Write(&b, fqName, "(")
 
 	// Emit call params
-	if paramsRecord != nil {
-		for i, f := range paramsRecord.Fields {
+	if compoundParams.typ != nil {
+		rec := wit.KindOf[*wit.Record](compoundParams.typ)
+		for i, f := range rec.Fields {
 			if i > 0 {
 				b.WriteString(", ")
 			}
 			stringio.Write(&b, compoundParams.name, ".", fieldName(f.Name, false))
 		}
 	} else {
-		for i, p := range decl.wasm.params {
+		for i, p := range callParams {
 			if i > 0 {
 				b.WriteString(", ")
 			}
@@ -1750,9 +1771,10 @@ func (g *generator) defineExportedFunction(owner wit.Ident, f *wit.Function, dec
 		}
 	}
 	b.WriteString(")\n")
-	if !sameResults {
-		b.WriteString("return ")
-		if resultsRecord != nil {
+
+	// TODO: lower results
+	if !sameResults && false {
+		if compoundResults.typ != nil {
 			stringio.Write(&b, "&", compoundResults.name)
 		} else {
 			for i, r := range decl.wasm.results {
@@ -1767,7 +1789,7 @@ func (g *generator) defineExportedFunction(owner wit.Ident, f *wit.Function, dec
 		}
 		b.WriteRune('\n')
 	}
-
+	b.WriteString("return\n")
 	b.WriteString("}\n\n")
 
 	// Emit default function body
