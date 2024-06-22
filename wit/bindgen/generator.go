@@ -1122,6 +1122,19 @@ func (g *generator) lowerPrimitive(file *gen.File, p wit.Primitive, input string
 	}
 }
 
+// liftTypeInput returns a string of typecast parameters for lifting into type t.
+func (g *generator) liftTypeInput(file *gen.File, dir wit.Direction, t wit.Type, params []param) string {
+	var b strings.Builder
+	flat := t.Flat()
+	for i, p := range params {
+		if i > 0 {
+			b.WriteString(", ")
+		}
+		b.WriteString(g.cast(file, p.typ, flat[i], p.name))
+	}
+	return b.String()
+}
+
 func (g *generator) liftType(file *gen.File, dir wit.Direction, t wit.Type, input string) string {
 	switch t := t.(type) {
 	case nil:
@@ -1585,15 +1598,9 @@ func (g *generator) defineImportedFunction(_ wit.Ident, f *wit.Function, decl fu
 	} else if len(callResults) > 0 {
 		i := 0
 		for _, r := range decl.f.results {
-			var b2 strings.Builder
-			for j, t := range r.typ.Flat() {
-				if j > 0 {
-					b2.WriteString(", ")
-				}
-				b2.WriteString(g.cast(file, callResults[i].typ, t, callResults[i].name))
-				i++
-			}
-			stringio.Write(&b, r.name, " = ", g.liftType(file, r.dir, r.typ, b2.String()))
+			flat := r.typ.Flat()
+			stringio.Write(&b, r.name, " = ", g.liftType(file, r.dir, r.typ, g.liftTypeInput(file, r.dir, r.typ, callResults[i:i+len(flat)])))
+			i += len(flat)
 		}
 		b.WriteString("\n")
 		b.WriteString("return ")
@@ -1709,16 +1716,9 @@ func (g *generator) defineExportedFunction(owner wit.Ident, f *wit.Function, dec
 				stringio.Write(&b, p.name, " := *", decl.wasm.params[i].name, "\n")
 				continue
 			}
-			var b2 strings.Builder
-			for j, f := range p.typ.Flat() {
-				if j > 0 {
-					b2.WriteString(", ")
-				}
-				wp := decl.wasm.params[i]
-				stringio.Write(&b2, g.cast(file, wp.typ, f, wp.name))
-				i++
-			}
-			stringio.Write(&b, p.name, " := ", g.liftType(file, dir, p.typ, b2.String()), "\n")
+			flat := p.typ.Flat()
+			stringio.Write(&b, p.name, " := ", g.liftType(file, dir, p.typ, g.liftTypeInput(file, dir, p.typ, decl.wasm.params[i:i+len(flat)])), "\n")
+			i += len(flat)
 		}
 	}
 
