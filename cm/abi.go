@@ -4,13 +4,23 @@ import (
 	"unsafe"
 )
 
-// Reinterpret reinterprets the bits of type From into type To.
-// Will panic if the size of From is smaller than To.
-func Reinterpret[To, From any](from From) (to To) {
+// Reinterpret reinterprets the bits of type From into type T.
+// Will panic if the size of From is smaller than the size of To.
+func Reinterpret[T, From any](from From) (to T) {
 	if unsafe.Sizeof(to) > unsafe.Sizeof(from) {
 		panic("reinterpret: size of to > from")
 	}
-	return *(*To)(unsafe.Pointer(&from))
+	return *(*T)(unsafe.Pointer(&from))
+}
+
+// Reinterpret2 reinterprets the bits of type From into types T0 and T1.
+// Will panic if the size of From is smaller than the size of T1 + T2.
+func Reinterpret2[T1, T2, From any](from From) (T1, T2) {
+	r := Reinterpret[struct {
+		f1 T1
+		f2 T2
+	}](from)
+	return r.f1, r.f2
 }
 
 // LowerResult lowers an untyped result into Core WebAssembly I32.
