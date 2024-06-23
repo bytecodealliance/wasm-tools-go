@@ -34,20 +34,6 @@ func New[V ~struct{ variant[Tag, Align, Shape] }, Tag Discriminant, Shape, Align
 	return *(*V)(unsafe.Pointer(&v))
 }
 
-// Tag returns the tag of [Variant] v.
-func Tag[V ~struct{ variant[Tag, Align, Shape] }, Tag Discriminant, Shape, Align any](v *V) Tag {
-	validateVariant[Tag, Shape, Align, struct{}]()
-	v2 := (*variant[Tag, Shape, Align])(unsafe.Pointer(v))
-	return v2.tag
-}
-
-// Is returns true if the [Variant] case is equal to tag.
-func Is[V ~struct{ variant[Tag, Align, Shape] }, Tag Discriminant, Shape, Align any](v *V, tag Tag) bool {
-	validateVariant[Tag, Shape, Align, struct{}]()
-	v2 := (*variant[Tag, Shape, Align])(unsafe.Pointer(v))
-	return v2.tag == tag
-}
-
 // Case returns a non-nil *T if the [Variant] case is equal to tag, otherwise it returns nil.
 func Case[T any, V ~struct{ variant[Tag, Align, Shape] }, Tag Discriminant, Shape, Align any](v *V, tag Tag) *T {
 	validateVariant[Tag, Shape, Align, T]()
@@ -64,6 +50,11 @@ type variant[Tag Discriminant, Shape, Align any] struct {
 	tag  Tag
 	_    [0]Align
 	data Shape
+}
+
+// Tag returns the tag (discriminant) of variant v.
+func (v *variant[Tag, Shape, Align]) Tag() Tag {
+	return v.tag
 }
 
 // This function is sized so it can be inlined and optimized away.

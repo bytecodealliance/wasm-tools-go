@@ -858,7 +858,7 @@ func (g *generator) variantRep(file *gen.File, dir wit.Direction, v *wit.Variant
 			// Case without an associated type returns bool
 			stringio.Write(&b, "// ", caseName, " returns true if [", goName, "] represents the variant case \"", c.Name, "\".\n")
 			stringio.Write(&b, "func (self *", goName, ") ", caseName, "() bool {\n")
-			stringio.Write(&b, "return ", cm, ".Tag(self) == ", caseNum)
+			stringio.Write(&b, "return self.Tag() == ", caseNum)
 			b.WriteString("}\n\n")
 		} else {
 			// Case with associated type T returns *T
@@ -1045,7 +1045,7 @@ func (g *generator) lowerVariant(file *gen.File, dir wit.Direction, t *wit.TypeD
 	flat := t.Flat()
 	afile := g.abiFile(file.Package)
 	var b strings.Builder
-	stringio.Write(&b, "f0 = ", g.cast(afile, dir, wit.Discriminant(len(v.Cases)), flat[0], g.cmCall(afile, "Tag", "&v")), "\n")
+	stringio.Write(&b, "f0 = ", g.cast(afile, dir, wit.Discriminant(len(v.Cases)), flat[0], "v.Tag()"), "\n")
 	stringio.Write(&b, "switch f0 {\n")
 	for i, c := range v.Cases {
 		if c.Type == nil {
