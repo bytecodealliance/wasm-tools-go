@@ -925,7 +925,7 @@ func (g *generator) lowerType(file *gen.File, dir wit.Direction, t wit.Type, inp
 		t = t.Root()
 		return g.lowerTypeDef(file, dir, t, input)
 	case wit.Primitive:
-		return g.lowerPrimitive(file, t, input)
+		return g.lowerPrimitive(file, dir, t, input)
 	default:
 		panic(fmt.Sprintf("BUG: unknown type %T", t)) // should never reach here
 	}
@@ -946,7 +946,7 @@ func (g *generator) lowerTypeDef(file *gen.File, dir wit.Direction, t *wit.TypeD
 	case *wit.Flags:
 		return g.lowerFlags(file, dir, t, input)
 	case *wit.Enum:
-		return g.cast(file, t, flat[0], input)
+		return g.cast(file, dir, t, flat[0], input)
 		// return g.cast(file, wit.Discriminant(len(kind.Cases)), flat[0], input)
 		// return g.cmCall(file, "LowerEnum", input)
 	case *wit.Variant:
@@ -1026,7 +1026,7 @@ func (g *generator) lowerFlags(file *gen.File, dir wit.Direction, t *wit.TypeDef
 	flags := t.Kind.(*wit.Flags)
 	flat := t.Flat()
 	if len(flat) == 1 {
-		return g.cast(file, wit.Discriminant(len(flags.Flags)), flat[0], input)
+		return g.cast(file, dir, wit.Discriminant(len(flags.Flags)), flat[0], input)
 	}
 	// The following line is moot because of the above check, which replaces a function call with an inline cast.
 	// It is here for completeness.
@@ -1045,7 +1045,7 @@ func (g *generator) lowerVariant(file *gen.File, dir wit.Direction, t *wit.TypeD
 	}
 	flat := t.Flat()
 	var b strings.Builder
-	stringio.Write(&b, "f0 = ", g.cast(afile, wit.Discriminant(len(v.Cases)), flat[0], g.cmCall(afile, "Tag", "&v")), "\n")
+	stringio.Write(&b, "f0 = ", g.cast(afile, dir, wit.Discriminant(len(v.Cases)), flat[0], g.cmCall(afile, "Tag", "&v")), "\n")
 	stringio.Write(&b, "switch f0 {\n")
 	for i, c := range v.Cases {
 		if c.Type == nil {
@@ -1107,18 +1107,18 @@ func (g *generator) lowerVariantCaseInto(file *gen.File, dir wit.Direction, t wi
 	}
 	stringio.Write(&b, " := ", g.lowerType(file, dir, t, input), "\n")
 	for i, from := range t.Flat() {
-		stringio.Write(&b, "f"+strconv.Itoa(i+1), " = ", g.cast(file, from, into[i], "v"+strconv.Itoa(i+1)), "\n")
+		stringio.Write(&b, "f"+strconv.Itoa(i+1), " = ", g.cast(file, dir, from, into[i], "v"+strconv.Itoa(i+1)), "\n")
 	}
 	return b.String()
 }
 
-func (g *generator) lowerPrimitive(file *gen.File, p wit.Primitive, input string) string {
+func (g *generator) lowerPrimitive(file *gen.File, dir wit.Direction, p wit.Primitive, input string) string {
 	flat := p.Flat()
 	switch p := p.(type) {
 	case wit.String:
 		return g.cmCall(file, "LowerString", input)
 	default:
-		return g.cast(file, p, flat[0], input)
+		return g.cast(file, dir, p, flat[0], input)
 	}
 }
 
@@ -1130,7 +1130,7 @@ func (g *generator) liftTypeInput(file *gen.File, dir wit.Direction, t wit.Type,
 		if i > 0 {
 			b.WriteString(", ")
 		}
-		b.WriteString(g.cast(file, p.typ, flat[i], p.name))
+		b.WriteString(g.cast(file, dir, p.typ, flat[i], p.name))
 	}
 	return b.String()
 }
@@ -1167,7 +1167,7 @@ func (g *generator) liftTypeDef(file *gen.File, dir wit.Direction, t *wit.TypeDe
 	case *wit.Flags:
 		return "// TODO: g.liftFlags(file, dir, t, input)"
 	case *wit.Enum:
-		return g.cast(file, flat[0], t, input)
+		return g.cast(file, dir, flat[0], t, input)
 		// return g.cmCall(file, "LiftEnum", input)
 	case *wit.Variant:
 		return "// TODO: g.liftVariant(file, dir, t, input)"
@@ -1286,7 +1286,7 @@ func (g *generator) liftVariantCase(file *gen.File, dir wit.Direction, t wit.Typ
 		if i > 0 {
 			b.WriteString(", ")
 		}
-		stringio.Write(&b, g.cast(file, from[i], f, "f"+strconv.Itoa(i+1)))
+		stringio.Write(&b, g.cast(file, dir, from[i], f, "f"+strconv.Itoa(i+1)))
 	}
 	return g.liftType(file, dir, t, b.String())
 }
@@ -1304,14 +1304,17 @@ func (g *generator) liftPrimitive(file *gen.File, dir wit.Direction, t wit.Type,
 	case wit.String:
 		return g.cmCall(file, "LiftString", input)
 	default:
-		return g.cast(file, flat[0], t, input)
+		return g.cast(file, dir, flat[0], t, input)
 	}
 }
 
-// TODO: add direction
-func (g *generator) cast(file *gen.File, from, to wit.Type, input string) string {
+func (g *generator) cast(file *gen.File, dir wit.Direction, from, to wit.Type, input string) string {
 	if castable(from, to) {
 		return "(" + g.typeRep(file, wit.Imported, to) + ")(" + input + ")"
+	}
+	t := derefPointer(to)
+	if t != nil {
+		return g.cmCall(file, goKind(from)+"To"+goKind(to)+"["+g.typeRep(file, dir, t)+"]", input)
 	}
 	return g.cmCall(file, goKind(from)+"To"+goKind(to), input)
 }
@@ -1610,7 +1613,7 @@ func (g *generator) defineImportedFunction(_ wit.Ident, f *wit.Function, decl fu
 			b.WriteRune('&')
 			b.WriteString(p.name)
 		} else {
-			b.WriteString(g.cast(file, p.typ, p.typ, p.name))
+			b.WriteString(g.cast(file, p.dir, p.typ, p.typ, p.name))
 		}
 	}
 	b.WriteString(")\n")
