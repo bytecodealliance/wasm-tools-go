@@ -508,6 +508,7 @@ func (g *generator) declareTypeDef(file *gen.File, dir wit.Direction, t *wit.Typ
 	}
 	g.types[dir][t] = decl
 
+	// Declare the export scope for this type.
 	if dir == wit.Exported && g.exportScopes[owner.String()] != nil {
 		g.exportScopes[owner.String()].DeclareName(goName)
 	}
@@ -547,6 +548,12 @@ func (g *generator) declareTypeDef(file *gen.File, dir wit.Direction, t *wit.Typ
 				}
 			}
 		}
+	}
+
+	// Predeclare reserved methods.
+	switch t.Kind.(type) {
+	case *wit.Variant:
+		decl.scope.DeclareName("Tag")
 	}
 
 	return decl, nil
