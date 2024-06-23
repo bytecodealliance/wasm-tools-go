@@ -14,13 +14,13 @@ func Reinterpret[T, From any](from From) (to T) {
 }
 
 // Reinterpret2 reinterprets the bits of type From into types T0 and T1.
-// Will panic if the size of From is smaller than the size of T1 + T2.
-func Reinterpret2[T1, T2, From any](from From) (T1, T2) {
+// Will panic if the size of From is smaller than the size of T0 + T1.
+func Reinterpret2[T0, T1, From any](from From) (T0, T1) {
 	r := Reinterpret[struct {
+		f0 T0
 		f1 T1
-		f2 T2
 	}](from)
-	return r.f1, r.f2
+	return r.f0, r.f1
 }
 
 // LowerResult lowers an untyped result into Core WebAssembly I32.
