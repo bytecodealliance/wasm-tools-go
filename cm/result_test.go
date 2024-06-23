@@ -12,6 +12,7 @@ var (
 )
 
 type resulter[OK, Err any] interface {
+	IsOK() bool
 	IsErr() bool
 	OK() *OK
 	Err() *Err
@@ -127,7 +128,7 @@ func unequalSize[A, B any](t *testing.T, a A, b B) {
 func BenchmarkResultInlines(b *testing.B) {
 	var ok *struct{}
 	var err *string
-	var r1 = Err[ErrResult[struct{}, string]]("hello")
+	r1 := Err[ErrResult[struct{}, string]]("hello")
 	for i := 0; i < b.N; i++ {
 		ok = r1.OK()
 	}
