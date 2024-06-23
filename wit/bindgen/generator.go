@@ -958,7 +958,7 @@ func (g *generator) lowerTypeDef(file *gen.File, dir wit.Direction, t *wit.TypeD
 	case *wit.List:
 		return g.cmCall(file, "LowerList", input)
 	case *wit.Resource, *wit.Own, *wit.Borrow:
-		return g.cmCall(file, "Reinterpret["+g.typeRep(file, dir, t)+"]", input)
+		return g.cmCall(file, "Reinterpret["+g.typeRep(file, dir, flat[0])+"]", input)
 	case *wit.Future:
 		return "/* TODO: lower *wit.Future */"
 	case *wit.Stream:
@@ -1525,7 +1525,7 @@ func (g *generator) defineImportedFunction(_ wit.Ident, f *wit.Function, decl fu
 			compoundParams.typ = t
 		}
 
-		if len(decl.f.params) > 0 && derefTypeDef(callParams[0].typ) == decl.f.params[0].typ {
+		if len(decl.f.params) > 0 && derefPointer(callParams[0].typ) == decl.f.params[0].typ {
 			simplePointerParam = true
 		}
 
@@ -1735,8 +1735,9 @@ func (g *generator) defineExportedFunction(owner wit.Ident, f *wit.Function, dec
 	if compoundParams.typ == nil {
 		i := 0
 		for _, p := range callParams {
-			if p.typ == derefTypeDef(decl.wasm.params[i].typ) {
+			if p.typ == derefPointer(decl.wasm.params[i].typ) {
 				stringio.Write(&b, p.name, " := *", decl.wasm.params[i].name, "\n")
+				i++
 				continue
 			}
 			flat := p.typ.Flat()
@@ -1799,11 +1800,23 @@ func (g *generator) defineExportedFunction(owner wit.Ident, f *wit.Function, dec
 	if compoundResults.typ != nil {
 		stringio.Write(&b, "&", compoundResults.name, " // TODO: correctly handle compound")
 	} else if len(callResults) > 0 {
-		for i, r := range decl.wasm.results {
-			if callResults[i].typ == derefTypeDef(r.typ) {
-				stringio.Write(&b, r.name, " = &", callResults[i].name, "\n")
+		i := 0
+		for _, r := range callResults {
+			flat := r.typ.Flat()
+			wr := decl.wasm.results[i]
+			if r.typ == derefPointer(wr.typ) {
+				stringio.Write(&b, wr.name, " = &", r.name, "\n")
+				i++
 				continue
 			}
+			for j := range flat {
+				if j > 0 {
+					b.WriteString(", ")
+				}
+				b.WriteString(decl.wasm.results[i].name)
+				i++
+			}
+			stringio.Write(&b, " = ", g.lowerType(file, dir, r.typ, r.name), "\n")
 		}
 
 		// for i, r := range decl.wasm.results {
@@ -1899,13 +1912,18 @@ func isPointer(t wit.Type) bool {
 	return false
 }
 
-func derefTypeDef(t wit.Type) *wit.TypeDef {
+func derefPointer(t wit.Type) wit.Type {
 	if td, ok := t.(*wit.TypeDef); ok {
 		if p, ok := td.Kind.(*wit.Pointer); ok {
-			if td, ok := p.Type.(*wit.TypeDef); ok {
-				return td
-			}
+			return p.Type
 		}
+	}
+	return nil
+}
+
+func derefTypeDef(t wit.Type) *wit.TypeDef {
+	if td, ok := derefPointer(t).(*wit.TypeDef); ok {
+		return td
 	}
 	return nil
 }
