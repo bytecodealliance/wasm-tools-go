@@ -1513,9 +1513,10 @@ func (g *generator) defineImportedFunction(_ wit.Ident, f *wit.Function, decl fu
 		callResults[i].name = decl.f.scope.DeclareName(callResults[i].name)
 	}
 
-	var simplePointerParam bool
 	var compoundParams param
 	var compoundResults param
+	var pointerParam param
+	var pointerResult param
 	if len(callParams) > 0 {
 		p := callParams[0]
 		t := derefAnonRecord(p.typ)
@@ -1523,10 +1524,8 @@ func (g *generator) defineImportedFunction(_ wit.Ident, f *wit.Function, decl fu
 			compoundParams = p
 			g.declareTypeDef(file, dir, t, decl.wasm.name+"_params")
 			compoundParams.typ = t
-		}
-
-		if len(decl.f.params) > 0 && derefPointer(callParams[0].typ) == decl.f.params[0].typ {
-			simplePointerParam = true
+		} else if len(decl.f.params) > 0 && derefPointer(p.typ) == decl.f.params[0].typ {
+			pointerParam = p
 		}
 
 		p = *last(callParams)
@@ -1535,6 +1534,8 @@ func (g *generator) defineImportedFunction(_ wit.Ident, f *wit.Function, decl fu
 			compoundResults = p
 			g.declareTypeDef(file, dir, t, decl.wasm.name+"_results")
 			compoundResults.typ = t
+		} else if len(decl.f.results) > 0 && derefPointer(p.typ) == decl.f.results[0].typ {
+			pointerResult = p
 		}
 	}
 
@@ -1557,7 +1558,7 @@ func (g *generator) defineImportedFunction(_ wit.Ident, f *wit.Function, decl fu
 	b.WriteString(" {\n")
 
 	// Lower into wasmimport variables
-	if simplePointerParam {
+	if pointerParam.typ != nil {
 		stringio.Write(&b, callParams[0].name, " := &", decl.f.params[0].name, "\n")
 	} else if compoundParams.typ != nil {
 		stringio.Write(&b, compoundParams.name, " := ", g.typeRep(file, compoundParams.dir, compoundParams.typ), "{ ")
@@ -1605,7 +1606,7 @@ func (g *generator) defineImportedFunction(_ wit.Ident, f *wit.Function, decl fu
 		}
 		t := derefPointer(p.typ)
 		// TODO: this logic is ugly
-		if t != nil && (t == compoundParams.typ || t == compoundResults.typ) {
+		if t != nil && (t == compoundParams.typ || t == compoundResults.typ || p.typ == pointerResult.typ) {
 			b.WriteRune('&')
 			b.WriteString(p.name)
 		} else {
