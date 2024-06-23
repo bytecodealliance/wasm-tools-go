@@ -997,7 +997,7 @@ func (g *generator) lowerRecord(file *gen.File, dir wit.Direction, t *wit.TypeDe
 		stringio.Write(&b, " = ", g.lowerType(afile, dir, f.Type, "v."+fieldName(f.Name, true)), "\n")
 	}
 	b.WriteString("return\n")
-	return g.typeDefLowerFunction(afile, dir, t, input, b.String())
+	return g.typeDefLowerFunction(file, dir, t, input, b.String())
 }
 
 func (g *generator) lowerTuple(file *gen.File, dir wit.Direction, t *wit.TypeDef, input string) string {
@@ -1019,7 +1019,7 @@ func (g *generator) lowerTuple(file *gen.File, dir wit.Direction, t *wit.TypeDef
 		stringio.Write(&b, " = ", g.lowerType(afile, dir, tt, field), "\n")
 	}
 	b.WriteString("return\n")
-	return g.typeDefLowerFunction(afile, dir, t, input, b.String())
+	return g.typeDefLowerFunction(file, dir, t, input, b.String())
 }
 
 func (g *generator) lowerFlags(file *gen.File, dir wit.Direction, t *wit.TypeDef, input string) string {
