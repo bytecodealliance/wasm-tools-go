@@ -74,5 +74,10 @@ func F32ToF64(v float32) float64    { return float64(v) }
 
 func PointerToU32[T any](v *T) uint32 { return uint32(uintptr(unsafe.Pointer(v))) }
 func PointerToU64[T any](v *T) uint64 { return uint64(uintptr(unsafe.Pointer(v))) }
-func U32ToPointer[T any](v uint32) *T { return (*T)(unsafe.Pointer(uintptr(v))) }
-func U64ToPointer[T any](v uint64) *T { return (*T)(unsafe.Pointer(uintptr(v))) }
+func U32ToPointer[T any](v uint32) *T { return (*T)(unsafePointer(uintptr(v))) }
+func U64ToPointer[T any](v uint64) *T { return (*T)(unsafePointer(uintptr(v))) }
+
+// Appease vet, see https://github.com/golang/go/issues/58625
+func unsafePointer(p uintptr) unsafe.Pointer {
+	return *(*unsafe.Pointer)(unsafe.Pointer(&p))
+}
