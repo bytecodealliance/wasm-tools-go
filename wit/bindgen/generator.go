@@ -1601,7 +1601,8 @@ func (g *generator) defineImportedFunction(_ wit.Ident, f *wit.Function, decl fu
 		if i > 0 {
 			b.WriteString(", ")
 		}
-		td := derefTypeDef(p.typ)
+		td := derefPointer(p.typ)
+		// TODO: this logic is ugly
 		if td != nil && (td == compoundParams.typ || i == len(callParams)-1) {
 			b.WriteRune('&')
 			b.WriteString(p.name)
