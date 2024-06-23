@@ -146,3 +146,45 @@ func Err[R ~struct {
 	*((*Err)(unsafe.Pointer(&r.data))) = err
 	return R(r)
 }
+
+// IsOK returns true r represents the OK case.
+func IsOK[R ~struct {
+	isErr bool
+	_     [0]OK
+	_     [0]Err
+	data  Shape
+}, Shape, OK, Err any](r *R) bool {
+	return !(*result[Err, OK, Err])(unsafe.Pointer(r)).isErr
+}
+
+// IsErr returns true r represents the error case.
+func IsErr[R ~struct {
+	isErr bool
+	_     [0]OK
+	_     [0]Err
+	data  Shape
+}, Shape, OK, Err any](r *R) bool {
+	return (*result[Err, OK, Err])(unsafe.Pointer(r)).isErr
+}
+
+// GetOK returns a non-nil *OK pointer if r represents the OK case.
+// If r represents an error, then it returns nil.
+func GetOK[R ~struct {
+	isErr bool
+	_     [0]OK
+	_     [0]Err
+	data  Shape
+}, Shape, OK, Err any](r *R) *OK {
+	return (*result[Err, OK, Err])(unsafe.Pointer(r)).OK()
+}
+
+// GetErr returns a non-nil *Err pointer if r represents the error case.
+// If r represents the OK case, then it returns nil.
+func GetErr[R ~struct {
+	isErr bool
+	_     [0]OK
+	_     [0]Err
+	data  Shape
+}, Shape, OK, Err any](r *R) *Err {
+	return (*result[Err, OK, Err])(unsafe.Pointer(r)).Err()
+}

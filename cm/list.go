@@ -37,7 +37,7 @@ func (list List[T]) Data() *T {
 // Len returns the length of the list.
 // TODO: should this return an int instead of a uint?
 func (list List[T]) Len() uint {
-	return uint(list.len)
+	return list.len
 }
 
 // Slice returns a Go slice representing the List.
