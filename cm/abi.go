@@ -18,21 +18,6 @@ func LowerResult[T ~bool](v T) uint32 {
 	return uint32(*(*uint8)(unsafe.Pointer(&v)))
 }
 
-// LowerHandle lowers a handle ([cm.Resource], [cm.Rep]) into a Core WebAssembly I32.
-func LowerHandle[T any](v T) uint32 {
-	return *(*uint32)(unsafe.Pointer(&v))
-}
-
-// LiftHandle lifts Core WebAssembly I32 into a handle ([cm.Resource], [cm.Rep]).
-func LiftHandle[H any](v uint32) H {
-	return *(*H)(unsafe.Pointer(&v))
-}
-
-// LowerEnum lowers an enum into a Core WebAssembly I32.
-func LowerEnum[E ~uint8 | ~uint16 | ~uint32](e E) uint32 {
-	return uint32(e)
-}
-
 // LowerString lowers a [string] into a pair of Core WebAssembly types.
 func LowerString[S ~string](s S) (*byte, uint) {
 	return unsafe.StringData(string(s)), uint(len(s))
