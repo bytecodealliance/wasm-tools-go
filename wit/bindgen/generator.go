@@ -1797,10 +1797,8 @@ func (g *generator) defineExportedFunction(owner wit.Ident, f *wit.Function, dec
 	}
 	b.WriteString(")\n")
 
-	// TODO: lower results
-	if compoundResults.typ != nil {
-		stringio.Write(&b, "&", compoundResults.name, " // TODO: correctly handle compound")
-	} else if len(callResults) > 0 {
+	// Lower results
+	if len(callResults) > 0 && compoundResults.typ == nil {
 		i := 0
 		for _, r := range callResults {
 			flat := r.typ.Flat()
@@ -1819,16 +1817,6 @@ func (g *generator) defineExportedFunction(owner wit.Ident, f *wit.Function, dec
 			}
 			stringio.Write(&b, " = ", g.lowerType(file, dir, r.typ, r.name), "\n")
 		}
-
-		// for i, r := range decl.wasm.results {
-		// 	if i > 0 {
-		// 		b.WriteString(", ")
-		// 	}
-		// 	if isPointer(r.typ) {
-		// 		b.WriteRune('&')
-		// 	}
-		// 	b.WriteString(r.name)
-		// }
 	}
 
 	b.WriteString("return\n")
