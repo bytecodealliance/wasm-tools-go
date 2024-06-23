@@ -108,12 +108,17 @@ func action(ctx context.Context, cmd *cli.Command) error {
 			file := pkg.Files[filename]
 
 			dir := filepath.Join(out, strings.TrimPrefix(file.Package.Path, pkgRoot))
+			path := filepath.Join(dir, file.Name)
+
+			if !file.HasContent() {
+				fmt.Fprintf(os.Stderr, "Skipping empty file: %s\n", path)
+				continue
+			}
+
 			err := os.MkdirAll(dir, outPerm)
 			if err != nil {
 				return err
 			}
-
-			path := filepath.Join(dir, file.Name)
 
 			b, err := file.Bytes()
 			if err != nil {

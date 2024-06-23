@@ -62,6 +62,23 @@ func (f *File) IsGo() bool {
 	return strings.HasSuffix(f.Name, ".go")
 }
 
+// HasContent returns true if f contains any content.
+func (f *File) HasContent() bool {
+	if !f.IsGo() {
+		return len(f.Content) > 0
+	}
+	if len(f.PackageDocs) > 0 || len(f.Header) > 0 || len(f.Content) > 0 || len(f.Trailer) > 0 {
+		return true
+	}
+	for _, name := range f.Imports {
+		if name == "_" {
+			// This file has content because it imports a Go package for its side effects.
+			return true
+		}
+	}
+	return false
+}
+
 // Write implements [io.Writer].
 func (f *File) Write(content []byte) (int, error) {
 	f.Content = append(f.Content, content...)

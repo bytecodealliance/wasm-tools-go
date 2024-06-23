@@ -997,13 +997,13 @@ func (g *generator) lowerRecord(file *gen.File, dir wit.Direction, t *wit.TypeDe
 		stringio.Write(&b, " = ", g.lowerType(afile, dir, f.Type, "v."+fieldName(f.Name, true)), "\n")
 	}
 	b.WriteString("return\n")
-	return g.typeDefLowerFunction(afile, dir, t, input, b.String())
+	return g.typeDefLowerFunction(file, dir, t, input, b.String())
 }
 
 func (g *generator) lowerTuple(file *gen.File, dir wit.Direction, t *wit.TypeDef, input string) string {
-	afile := g.abiFile(file.Package)
 	tup := t.Kind.(*wit.Tuple)
 	mono := tup.Type()
+	afile := g.abiFile(file.Package)
 	var b strings.Builder
 	for i, tt := range tup.Types {
 		for j := range tt.Flat() {
@@ -1019,7 +1019,7 @@ func (g *generator) lowerTuple(file *gen.File, dir wit.Direction, t *wit.TypeDef
 		stringio.Write(&b, " = ", g.lowerType(afile, dir, tt, field), "\n")
 	}
 	b.WriteString("return\n")
-	return g.typeDefLowerFunction(afile, dir, t, input, b.String())
+	return g.typeDefLowerFunction(file, dir, t, input, b.String())
 }
 
 func (g *generator) lowerFlags(file *gen.File, dir wit.Direction, t *wit.TypeDef, input string) string {
@@ -1038,12 +1038,12 @@ func (g *generator) lowerFlags(file *gen.File, dir wit.Direction, t *wit.TypeDef
 }
 
 func (g *generator) lowerVariant(file *gen.File, dir wit.Direction, t *wit.TypeDef, input string) string {
-	afile := g.abiFile(file.Package)
 	v := t.Kind.(*wit.Variant)
 	if v.Enum() != nil {
 		return g.cmCall(file, "LowerEnum", input)
 	}
 	flat := t.Flat()
+	afile := g.abiFile(file.Package)
 	var b strings.Builder
 	stringio.Write(&b, "f0 = ", g.cast(afile, dir, wit.Discriminant(len(v.Cases)), flat[0], g.cmCall(afile, "Tag", "&v")), "\n")
 	stringio.Write(&b, "switch f0 {\n")
@@ -1062,12 +1062,12 @@ func (g *generator) lowerVariant(file *gen.File, dir wit.Direction, t *wit.TypeD
 }
 
 func (g *generator) lowerResult(file *gen.File, dir wit.Direction, t *wit.TypeDef, input string) string {
-	afile := g.abiFile(file.Package)
 	r := t.Kind.(*wit.Result)
 	if r.OK == nil && r.Err == nil {
 		return g.cmCall(file, "LowerResult", input)
 	}
 	flat := t.Flat()
+	afile := g.abiFile(file.Package)
 	var b strings.Builder
 	stringio.Write(&b, "switch ", g.cmCall(afile, "IsErr", "&v"), " {\n")
 	b.WriteString("case false:\n")
@@ -1081,9 +1081,9 @@ func (g *generator) lowerResult(file *gen.File, dir wit.Direction, t *wit.TypeDe
 }
 
 func (g *generator) lowerOption(file *gen.File, dir wit.Direction, t *wit.TypeDef, input string) string {
-	afile := g.abiFile(file.Package)
 	o := t.Kind.(*wit.Option)
 	flat := t.Flat()
+	afile := g.abiFile(file.Package)
 	var b strings.Builder
 	stringio.Write(&b, "some := v.Some()\n")
 	b.WriteString("if some != nil {\n")
@@ -1202,8 +1202,8 @@ func (g *generator) typeDefLiftFunction(file *gen.File, dir wit.Direction, t *wi
 }
 
 func (g *generator) liftRecord(file *gen.File, dir wit.Direction, t *wit.TypeDef, input string) string {
-	afile := g.abiFile(file.Package)
 	r := t.Kind.(*wit.Record)
+	afile := g.abiFile(file.Package)
 	var b strings.Builder
 	i := 0
 	for _, f := range r.Fields {
@@ -1222,9 +1222,9 @@ func (g *generator) liftRecord(file *gen.File, dir wit.Direction, t *wit.TypeDef
 }
 
 func (g *generator) liftTuple(file *gen.File, dir wit.Direction, t *wit.TypeDef, input string) string {
-	afile := g.abiFile(file.Package)
 	tup := t.Kind.(*wit.Tuple)
 	mono := tup.Type()
+	afile := g.abiFile(file.Package)
 	var b strings.Builder
 	k := 0
 	for i, tt := range tup.Types {
@@ -1247,12 +1247,12 @@ func (g *generator) liftTuple(file *gen.File, dir wit.Direction, t *wit.TypeDef,
 }
 
 func (g *generator) liftResult(file *gen.File, dir wit.Direction, t *wit.TypeDef, input string) string {
-	afile := g.abiFile(file.Package)
 	r := t.Kind.(*wit.Result)
 	if r.OK == nil && r.Err == nil {
 		return g.cmCall(file, "Reinterpret["+g.typeRep(file, dir, t)+"]", input)
 	}
 	flat := t.Flat()
+	afile := g.abiFile(file.Package)
 	var b strings.Builder
 	stringio.Write(&b, "switch f0 {\n")
 	if r.OK != nil {
@@ -1269,9 +1269,9 @@ func (g *generator) liftResult(file *gen.File, dir wit.Direction, t *wit.TypeDef
 }
 
 func (g *generator) liftOption(file *gen.File, dir wit.Direction, t *wit.TypeDef, input string) string {
-	afile := g.abiFile(file.Package)
 	o := t.Kind.(*wit.Option)
 	flat := t.Flat()
+	afile := g.abiFile(file.Package)
 	var b strings.Builder
 	b.WriteString("if f0 == 0 {\n")
 	b.WriteString("return")

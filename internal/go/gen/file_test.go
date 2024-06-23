@@ -4,6 +4,40 @@ import (
 	"testing"
 )
 
+func TestFileHasContent(t *testing.T) {
+	positives := []File{
+		{Name: "comment.go", Content: []byte("// Comment\n")},
+		{Name: "package_docs.go", PackageDocs: "package documentation"},
+		{Name: "header.go", Header: "// Header\n"},
+		{Name: "trailer.go", Trailer: "// Trailer\n"},
+		{Name: "blank_imports.go", Imports: map[string]string{"unsafe": "_"}},
+		{Name: "assembly.s", Content: []byte("// Comment\n")},
+	}
+	for _, f := range positives {
+		t.Run(f.Name, func(t *testing.T) {
+			got, want := f.HasContent(), true
+			if got != want {
+				t.Errorf("f.HasContent(): %t, expected %t", got, want)
+			}
+		})
+	}
+
+	negatives := []File{
+		{Name: "empty.go", GeneratedBy: "package testing"},
+		{Name: "build_tag_only.go", Build: "!wasip1"},
+		{Name: "named_imports.go", Imports: map[string]string{"unsafe": "unsafe"}},
+		{Name: "assembly.s", Content: nil},
+	}
+	for _, f := range negatives {
+		t.Run(f.Name, func(t *testing.T) {
+			got, want := f.HasContent(), false
+			if got != want {
+				t.Errorf("f.HasContent(): %t, expected %t", got, want)
+			}
+		})
+	}
+}
+
 func TestFileBytes(t *testing.T) {
 	pkg := NewPackage("wasm/wasi/clocks/wallclock")
 	f := pkg.File("wallclock.wit.go")

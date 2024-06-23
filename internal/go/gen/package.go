@@ -54,7 +54,7 @@ func (pkg *Package) HasPackageDocs() bool {
 // with non-empty content.
 func (pkg *Package) HasContent() bool {
 	for _, file := range pkg.Files {
-		if len(file.Content) > 0 {
+		if file.HasContent() {
 			return true
 		}
 	}
