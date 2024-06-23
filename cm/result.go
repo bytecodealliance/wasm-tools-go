@@ -114,8 +114,3 @@ func Err[R ~struct{ result[Shape, OK, Err] }, Shape, OK, Err any](err Err) R {
 	*((*Err)(unsafe.Pointer(&r.data))) = err
 	return R(r)
 }
-
-// IsOK returns true r represents the OK case.
-func IsOK[R ~struct{ result[Shape, OK, Err] }, Shape, OK, Err any](r *R) bool {
-	return !*(*bool)(unsafe.Pointer(r))
-}
