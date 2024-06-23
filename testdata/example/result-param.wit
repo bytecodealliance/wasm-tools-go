@@ -1,0 +1,12 @@
+package example:result-param;
+
+interface a {
+	f0: func(r: result);
+	f1: func(r: result<option<string>>);
+	f2: func(r: result<string, f64>);
+	f3: func(r: result<_, u32>);
+}
+
+world imports {
+	import a;
+}

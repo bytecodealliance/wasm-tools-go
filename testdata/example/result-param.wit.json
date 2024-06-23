@@ -1,0 +1,129 @@
+{
+  "worlds": [
+    {
+      "name": "imports",
+      "imports": {
+        "interface-0": {
+          "interface": {
+            "id": 0
+          }
+        }
+      },
+      "exports": {},
+      "package": 0
+    }
+  ],
+  "interfaces": [
+    {
+      "name": "a",
+      "types": {},
+      "functions": {
+        "f0": {
+          "name": "f0",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "r",
+              "type": 0
+            }
+          ],
+          "results": []
+        },
+        "f1": {
+          "name": "f1",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "r",
+              "type": 2
+            }
+          ],
+          "results": []
+        },
+        "f2": {
+          "name": "f2",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "r",
+              "type": 3
+            }
+          ],
+          "results": []
+        },
+        "f3": {
+          "name": "f3",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "r",
+              "type": 4
+            }
+          ],
+          "results": []
+        }
+      },
+      "package": 0
+    }
+  ],
+  "types": [
+    {
+      "name": null,
+      "kind": {
+        "result": {
+          "ok": null,
+          "err": null
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "option": "string"
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "result": {
+          "ok": 1,
+          "err": null
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "result": {
+          "ok": "string",
+          "err": "f64"
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "result": {
+          "ok": null,
+          "err": "u32"
+        }
+      },
+      "owner": null
+    }
+  ],
+  "packages": [
+    {
+      "name": "example:result-param",
+      "interfaces": {
+        "a": 0
+      },
+      "worlds": {
+        "imports": 0
+      }
+    }
+  ]
+}

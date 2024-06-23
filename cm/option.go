@@ -10,13 +10,13 @@ type Option[T any] struct {
 	some   T
 }
 
-// None returns an Option[T] representing the none case,
-// equivalent to the zero value of Option[T].
+// None returns an [Option] representing the none case,
+// equivalent to the zero value.
 func None[T any]() Option[T] {
 	return Option[T]{}
 }
 
-// Some returns an Option[T] representing the some case.
+// Some returns an [Option] representing the some case.
 func Some[T any](v T) Option[T] {
 	return Option[T]{
 		isSome: true,

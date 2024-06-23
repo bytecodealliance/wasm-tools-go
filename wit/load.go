@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"strings"
 )
 
 // LoadJSON loads a [WIT] JSON file from path.
@@ -47,8 +46,6 @@ func LoadWIT(path string) (*Resolve, error) {
 	} else {
 		cmd.Args = append(cmd.Args, path)
 	}
-
-	fmt.Printf("%s\n", strings.Join(cmd.Args, " "))
 
 	err = cmd.Run()
 	if err != nil {
