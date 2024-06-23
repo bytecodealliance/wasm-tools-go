@@ -1557,7 +1557,9 @@ func (g *generator) defineImportedFunction(_ wit.Ident, f *wit.Function, decl fu
 	b.WriteString(" {\n")
 
 	// Lower into wasmimport variables
-	if compoundParams.typ != nil {
+	if simplePointerParam {
+		stringio.Write(&b, callParams[0].name, " := &", decl.f.params[0].name, "\n")
+	} else if compoundParams.typ != nil {
 		stringio.Write(&b, compoundParams.name, " := ", g.typeRep(file, compoundParams.dir, compoundParams.typ), "{ ")
 		for i, p := range decl.f.params {
 			if i > 0 {
@@ -1566,7 +1568,7 @@ func (g *generator) defineImportedFunction(_ wit.Ident, f *wit.Function, decl fu
 			b.WriteString(p.name)
 		}
 		b.WriteString(" }\n")
-	} else if len(callParams) > 0 && !simplePointerParam {
+	} else if len(callParams) > 0 {
 		i := 0
 		for _, p := range decl.f.params {
 			flat := p.typ.Flat()
@@ -1601,9 +1603,9 @@ func (g *generator) defineImportedFunction(_ wit.Ident, f *wit.Function, decl fu
 		if i > 0 {
 			b.WriteString(", ")
 		}
-		td := derefPointer(p.typ)
+		t := derefPointer(p.typ)
 		// TODO: this logic is ugly
-		if td != nil && (td == compoundParams.typ || i == len(callParams)-1) {
+		if t != nil && (t == compoundParams.typ || t == compoundResults.typ) {
 			b.WriteRune('&')
 			b.WriteString(p.name)
 		} else {
@@ -1620,25 +1622,18 @@ func (g *generator) defineImportedFunction(_ wit.Ident, f *wit.Function, decl fu
 			}
 			stringio.Write(&b, compoundResults.name, ".", fieldName(f.Name, false))
 		}
+		b.WriteString("\n")
 	} else if len(callResults) > 0 {
 		i := 0
 		for _, r := range decl.f.results {
 			flat := r.typ.Flat()
-			stringio.Write(&b, r.name, " = ", g.liftType(file, r.dir, r.typ, g.liftTypeInput(file, r.dir, r.typ, callResults[i:i+len(flat)])))
+			stringio.Write(&b, r.name, " = ", g.liftType(file, r.dir, r.typ, g.liftTypeInput(file, r.dir, r.typ, callResults[i:i+len(flat)])), "\n")
 			i += len(flat)
 		}
-		b.WriteString("\n")
-		b.WriteString("return ")
-		// for i, r := range decl.f.results {
-		// 	if i > 0 {
-		// 		b.WriteString(", ")
-		// 	}
-		// 	b.WriteString(r.name)
-		// }
+		b.WriteString("return\n")
 	} else {
-		b.WriteString("return")
+		b.WriteString("return\n")
 	}
-	b.WriteRune('\n')
 	b.WriteString("}\n\n")
 
 	// Emit wasmimport function
