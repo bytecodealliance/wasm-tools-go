@@ -1248,10 +1248,10 @@ func (g *generator) liftTuple(file *gen.File, dir wit.Direction, t *wit.TypeDef,
 
 func (g *generator) liftResult(file *gen.File, dir wit.Direction, t *wit.TypeDef, input string) string {
 	r := t.Kind.(*wit.Result)
-	if r.OK == nil && r.Err == nil {
-		return g.cmCall(file, "Reinterpret["+g.typeRep(file, dir, t)+"]", input)
-	}
 	flat := t.Flat()
+	if r.OK == nil && r.Err == nil {
+		return g.cmCall(file, "Reinterpret["+g.typeRep(file, dir, t)+"]", g.cast(file, dir, flat[0], wit.U8{}, input))
+	}
 	afile := g.abiFile(file.Package)
 	var b strings.Builder
 	stringio.Write(&b, "switch f0 {\n")
