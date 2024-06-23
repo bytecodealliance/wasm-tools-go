@@ -64,10 +64,11 @@ func LowerBool[B ~bool](v B) uint32 { return uint32(*(*uint8)(unsafe.Pointer(&v)
 
 func BoolToU32[B ~bool](v B) uint32 { return uint32(*(*uint8)(unsafe.Pointer(&v))) }
 func BoolToU64[B ~bool](v B) uint64 { return uint64(*(*uint8)(unsafe.Pointer(&v))) }
-func S32ToF32(v int32) float32      { return *(*float32)(unsafe.Pointer(&v)) }
 func S64ToF64(v int64) float64      { return *(*float64)(unsafe.Pointer(&v)) }
 func F64ToU64(v float64) uint64     { return *(*uint64)(unsafe.Pointer(&v)) }
+func U32ToBool(v uint32) bool       { tmp := uint8(v); return *(*bool)(unsafe.Pointer(&tmp)) }
 func U32ToF32(v uint32) float32     { return *(*float32)(unsafe.Pointer(&v)) }
+func U64ToBool(v uint64) bool       { tmp := uint8(v); return *(*bool)(unsafe.Pointer(&tmp)) }
 func U64ToF64(v uint64) float64     { return *(*float64)(unsafe.Pointer(&v)) }
 func F32ToF64(v float32) float64    { return float64(v) }
 
