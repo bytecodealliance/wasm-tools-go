@@ -1,13 +1,14 @@
 package example:records;
 
 interface a {
+	type value = string;
 	record request {
-		name: string,
+		name: value,
 		value: u32,
 		attributes: list<u32>,
 	}
 	record response {
-		value: string,
+		value: value,
 		rating: u32,
 		attributes: list<u32>,
 	}
