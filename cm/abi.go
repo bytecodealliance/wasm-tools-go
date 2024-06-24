@@ -29,8 +29,8 @@ func LowerResult[T ~bool](v T) uint32 {
 }
 
 // LowerString lowers a [string] into a pair of Core WebAssembly types.
-func LowerString[S ~string](s S) (*byte, uint) {
-	return unsafe.StringData(string(s)), uint(len(s))
+func LowerString[S ~string](s S) (*byte, uint32) {
+	return unsafe.StringData(string(s)), uint32(len(s))
 }
 
 // LiftString lifts Core WebAssembly types into a [string].
