@@ -19,54 +19,53 @@ type Result bool
 // For results with two zero-length types, use [Result].
 //
 // TODO: change this to an alias when https://github.com/golang/go/issues/46477 is implemented.
-type OKResult[OK, Err any] result[OK, OK, Err]
-
-// IsErr returns true if r represents the error case.
-func (r *OKResult[OK, Err]) IsErr() bool {
-	return r.isErr
-}
-
-// OK returns a non-nil *OK pointer if r represents the OK case.
-// If r represents an error, then it returns nil.
-func (r *OKResult[OK, Err]) OK() *OK {
-	return (*result[OK, OK, Err])(r).OK()
-}
-
-// Err returns a non-nil *Err pointer if r represents the error case.
-// If r represents the OK case, then it returns nil.
-func (r *OKResult[OK, Err]) Err() *Err {
-	return (*result[OK, OK, Err])(r).Err()
-}
+type OKResult[OK, Err any] struct{ result[OK, OK, Err] }
 
 // ErrResult represents a result sized to hold the Err type.
 // The size of the Err type must be greater than or equal to the size of the OK type.
 // For results with two zero-length types, use [Result].
 //
 // TODO: change this to an alias when https://github.com/golang/go/issues/46477 is implemented.
-type ErrResult[OK, Err any] result[Err, OK, Err]
+type ErrResult[OK, Err any] struct{ result[Err, OK, Err] }
 
-// IsErr returns true if r represents the error case.
-func (r *ErrResult[OK, Err]) IsErr() bool {
-	return r.isErr
-}
-
-// OK returns a non-nil *OK pointer if r represents the OK case.
-// If r represents an error, then it returns nil.
-func (r *ErrResult[OK, Err]) OK() *OK {
-	return (*result[Err, OK, Err])(r).OK()
-}
-
-// Err returns a non-nil *Err pointer if r represents the error case.
-// If r represents the OK case, then it returns nil.
-func (r *ErrResult[OK, Err]) Err() *Err {
-	return (*result[Err, OK, Err])(r).Err()
-}
-
+// result represents the internal representation of a Component Model result type.
 type result[Shape, OK, Err any] struct {
 	isErr bool
 	_     [0]OK
 	_     [0]Err
 	data  Shape
+}
+
+// IsOK returns true if r represents the OK case.
+func (r *result[Shape, OK, Err]) IsOK() bool {
+	r.validate()
+	return !r.isErr
+}
+
+// IsErr returns true if r represents the error case.
+func (r *result[Shape, OK, Err]) IsErr() bool {
+	r.validate()
+	return r.isErr
+}
+
+// OK returns a non-nil *OK pointer if r represents the OK case.
+// If r represents an error, then it returns nil.
+func (r *result[Shape, OK, Err]) OK() *OK {
+	r.validate()
+	if r.isErr {
+		return nil
+	}
+	return (*OK)(unsafe.Pointer(&r.data))
+}
+
+// Err returns a non-nil *Err pointer if r represents the error case.
+// If r represents the OK case, then it returns nil.
+func (r *result[Shape, OK, Err]) Err() *Err {
+	r.validate()
+	if !r.isErr {
+		return nil
+	}
+	return (*Err)(unsafe.Pointer(&r.data))
 }
 
 // This function is sized so it can be inlined and optimized away.
@@ -96,36 +95,10 @@ func (r *result[Shape, OK, Err]) validate() {
 	}
 }
 
-func (r *result[Shape, OK, Err]) IsErr() bool {
-	r.validate()
-	return r.isErr
-}
-
-func (r *result[Shape, OK, Err]) OK() *OK {
-	r.validate()
-	if r.isErr {
-		return nil
-	}
-	return (*OK)(unsafe.Pointer(&r.data))
-}
-
-func (r *result[Shape, OK, Err]) Err() *Err {
-	r.validate()
-	if !r.isErr {
-		return nil
-	}
-	return (*Err)(unsafe.Pointer(&r.data))
-}
-
 // OK returns an OK result with shape Shape and type OK and Err.
 // Pass OKResult[OK, Err] or ErrResult[OK, Err] as the first type argument.
-func OK[R ~struct {
-	isErr bool
-	_     [0]OK
-	_     [0]Err
-	data  Shape
-}, Shape, OK, Err any](ok OK) R {
-	var r result[Shape, OK, Err]
+func OK[R ~struct{ result[Shape, OK, Err] }, Shape, OK, Err any](ok OK) R {
+	var r struct{ result[Shape, OK, Err] }
 	r.validate()
 	r.isErr = ResultOK
 	*((*OK)(unsafe.Pointer(&r.data))) = ok
@@ -134,57 +107,10 @@ func OK[R ~struct {
 
 // Err returns an error result with shape Shape and type OK and Err.
 // Pass OKResult[OK, Err] or ErrResult[OK, Err] as the first type argument.
-func Err[R ~struct {
-	isErr bool
-	_     [0]OK
-	_     [0]Err
-	data  Shape
-}, Shape, OK, Err any](err Err) R {
-	var r result[Shape, OK, Err]
+func Err[R ~struct{ result[Shape, OK, Err] }, Shape, OK, Err any](err Err) R {
+	var r struct{ result[Shape, OK, Err] }
 	r.validate()
 	r.isErr = ResultErr
 	*((*Err)(unsafe.Pointer(&r.data))) = err
 	return R(r)
-}
-
-// IsOK returns true r represents the OK case.
-func IsOK[R ~struct {
-	isErr bool
-	_     [0]OK
-	_     [0]Err
-	data  Shape
-}, Shape, OK, Err any](r *R) bool {
-	return !(*result[Err, OK, Err])(unsafe.Pointer(r)).isErr
-}
-
-// IsErr returns true r represents the error case.
-func IsErr[R ~struct {
-	isErr bool
-	_     [0]OK
-	_     [0]Err
-	data  Shape
-}, Shape, OK, Err any](r *R) bool {
-	return (*result[Err, OK, Err])(unsafe.Pointer(r)).isErr
-}
-
-// GetOK returns a non-nil *OK pointer if r represents the OK case.
-// If r represents an error, then it returns nil.
-func GetOK[R ~struct {
-	isErr bool
-	_     [0]OK
-	_     [0]Err
-	data  Shape
-}, Shape, OK, Err any](r *R) *OK {
-	return (*result[Err, OK, Err])(unsafe.Pointer(r)).OK()
-}
-
-// GetErr returns a non-nil *Err pointer if r represents the error case.
-// If r represents the OK case, then it returns nil.
-func GetErr[R ~struct {
-	isErr bool
-	_     [0]OK
-	_     [0]Err
-	data  Shape
-}, Shape, OK, Err any](r *R) *Err {
-	return (*result[Err, OK, Err])(unsafe.Pointer(r)).Err()
 }

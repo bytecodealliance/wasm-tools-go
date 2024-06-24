@@ -4,33 +4,28 @@ import (
 	"unsafe"
 )
 
-// Reinterpret reinterprets the bits of type From into type To.
-// Will panic if the size of From is smaller than To.
-func Reinterpret[To, From any](from From) (to To) {
+// Reinterpret reinterprets the bits of type From into type T.
+// Will panic if the size of From is smaller than the size of To.
+func Reinterpret[T, From any](from From) (to T) {
 	if unsafe.Sizeof(to) > unsafe.Sizeof(from) {
 		panic("reinterpret: size of to > from")
 	}
-	return *(*To)(unsafe.Pointer(&from))
+	return *(*T)(unsafe.Pointer(&from))
+}
+
+// Reinterpret2 reinterprets the bits of type From into types T0 and T1.
+// Will panic if the size of From is smaller than the size of T0 + T1.
+func Reinterpret2[T0, T1, From any](from From) (T0, T1) {
+	r := Reinterpret[struct {
+		f0 T0
+		f1 T1
+	}](from)
+	return r.f0, r.f1
 }
 
 // LowerResult lowers an untyped result into Core WebAssembly I32.
 func LowerResult[T ~bool](v T) uint32 {
 	return uint32(*(*uint8)(unsafe.Pointer(&v)))
-}
-
-// LowerHandle lowers a handle ([cm.Resource], [cm.Rep]) into a Core WebAssembly I32.
-func LowerHandle[T any](v T) uint32 {
-	return *(*uint32)(unsafe.Pointer(&v))
-}
-
-// LiftHandle lifts Core WebAssembly I32 into a handle ([cm.Resource], [cm.Rep]).
-func LiftHandle[H any](v uint32) H {
-	return *(*H)(unsafe.Pointer(&v))
-}
-
-// LowerEnum lowers an enum into a Core WebAssembly I32.
-func LowerEnum[E ~uint8 | ~uint16 | ~uint32](e E) uint32 {
-	return uint32(e)
 }
 
 // LowerString lowers a [string] into a pair of Core WebAssembly types.
@@ -44,20 +39,14 @@ func LiftString[Data unsafe.Pointer | uintptr | *uint8, Len uint | uintptr | uin
 }
 
 // LowerList lowers a [List] into a pair of Core WebAssembly types.
-func LowerList[L ~struct {
-	data *T
-	len  uint
-}, T any](list L) (*T, uint) {
+func LowerList[L ~struct{ list[T] }, T any](list L) (*T, uint) {
 	l := (*List[T])(unsafe.Pointer(&list))
 	return l.data, l.len
 }
 
 // LiftList lifts Core WebAssembly types into a [List].
 func LiftList[L List[T], T any, Data unsafe.Pointer | uintptr | *T, Len uint | uintptr | uint32 | uint64](data Data, len Len) L {
-	return L{
-		data: (*T)(unsafe.Pointer(data)),
-		len:  uint(len),
-	}
+	return L(NewList((*T)(unsafe.Pointer(data)), uint(len)))
 }
 
 func LowerBool[B ~bool](v B) uint32 { return uint32(*(*uint8)(unsafe.Pointer(&v))) }

@@ -508,6 +508,7 @@ func (g *generator) declareTypeDef(file *gen.File, dir wit.Direction, t *wit.Typ
 	}
 	g.types[dir][t] = decl
 
+	// Declare the export scope for this type.
 	if dir == wit.Exported && g.exportScopes[owner.String()] != nil {
 		g.exportScopes[owner.String()].DeclareName(goName)
 	}
@@ -547,6 +548,12 @@ func (g *generator) declareTypeDef(file *gen.File, dir wit.Direction, t *wit.Typ
 				}
 			}
 		}
+	}
+
+	// Predeclare reserved methods.
+	switch t.Kind.(type) {
+	case *wit.Variant:
+		decl.scope.DeclareName("Tag")
 	}
 
 	return decl, nil
@@ -858,7 +865,7 @@ func (g *generator) variantRep(file *gen.File, dir wit.Direction, v *wit.Variant
 			// Case without an associated type returns bool
 			stringio.Write(&b, "// ", caseName, " returns true if [", goName, "] represents the variant case \"", c.Name, "\".\n")
 			stringio.Write(&b, "func (self *", goName, ") ", caseName, "() bool {\n")
-			stringio.Write(&b, "return ", cm, ".Tag(self) == ", caseNum)
+			stringio.Write(&b, "return self.Tag() == ", caseNum)
 			b.WriteString("}\n\n")
 		} else {
 			// Case with associated type T returns *T
@@ -1045,7 +1052,7 @@ func (g *generator) lowerVariant(file *gen.File, dir wit.Direction, t *wit.TypeD
 	flat := t.Flat()
 	afile := g.abiFile(file.Package)
 	var b strings.Builder
-	stringio.Write(&b, "f0 = ", g.cast(afile, dir, wit.Discriminant(len(v.Cases)), flat[0], g.cmCall(afile, "Tag", "&v")), "\n")
+	stringio.Write(&b, "f0 = ", g.cast(afile, dir, wit.Discriminant(len(v.Cases)), flat[0], "v.Tag()"), "\n")
 	stringio.Write(&b, "switch f0 {\n")
 	for i, c := range v.Cases {
 		if c.Type == nil {
@@ -1069,12 +1076,11 @@ func (g *generator) lowerResult(file *gen.File, dir wit.Direction, t *wit.TypeDe
 	flat := t.Flat()
 	afile := g.abiFile(file.Package)
 	var b strings.Builder
-	stringio.Write(&b, "switch ", g.cmCall(afile, "IsErr", "&v"), " {\n")
-	b.WriteString("case false:\n")
-	b.WriteString(g.lowerVariantCaseInto(afile, dir, r.OK, flat[1:], "*"+g.cmCall(afile, "GetOK", "&v")))
-	b.WriteString("case true:\n")
+	stringio.Write(&b, "if v.IsOK() {\n")
+	b.WriteString(g.lowerVariantCaseInto(afile, dir, r.OK, flat[1:], "*v.OK()"))
+	b.WriteString("} else {\n")
 	b.WriteString("f0 = 1\n")
-	b.WriteString(g.lowerVariantCaseInto(afile, dir, r.Err, flat[1:], "*"+g.cmCall(afile, "GetErr", "&v")))
+	b.WriteString(g.lowerVariantCaseInto(afile, dir, r.Err, flat[1:], "*v.Err()"))
 	b.WriteString("}\n")
 	b.WriteString("return\n")
 	return g.typeDefLowerFunction(file, dir, t, input, b.String())
@@ -1248,10 +1254,10 @@ func (g *generator) liftTuple(file *gen.File, dir wit.Direction, t *wit.TypeDef,
 
 func (g *generator) liftResult(file *gen.File, dir wit.Direction, t *wit.TypeDef, input string) string {
 	r := t.Kind.(*wit.Result)
-	if r.OK == nil && r.Err == nil {
-		return g.cmCall(file, "Reinterpret["+g.typeRep(file, dir, t)+"]", input)
-	}
 	flat := t.Flat()
+	if r.OK == nil && r.Err == nil {
+		return g.cmCall(file, "Reinterpret["+g.typeRep(file, dir, t)+"]", g.cast(file, dir, flat[0], wit.U8{}, input))
+	}
 	afile := g.abiFile(file.Package)
 	var b strings.Builder
 	stringio.Write(&b, "switch f0 {\n")
