@@ -4,11 +4,13 @@ interface a {
 	record request {
 		name: string,
 		value: u32,
+		attributes: list<u32>,
 	}
 
 	record response {
 		value: string,
 		rating: u32,
+		attributes: list<u32>,
 	}
 
 	handle: func(r: request) -> response;

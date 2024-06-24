@@ -17,8 +17,8 @@
     {
       "name": "a",
       "types": {
-        "request": 0,
-        "response": 1
+        "request": 1,
+        "response": 2
       },
       "functions": {
         "handle": {
@@ -27,12 +27,12 @@
           "params": [
             {
               "name": "r",
-              "type": 0
+              "type": 1
             }
           ],
           "results": [
             {
-              "type": 1
+              "type": 2
             }
           ]
         }
@@ -41,6 +41,13 @@
     }
   ],
   "types": [
+    {
+      "name": null,
+      "kind": {
+        "list": "u32"
+      },
+      "owner": null
+    },
     {
       "name": "request",
       "kind": {
@@ -53,6 +60,10 @@
             {
               "name": "value",
               "type": "u32"
+            },
+            {
+              "name": "attributes",
+              "type": 0
             }
           ]
         }
@@ -73,6 +84,10 @@
             {
               "name": "rating",
               "type": "u32"
+            },
+            {
+              "name": "attributes",
+              "type": 0
             }
           ]
         }
