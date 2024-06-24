@@ -1,0 +1,19 @@
+package example:records;
+
+interface a {
+	record request {
+		name: string,
+		value: u32,
+	}
+
+	record response {
+		value: string,
+		rating: u32,
+	}
+
+	handle: func(r: request) -> response;
+}
+
+world imports {
+	import a;
+}
