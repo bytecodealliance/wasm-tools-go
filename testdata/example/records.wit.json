@@ -9,7 +9,13 @@
           }
         }
       },
-      "exports": {},
+      "exports": {
+        "interface-0": {
+          "interface": {
+            "id": 0
+          }
+        }
+      },
       "package": 0
     }
   ],
@@ -17,8 +23,9 @@
     {
       "name": "a",
       "types": {
-        "request": 0,
-        "response": 1
+        "value": 0,
+        "request": 2,
+        "response": 3
       },
       "functions": {
         "handle": {
@@ -27,12 +34,12 @@
           "params": [
             {
               "name": "r",
-              "type": 0
+              "type": 2
             }
           ],
           "results": [
             {
-              "type": 1
+              "type": 3
             }
           ]
         }
@@ -42,17 +49,37 @@
   ],
   "types": [
     {
+      "name": "value",
+      "kind": {
+        "type": "string"
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "list": "u32"
+      },
+      "owner": null
+    },
+    {
       "name": "request",
       "kind": {
         "record": {
           "fields": [
             {
               "name": "name",
-              "type": "string"
+              "type": 0
             },
             {
               "name": "value",
               "type": "u32"
+            },
+            {
+              "name": "attributes",
+              "type": 1
             }
           ]
         }
@@ -68,11 +95,15 @@
           "fields": [
             {
               "name": "value",
-              "type": "string"
+              "type": 0
             },
             {
               "name": "rating",
               "type": "u32"
+            },
+            {
+              "name": "attributes",
+              "type": 1
             }
           ]
         }

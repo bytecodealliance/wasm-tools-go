@@ -1308,7 +1308,7 @@ func (g *generator) liftPrimitive(file *gen.File, dir wit.Direction, t wit.Type,
 	flat := p.Flat()
 	switch p.(type) {
 	case wit.String:
-		return g.cmCall(file, "LiftString", input)
+		return g.cmCall(file, "LiftString["+g.typeRep(file, dir, t)+"]", input)
 	default:
 		return g.cast(file, dir, flat[0], t, input)
 	}

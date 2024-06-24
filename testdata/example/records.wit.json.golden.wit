@@ -1,11 +1,21 @@
 package example:records;
 
 interface a {
-	record request { name: string, value: u32 }
-	record response { value: string, rating: u32 }
+	type value = string;
+	record request {
+		name: value,
+		value: u32,
+		attributes: list<u32>,
+	}
+	record response {
+		value: value,
+		rating: u32,
+		attributes: list<u32>,
+	}
 	handle: func(r: request) -> response;
 }
 
 world imports {
 	import a;
+	export a;
 }

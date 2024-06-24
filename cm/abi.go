@@ -34,14 +34,14 @@ func LowerString[S ~string](s S) (*byte, uint32) {
 }
 
 // LiftString lifts Core WebAssembly types into a [string].
-func LiftString[Data unsafe.Pointer | uintptr | *uint8, Len uint | uintptr | uint32 | uint64](data Data, len Len) string {
-	return unsafe.String((*uint8)(unsafe.Pointer(data)), int(len))
+func LiftString[T ~string, Data unsafe.Pointer | uintptr | *uint8, Len uint | uintptr | uint32 | uint64](data Data, len Len) T {
+	return T(unsafe.String((*uint8)(unsafe.Pointer(data)), int(len)))
 }
 
 // LowerList lowers a [List] into a pair of Core WebAssembly types.
-func LowerList[L ~struct{ list[T] }, T any](list L) (*T, uint) {
+func LowerList[L ~struct{ list[T] }, T any](list L) (*T, uint32) {
 	l := (*List[T])(unsafe.Pointer(&list))
-	return l.data, l.len
+	return l.data, uint32(l.len)
 }
 
 // LiftList lifts Core WebAssembly types into a [List].
