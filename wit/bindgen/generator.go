@@ -1494,7 +1494,7 @@ func (g *generator) defineFunction(owner wit.Ident, dir wit.Direction, f *wit.Fu
 		if err != nil {
 			return err
 		}
-		if pf := f.PostReturn(); pf != nil {
+		if pf := f.PostReturn(dir); pf != nil {
 			return g.defineFunction(owner, dir, pf)
 		}
 	default:
