@@ -201,35 +201,28 @@ func (t *TypeDef) Destructor() *Function {
 }
 
 // PostReturn returns a [post-return] function for f, which is part of the
-// Component Model machinery that allows the caller of f to call back into the component to clean up results.
-// Returns nil if f has no results, therefore does not require cleanup.
+// Component Model machinery that allows the caller of f to call back into
+// the component to clean up results. Returns nil if the Core WebAssembly
+// derivative of f has no results, therefore does not require cleanup.
+//
+// While this accepts a [Direction], this is currently only used for exported functions.
 //
 // [post-return]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#canon-lift
-func (f *Function) PostReturn() *Function {
-	if !f.ReturnsPointer() {
+func (f *Function) PostReturn(dir Direction) *Function {
+	core := f.CoreFunction(dir)
+
+	if !core.ReturnsPointer() {
 		return nil
 	}
 
-	var kind FunctionKind
-	switch k := f.Kind.(type) {
-	case *Method:
-		kind = &Static{Type: k.Type}
-	case *Constructor:
-		kind = &Static{Type: k.Type}
-	case *Static:
-		kind = &Static{Type: k.Type}
-	case *Freestanding:
-		kind = &Freestanding{}
-	}
-
-	params := slices.Clone(f.Results)
+	params := slices.Clone(core.Results)
 	if params[0].Name == "" {
 		params[0].Name = "result"
 	}
 
 	return &Function{
 		Name:   "cabi_post_" + f.Name,
-		Kind:   kind,
+		Kind:   &Freestanding{},
 		Params: params,
 		Docs:   Docs{Contents: "Post-return cleanup function."},
 	}

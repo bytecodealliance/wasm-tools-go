@@ -308,7 +308,7 @@ func (*Pointer) Align() uintptr { return 4 }
 // Flat returns the [flattened] ABI representation of [Pointer].
 //
 // [flattened]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
-func (*Pointer) Flat() []Type { return []Type{U32{}} }
+func (p *Pointer) Flat() []Type { return []Type{PointerTo(p.Type)} }
 
 // hasPointer always returns true.
 func (*Pointer) hasPointer() bool    { return true }
