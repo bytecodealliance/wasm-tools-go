@@ -1494,9 +1494,13 @@ func (g *generator) defineFunction(owner wit.Ident, dir wit.Direction, f *wit.Fu
 		if err != nil {
 			return err
 		}
-		if pf := f.PostReturn(dir); pf != nil {
-			return g.defineFunction(owner, dir, pf)
-		}
+		// A post-return function is mechanically different than
+		// other functions, in that it might not have a user-defined
+		// implementation. Since Go has a GC, this work can be deferred.
+		// Additional design work is needed here.
+		// if pf := f.PostReturn(dir); pf != nil {
+		// 	return g.defineFunction(owner, dir, pf)
+		// }
 	default:
 		return errors.New("BUG: unknown direction " + dir.String())
 	}
