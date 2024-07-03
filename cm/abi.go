@@ -4,6 +4,9 @@ import (
 	"unsafe"
 )
 
+// StringShape is a GC shape for storing strings in [Variant] or [Result] types.
+type StringShape [unsafe.Sizeof("")]byte
+
 // Reinterpret reinterprets the bits of type From into type T.
 // Will panic if the size of From is smaller than the size of To.
 func Reinterpret[T, From any](from From) (to T) {

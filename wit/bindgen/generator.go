@@ -136,7 +136,10 @@ type generator struct {
 	// It is indexed on wit.Direction, either Imported or Exported.
 	defined [2]map[any]bool
 
-	// lower and lift represents lowering and lifting functions for defined types.
+	// ABI shapes for any type, use for variant and result Shape type parameters.
+	shapes map[typeUse]string
+
+	// lowering and lifting functions for defined types.
 	lowerFunctions map[typeUse]function
 	liftFunctions  map[typeUse]function
 }
@@ -146,6 +149,7 @@ func newGenerator(res *wit.Resolve, opts ...Option) (*generator, error) {
 		packages:       make(map[string]*gen.Package),
 		witPackages:    make(map[string]*gen.Package),
 		exportScopes:   make(map[string]gen.Scope),
+		shapes:         make(map[typeUse]string),
 		lowerFunctions: make(map[typeUse]function),
 		liftFunctions:  make(map[typeUse]function),
 	}
@@ -598,10 +602,12 @@ func typeDefOwner(t *wit.TypeDef) wit.Ident {
 	return id
 }
 
-// typeDefGoName returns a mangled Go name for t.
-func (g *generator) typeDefGoName(dir wit.Direction, t *wit.TypeDef) string {
-	if decl, ok := g.types[dir][t]; ok {
-		return decl.name
+// typeGoName returns a mangled Go name for t.
+func (g *generator) typeGoName(dir wit.Direction, t wit.Type) string {
+	if td, ok := t.(*wit.TypeDef); ok {
+		if decl, ok := g.types[dir][td]; ok {
+			return decl.name
+		}
 	}
 	return GoName(t.WIT(nil, t.TypeName()), true)
 }
@@ -887,7 +893,7 @@ func (g *generator) resultRep(file *gen.File, dir wit.Direction, r *wit.Result) 
 	if r.OK == nil && r.Err == nil {
 		b.WriteString(".BoolResult")
 	} else {
-		stringio.Write(&b, ".Result[", g.typeRep(file, dir, shape), ", ", g.typeRep(file, dir, r.OK), ", ", g.typeRep(file, dir, r.Err), "]")
+		stringio.Write(&b, ".Result[", g.typeShape(file, dir, shape), ", ", g.typeRep(file, dir, r.OK), ", ", g.typeRep(file, dir, r.Err), "]")
 	}
 	return b.String()
 }
@@ -922,6 +928,37 @@ func (g *generator) borrowRep(file *gen.File, dir wit.Direction, b *wit.Borrow) 
 	default:
 		panic("BUG: unknown direction " + dir.String())
 	}
+}
+
+func (g *generator) typeShape(file *gen.File, dir wit.Direction, t wit.Type) string {
+	switch t := t.(type) {
+	case *wit.TypeDef:
+		t = t.Root()
+		return g.typeDefShape(file, dir, t)
+	case wit.String:
+		return file.Import(g.opts.cmPackage) + ".StringShape"
+	default:
+		return g.typeRep(file, dir, t)
+	}
+}
+
+func (g *generator) typeDefShape(file *gen.File, dir wit.Direction, t *wit.TypeDef) string {
+	switch kind := t.Kind.(type) {
+	case wit.Type:
+		return g.typeShape(file, dir, kind)
+	case *wit.Resource, *wit.Own, *wit.Borrow, *wit.Enum, *wit.Flags:
+		return g.typeRep(file, dir, t)
+	}
+
+	use := typeUse{file.Package, dir, t}
+	name, ok := g.shapes[use]
+	if !ok {
+		afile := g.abiFile(file.Package)
+		name = afile.DeclareName(g.typeGoName(dir, t) + "Shape")
+		g.shapes[use] = name
+		stringio.Write(afile, "type ", name, " ", g.typeRep(afile, dir, t), "\n\n")
+	}
+	return name
 }
 
 func (g *generator) lowerType(file *gen.File, dir wit.Direction, t wit.Type, input string) string {
@@ -981,7 +1018,7 @@ func (g *generator) typeDefLowerFunction(file *gen.File, dir wit.Direction, t *w
 	f, ok := g.lowerFunctions[use]
 	if !ok {
 		afile := g.abiFile(file.Package)
-		name := afile.DeclareName("lower_" + g.typeDefGoName(dir, t))
+		name := afile.DeclareName("lower_" + g.typeGoName(dir, t))
 		f = goFunction(afile, dir, wit.Imported, wit.LowerFunction(t), name)
 		g.lowerFunctions[use] = f
 		stringio.Write(afile, "func ", name, g.functionSignature(afile, f), " {\n", body, "}\n\n")
@@ -1200,7 +1237,7 @@ func (g *generator) typeDefLiftFunction(file *gen.File, dir wit.Direction, t *wi
 	f, ok := g.liftFunctions[use]
 	if !ok {
 		afile := g.abiFile(file.Package)
-		name := afile.DeclareName("lift_" + g.typeDefGoName(dir, t))
+		name := afile.DeclareName("lift_" + g.typeGoName(dir, t))
 		f = goFunction(afile, dir, wit.Imported, wit.LiftFunction(t), name)
 		g.liftFunctions[use] = f
 		stringio.Write(afile, "func ", name, g.functionSignature(afile, f), " {\n", body, "}\n\n")
