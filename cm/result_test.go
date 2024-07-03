@@ -181,12 +181,18 @@ func TestIssue95Uint64(t *testing.T) {
 func TestIssue95Struct(t *testing.T) {
 	type (
 		// structResult  ErrResult[stringStruct, structVariant]
-		stringStruct  struct{ string }
+		stringStruct struct {
+			// i int
+			s string
+		}
 		structVariant Variant[uint8, stringStruct, stringStruct]
-		structResult  Result[[unsafe.Sizeof(*(*structVariant)(nil))]byte, stringStruct, structVariant]
+		// structVariant Variant[uint8, [1]stringStruct, [2]stringStruct]
+		// structResult ErrResult[stringStruct, structVariant]
+		structResult Result[[unsafe.Sizeof(*(*structVariant)(nil))]byte, stringStruct, structVariant]
+		// structResult Result[[2]uintptr, stringStruct, structVariant]
 	)
 
-	want := stringStruct{"hello"}
+	want := stringStruct{s: "hello"}
 	res := OK[structResult](want)
 	got := *res.OK()
 	fmt.Printf("unsafe.Sizeof(res): %d\n", unsafe.Sizeof(res))
