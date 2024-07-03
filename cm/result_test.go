@@ -163,9 +163,10 @@ func TestIssue95String(t *testing.T) {
 
 func TestIssue95Uint64(t *testing.T) {
 	type (
-		// uint64Variant Variant[uint8, uint64, uint64]
-		uint64Variant Variant[uint8, [unsafe.Sizeof(uint64(0))]byte, uint64]
-		uint64Result  ErrResult[uint64, uint64Variant]
+		uint64Variant Variant[uint8, uint64, uint64]
+		// uint64Variant Variant[uint8, [unsafe.Sizeof(uint64(0))]byte, uint64]
+		// uint64Result ErrResult[uint64, uint64Variant]
+		uint64Result Result[[unsafe.Sizeof(uint64Variant{})]byte, uint64, uint64Variant]
 	)
 
 	want := uint64(123)

@@ -940,8 +940,8 @@ func (g *generator) typeShape(file *gen.File, dir wit.Direction, t wit.Type) str
 	case *wit.TypeDef:
 		t = t.Root()
 		return g.typeDefShape(file, dir, t)
-	case wit.String:
-		return file.Import(g.opts.cmPackage) + ".StringShape"
+	// case wit.String:
+	// 	return file.Import(g.opts.cmPackage) + ".StringShape"
 	default:
 		return g.typeRep(file, dir, t)
 	}
@@ -955,7 +955,7 @@ func (g *generator) typeDefShape(file *gen.File, dir wit.Direction, t *wit.TypeD
 		if kind.Enum() != nil {
 			return g.typeRep(file, dir, t)
 		}
-	case *wit.Resource, *wit.Own, *wit.Borrow, *wit.Enum, *wit.Flags:
+	case *wit.Resource, *wit.Own, *wit.Borrow, *wit.Enum, *wit.Flags, *wit.List:
 		return g.typeRep(file, dir, t)
 	}
 
