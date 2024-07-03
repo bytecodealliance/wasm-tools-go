@@ -36,8 +36,8 @@ type ErrResult[OK, Err any] struct{ result[Err, OK, Err] }
 // result represents the internal representation of a Component Model result type.
 type result[Shape, OK, Err any] struct {
 	isErr bool
-	_     [0][2]OK
-	_     [0][2]Err
+	_     [0]OK
+	_     [0]Err
 	data  Shape // [unsafe.Sizeof(*(*Shape)(unsafe.Pointer(nil)))]byte
 }
 
