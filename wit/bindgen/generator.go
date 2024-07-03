@@ -829,8 +829,8 @@ func (g *generator) variantRep(file *gen.File, dir wit.Direction, v *wit.Variant
 	}
 
 	disc := wit.Discriminant(len(v.Cases))
-	shape := variantShape(v)
-	align := variantAlign(v)
+	shape := variantShape(v.Types())
+	align := variantAlign(v.Types())
 
 	// Emit type
 	var b strings.Builder
