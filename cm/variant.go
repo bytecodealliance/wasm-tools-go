@@ -20,7 +20,7 @@ func NewVariant[Tag Discriminant, Shape, Align any, T any](tag Tag, data T) Vari
 	validateVariant[Tag, Shape, Align, T]()
 	var v Variant[Tag, Shape, Align]
 	v.tag = tag
-	v.data = *(*Shape)(unsafe.Pointer(&data))
+	*(*T)(unsafe.Pointer(&v.data)) = data
 	return v
 }
 
@@ -30,7 +30,7 @@ func New[V ~struct{ variant[Tag, Shape, Align] }, Tag Discriminant, Shape, Align
 	validateVariant[Tag, Shape, Align, T]()
 	var v variant[Tag, Shape, Align]
 	v.tag = tag
-	v.data = *(*Shape)(unsafe.Pointer(&data))
+	*(*T)(unsafe.Pointer(&v.data)) = data
 	return *(*V)(unsafe.Pointer(&v))
 }
 
@@ -49,7 +49,7 @@ func Case[T any, V ~struct{ variant[Tag, Shape, Align] }, Tag Discriminant, Shap
 type variant[Tag Discriminant, Shape, Align any] struct {
 	tag  Tag
 	_    [0]Align
-	data Shape
+	data Shape // [unsafe.Sizeof(*(*Shape)(unsafe.Pointer(nil)))]byte
 }
 
 // Tag returns the tag (discriminant) of variant v.

@@ -33,7 +33,7 @@ type result[Shape, OK, Err any] struct {
 	isErr bool
 	_     [0]OK
 	_     [0]Err
-	data  Shape
+	data  Shape // [unsafe.Sizeof(*(*Shape)(unsafe.Pointer(nil)))]byte
 }
 
 // IsOK returns true if r represents the OK case.
