@@ -140,7 +140,8 @@ type generator struct {
 	defined [2]map[any]bool
 
 	// ABI shapes for any type, use for variant and result Shape type parameters.
-	shapes map[typeUse]string
+	shapes   map[typeUse]string
+	shapeNum int
 
 	// lowering and lifting functions for defined types.
 	lowerFunctions map[typeUse]function
@@ -961,7 +962,8 @@ func (g *generator) typeDefShape(file *gen.File, dir wit.Direction, t *wit.TypeD
 	name, ok := g.shapes[use]
 	if !ok {
 		afile := g.abiFile(file.Package)
-		name = afile.DeclareName(g.typeDefGoName(dir, t) + "Shape")
+		g.shapeNum++
+		name = afile.DeclareName("Shape" + strconv.Itoa(g.shapeNum))
 		g.shapes[use] = name
 		var b bytes.Buffer
 		stringio.Write(&b, "// ", name, " is used for storage in variant or result types.\n")
