@@ -48,7 +48,7 @@ func Case[T any, V ~struct{ variant[Tag, Shape, Align] }, Tag Discriminant, Shap
 // Shape and Align must be non-zero sized types.
 type variant[Tag Discriminant, Shape, Align any] struct {
 	tag  Tag
-	_    [0]Align
+	_    [0][2]Align
 	data Shape // [unsafe.Sizeof(*(*Shape)(unsafe.Pointer(nil)))]byte
 }
 

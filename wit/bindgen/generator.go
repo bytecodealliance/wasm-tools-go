@@ -38,7 +38,7 @@ const (
 	experimentPredeclareHandles = false
 
 	// Define Go GC shape types for variant and result storage.
-	experimentCreateShapeTypes = true
+	experimentCreateShapeTypes = false
 )
 
 type typeDecl struct {

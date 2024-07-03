@@ -146,8 +146,8 @@ func TestIssue95String(t *testing.T) {
 		stringVariant Variant[uint8, string, string]
 		// stringVariant Variant[uint8, [unsafe.Sizeof("")]byte, string]
 		// stringVariant Variant[uint8, magic, string]
-		// stringResult ErrResult[string, stringVariant]
-		stringResult Result[[unsafe.Sizeof(*(*stringVariant)(nil))]byte, string, stringVariant]
+		stringResult ErrResult[string, stringVariant]
+		// stringResult Result[[unsafe.Sizeof(*(*stringVariant)(nil))]byte, string, stringVariant]
 	)
 
 	want := "hello"
@@ -163,9 +163,9 @@ func TestIssue95String(t *testing.T) {
 
 func TestIssue95Uint64(t *testing.T) {
 	type (
-		// uint64Variant Variant[uint8, uint64, uint64]
-		uint64Variant Variant[uint8, [unsafe.Sizeof(uint64(0))]byte, uint64]
-		uint64Result  ErrResult[uint64, uint64Variant]
+		uint64Variant Variant[uint8, uint64, uint64]
+		// uint64Variant Variant[uint8, [unsafe.Sizeof(uint64(0))]byte, uint64]
+		uint64Result ErrResult[uint64, uint64Variant]
 	)
 
 	want := uint64(123)
@@ -187,8 +187,8 @@ func TestIssue95Struct(t *testing.T) {
 		}
 		structVariant Variant[uint8, stringStruct, stringStruct]
 		// structVariant Variant[uint8, [1]stringStruct, [2]stringStruct]
-		// structResult ErrResult[stringStruct, structVariant]
-		structResult Result[[unsafe.Sizeof(*(*structVariant)(nil))]byte, stringStruct, structVariant]
+		structResult ErrResult[stringStruct, structVariant]
+		// structResult Result[[unsafe.Sizeof(*(*structVariant)(nil))]byte, stringStruct, structVariant]
 		// structResult Result[[2]uintptr, stringStruct, structVariant]
 	)
 
