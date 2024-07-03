@@ -36,6 +36,9 @@ const (
 	// Predeclare Go types for own<T> and borrow<T>.
 	// Currently broken.
 	experimentPredeclareHandles = false
+
+	// Define Go GC shape types for variant and result storage.
+	experimentCreateShapeTypes = true
 )
 
 type typeDecl struct {
@@ -929,6 +932,10 @@ func (g *generator) borrowRep(file *gen.File, dir wit.Direction, b *wit.Borrow) 
 }
 
 func (g *generator) typeShape(file *gen.File, dir wit.Direction, t wit.Type) string {
+	if !experimentCreateShapeTypes {
+		return g.typeRep(file, dir, t)
+	}
+
 	switch t := t.(type) {
 	case *wit.TypeDef:
 		t = t.Root()
