@@ -839,7 +839,7 @@ func (g *generator) variantRep(file *gen.File, dir wit.Direction, v *wit.Variant
 	// Emit type
 	var b strings.Builder
 	cm := file.Import(g.opts.cmPackage)
-	stringio.Write(&b, cm, ".Variant[", g.typeRep(file, dir, disc), ", ", g.typeRep(file, dir, shape), ", ", g.typeRep(file, dir, align), "]\n\n")
+	stringio.Write(&b, cm, ".Variant[", g.typeRep(file, dir, disc), ", ", g.typeShape(file, dir, shape), ", ", g.typeRep(file, dir, align), "]\n\n")
 
 	// Emit cases
 	for i, c := range v.Cases {
@@ -944,6 +944,10 @@ func (g *generator) typeDefShape(file *gen.File, dir wit.Direction, t *wit.TypeD
 	switch kind := t.Kind.(type) {
 	case wit.Type:
 		return g.typeShape(file, dir, kind)
+	case *wit.Variant:
+		if kind.Enum() != nil {
+			return g.typeRep(file, dir, t)
+		}
 	case *wit.Resource, *wit.Own, *wit.Borrow, *wit.Enum, *wit.Flags:
 		return g.typeRep(file, dir, t)
 	}
@@ -954,7 +958,12 @@ func (g *generator) typeDefShape(file *gen.File, dir wit.Direction, t *wit.TypeD
 		afile := g.abiFile(file.Package)
 		name = afile.DeclareName(g.typeDefGoName(dir, t) + "Shape")
 		g.shapes[use] = name
-		stringio.Write(afile, "type ", name, " ", g.typeRep(afile, dir, t), "\n\n")
+		var b bytes.Buffer
+		stringio.Write(&b, "// ", name, " is used for storage in variant or result types.\n")
+		stringio.Write(&b, "type ", name, " struct {\n")
+		stringio.Write(&b, "shape [", afile.Import("unsafe"), ".Sizeof(", g.typeRep(afile, dir, t), "{})]byte\n")
+		b.WriteString("}\n\n")
+		afile.Write(b.Bytes())
 	}
 	return name
 }
