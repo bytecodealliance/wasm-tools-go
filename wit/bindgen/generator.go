@@ -879,14 +879,15 @@ func (g *generator) variantRep(file *gen.File, dir wit.Direction, v *wit.Variant
 }
 
 func (g *generator) resultRep(file *gen.File, dir wit.Direction, r *wit.Result) string {
+	shape := variantShape(r.Types())
+
+	// Emit type
 	var b strings.Builder
 	b.WriteString(file.Import(g.opts.cmPackage))
 	if r.OK == nil && r.Err == nil {
-		b.WriteString(".Result")
-	} else if r.OK == nil || (r.Err != nil && r.Err.Size() > r.OK.Size()) {
-		stringio.Write(&b, ".ErrResult[", g.typeRep(file, dir, r.OK), ", ", g.typeRep(file, dir, r.Err), "]")
+		b.WriteString(".BoolResult")
 	} else {
-		stringio.Write(&b, ".OKResult[", g.typeRep(file, dir, r.OK), ", ", g.typeRep(file, dir, r.Err), "]")
+		stringio.Write(&b, ".Result[", g.typeRep(file, dir, shape), ", ", g.typeRep(file, dir, r.OK), ", ", g.typeRep(file, dir, r.Err), "]")
 	}
 	return b.String()
 }
