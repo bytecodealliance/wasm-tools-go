@@ -1,6 +1,7 @@
 package cm
 
 import (
+	"fmt"
 	"runtime"
 	"testing"
 	"unsafe"
@@ -136,23 +137,73 @@ func BenchmarkResultInlines(b *testing.B) {
 	_ = err
 }
 
-func TestIssue95(t *testing.T) {
+func TestIssue95String(t *testing.T) {
+	type (
+		magic struct {
+			data *byte
+			len  [unsafe.Sizeof(uintptr(0))]byte
+		}
+		stringVariant Variant[uint8, string, string]
+		// stringVariant Variant[uint8, [unsafe.Sizeof("")]byte, string]
+		// stringVariant Variant[uint8, magic, string]
+		// stringResult ErrResult[string, stringVariant]
+		stringResult SomeResult[[unsafe.Sizeof(*(*stringVariant)(nil))]byte, string, stringVariant]
+	)
+
 	want := "hello"
-	res := issue95(false, want)
+	res := OK[stringResult](want)
 	got := *res.OK()
+	fmt.Printf("unsafe.Sizeof(res): %d\n", unsafe.Sizeof(res))
+	fmt.Printf("got: %v (%d) want: %v (%d)\n",
+		unsafe.StringData(got), len(got), unsafe.StringData(want), len(want))
 	if got != want {
-		t.Errorf("*res.OK(): %s, expected %s", got, want)
+		t.Errorf("*res.OK(): %v, expected %v", got, want)
 	}
 }
 
-func issue95(isErr bool, v string) stringResult {
-	if isErr {
-		err := New[stringVariant](0, v)
-		return Err[stringResult](err)
+func TestIssue95Uint64(t *testing.T) {
+	type (
+		// uint64Variant Variant[uint8, uint64, uint64]
+		uint64Variant Variant[uint8, [unsafe.Sizeof(uint64(0))]byte, uint64]
+		uint64Result  ErrResult[uint64, uint64Variant]
+	)
+
+	want := uint64(123)
+	res := OK[uint64Result](want)
+	got := *res.OK()
+	fmt.Printf("unsafe.Sizeof(res): %d\n", unsafe.Sizeof(res))
+	fmt.Printf("got: %v want: %v\n", got, want)
+	if got != want {
+		t.Errorf("*res.OK(): %v, expected %v", got, want)
 	}
-	return OK[stringResult](v)
 }
 
-type stringResult ErrResult[string, stringVariant]
+func TestIssue95Struct(t *testing.T) {
+	type (
+		// structResult  ErrResult[stringStruct, structVariant]
+		stringStruct  struct{ string }
+		structVariant Variant[uint8, stringStruct, stringStruct]
+		structResult  SomeResult[[unsafe.Sizeof(*(*structVariant)(nil))]byte, stringStruct, structVariant]
+	)
 
-type stringVariant Variant[uint8, string, string]
+	want := stringStruct{"hello"}
+	res := OK[structResult](want)
+	got := *res.OK()
+	fmt.Printf("unsafe.Sizeof(res): %d\n", unsafe.Sizeof(res))
+	fmt.Printf("got: %v want: %v\n", got, want)
+	if got != want {
+		t.Errorf("*res.OK(): %v, expected %v", got, want)
+	}
+}
+
+func TestIssue95BoolInt64(t *testing.T) {
+	type boolInt64Result ErrResult[bool, int64]
+	want := int64(1234567890)
+	res := Err[boolInt64Result](1234567890)
+	got := *res.Err()
+	fmt.Printf("unsafe.Sizeof(res): %d\n", unsafe.Sizeof(res))
+	fmt.Printf("got: %v want: %v\n", got, want)
+	if got != want {
+		t.Errorf("*res.OK(): %v, expected %v", got, want)
+	}
+}

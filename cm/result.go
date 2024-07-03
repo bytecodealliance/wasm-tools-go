@@ -14,6 +14,11 @@ const (
 // False represents the OK case and true represents the error case.
 type Result bool
 
+// SomeResult represents a result sized to hold the Shape type.
+// The size of the Shape type must be greater than or equal to the size of OK and Err types.
+// For results with two zero-length types, use [Result].
+type SomeResult[Shape, OK, Err any] struct{ result[Shape, OK, Err] }
+
 // OKResult represents a result sized to hold the OK type.
 // The size of the OK type must be greater than or equal to the size of the Err type.
 // For results with two zero-length types, use [Result].
