@@ -64,11 +64,11 @@ func validateVariant[Disc Discriminant, Shape, Align any, T any]() {
 
 	// Check if size of T is greater than Shape
 	if unsafe.Sizeof(t) > unsafe.Sizeof(v.data) {
-		panic("result: size of requested type > data type")
+		panic("variant: size of requested type > data type")
 	}
 
 	// Check if Shape is zero-sized, but size of result != 1
 	if unsafe.Sizeof(v.data) == 0 && unsafe.Sizeof(v) != 1 {
-		panic("result: size of data type == 0, but result size != 1")
+		panic("variant: size of data type == 0, but result size != 1")
 	}
 }
