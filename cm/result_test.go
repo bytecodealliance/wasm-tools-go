@@ -29,9 +29,9 @@ func TestResultLayout(t *testing.T) {
 		size   uintptr
 		offset uintptr
 	}{
-		{"result", Result(false), 1, 0},
-		{"ok", Result(ResultOK), 1, 0},
-		{"err", Result(ResultErr), 1, 0},
+		{"result", BoolResult(false), 1, 0},
+		{"ok", BoolResult(ResultOK), 1, 0},
+		{"err", BoolResult(ResultErr), 1, 0},
 
 		{"result<string, string>", OKResult[string, string]{}, sizePlusAlignOf[string](), ptrSize},
 		{"result<bool, string>", ErrResult[bool, string]{}, sizePlusAlignOf[string](), ptrSize},
@@ -147,7 +147,7 @@ func TestIssue95String(t *testing.T) {
 		// stringVariant Variant[uint8, [unsafe.Sizeof("")]byte, string]
 		// stringVariant Variant[uint8, magic, string]
 		// stringResult ErrResult[string, stringVariant]
-		stringResult SomeResult[[unsafe.Sizeof(*(*stringVariant)(nil))]byte, string, stringVariant]
+		stringResult Result[[unsafe.Sizeof(*(*stringVariant)(nil))]byte, string, stringVariant]
 	)
 
 	want := "hello"
@@ -183,7 +183,7 @@ func TestIssue95Struct(t *testing.T) {
 		// structResult  ErrResult[stringStruct, structVariant]
 		stringStruct  struct{ string }
 		structVariant Variant[uint8, stringStruct, stringStruct]
-		structResult  SomeResult[[unsafe.Sizeof(*(*structVariant)(nil))]byte, stringStruct, structVariant]
+		structResult  Result[[unsafe.Sizeof(*(*structVariant)(nil))]byte, stringStruct, structVariant]
 	)
 
 	want := stringStruct{"hello"}

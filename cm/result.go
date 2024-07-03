@@ -10,25 +10,25 @@ const (
 	ResultErr = true
 )
 
-// Result represents a result with no OK or error type.
+// BoolResult represents a result with no OK or error type.
 // False represents the OK case and true represents the error case.
-type Result bool
+type BoolResult bool
 
-// SomeResult represents a result sized to hold the Shape type.
+// Result represents a result sized to hold the Shape type.
 // The size of the Shape type must be greater than or equal to the size of OK and Err types.
-// For results with two zero-length types, use [Result].
-type SomeResult[Shape, OK, Err any] struct{ result[Shape, OK, Err] }
+// For results with two zero-length types, use [BoolResult].
+type Result[Shape, OK, Err any] struct{ result[Shape, OK, Err] }
 
 // OKResult represents a result sized to hold the OK type.
 // The size of the OK type must be greater than or equal to the size of the Err type.
-// For results with two zero-length types, use [Result].
+// For results with two zero-length types, use [BoolResult].
 //
 // TODO: change this to an alias when https://github.com/golang/go/issues/46477 is implemented.
 type OKResult[OK, Err any] struct{ result[OK, OK, Err] }
 
 // ErrResult represents a result sized to hold the Err type.
 // The size of the Err type must be greater than or equal to the size of the OK type.
-// For results with two zero-length types, use [Result].
+// For results with two zero-length types, use [BoolResult].
 //
 // TODO: change this to an alias when https://github.com/golang/go/issues/46477 is implemented.
 type ErrResult[OK, Err any] struct{ result[Err, OK, Err] }
