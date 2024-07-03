@@ -104,7 +104,7 @@ func goParams(scope gen.Scope, dir wit.Direction, params []wit.Param) []param {
 type typeUse struct {
 	pkg *gen.Package
 	dir wit.Direction
-	typ wit.Type
+	typ *wit.TypeDef
 }
 
 type generator struct {
