@@ -940,8 +940,6 @@ func (g *generator) typeShape(file *gen.File, dir wit.Direction, t wit.Type) str
 	case *wit.TypeDef:
 		t = t.Root()
 		return g.typeDefShape(file, dir, t)
-	// case wit.String:
-	// 	return file.Import(g.opts.cmPackage) + ".StringShape"
 	default:
 		return g.typeRep(file, dir, t)
 	}
