@@ -1,0 +1,14 @@
+package issues:issue95;
+
+interface i {
+	variant error {
+		too-short(string),
+		too-tall(string),
+		unknown(string),
+	}
+	type r = result<string, error>;
+}
+
+world w {
+	import i;
+}
