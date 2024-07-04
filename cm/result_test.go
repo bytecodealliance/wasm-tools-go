@@ -8,8 +8,8 @@ import (
 )
 
 var (
-	_ resulter[string, bool] = &OKResult[string, bool]{}
-	_ resulter[bool, string] = &ErrResult[bool, string]{}
+	_ resulter[string, bool] = &Result[string, string, bool]{}
+	_ resulter[bool, string] = &Result[string, bool, string]{}
 )
 
 type resulter[OK, Err any] interface {
@@ -33,28 +33,28 @@ func TestResultLayout(t *testing.T) {
 		{"ok", BoolResult(ResultOK), 1, 0},
 		{"err", BoolResult(ResultErr), 1, 0},
 
-		{"result<string, string>", OKResult[string, string]{}, sizePlusAlignOf[string](), ptrSize},
-		{"result<bool, string>", ErrResult[bool, string]{}, sizePlusAlignOf[string](), ptrSize},
-		{"result<string, _>", OKResult[string, struct{}]{}, sizePlusAlignOf[string](), ptrSize},
-		{"result<_, string>", ErrResult[struct{}, string]{}, sizePlusAlignOf[string](), ptrSize},
-		{"result<u64, u64>", OKResult[uint64, uint64]{}, 16, alignOf[uint64]()},
-		{"result<u32, u64>", ErrResult[uint32, uint64]{}, 16, alignOf[uint64]()},
-		{"result<u64, u32>", OKResult[uint64, uint32]{}, 16, alignOf[uint64]()},
-		{"result<u8, u64>", ErrResult[uint8, uint64]{}, 16, alignOf[uint64]()},
-		{"result<u64, u8>", OKResult[uint64, uint8]{}, 16, alignOf[uint64]()},
-		{"result<u8, u32>", ErrResult[uint8, uint32]{}, 8, alignOf[uint32]()},
-		{"result<u32, u8>", OKResult[uint32, uint8]{}, 8, alignOf[uint32]()},
-		{"result<[9]u8, u64>", OKResult[[9]byte, uint64]{}, 24, alignOf[uint64]()},
+		{"result<string, string>", Result[string, string, string]{}, sizePlusAlignOf[string](), ptrSize},
+		{"result<bool, string>", Result[string, bool, string]{}, sizePlusAlignOf[string](), ptrSize},
+		{"result<string, _>", Result[string, string, struct{}]{}, sizePlusAlignOf[string](), ptrSize},
+		{"result<_, string>", Result[string, struct{}, string]{}, sizePlusAlignOf[string](), ptrSize},
+		{"result<u64, u64>", Result[uint64, uint64, uint64]{}, 16, alignOf[uint64]()},
+		{"result<u32, u64>", Result[uint64, uint32, uint64]{}, 16, alignOf[uint64]()},
+		{"result<u64, u32>", Result[uint64, uint64, uint32]{}, 16, alignOf[uint64]()},
+		{"result<u8, u64>", Result[uint64, uint8, uint64]{}, 16, alignOf[uint64]()},
+		{"result<u64, u8>", Result[uint64, uint64, uint8]{}, 16, alignOf[uint64]()},
+		{"result<u8, u32>", Result[uint32, uint8, uint32]{}, 8, alignOf[uint32]()},
+		{"result<u32, u8>", Result[uint32, uint32, uint8]{}, 8, alignOf[uint32]()},
+		{"result<[9]u8, u64>", Result[[9]byte, [9]byte, uint64]{}, 24, alignOf[uint64]()},
 
-		{"result<string, _>", OKResult[string, struct{}]{}, sizePlusAlignOf[string](), ptrSize},
-		{"result<string, _>", OKResult[string, struct{}]{}, sizePlusAlignOf[string](), ptrSize},
-		{"result<string, bool>", OKResult[string, bool]{}, sizePlusAlignOf[string](), ptrSize},
-		{"result<[9]u8, u64>", OKResult[[9]byte, uint64]{}, 24, alignOf[uint64]()},
+		{"result<string, _>", Result[string, string, struct{}]{}, sizePlusAlignOf[string](), ptrSize},
+		{"result<string, _>", Result[string, string, struct{}]{}, sizePlusAlignOf[string](), ptrSize},
+		{"result<string, bool>", Result[string, string, bool]{}, sizePlusAlignOf[string](), ptrSize},
+		{"result<[9]u8, u64>", Result[[9]byte, [9]byte, uint64]{}, 24, alignOf[uint64]()},
 
-		{"result<_, string>", ErrResult[struct{}, string]{}, sizePlusAlignOf[string](), ptrSize},
-		{"result<_, string>", ErrResult[struct{}, string]{}, sizePlusAlignOf[string](), ptrSize},
-		{"result<bool, string>", ErrResult[bool, string]{}, sizePlusAlignOf[string](), ptrSize},
-		{"result<u64, [9]u8>", ErrResult[uint64, [9]byte]{}, 24, alignOf[uint64]()},
+		{"result<_, string>", Result[string, struct{}, string]{}, sizePlusAlignOf[string](), ptrSize},
+		{"result<_, string>", Result[string, struct{}, string]{}, sizePlusAlignOf[string](), ptrSize},
+		{"result<bool, string>", Result[string, bool, string]{}, sizePlusAlignOf[string](), ptrSize},
+		{"result<u64, [9]u8>", Result[[9]byte, uint64, [9]byte]{}, 24, alignOf[uint64]()},
 	}
 
 	for _, tt := range tests {
@@ -71,7 +71,7 @@ func TestResultLayout(t *testing.T) {
 }
 
 func TestResultOKOrErr(t *testing.T) {
-	r1 := OK[OKResult[string, struct{}]]("hello")
+	r1 := OK[Result[string, string, struct{}]]("hello")
 	if ok := r1.OK(); ok == nil {
 		t.Errorf("OK(): %v, expected non-nil OK", ok)
 	}
@@ -79,7 +79,7 @@ func TestResultOKOrErr(t *testing.T) {
 		t.Errorf("Err(): %v, expected nil Err", err)
 	}
 
-	r2 := Err[ErrResult[struct{}, bool]](true)
+	r2 := Err[Result[bool, struct{}, bool]](true)
 	if ok := r2.OK(); ok != nil {
 		t.Errorf("OK(): %v, expected nil OK", ok)
 	}
@@ -129,7 +129,7 @@ func unequalSize[A, B any](t *testing.T, a A, b B) {
 func BenchmarkResultInlines(b *testing.B) {
 	var ok *struct{}
 	var err *string
-	r1 := Err[ErrResult[struct{}, string]]("hello")
+	r1 := Err[Result[string, struct{}, string]]("hello")
 	for i := 0; i < b.N; i++ {
 		ok = r1.OK()
 	}
@@ -146,7 +146,7 @@ func TestIssue95String(t *testing.T) {
 		stringVariant Variant[uint8, string, string]
 		// stringVariant Variant[uint8, [unsafe.Sizeof("")]byte, string]
 		// stringVariant Variant[uint8, magic, string]
-		// stringResult ErrResult[string, stringVariant]
+		// stringResult Result[stringVariant, string, stringVariant]
 		stringResult Result[[unsafe.Sizeof(*(*stringVariant)(nil))]byte, string, stringVariant]
 	)
 
@@ -165,7 +165,7 @@ func TestIssue95Uint64(t *testing.T) {
 	type (
 		uint64Variant Variant[uint8, uint64, uint64]
 		// uint64Variant Variant[uint8, [unsafe.Sizeof(uint64(0))]byte, uint64]
-		// uint64Result ErrResult[uint64, uint64Variant]
+		// uint64Result Result[uint64Variant, uint64, uint64Variant]
 		uint64Result Result[[unsafe.Sizeof(uint64Variant{})]byte, uint64, uint64Variant]
 	)
 
@@ -181,14 +181,14 @@ func TestIssue95Uint64(t *testing.T) {
 
 func TestIssue95Struct(t *testing.T) {
 	type (
-		// structResult  ErrResult[stringStruct, structVariant]
+		// structResult  Result[structVariant, stringStruct, structVariant]
 		stringStruct struct {
 			// i int
 			s string
 		}
 		structVariant Variant[uint8, stringStruct, stringStruct]
 		// structVariant Variant[uint8, [1]stringStruct, [2]stringStruct]
-		// structResult ErrResult[stringStruct, structVariant]
+		// structResult Result[structVariant, stringStruct, structVariant]
 		structResult Result[[unsafe.Sizeof(*(*structVariant)(nil))]byte, stringStruct, structVariant]
 		// structResult Result[[2]uintptr, stringStruct, structVariant]
 	)
@@ -204,7 +204,7 @@ func TestIssue95Struct(t *testing.T) {
 }
 
 func TestIssue95BoolInt64(t *testing.T) {
-	type boolInt64Result ErrResult[bool, int64]
+	type boolInt64Result Result[int64, bool, int64]
 	want := int64(1234567890)
 	res := Err[boolInt64Result](1234567890)
 	got := *res.Err()
