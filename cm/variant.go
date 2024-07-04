@@ -69,6 +69,6 @@ func validateVariant[Disc Discriminant, Shape, Align any, T any]() {
 
 	// Check if Shape is zero-sized, but size of result != 1
 	if unsafe.Sizeof(v.data) == 0 && unsafe.Sizeof(v) != 1 {
-		panic("variant: size of data type == 0, but result size != 1")
+		panic("variant: size of data type == 0, but variant size != 1")
 	}
 }
