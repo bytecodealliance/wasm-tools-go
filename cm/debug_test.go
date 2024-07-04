@@ -49,9 +49,9 @@ type ResultDebug interface {
 	VariantDebug
 }
 
-func (r Result) Size() uintptr       { return unsafe.Sizeof(r) }
-func (r Result) DataAlign() uintptr  { return 0 }
-func (r Result) DataOffset() uintptr { return 0 }
+func (r BoolResult) Size() uintptr       { return unsafe.Sizeof(r) }
+func (r BoolResult) DataAlign() uintptr  { return 0 }
+func (r BoolResult) DataOffset() uintptr { return 0 }
 
 func (r result[Shape, OK, Err]) Size() uintptr       { return unsafe.Sizeof(r) }
 func (r result[Shape, OK, Err]) DataAlign() uintptr  { return unsafe.Alignof(r.data) }

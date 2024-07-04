@@ -1,0 +1,76 @@
+{
+  "worlds": [
+    {
+      "name": "w",
+      "imports": {
+        "interface-0": {
+          "interface": {
+            "id": 0
+          }
+        }
+      },
+      "exports": {},
+      "package": 0
+    }
+  ],
+  "interfaces": [
+    {
+      "name": "i",
+      "types": {
+        "error": 0,
+        "r": 1
+      },
+      "functions": {},
+      "package": 0
+    }
+  ],
+  "types": [
+    {
+      "name": "error",
+      "kind": {
+        "variant": {
+          "cases": [
+            {
+              "name": "too-short",
+              "type": "string"
+            },
+            {
+              "name": "too-tall",
+              "type": "string"
+            },
+            {
+              "name": "unknown",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": "r",
+      "kind": {
+        "result": {
+          "ok": "string",
+          "err": 0
+        }
+      },
+      "owner": {
+        "interface": 0
+      }
+    }
+  ],
+  "packages": [
+    {
+      "name": "issues:issue95",
+      "interfaces": {
+        "i": 0
+      },
+      "worlds": {
+        "w": 0
+      }
+    }
+  ]
+}

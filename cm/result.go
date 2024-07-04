@@ -10,30 +10,21 @@ const (
 	ResultErr = true
 )
 
-// Result represents a result with no OK or error type.
+// BoolResult represents a result with no OK or error type.
 // False represents the OK case and true represents the error case.
-type Result bool
+type BoolResult bool
 
-// OKResult represents a result sized to hold the OK type.
-// The size of the OK type must be greater than or equal to the size of the Err type.
-// For results with two zero-length types, use [Result].
-//
-// TODO: change this to an alias when https://github.com/golang/go/issues/46477 is implemented.
-type OKResult[OK, Err any] struct{ result[OK, OK, Err] }
-
-// ErrResult represents a result sized to hold the Err type.
-// The size of the Err type must be greater than or equal to the size of the OK type.
-// For results with two zero-length types, use [Result].
-//
-// TODO: change this to an alias when https://github.com/golang/go/issues/46477 is implemented.
-type ErrResult[OK, Err any] struct{ result[Err, OK, Err] }
+// Result represents a result sized to hold the Shape type.
+// The size of the Shape type must be greater than or equal to the size of OK and Err types.
+// For results with two zero-length types, use [BoolResult].
+type Result[Shape, OK, Err any] struct{ result[Shape, OK, Err] }
 
 // result represents the internal representation of a Component Model result type.
 type result[Shape, OK, Err any] struct {
 	isErr bool
 	_     [0]OK
 	_     [0]Err
-	data  Shape
+	data  Shape // [unsafe.Sizeof(*(*Shape)(unsafe.Pointer(nil)))]byte
 }
 
 // IsOK returns true if r represents the OK case.
@@ -96,7 +87,7 @@ func (r *result[Shape, OK, Err]) validate() {
 }
 
 // OK returns an OK result with shape Shape and type OK and Err.
-// Pass OKResult[OK, Err] or ErrResult[OK, Err] as the first type argument.
+// Pass Result[OK, OK, Err] or Result[Err, OK, Err] as the first type argument.
 func OK[R ~struct{ result[Shape, OK, Err] }, Shape, OK, Err any](ok OK) R {
 	var r struct{ result[Shape, OK, Err] }
 	r.validate()
@@ -106,7 +97,7 @@ func OK[R ~struct{ result[Shape, OK, Err] }, Shape, OK, Err any](ok OK) R {
 }
 
 // Err returns an error result with shape Shape and type OK and Err.
-// Pass OKResult[OK, Err] or ErrResult[OK, Err] as the first type argument.
+// Pass Result[OK, OK, Err] or Result[Err, OK, Err] as the first type argument.
 func Err[R ~struct{ result[Shape, OK, Err] }, Shape, OK, Err any](err Err) R {
 	var r struct{ result[Shape, OK, Err] }
 	r.validate()

@@ -36,6 +36,9 @@ const (
 	// Predeclare Go types for own<T> and borrow<T>.
 	// Currently broken.
 	experimentPredeclareHandles = false
+
+	// Define Go GC shape types for variant and result storage.
+	experimentCreateShapeTypes = true
 )
 
 type typeDecl struct {
@@ -104,7 +107,7 @@ func goParams(scope gen.Scope, dir wit.Direction, params []wit.Param) []param {
 type typeUse struct {
 	pkg *gen.Package
 	dir wit.Direction
-	td  *wit.TypeDef
+	typ *wit.TypeDef
 }
 
 type generator struct {
@@ -136,7 +139,10 @@ type generator struct {
 	// It is indexed on wit.Direction, either Imported or Exported.
 	defined [2]map[any]bool
 
-	// lower and lift represents lowering and lifting functions for defined types.
+	// ABI shapes for any type, use for variant and result Shape type parameters.
+	shapes map[typeUse]string
+
+	// lowering and lifting functions for defined types.
 	lowerFunctions map[typeUse]function
 	liftFunctions  map[typeUse]function
 }
@@ -146,6 +152,7 @@ func newGenerator(res *wit.Resolve, opts ...Option) (*generator, error) {
 		packages:       make(map[string]*gen.Package),
 		witPackages:    make(map[string]*gen.Package),
 		exportScopes:   make(map[string]gen.Scope),
+		shapes:         make(map[typeUse]string),
 		lowerFunctions: make(map[typeUse]function),
 		liftFunctions:  make(map[typeUse]function),
 	}
@@ -600,7 +607,7 @@ func typeDefOwner(t *wit.TypeDef) wit.Ident {
 
 // typeDefGoName returns a mangled Go name for t.
 func (g *generator) typeDefGoName(dir wit.Direction, t *wit.TypeDef) string {
-	if decl, ok := g.types[dir][t]; ok {
+	if decl, ok := g.types[dir][t]; ok && decl.name != "" {
 		return decl.name
 	}
 	return GoName(t.WIT(nil, t.TypeName()), true)
@@ -829,13 +836,18 @@ func (g *generator) variantRep(file *gen.File, dir wit.Direction, v *wit.Variant
 	}
 
 	disc := wit.Discriminant(len(v.Cases))
-	shape := variantShape(v)
-	align := variantAlign(v)
+	shape := variantShape(v.Types())
+	align := variantAlign(v.Types())
+
+	typeShape := g.typeShape(file, dir, shape)
+	if len(v.Types()) == 1 {
+		typeShape = g.typeRep(file, dir, shape)
+	}
 
 	// Emit type
 	var b strings.Builder
 	cm := file.Import(g.opts.cmPackage)
-	stringio.Write(&b, cm, ".Variant[", g.typeRep(file, dir, disc), ", ", g.typeRep(file, dir, shape), ", ", g.typeRep(file, dir, align), "]\n\n")
+	stringio.Write(&b, cm, ".Variant[", g.typeRep(file, dir, disc), ", ", typeShape, ", ", g.typeRep(file, dir, align), "]\n\n")
 
 	// Emit cases
 	for i, c := range v.Cases {
@@ -879,14 +891,19 @@ func (g *generator) variantRep(file *gen.File, dir wit.Direction, v *wit.Variant
 }
 
 func (g *generator) resultRep(file *gen.File, dir wit.Direction, r *wit.Result) string {
+	shape := variantShape(r.Types())
+	typeShape := g.typeShape(file, dir, shape)
+	if len(r.Types()) == 1 {
+		typeShape = g.typeRep(file, dir, shape)
+	}
+
+	// Emit type
 	var b strings.Builder
 	b.WriteString(file.Import(g.opts.cmPackage))
 	if r.OK == nil && r.Err == nil {
-		b.WriteString(".Result")
-	} else if r.OK == nil || (r.Err != nil && r.Err.Size() > r.OK.Size()) {
-		stringio.Write(&b, ".ErrResult[", g.typeRep(file, dir, r.OK), ", ", g.typeRep(file, dir, r.Err), "]")
+		b.WriteString(".BoolResult")
 	} else {
-		stringio.Write(&b, ".OKResult[", g.typeRep(file, dir, r.OK), ", ", g.typeRep(file, dir, r.Err), "]")
+		stringio.Write(&b, ".Result[", typeShape, ", ", g.typeRep(file, dir, r.OK), ", ", g.typeRep(file, dir, r.Err), "]")
 	}
 	return b.String()
 }
@@ -921,6 +938,55 @@ func (g *generator) borrowRep(file *gen.File, dir wit.Direction, b *wit.Borrow) 
 	default:
 		panic("BUG: unknown direction " + dir.String())
 	}
+}
+
+func (g *generator) typeShape(file *gen.File, dir wit.Direction, t wit.Type) string {
+	if !experimentCreateShapeTypes {
+		return g.typeRep(file, dir, t)
+	}
+
+	switch t := t.(type) {
+	case *wit.TypeDef:
+		t = t.Root()
+		return g.typeDefShape(file, dir, t)
+	default:
+		return g.typeRep(file, dir, t)
+	}
+}
+
+func (g *generator) typeDefShape(file *gen.File, dir wit.Direction, t *wit.TypeDef) string {
+	switch kind := t.Kind.(type) {
+	case wit.Type:
+		return g.typeShape(file, dir, kind)
+	case *wit.Variant:
+		if kind.Enum() != nil {
+			// Variants that can be represented as an enum do not need a custom shape.
+			return g.typeRep(file, dir, t)
+		}
+	case *wit.Tuple:
+		if kind.Type() != nil {
+			// Monotypic tuples have a packed memory layout.
+			return g.typeRep(file, dir, t)
+		}
+	case *wit.Resource, *wit.Own, *wit.Borrow, *wit.Enum, *wit.Flags, *wit.List:
+		// Resource handles, enum, flags, and list types do not need a custom shape.
+		return g.typeRep(file, dir, t)
+	}
+
+	use := typeUse{file.Package, dir, t}
+	name, ok := g.shapes[use]
+	if !ok {
+		afile := g.abiFile(file.Package)
+		name = afile.DeclareName(g.typeDefGoName(dir, t) + "Shape")
+		g.shapes[use] = name
+		var b bytes.Buffer
+		stringio.Write(&b, "// ", name, " is used for storage in variant or result types.\n")
+		stringio.Write(&b, "type ", name, " struct {\n")
+		stringio.Write(&b, "shape [", afile.Import("unsafe"), ".Sizeof(", g.typeRep(afile, dir, t), "{})]byte\n")
+		b.WriteString("}\n\n")
+		afile.Write(b.Bytes())
+	}
+	return name
 }
 
 func (g *generator) lowerType(file *gen.File, dir wit.Direction, t wit.Type, input string) string {

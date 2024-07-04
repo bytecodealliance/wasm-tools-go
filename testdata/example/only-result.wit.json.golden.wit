@@ -1,0 +1,14 @@
+package example:only;
+
+interface a {
+	f: func() -> result<u32, u8>;
+}
+
+interface b {
+	f: func() -> result<u32, u8>;
+}
+
+world w {
+	import a;
+	import b;
+}

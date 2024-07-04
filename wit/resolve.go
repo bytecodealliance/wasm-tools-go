@@ -869,6 +869,18 @@ func (r *Result) Despecialize() TypeDefKind {
 	}
 }
 
+// Types returns the unique associated types in [Result] r.
+func (r *Result) Types() []Type {
+	var types []Type
+	if r.OK != nil {
+		types = append(types, r.OK)
+	}
+	if r.Err != nil && r.Err != r.OK {
+		types = append(types, r.Err)
+	}
+	return types
+}
+
 // Size returns the [ABI byte size] for [Result] r.
 // It is first [despecialized] into a [Variant] with two cases "ok" and "error", then sized.
 //
