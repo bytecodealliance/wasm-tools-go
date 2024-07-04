@@ -4,14 +4,6 @@ This directory contains design notes and prototypes of Go bindings for Component
 
 ## Exports
 
-### Post-Return
-
-For each exported function that returns allocated memory, there is a [post-return](https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#canon-lift) function called by the Canonical ABI machinery to allow the component to free the allocation(s).
-
-The post-return function name is `cabi_post_` followed by the fully-qualified function name. For example, the WIT function `example:foo/bar#echo` returning a `string` would have a post-return function named `cabi_post_example:foo/bar#echo`.
-
-The post-return function has the form of `(func (param flatten_functype($ft).results))`, where the arguments is a flattened representation of the function results.
-
 ### Export Bindings for Resource Types
 
 For each exported resource type, in addition to constructors, methods, and static functions, a component must import and export a number of functions to manage the resource lifecycle.
@@ -45,6 +37,16 @@ Similarly, a function is exported for each resource method (e.g. `drink` and `sp
 
 - Export: `example:foo/bar#[method]water.drink` (implemented by user code)
 - Export: `example:foo/bar#[method]water.spill` (implemented by user code)
+
+### Post-Return
+
+**Note: as of v0.1.0, this package does not support post-return functions.** See [#118](https://github.com/ydnar/wasm-tools-go/issues/118) for more information.
+
+For each exported function that returns allocated memory, there is a [post-return](https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#canon-lift) function called by the Canonical ABI machinery to allow the component to free the allocation(s).
+
+The post-return function name is `cabi_post_` followed by the fully-qualified function name. For example, the WIT function `example:foo/bar#echo` returning a `string` would have a post-return function named `cabi_post_example:foo/bar#echo`.
+
+The post-return function has the form of `(func (param flatten_functype($ft).results))`, where the arguments is a flattened representation of the function results.
 
 ### Example in Go
 
