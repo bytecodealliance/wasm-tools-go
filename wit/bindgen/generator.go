@@ -607,7 +607,7 @@ func typeDefOwner(t *wit.TypeDef) wit.Ident {
 
 // typeDefGoName returns a mangled Go name for t.
 func (g *generator) typeDefGoName(dir wit.Direction, t *wit.TypeDef) string {
-	if decl, ok := g.types[dir][t]; ok {
+	if decl, ok := g.types[dir][t]; ok && decl.name != "" {
 		return decl.name
 	}
 	return GoName(t.WIT(nil, t.TypeName()), true)
