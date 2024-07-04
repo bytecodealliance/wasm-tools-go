@@ -839,10 +839,15 @@ func (g *generator) variantRep(file *gen.File, dir wit.Direction, v *wit.Variant
 	shape := variantShape(v.Types())
 	align := variantAlign(v.Types())
 
+	typeShape := g.typeShape(file, dir, shape)
+	if len(v.Types()) == 1 {
+		typeShape = g.typeRep(file, dir, shape)
+	}
+
 	// Emit type
 	var b strings.Builder
 	cm := file.Import(g.opts.cmPackage)
-	stringio.Write(&b, cm, ".Variant[", g.typeRep(file, dir, disc), ", ", g.typeShape(file, dir, shape), ", ", g.typeRep(file, dir, align), "]\n\n")
+	stringio.Write(&b, cm, ".Variant[", g.typeRep(file, dir, disc), ", ", typeShape, ", ", g.typeRep(file, dir, align), "]\n\n")
 
 	// Emit cases
 	for i, c := range v.Cases {
@@ -887,6 +892,10 @@ func (g *generator) variantRep(file *gen.File, dir wit.Direction, v *wit.Variant
 
 func (g *generator) resultRep(file *gen.File, dir wit.Direction, r *wit.Result) string {
 	shape := variantShape(r.Types())
+	typeShape := g.typeShape(file, dir, shape)
+	if len(r.Types()) == 1 {
+		typeShape = g.typeRep(file, dir, shape)
+	}
 
 	// Emit type
 	var b strings.Builder
@@ -894,7 +903,7 @@ func (g *generator) resultRep(file *gen.File, dir wit.Direction, r *wit.Result) 
 	if r.OK == nil && r.Err == nil {
 		b.WriteString(".BoolResult")
 	} else {
-		stringio.Write(&b, ".Result[", g.typeShape(file, dir, shape), ", ", g.typeRep(file, dir, r.OK), ", ", g.typeRep(file, dir, r.Err), "]")
+		stringio.Write(&b, ".Result[", typeShape, ", ", g.typeRep(file, dir, r.OK), ", ", g.typeRep(file, dir, r.Err), "]")
 	}
 	return b.String()
 }
