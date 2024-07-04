@@ -4,10 +4,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+This release changes the memory layout of `variant` and `result` types to permit passing these types on the stack safely. This required breaking changes to package `cm`, detailed below, as well as slightly more verbose type signatures for WIT functions that return a typed `result`.
+
+### Breaking Changes
+- Type `cm.Result` is now `cm.BoolResult`.
+- Types `cm.OKResult` and `cm.ErrResult` have been removed, replaced with a more generalized `cm.Result[Shape, OK, Err]` type.
+
+### Added
+- WIT labels with uppercase acronyms or [initialisms](https://go.dev/wiki/CodeReviewComments#initialisms) are now preserved in Go form. For example, the WIT name `time-EOD` will result in the Go name `TimeEOD`.
+- `OK` is now a predefined initialism. For example, the WIT name `state-ok` would previously translate into the Go name `StateOk` instead of the idiomatic `StateOK`.
+
 ### Fixed
 - [#95](https://github.com/ydnar/wasm-tools-go/issues/95): `wit-bindgen-go` now correctly generates packed `data` shape types for `variant` and `result` types.
-- WIT labels with uppercase acronyms or [initialisms](https://go.dev/wiki/CodeReviewComments#initialisms) are now preserved in Go form. For example, the WIT name `time-EOD` will result in the Go name `TimeEOD`.
-- `OK` is now a predefined initialism.
+- Fixed swapped `Shape` and `Align` type parameters in the functions `cm.New` and `cm.Case` for manipulating `variant` types.
+- Variant validation now correctly reports `variant` instead of `result` in panic messages.
 
 ## [v0.1.0] — 2024-07-04
 
