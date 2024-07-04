@@ -20,19 +20,28 @@ func GoPackageName(name string) string {
 // GoName returns an idiomatic (exported CamelCase) Go name for a WIT name.
 func GoName(name string, export bool) string {
 	var b strings.Builder
-	for i, segment := range segments(strings.ToLower(name)) {
+	for i, segment := range segments(name) {
 		if i == 0 && !export {
+			segment = strings.ToLower(segment)
 			if s, ok := Segments[segment]; ok {
+				// Use opinionated segment
 				b.WriteString(s)
 			} else {
+				// Default to lowercase segment
 				b.WriteString(segment)
 			}
 		} else {
-			if s, ok := ExportedSegments[segment]; ok {
+			if segment == strings.ToUpper(segment) {
+				// Preserve all UPPERCASE
+				b.WriteString(segment)
+			} else if s, ok := ExportedSegments[segment]; ok {
+				// Use opinionated segment
 				b.WriteString(s)
 			} else if gen.Initialisms[segment] {
+				// Use opinionated segment from initialisms
 				b.WriteString(strings.ToUpper(segment))
 			} else {
+				// Title-case the segment
 				runes := []rune(segment)
 				runes[0] = unicode.ToUpper(runes[0])
 				b.WriteString(string(runes))
