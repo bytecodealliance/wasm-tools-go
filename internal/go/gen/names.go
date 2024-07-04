@@ -188,6 +188,7 @@ var Initialisms = mapWords(
 	"json",
 	"lhs",
 	"mime",
+	"ok",
 	"posix",
 	"qps",
 	"ram",
