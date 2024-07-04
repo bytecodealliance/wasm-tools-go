@@ -19,6 +19,8 @@ func TestGoName(t *testing.T) {
 		{"fifo-queue", "fifoQueue", "FIFOQueue"},
 		{"FIFO-queue", "fifoQueue", "FIFOQueue"},
 		{"metadata-hash-value", "metadataHashValue", "MetadataHashValue"},
+		{"time-EOD", "timeEOD", "TimeEOD"},
+		{"EOD-time", "eodTime", "EODTime"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
