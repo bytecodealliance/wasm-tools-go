@@ -951,9 +951,16 @@ func (g *generator) typeDefShape(file *gen.File, dir wit.Direction, t *wit.TypeD
 		return g.typeShape(file, dir, kind)
 	case *wit.Variant:
 		if kind.Enum() != nil {
+			// Variants that can be represented as an enum do not need a custom shape.
+			return g.typeRep(file, dir, t)
+		}
+	case *wit.Tuple:
+		if kind.Type() != nil {
+			// Monotypic tuples have a packed memory layout.
 			return g.typeRep(file, dir, t)
 		}
 	case *wit.Resource, *wit.Own, *wit.Borrow, *wit.Enum, *wit.Flags, *wit.List:
+		// Resource handles, enum, flags, and list types do not need a custom shape.
 		return g.typeRep(file, dir, t)
 	}
 
