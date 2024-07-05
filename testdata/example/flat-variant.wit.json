@@ -25,7 +25,7 @@
       "types": {
         "numbers": 1,
         "optional-float": 2,
-        "in32": 3
+        "v32": 4
       },
       "functions": {
         "f0": {
@@ -56,7 +56,7 @@
           "params": [
             {
               "name": "v",
-              "type": 3
+              "type": 4
             }
           ],
           "results": []
@@ -93,6 +93,10 @@
             {
               "name": "four",
               "type": 0
+            },
+            {
+              "name": "five",
+              "type": "bool"
             }
           ]
         }
@@ -111,7 +115,18 @@
       }
     },
     {
-      "name": "in32",
+      "name": null,
+      "kind": {
+        "tuple": {
+          "types": [
+            "u32"
+          ]
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": "v32",
       "kind": {
         "variant": {
           "cases": [
@@ -130,6 +145,10 @@
             {
               "name": "four",
               "type": "f32"
+            },
+            {
+              "name": "five",
+              "type": 3
             }
           ]
         }

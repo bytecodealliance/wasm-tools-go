@@ -6,17 +6,19 @@ interface a {
 		two(string),
 		three(f64),
 		four(option<string>),
+		five(bool),
 	}
 	type optional-float = option<f64>;
-	variant in32 {
+	variant v32 {
 		one,
 		two(s32),
 		three(u32),
 		four(f32),
+		five(tuple<u32>),
 	}
 	f0: func(f: f64);
 	f1: func(v: numbers);
-	f2: func(v: in32);
+	f2: func(v: v32);
 }
 
 world imports {
