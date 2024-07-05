@@ -1330,7 +1330,7 @@ func (g *generator) liftVariant(file *gen.File, dir wit.Direction, t *wit.TypeDe
 		stringio.Write(&b, "return ", g.cmCall(afile, "New["+g.typeRep(afile, dir, t)+"]", tag+", "+g.liftVariantCase(afile, dir, c.Type, flat[1:])), "\n")
 	}
 	b.WriteString("}\n")
-	b.WriteString("return\n")
+	stringio.Write(&b, "panic(\"lift variant: unknown case: \" + ", afile.Import("strconv"), ".Itoa(int(f0)))\n")
 	return g.typeDefLiftFunction(file, dir, t, input, b.String())
 }
 
@@ -1348,7 +1348,7 @@ func (g *generator) liftResult(file *gen.File, dir wit.Direction, t *wit.TypeDef
 	b.WriteString("case 1:\n")
 	stringio.Write(&b, "return ", g.cmCall(afile, "Err["+g.typeRep(afile, dir, t)+"]", g.liftVariantCase(afile, dir, r.Err, flat[1:])), "\n")
 	b.WriteString("}\n")
-	b.WriteString("return\n")
+	stringio.Write(&b, "panic(\"lift result: unknown case: \" + ", afile.Import("strconv"), ".Itoa(int(f0)))\n")
 	return g.typeDefLiftFunction(file, dir, t, input, b.String())
 }
 
