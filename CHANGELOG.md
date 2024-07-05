@@ -4,14 +4,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
-### Breaking Changes
-- Package `cm`: Removed unused functions `Reinterpret2`, `LowerResult`, `LowerBool`, `BoolToU64`, `S64ToF64`.
-- Package `cm`: Removed unused experimental `flags` implementation behind a build tag.
-
 ### Added
 - Canonical ABI lifting code for `flags` and `variant` types.
 - Lifting code for `result` and `variant` will now panic if caller passes an invalid case.
 - Additional test coverage for `variant` and `flags` cases.
+
+### Removed
+- Package `cm`: Removed unused functions `Reinterpret2`, `LowerResult`, `LowerBool`, `BoolToU64`, `S64ToF64`.
+- Package `cm`: Removed unused experimental `flags` implementation behind a build tag.
 
 ### Fixed
 - Lifting code for `result` with no error type will now correctly set `IsErr`.
