@@ -1137,7 +1137,7 @@ func (g *generator) lowerVariant(file *gen.File, dir wit.Direction, t *wit.TypeD
 func (g *generator) lowerResult(file *gen.File, dir wit.Direction, t *wit.TypeDef, input string) string {
 	r := t.Kind.(*wit.Result)
 	if r.OK == nil && r.Err == nil {
-		return g.cmCall(file, "LowerBool", input)
+		return g.cast(file, dir, wit.Bool{}, wit.U32{}, input)
 	}
 	flat := t.Flat()
 	afile := g.abiFile(file.Package)
@@ -1322,7 +1322,7 @@ func (g *generator) liftResult(file *gen.File, dir wit.Direction, t *wit.TypeDef
 	r := t.Kind.(*wit.Result)
 	flat := t.Flat()
 	if r.OK == nil && r.Err == nil {
-		return g.cmCall(file, "LiftBool["+g.typeRep(file, dir, t)+"]", input)
+		return g.cast(file, dir, wit.Bool{}, t, g.cast(file, dir, flat[0], wit.Bool{}, input))
 	}
 	afile := g.abiFile(file.Package)
 	var b strings.Builder
@@ -1420,7 +1420,11 @@ func castable(from, to wit.Type) bool {
 	case wit.String:
 		fromString = true
 	default:
-		if wit.KindOf[*wit.Enum](from) != nil {
+		if r := wit.KindOf[*wit.Result](from); r != nil && len(r.Types()) == 0 {
+			fromBool = true
+		} else if v := wit.KindOf[*wit.Variant](from); v != nil && v.Enum() != nil {
+			fromInt = true
+		} else if wit.KindOf[*wit.Enum](from) != nil {
 			fromInt = true
 		} else if isPointer(from) {
 			fromPointer = true
@@ -1439,7 +1443,11 @@ func castable(from, to wit.Type) bool {
 	case wit.String:
 		return fromString
 	default:
-		if wit.KindOf[*wit.Enum](to) != nil {
+		if r := wit.KindOf[*wit.Result](to); r != nil && len(r.Types()) == 0 {
+			return fromBool
+		} else if v := wit.KindOf[*wit.Variant](to); v != nil && v.Enum() != nil {
+			return fromInt
+		} else if wit.KindOf[*wit.Enum](to) != nil {
 			return fromInt
 		} else if isPointer(to) {
 			return fromPointer
