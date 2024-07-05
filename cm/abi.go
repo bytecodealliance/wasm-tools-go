@@ -13,11 +13,6 @@ func Reinterpret[T, From any](from From) (to T) {
 	return *(*T)(unsafe.Pointer(&from))
 }
 
-// LowerResult lowers an untyped result into Core WebAssembly I32.
-func LowerResult[T ~bool](v T) uint32 {
-	return uint32(*(*uint8)(unsafe.Pointer(&v)))
-}
-
 // LowerString lowers a [string] into a pair of Core WebAssembly types.
 func LowerString[S ~string](s S) (*byte, uint32) {
 	return unsafe.StringData(string(s)), uint32(len(s))
