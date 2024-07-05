@@ -8,10 +8,18 @@ interface a {
 		four(option<string>),
 	}
 	type optional-float = option<f64>;
+	variant in32 {
+		one,
+		two(s32),
+		three(u32),
+		four(f32),
+	}
 	f0: func(f: f64);
 	f1: func(v: numbers);
+	f2: func(v: in32);
 }
 
 world imports {
 	import a;
+	export a;
 }

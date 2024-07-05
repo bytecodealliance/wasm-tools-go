@@ -13,8 +13,18 @@ interface a {
 	f1: func(v: numbers);
 
 	type optional-float = option<float64>;
+
+	variant in32 {
+		one,
+		two(s32),
+		three(u32),
+		four(f32),
+	}
+
+	f2: func(v: in32);
 }
 
 world imports {
 	import a;
+	export a;
 }
