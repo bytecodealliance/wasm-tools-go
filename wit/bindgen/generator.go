@@ -1112,10 +1112,10 @@ func (g *generator) lowerFlags(file *gen.File, dir wit.Direction, t *wit.TypeDef
 
 func (g *generator) lowerVariant(file *gen.File, dir wit.Direction, t *wit.TypeDef, input string) string {
 	v := t.Kind.(*wit.Variant)
+	flat := t.Flat()
 	if v.Enum() != nil {
 		return g.cmCall(file, "LowerEnum", input)
 	}
-	flat := t.Flat()
 	afile := g.abiFile(file.Package)
 	var b strings.Builder
 	stringio.Write(&b, "f0 = ", g.cast(afile, dir, wit.Discriminant(len(v.Cases)), flat[0], "v.Tag()"), "\n")
@@ -1242,7 +1242,7 @@ func (g *generator) liftTypeDef(file *gen.File, dir wit.Direction, t *wit.TypeDe
 		return g.cast(file, dir, flat[0], t, input)
 		// return g.cmCall(file, "LiftEnum", input)
 	case *wit.Variant:
-		return "// TODO: g.liftVariant(file, dir, t, input)"
+		return g.liftVariant(file, dir, t, input)
 	case *wit.Result:
 		return g.liftResult(file, dir, t, input)
 	case *wit.Option:
@@ -1316,6 +1316,25 @@ func (g *generator) liftTuple(file *gen.File, dir wit.Direction, t *wit.TypeDef,
 	}
 	b.WriteString("return\n")
 	return g.typeDefLiftFunction(afile, dir, t, input, b.String())
+}
+
+func (g *generator) liftVariant(file *gen.File, dir wit.Direction, t *wit.TypeDef, input string) string {
+	v := t.Kind.(*wit.Variant)
+	flat := t.Flat()
+	if v.Enum() != nil {
+		return g.cast(file, dir, flat[0], t, input)
+	}
+	afile := g.abiFile(file.Package)
+	var b strings.Builder
+	stringio.Write(&b, "switch f0 {\n")
+	for i, c := range v.Cases {
+		tag := strconv.Itoa(i)
+		stringio.Write(&b, "case ", tag, ":\n")
+		stringio.Write(&b, "return ", g.cmCall(afile, "New["+g.typeRep(afile, dir, t)+"]", tag+", "+g.liftVariantCase(afile, dir, c.Type, flat[1:])), "\n")
+	}
+	b.WriteString("}\n")
+	b.WriteString("return\n")
+	return g.typeDefLiftFunction(file, dir, t, input, b.String())
 }
 
 func (g *generator) liftResult(file *gen.File, dir wit.Direction, t *wit.TypeDef, input string) string {
