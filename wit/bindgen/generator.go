@@ -1343,14 +1343,10 @@ func (g *generator) liftResult(file *gen.File, dir wit.Direction, t *wit.TypeDef
 	afile := g.abiFile(file.Package)
 	var b strings.Builder
 	stringio.Write(&b, "switch f0 {\n")
-	if r.OK != nil {
-		b.WriteString("case 0:\n")
-		stringio.Write(&b, "return ", g.cmCall(afile, "OK["+g.typeRep(afile, dir, t)+"]", g.liftVariantCase(afile, dir, r.OK, flat[1:])), "\n")
-	}
-	if r.Err != nil {
-		b.WriteString("case 1:\n")
-		stringio.Write(&b, "return ", g.cmCall(afile, "Err["+g.typeRep(afile, dir, t)+"]", g.liftVariantCase(afile, dir, r.Err, flat[1:])), "\n")
-	}
+	b.WriteString("case 0:\n")
+	stringio.Write(&b, "return ", g.cmCall(afile, "OK["+g.typeRep(afile, dir, t)+"]", g.liftVariantCase(afile, dir, r.OK, flat[1:])), "\n")
+	b.WriteString("case 1:\n")
+	stringio.Write(&b, "return ", g.cmCall(afile, "Err["+g.typeRep(afile, dir, t)+"]", g.liftVariantCase(afile, dir, r.Err, flat[1:])), "\n")
 	b.WriteString("}\n")
 	b.WriteString("return\n")
 	return g.typeDefLiftFunction(file, dir, t, input, b.String())
