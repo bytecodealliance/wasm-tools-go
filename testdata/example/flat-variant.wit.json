@@ -9,7 +9,13 @@
           }
         }
       },
-      "exports": {},
+      "exports": {
+        "interface-0": {
+          "interface": {
+            "id": 0
+          }
+        }
+      },
       "package": 0
     }
   ],
@@ -18,7 +24,8 @@
       "name": "a",
       "types": {
         "numbers": 1,
-        "optional-float": 2
+        "optional-float": 2,
+        "v32": 4
       },
       "functions": {
         "f0": {
@@ -39,6 +46,17 @@
             {
               "name": "v",
               "type": 1
+            }
+          ],
+          "results": []
+        },
+        "f2": {
+          "name": "f2",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "v",
+              "type": 4
             }
           ],
           "results": []
@@ -75,6 +93,10 @@
             {
               "name": "four",
               "type": 0
+            },
+            {
+              "name": "five",
+              "type": "bool"
             }
           ]
         }
@@ -87,6 +109,49 @@
       "name": "optional-float",
       "kind": {
         "option": "f64"
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "tuple": {
+          "types": [
+            "u32"
+          ]
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": "v32",
+      "kind": {
+        "variant": {
+          "cases": [
+            {
+              "name": "one",
+              "type": null
+            },
+            {
+              "name": "two",
+              "type": "s32"
+            },
+            {
+              "name": "three",
+              "type": "u32"
+            },
+            {
+              "name": "four",
+              "type": "f32"
+            },
+            {
+              "name": "five",
+              "type": 3
+            }
+          ]
+        }
       },
       "owner": {
         "interface": 0

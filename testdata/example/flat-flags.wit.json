@@ -1,0 +1,81 @@
+{
+  "worlds": [
+    {
+      "name": "imports",
+      "imports": {
+        "interface-0": {
+          "interface": {
+            "id": 0
+          }
+        }
+      },
+      "exports": {
+        "interface-0": {
+          "interface": {
+            "id": 0
+          }
+        }
+      },
+      "package": 0
+    }
+  ],
+  "interfaces": [
+    {
+      "name": "a",
+      "types": {
+        "compass": 0
+      },
+      "functions": {
+        "f0": {
+          "name": "f0",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "f",
+              "type": 0
+            }
+          ],
+          "results": []
+        }
+      },
+      "package": 0
+    }
+  ],
+  "types": [
+    {
+      "name": "compass",
+      "kind": {
+        "flags": {
+          "flags": [
+            {
+              "name": "north"
+            },
+            {
+              "name": "east"
+            },
+            {
+              "name": "south"
+            },
+            {
+              "name": "west"
+            }
+          ]
+        }
+      },
+      "owner": {
+        "interface": 0
+      }
+    }
+  ],
+  "packages": [
+    {
+      "name": "example:flat-flags",
+      "interfaces": {
+        "a": 0
+      },
+      "worlds": {
+        "imports": 0
+      }
+    }
+  ]
+}

@@ -1020,8 +1020,6 @@ func (g *generator) lowerTypeDef(file *gen.File, dir wit.Direction, t *wit.TypeD
 		return g.lowerFlags(file, dir, t, input)
 	case *wit.Enum:
 		return g.cast(file, dir, t, flat[0], input)
-		// return g.cast(file, wit.Discriminant(len(kind.Cases)), flat[0], input)
-		// return g.cmCall(file, "LowerEnum", input)
 	case *wit.Variant:
 		return g.lowerVariant(file, dir, t, input)
 	case *wit.Result:
@@ -1101,21 +1099,16 @@ func (g *generator) lowerFlags(file *gen.File, dir wit.Direction, t *wit.TypeDef
 	if len(flat) == 1 {
 		return g.cast(file, dir, wit.Discriminant(len(flags.Flags)), flat[0], input)
 	}
-	// The following line is moot because of the above check, which replaces a function call with an inline cast.
-	// It is here for completeness.
-	body := "return uint32(v)\n"
-	if len(flat) > 1 {
-		body = "// TODO: lower flags with > 64 values\n"
-	}
+	body := "// TODO: lower flags with > 32 values\n"
 	return g.typeDefLowerFunction(file, dir, t, input, body)
 }
 
 func (g *generator) lowerVariant(file *gen.File, dir wit.Direction, t *wit.TypeDef, input string) string {
 	v := t.Kind.(*wit.Variant)
-	if v.Enum() != nil {
-		return g.cmCall(file, "LowerEnum", input)
-	}
 	flat := t.Flat()
+	if v.Enum() != nil {
+		return g.cast(file, dir, t, flat[0], input)
+	}
 	afile := g.abiFile(file.Package)
 	var b strings.Builder
 	stringio.Write(&b, "f0 = ", g.cast(afile, dir, wit.Discriminant(len(v.Cases)), flat[0], "v.Tag()"), "\n")
@@ -1137,7 +1130,7 @@ func (g *generator) lowerVariant(file *gen.File, dir wit.Direction, t *wit.TypeD
 func (g *generator) lowerResult(file *gen.File, dir wit.Direction, t *wit.TypeDef, input string) string {
 	r := t.Kind.(*wit.Result)
 	if r.OK == nil && r.Err == nil {
-		return g.cmCall(file, "LowerResult", input)
+		return g.cast(file, dir, wit.Bool{}, wit.U32{}, input)
 	}
 	flat := t.Flat()
 	afile := g.abiFile(file.Package)
@@ -1237,12 +1230,11 @@ func (g *generator) liftTypeDef(file *gen.File, dir wit.Direction, t *wit.TypeDe
 	case *wit.Tuple:
 		return g.liftTuple(file, dir, t, input)
 	case *wit.Flags:
-		return "// TODO: g.liftFlags(file, dir, t, input)"
+		return g.liftFlags(file, dir, t, input)
 	case *wit.Enum:
 		return g.cast(file, dir, flat[0], t, input)
-		// return g.cmCall(file, "LiftEnum", input)
 	case *wit.Variant:
-		return "// TODO: g.liftVariant(file, dir, t, input)"
+		return g.liftVariant(file, dir, t, input)
 	case *wit.Result:
 		return g.liftResult(file, dir, t, input)
 	case *wit.Option:
@@ -1318,25 +1310,50 @@ func (g *generator) liftTuple(file *gen.File, dir wit.Direction, t *wit.TypeDef,
 	return g.typeDefLiftFunction(afile, dir, t, input, b.String())
 }
 
-func (g *generator) liftResult(file *gen.File, dir wit.Direction, t *wit.TypeDef, input string) string {
-	r := t.Kind.(*wit.Result)
+func (g *generator) liftFlags(file *gen.File, dir wit.Direction, t *wit.TypeDef, input string) string {
+	// flags := t.Kind.(*wit.Flags)
 	flat := t.Flat()
-	if r.OK == nil && r.Err == nil {
-		return g.cmCall(file, "Reinterpret["+g.typeRep(file, dir, t)+"]", g.cast(file, dir, flat[0], wit.U8{}, input))
+	if len(flat) == 1 {
+		return g.cast(file, dir, flat[0], t, input)
+	}
+	body := "// TODO: lift flags with > 32 values\n"
+	return g.typeDefLiftFunction(file, dir, t, input, body)
+}
+
+func (g *generator) liftVariant(file *gen.File, dir wit.Direction, t *wit.TypeDef, input string) string {
+	v := t.Kind.(*wit.Variant)
+	flat := t.Flat()
+	if v.Enum() != nil {
+		return g.cast(file, dir, flat[0], t, input)
 	}
 	afile := g.abiFile(file.Package)
 	var b strings.Builder
 	stringio.Write(&b, "switch f0 {\n")
-	if r.OK != nil {
-		b.WriteString("case 0:\n")
-		stringio.Write(&b, "return ", g.cmCall(afile, "OK["+g.typeRep(afile, dir, t)+"]", g.liftVariantCase(afile, dir, r.OK, flat[1:])), "\n")
-	}
-	if r.Err != nil {
-		b.WriteString("case 1:\n")
-		stringio.Write(&b, "return ", g.cmCall(afile, "Err["+g.typeRep(afile, dir, t)+"]", g.liftVariantCase(afile, dir, r.Err, flat[1:])), "\n")
+	for i, c := range v.Cases {
+		tag := strconv.Itoa(i)
+		stringio.Write(&b, "case ", tag, ":\n")
+		stringio.Write(&b, "return ", g.cmCall(afile, "New["+g.typeRep(afile, dir, t)+"]", tag+", "+g.liftVariantCase(afile, dir, c.Type, flat[1:])), "\n")
 	}
 	b.WriteString("}\n")
-	b.WriteString("return\n")
+	stringio.Write(&b, "panic(\"lift variant: unknown case: \" + ", afile.Import("strconv"), ".Itoa(int(f0)))\n")
+	return g.typeDefLiftFunction(file, dir, t, input, b.String())
+}
+
+func (g *generator) liftResult(file *gen.File, dir wit.Direction, t *wit.TypeDef, input string) string {
+	r := t.Kind.(*wit.Result)
+	flat := t.Flat()
+	if r.OK == nil && r.Err == nil {
+		return g.cast(file, dir, wit.Bool{}, t, g.cast(file, dir, flat[0], wit.Bool{}, input))
+	}
+	afile := g.abiFile(file.Package)
+	var b strings.Builder
+	stringio.Write(&b, "switch f0 {\n")
+	b.WriteString("case 0:\n")
+	stringio.Write(&b, "return ", g.cmCall(afile, "OK["+g.typeRep(afile, dir, t)+"]", g.liftVariantCase(afile, dir, r.OK, flat[1:])), "\n")
+	b.WriteString("case 1:\n")
+	stringio.Write(&b, "return ", g.cmCall(afile, "Err["+g.typeRep(afile, dir, t)+"]", g.liftVariantCase(afile, dir, r.Err, flat[1:])), "\n")
+	b.WriteString("}\n")
+	stringio.Write(&b, "panic(\"lift result: unknown case: \" + ", afile.Import("strconv"), ".Itoa(int(f0)))\n")
 	return g.typeDefLiftFunction(file, dir, t, input, b.String())
 }
 
@@ -1348,11 +1365,14 @@ func (g *generator) liftOption(file *gen.File, dir wit.Direction, t *wit.TypeDef
 	b.WriteString("if f0 == 0 {\n")
 	b.WriteString("return")
 	b.WriteString("}\n")
-	stringio.Write(&b, "return ", g.cmCall(afile, "Some["+g.typeRep(afile, dir, t)+"]", g.liftVariantCase(afile, dir, o.Type, flat[1:])), "\n")
+	stringio.Write(&b, "return ", g.cmCall(afile, "Some["+g.typeRep(afile, dir, o.Type)+"]", g.liftVariantCase(afile, dir, o.Type, flat[1:])), "\n")
 	return g.typeDefLiftFunction(file, dir, t, input, b.String())
 }
 
 func (g *generator) liftVariantCase(file *gen.File, dir wit.Direction, t wit.Type, from []wit.Type) string {
+	if t == nil {
+		return "struct{}{}"
+	}
 	var b strings.Builder
 	for i, f := range t.Flat() {
 		if i > 0 {
@@ -1420,7 +1440,13 @@ func castable(from, to wit.Type) bool {
 	case wit.String:
 		fromString = true
 	default:
-		if wit.KindOf[*wit.Enum](from) != nil {
+		if r := wit.KindOf[*wit.Result](from); r != nil && len(r.Types()) == 0 {
+			fromBool = true
+		} else if v := wit.KindOf[*wit.Variant](from); v != nil && v.Enum() != nil {
+			fromInt = true
+		} else if wit.KindOf[*wit.Enum](from) != nil {
+			fromInt = true
+		} else if f := wit.KindOf[*wit.Flags](from); f != nil && len(f.Flags) <= 64 {
 			fromInt = true
 		} else if isPointer(from) {
 			fromPointer = true
@@ -1439,7 +1465,13 @@ func castable(from, to wit.Type) bool {
 	case wit.String:
 		return fromString
 	default:
-		if wit.KindOf[*wit.Enum](to) != nil {
+		if r := wit.KindOf[*wit.Result](to); r != nil && len(r.Types()) == 0 {
+			return fromBool
+		} else if v := wit.KindOf[*wit.Variant](to); v != nil && v.Enum() != nil {
+			return fromInt
+		} else if wit.KindOf[*wit.Enum](to) != nil {
+			return fromInt
+		} else if f := wit.KindOf[*wit.Flags](to); f != nil && len(f.Flags) <= 64 {
 			return fromInt
 		} else if isPointer(to) {
 			return fromPointer

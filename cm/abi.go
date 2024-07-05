@@ -13,21 +13,6 @@ func Reinterpret[T, From any](from From) (to T) {
 	return *(*T)(unsafe.Pointer(&from))
 }
 
-// Reinterpret2 reinterprets the bits of type From into types T0 and T1.
-// Will panic if the size of From is smaller than the size of T0 + T1.
-func Reinterpret2[T0, T1, From any](from From) (T0, T1) {
-	r := Reinterpret[struct {
-		f0 T0
-		f1 T1
-	}](from)
-	return r.f0, r.f1
-}
-
-// LowerResult lowers an untyped result into Core WebAssembly I32.
-func LowerResult[T ~bool](v T) uint32 {
-	return uint32(*(*uint8)(unsafe.Pointer(&v)))
-}
-
 // LowerString lowers a [string] into a pair of Core WebAssembly types.
 func LowerString[S ~string](s S) (*byte, uint32) {
 	return unsafe.StringData(string(s)), uint32(len(s))
@@ -49,18 +34,13 @@ func LiftList[L List[T], T any, Data unsafe.Pointer | uintptr | *T, Len uint | u
 	return L(NewList((*T)(unsafe.Pointer(data)), uint(len)))
 }
 
-func LowerBool[B ~bool](v B) uint32 { return uint32(*(*uint8)(unsafe.Pointer(&v))) }
-
-func BoolToU32[B ~bool](v B) uint32 { return uint32(*(*uint8)(unsafe.Pointer(&v))) }
-func BoolToU64[B ~bool](v B) uint64 { return uint64(*(*uint8)(unsafe.Pointer(&v))) }
-func S64ToF64(v int64) float64      { return *(*float64)(unsafe.Pointer(&v)) }
-func F64ToU64(v float64) uint64     { return *(*uint64)(unsafe.Pointer(&v)) }
-func U32ToBool(v uint32) bool       { tmp := uint8(v); return *(*bool)(unsafe.Pointer(&tmp)) }
-func U32ToF32(v uint32) float32     { return *(*float32)(unsafe.Pointer(&v)) }
-func U64ToBool(v uint64) bool       { tmp := uint8(v); return *(*bool)(unsafe.Pointer(&tmp)) }
-func U64ToF64(v uint64) float64     { return *(*float64)(unsafe.Pointer(&v)) }
-func F32ToF64(v float32) float64    { return float64(v) }
-
+func BoolToU32[B ~bool](v B) uint32   { return uint32(*(*uint8)(unsafe.Pointer(&v))) }
+func U32ToBool(v uint32) bool         { tmp := uint8(v); return *(*bool)(unsafe.Pointer(&tmp)) }
+func U32ToF32(v uint32) float32       { return *(*float32)(unsafe.Pointer(&v)) }
+func U64ToF64(v uint64) float64       { return *(*float64)(unsafe.Pointer(&v)) }
+func F32ToF64(v float32) float64      { return float64(v) }
+func F32ToU32(v float32) uint32       { return *(*uint32)(unsafe.Pointer(&v)) }
+func F64ToU64(v float64) uint64       { return *(*uint64)(unsafe.Pointer(&v)) }
 func PointerToU32[T any](v *T) uint32 { return uint32(uintptr(unsafe.Pointer(v))) }
 func PointerToU64[T any](v *T) uint64 { return uint64(uintptr(unsafe.Pointer(v))) }
 func U32ToPointer[T any](v uint32) *T { return (*T)(unsafePointer(uintptr(v))) }
