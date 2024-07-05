@@ -13,16 +13,6 @@ func Reinterpret[T, From any](from From) (to T) {
 	return *(*T)(unsafe.Pointer(&from))
 }
 
-// Reinterpret2 reinterprets the bits of type From into types T0 and T1.
-// Will panic if the size of From is smaller than the size of T0 + T1.
-func Reinterpret2[T0, T1, From any](from From) (T0, T1) {
-	r := Reinterpret[struct {
-		f0 T0
-		f1 T1
-	}](from)
-	return r.f0, r.f1
-}
-
 // LowerResult lowers an untyped result into Core WebAssembly I32.
 func LowerResult[T ~bool](v T) uint32 {
 	return uint32(*(*uint8)(unsafe.Pointer(&v)))
