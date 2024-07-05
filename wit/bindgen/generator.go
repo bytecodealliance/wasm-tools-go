@@ -1137,7 +1137,7 @@ func (g *generator) lowerVariant(file *gen.File, dir wit.Direction, t *wit.TypeD
 func (g *generator) lowerResult(file *gen.File, dir wit.Direction, t *wit.TypeDef, input string) string {
 	r := t.Kind.(*wit.Result)
 	if r.OK == nil && r.Err == nil {
-		return g.cmCall(file, "LowerResult", input)
+		return g.cmCall(file, "LowerBool", input)
 	}
 	flat := t.Flat()
 	afile := g.abiFile(file.Package)
@@ -1322,7 +1322,7 @@ func (g *generator) liftResult(file *gen.File, dir wit.Direction, t *wit.TypeDef
 	r := t.Kind.(*wit.Result)
 	flat := t.Flat()
 	if r.OK == nil && r.Err == nil {
-		return g.cmCall(file, "Reinterpret["+g.typeRep(file, dir, t)+"]", g.cast(file, dir, flat[0], wit.U8{}, input))
+		return g.cmCall(file, "LiftBool["+g.typeRep(file, dir, t)+"]", input)
 	}
 	afile := g.abiFile(file.Package)
 	var b strings.Builder

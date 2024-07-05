@@ -39,7 +39,16 @@ func LiftList[L List[T], T any, Data unsafe.Pointer | uintptr | *T, Len uint | u
 	return L(NewList((*T)(unsafe.Pointer(data)), uint(len)))
 }
 
-func LowerBool[B ~bool](v B) uint32 { return uint32(*(*uint8)(unsafe.Pointer(&v))) }
+// LowerBool lowers a ~[bool] into a WebAssembly I32.
+func LowerBool[B ~bool](v B) uint32 {
+	return uint32(*(*uint8)(unsafe.Pointer(&v)))
+}
+
+// LiftBool lifts Core WebAssembly type into a ~[bool].
+func LiftBool[B ~bool, T uint32 | uint64](v T) B {
+	tmp := uint8(v)
+	return *(*B)(unsafe.Pointer(&tmp))
+}
 
 func BoolToU32[B ~bool](v B) uint32 { return uint32(*(*uint8)(unsafe.Pointer(&v))) }
 func BoolToU64[B ~bool](v B) uint64 { return uint64(*(*uint8)(unsafe.Pointer(&v))) }
