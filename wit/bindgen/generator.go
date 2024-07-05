@@ -1020,8 +1020,6 @@ func (g *generator) lowerTypeDef(file *gen.File, dir wit.Direction, t *wit.TypeD
 		return g.lowerFlags(file, dir, t, input)
 	case *wit.Enum:
 		return g.cast(file, dir, t, flat[0], input)
-		// return g.cast(file, wit.Discriminant(len(kind.Cases)), flat[0], input)
-		// return g.cmCall(file, "LowerEnum", input)
 	case *wit.Variant:
 		return g.lowerVariant(file, dir, t, input)
 	case *wit.Result:
@@ -1114,7 +1112,7 @@ func (g *generator) lowerVariant(file *gen.File, dir wit.Direction, t *wit.TypeD
 	v := t.Kind.(*wit.Variant)
 	flat := t.Flat()
 	if v.Enum() != nil {
-		return g.cmCall(file, "LowerEnum", input)
+		return g.cast(file, dir, t, flat[0], input)
 	}
 	afile := g.abiFile(file.Package)
 	var b strings.Builder
@@ -1240,7 +1238,6 @@ func (g *generator) liftTypeDef(file *gen.File, dir wit.Direction, t *wit.TypeDe
 		return "// TODO: g.liftFlags(file, dir, t, input)"
 	case *wit.Enum:
 		return g.cast(file, dir, flat[0], t, input)
-		// return g.cmCall(file, "LiftEnum", input)
 	case *wit.Variant:
 		return g.liftVariant(file, dir, t, input)
 	case *wit.Result:
