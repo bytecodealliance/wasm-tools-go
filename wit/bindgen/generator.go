@@ -1348,11 +1348,14 @@ func (g *generator) liftOption(file *gen.File, dir wit.Direction, t *wit.TypeDef
 	b.WriteString("if f0 == 0 {\n")
 	b.WriteString("return")
 	b.WriteString("}\n")
-	stringio.Write(&b, "return ", g.cmCall(afile, "Some["+g.typeRep(afile, dir, t)+"]", g.liftVariantCase(afile, dir, o.Type, flat[1:])), "\n")
+	stringio.Write(&b, "return ", g.cmCall(afile, "Some["+g.typeRep(afile, dir, o.Type)+"]", g.liftVariantCase(afile, dir, o.Type, flat[1:])), "\n")
 	return g.typeDefLiftFunction(file, dir, t, input, b.String())
 }
 
 func (g *generator) liftVariantCase(file *gen.File, dir wit.Direction, t wit.Type, from []wit.Type) string {
+	if t == nil {
+		return "struct{}{}"
+	}
 	var b strings.Builder
 	for i, f := range t.Flat() {
 		if i > 0 {
