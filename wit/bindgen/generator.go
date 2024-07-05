@@ -1099,12 +1099,7 @@ func (g *generator) lowerFlags(file *gen.File, dir wit.Direction, t *wit.TypeDef
 	if len(flat) == 1 {
 		return g.cast(file, dir, wit.Discriminant(len(flags.Flags)), flat[0], input)
 	}
-	// The following line is moot because of the above check, which replaces a function call with an inline cast.
-	// It is here for completeness.
-	body := "return uint32(v)\n"
-	if len(flat) > 1 {
-		body = "// TODO: lower flags with > 64 values\n"
-	}
+	body := "// TODO: lower flags with > 32 values\n"
 	return g.typeDefLowerFunction(file, dir, t, input, body)
 }
 
@@ -1235,7 +1230,7 @@ func (g *generator) liftTypeDef(file *gen.File, dir wit.Direction, t *wit.TypeDe
 	case *wit.Tuple:
 		return g.liftTuple(file, dir, t, input)
 	case *wit.Flags:
-		return "// TODO: g.liftFlags(file, dir, t, input)"
+		return g.liftFlags(file, dir, t, input)
 	case *wit.Enum:
 		return g.cast(file, dir, flat[0], t, input)
 	case *wit.Variant:
@@ -1313,6 +1308,16 @@ func (g *generator) liftTuple(file *gen.File, dir wit.Direction, t *wit.TypeDef,
 	}
 	b.WriteString("return\n")
 	return g.typeDefLiftFunction(afile, dir, t, input, b.String())
+}
+
+func (g *generator) liftFlags(file *gen.File, dir wit.Direction, t *wit.TypeDef, input string) string {
+	// flags := t.Kind.(*wit.Flags)
+	flat := t.Flat()
+	if len(flat) == 1 {
+		return g.cast(file, dir, flat[0], t, input)
+	}
+	body := "// TODO: lift flags with > 32 values\n"
+	return g.typeDefLiftFunction(file, dir, t, input, body)
 }
 
 func (g *generator) liftVariant(file *gen.File, dir wit.Direction, t *wit.TypeDef, input string) string {
@@ -1441,6 +1446,8 @@ func castable(from, to wit.Type) bool {
 			fromInt = true
 		} else if wit.KindOf[*wit.Enum](from) != nil {
 			fromInt = true
+		} else if f := wit.KindOf[*wit.Flags](from); f != nil && len(f.Flags) <= 64 {
+			fromInt = true
 		} else if isPointer(from) {
 			fromPointer = true
 		} else {
@@ -1463,6 +1470,8 @@ func castable(from, to wit.Type) bool {
 		} else if v := wit.KindOf[*wit.Variant](to); v != nil && v.Enum() != nil {
 			return fromInt
 		} else if wit.KindOf[*wit.Enum](to) != nil {
+			return fromInt
+		} else if f := wit.KindOf[*wit.Flags](to); f != nil && len(f.Flags) <= 64 {
 			return fromInt
 		} else if isPointer(to) {
 			return fromPointer

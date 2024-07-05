@@ -1,0 +1,11 @@
+package example:flat-flags;
+
+interface a {
+	flags compass { north, east, south, west }
+	f0: func(f: compass);
+}
+
+world imports {
+	import a;
+	export a;
+}
