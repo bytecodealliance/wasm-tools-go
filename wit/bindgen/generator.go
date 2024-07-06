@@ -825,7 +825,20 @@ func (g *generator) enumRep(file *gen.File, dir wit.Direction, e *wit.Enum, goNa
 		}
 		b.WriteRune('\n')
 	}
-	b.WriteString(")\n")
+	b.WriteString(")\n\n")
+
+	stringsName := file.DeclareName("strings" + GoName(goName, true))
+	stringio.Write(&b, "var ", stringsName, " = [", fmt.Sprintf("%d", len(e.Cases)), "]string {\n")
+	for _, c := range e.Cases {
+		stringio.Write(&b, `"`, c.Name, `"`, ",\n")
+	}
+
+	b.WriteString("}\n\n")
+	b.WriteString(formatDocComments("String implements [fmt.Stringer], returning the enum case name of e.", true))
+	stringio.Write(&b, "func (e ", goName, ") String() string {\n")
+	stringio.Write(&b, "return ", stringsName, "[e]\n")
+	b.WriteString("}\n\n")
+
 	return b.String()
 }
 
