@@ -36,6 +36,21 @@
         "t10": 10
       },
       "functions": {
+        "f0": {
+          "name": "f0",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "t",
+              "type": 0
+            }
+          ],
+          "results": [
+            {
+              "type": 11
+            }
+          ]
+        },
         "f1": {
           "name": "f1",
           "kind": "freestanding",
@@ -47,12 +62,9 @@
           ],
           "results": [
             {
-              "type": 11
+              "type": 12
             }
-          ],
-          "docs": {
-            "contents": "f0: func(t: t0) -> tuple<>;"
-          }
+          ]
         },
         "f2": {
           "name": "f2",
@@ -65,7 +77,7 @@
           ],
           "results": [
             {
-              "type": 12
+              "type": 13
             }
           ]
         },
@@ -80,7 +92,7 @@
           ],
           "results": [
             {
-              "type": 13
+              "type": 14
             }
           ]
         },
@@ -95,7 +107,7 @@
           ],
           "results": [
             {
-              "type": 14
+              "type": 15
             }
           ]
         },
@@ -110,7 +122,7 @@
           ],
           "results": [
             {
-              "type": 15
+              "type": 16
             }
           ]
         },
@@ -125,7 +137,7 @@
           ],
           "results": [
             {
-              "type": 16
+              "type": 17
             }
           ]
         },
@@ -140,7 +152,7 @@
           ],
           "results": [
             {
-              "type": 17
+              "type": 18
             }
           ]
         },
@@ -155,7 +167,7 @@
           ],
           "results": [
             {
-              "type": 18
+              "type": 19
             }
           ]
         },
@@ -170,7 +182,7 @@
           ],
           "results": [
             {
-              "type": 19
+              "type": 20
             }
           ]
         },
@@ -185,7 +197,172 @@
           ],
           "results": [
             {
+              "type": 21
+            }
+          ]
+        },
+        "g0": {
+          "name": "g0",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "t",
+              "type": 11
+            }
+          ],
+          "results": [
+            {
+              "type": 11
+            }
+          ]
+        },
+        "g1": {
+          "name": "g1",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "t",
+              "type": 12
+            }
+          ],
+          "results": [
+            {
+              "type": 12
+            }
+          ]
+        },
+        "g2": {
+          "name": "g2",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "t",
+              "type": 13
+            }
+          ],
+          "results": [
+            {
+              "type": 13
+            }
+          ]
+        },
+        "g3": {
+          "name": "g3",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "t",
+              "type": 14
+            }
+          ],
+          "results": [
+            {
+              "type": 14
+            }
+          ]
+        },
+        "g4": {
+          "name": "g4",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "t",
+              "type": 15
+            }
+          ],
+          "results": [
+            {
+              "type": 15
+            }
+          ]
+        },
+        "g5": {
+          "name": "g5",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "t",
+              "type": 16
+            }
+          ],
+          "results": [
+            {
+              "type": 16
+            }
+          ]
+        },
+        "g6": {
+          "name": "g6",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "t",
+              "type": 17
+            }
+          ],
+          "results": [
+            {
+              "type": 17
+            }
+          ]
+        },
+        "g7": {
+          "name": "g7",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "t",
+              "type": 18
+            }
+          ],
+          "results": [
+            {
+              "type": 18
+            }
+          ]
+        },
+        "g8": {
+          "name": "g8",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "t",
+              "type": 19
+            }
+          ],
+          "results": [
+            {
+              "type": 19
+            }
+          ]
+        },
+        "g9": {
+          "name": "g9",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "t",
               "type": 20
+            }
+          ],
+          "results": [
+            {
+              "type": 20
+            }
+          ]
+        },
+        "g10": {
+          "name": "g10",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "t",
+              "type": 21
+            }
+          ],
+          "results": [
+            {
+              "type": 21
             }
           ]
         }
@@ -379,6 +556,15 @@
       "owner": {
         "interface": 0
       }
+    },
+    {
+      "name": null,
+      "kind": {
+        "tuple": {
+          "types": []
+        }
+      },
+      "owner": null
     },
     {
       "name": null,

@@ -13,7 +13,7 @@ interface tuples {
 	type t9 = tuple<string, bool, u8, u16, u32, u64, f32, f64, s8>;
 	type t10 = tuple<string, bool, u8, u16, u32, u64, f32, f64, s8, s16>;
 
-	// f0: func(t: t0) -> tuple<>;
+	f0: func(t: t0) -> tuple<>;
 	f1: func(t: t1) -> tuple<string>;
 	f2: func(t: t2) -> tuple<string, bool>;
 	f3: func(t: t3) -> tuple<string, bool, u8>;
@@ -24,6 +24,18 @@ interface tuples {
 	f8: func(t: t8) -> tuple<string, bool, u8, u16, u32, u64, f32, f64>;
 	f9: func(t: t9) -> tuple<string, bool, u8, u16, u32, u64, f32, f64, s8>;
 	f10: func(t: t10) -> tuple<string, bool, u8, u16, u32, u64, f32, f64, s8, s16>;
+
+	g0: func(t: tuple<>) -> tuple<>;
+	g1: func(t: tuple<string>) -> tuple<string>;
+	g2: func(t: tuple<string, bool>) -> tuple<string, bool>;
+	g3: func(t: tuple<string, bool, u8>) -> tuple<string, bool, u8>;
+	g4: func(t: tuple<string, bool, u8, u16>) -> tuple<string, bool, u8, u16>;
+	g5: func(t: tuple<string, bool, u8, u16, u32>) -> tuple<string, bool, u8, u16, u32>;
+	g6: func(t: tuple<string, bool, u8, u16, u32, u64>) -> tuple<string, bool, u8, u16, u32, u64>;
+	g7: func(t: tuple<string, bool, u8, u16, u32, u64, f32>) -> tuple<string, bool, u8, u16, u32, u64, f32>;
+	g8: func(t: tuple<string, bool, u8, u16, u32, u64, f32, f64>) -> tuple<string, bool, u8, u16, u32, u64, f32, f64>;
+	g9: func(t: tuple<string, bool, u8, u16, u32, u64, f32, f64, s8>) -> tuple<string, bool, u8, u16, u32, u64, f32, f64, s8>;
+	g10: func(t: tuple<string, bool, u8, u16, u32, u64, f32, f64, s8, s16>) -> tuple<string, bool, u8, u16, u32, u64, f32, f64, s8, s16>;
 }
 
 world w {
