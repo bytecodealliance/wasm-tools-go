@@ -1,5 +1,24 @@
 {
-  "worlds": [],
+  "worlds": [
+    {
+      "name": "w",
+      "imports": {
+        "interface-0": {
+          "interface": {
+            "id": 0
+          }
+        }
+      },
+      "exports": {
+        "interface-0": {
+          "interface": {
+            "id": 0
+          }
+        }
+      },
+      "package": 0
+    }
+  ],
   "interfaces": [
     {
       "name": "tuples",
@@ -16,7 +35,161 @@
         "t9": 9,
         "t10": 10
       },
-      "functions": {},
+      "functions": {
+        "f1": {
+          "name": "f1",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "t",
+              "type": 1
+            }
+          ],
+          "results": [
+            {
+              "type": 11
+            }
+          ],
+          "docs": {
+            "contents": "f0: func(t: t0) -> tuple<>;"
+          }
+        },
+        "f2": {
+          "name": "f2",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "t",
+              "type": 2
+            }
+          ],
+          "results": [
+            {
+              "type": 12
+            }
+          ]
+        },
+        "f3": {
+          "name": "f3",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "t",
+              "type": 3
+            }
+          ],
+          "results": [
+            {
+              "type": 13
+            }
+          ]
+        },
+        "f4": {
+          "name": "f4",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "t",
+              "type": 4
+            }
+          ],
+          "results": [
+            {
+              "type": 14
+            }
+          ]
+        },
+        "f5": {
+          "name": "f5",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "t",
+              "type": 5
+            }
+          ],
+          "results": [
+            {
+              "type": 15
+            }
+          ]
+        },
+        "f6": {
+          "name": "f6",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "t",
+              "type": 6
+            }
+          ],
+          "results": [
+            {
+              "type": 16
+            }
+          ]
+        },
+        "f7": {
+          "name": "f7",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "t",
+              "type": 7
+            }
+          ],
+          "results": [
+            {
+              "type": 17
+            }
+          ]
+        },
+        "f8": {
+          "name": "f8",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "t",
+              "type": 8
+            }
+          ],
+          "results": [
+            {
+              "type": 18
+            }
+          ]
+        },
+        "f9": {
+          "name": "f9",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "t",
+              "type": 9
+            }
+          ],
+          "results": [
+            {
+              "type": 19
+            }
+          ]
+        },
+        "f10": {
+          "name": "f10",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "t",
+              "type": 10
+            }
+          ],
+          "results": [
+            {
+              "type": 20
+            }
+          ]
+        }
+      },
       "package": 0
     }
   ],
@@ -206,6 +379,161 @@
       "owner": {
         "interface": 0
       }
+    },
+    {
+      "name": null,
+      "kind": {
+        "tuple": {
+          "types": [
+            "string"
+          ]
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "tuple": {
+          "types": [
+            "string",
+            "bool"
+          ]
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "tuple": {
+          "types": [
+            "string",
+            "bool",
+            "u8"
+          ]
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "tuple": {
+          "types": [
+            "string",
+            "bool",
+            "u8",
+            "u16"
+          ]
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "tuple": {
+          "types": [
+            "string",
+            "bool",
+            "u8",
+            "u16",
+            "u32"
+          ]
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "tuple": {
+          "types": [
+            "string",
+            "bool",
+            "u8",
+            "u16",
+            "u32",
+            "u64"
+          ]
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "tuple": {
+          "types": [
+            "string",
+            "bool",
+            "u8",
+            "u16",
+            "u32",
+            "u64",
+            "f32"
+          ]
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "tuple": {
+          "types": [
+            "string",
+            "bool",
+            "u8",
+            "u16",
+            "u32",
+            "u64",
+            "f32",
+            "f64"
+          ]
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "tuple": {
+          "types": [
+            "string",
+            "bool",
+            "u8",
+            "u16",
+            "u32",
+            "u64",
+            "f32",
+            "f64",
+            "s8"
+          ]
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "tuple": {
+          "types": [
+            "string",
+            "bool",
+            "u8",
+            "u16",
+            "u32",
+            "u64",
+            "f32",
+            "f64",
+            "s8",
+            "s16"
+          ]
+        }
+      },
+      "owner": null
     }
   ],
   "packages": [
@@ -214,7 +542,9 @@
       "interfaces": {
         "tuples": 0
       },
-      "worlds": {}
+      "worlds": {
+        "w": 0
+      }
     }
   ]
 }

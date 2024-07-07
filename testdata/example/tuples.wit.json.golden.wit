@@ -12,4 +12,21 @@ interface tuples {
 	type t8 = tuple<string, bool, u8, u16, u32, u64, f32, f64>;
 	type t9 = tuple<string, bool, u8, u16, u32, u64, f32, f64, s8>;
 	type t10 = tuple<string, bool, u8, u16, u32, u64, f32, f64, s8, s16>;
+
+	/// f0: func(t: t0) -> tuple<>;
+	f1: func(t: t1) -> tuple<string>;
+	f2: func(t: t2) -> tuple<string, bool>;
+	f3: func(t: t3) -> tuple<string, bool, u8>;
+	f4: func(t: t4) -> tuple<string, bool, u8, u16>;
+	f5: func(t: t5) -> tuple<string, bool, u8, u16, u32>;
+	f6: func(t: t6) -> tuple<string, bool, u8, u16, u32, u64>;
+	f7: func(t: t7) -> tuple<string, bool, u8, u16, u32, u64, f32>;
+	f8: func(t: t8) -> tuple<string, bool, u8, u16, u32, u64, f32, f64>;
+	f9: func(t: t9) -> tuple<string, bool, u8, u16, u32, u64, f32, f64, s8>;
+	f10: func(t: t10) -> tuple<string, bool, u8, u16, u32, u64, f32, f64, s8, s16>;
+}
+
+world w {
+	import tuples;
+	export tuples;
 }
