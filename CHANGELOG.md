@@ -2,6 +2,15 @@
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- [#128](https://github.com/ydnar/wasm-tools-go/pull/128): implemented `String` method for `enum` types ([@rajatjindal](https://github.com/rajatjindal)).
+
+### Fixed
+- [#130](https://github.com/ydnar/wasm-tools-go/issues/130): anonymous `tuple` types now correctly have exported Go struct fields.
+- [#129](https://github.com/ydnar/wasm-tools-go/issues/129): correctly handle zero-length `tuple` and `record` types, represented as `struct{}`.
+
 ## [v0.1.2] — 2024-07-05
 
 ### Added
