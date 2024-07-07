@@ -1089,12 +1089,14 @@ func (g *generator) lowerTuple(file *gen.File, dir wit.Direction, t *wit.TypeDef
 	mono := tup.Type()
 	afile := g.abiFile(file.Package)
 	var b strings.Builder
+	var f int
 	for i, tt := range tup.Types {
 		for j := range tt.Flat() {
 			if j > 0 {
 				b.WriteString(", ")
 			}
-			stringio.Write(&b, "f"+strconv.Itoa(i+j))
+			stringio.Write(&b, "f"+strconv.Itoa(f))
+			f++
 		}
 		field := "v.F" + strconv.Itoa(i)
 		if mono != nil {
