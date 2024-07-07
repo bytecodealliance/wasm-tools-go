@@ -16,6 +16,10 @@ interface a {
 	}
 
 	handle: func(r: request) -> response;
+
+	record empty {}
+
+	handle-empty: func(e: empty) -> empty;
 }
 
 world imports {

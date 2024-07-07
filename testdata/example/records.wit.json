@@ -25,7 +25,8 @@
       "types": {
         "value": 0,
         "request": 2,
-        "response": 3
+        "response": 3,
+        "empty": 4
       },
       "functions": {
         "handle": {
@@ -40,6 +41,21 @@
           "results": [
             {
               "type": 3
+            }
+          ]
+        },
+        "handle-empty": {
+          "name": "handle-empty",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "e",
+              "type": 4
+            }
+          ],
+          "results": [
+            {
+              "type": 4
             }
           ]
         }
@@ -106,6 +122,17 @@
               "type": 1
             }
           ]
+        }
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": "empty",
+      "kind": {
+        "record": {
+          "fields": []
         }
       },
       "owner": {
