@@ -710,7 +710,7 @@ func (g *generator) primitiveRep(p wit.Primitive) string {
 }
 
 func (g *generator) recordRep(file *gen.File, dir wit.Direction, r *wit.Record, goName string) string {
-	exported := token.IsExported(goName)
+	exported := len(goName) == 0 || token.IsExported(goName)
 	var b strings.Builder
 	b.WriteString("struct {")
 	for i, f := range r.Fields {
