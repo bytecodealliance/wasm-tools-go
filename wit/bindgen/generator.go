@@ -618,7 +618,7 @@ func (g *generator) typeDefKindRep(file *gen.File, dir wit.Direction, kind wit.T
 	case *wit.Record:
 		return g.recordRep(file, dir, kind, goName)
 	case *wit.Tuple:
-		return g.tupleRep(file, dir, kind)
+		return g.tupleRep(file, dir, kind, goName)
 	case *wit.Flags:
 		return g.flagsRep(file, dir, kind, goName)
 	case *wit.Enum:
@@ -736,13 +736,13 @@ func fieldName(name string, export bool) string {
 	return GoName(name, export)
 }
 
-func (g *generator) tupleRep(file *gen.File, dir wit.Direction, t *wit.Tuple) string {
+func (g *generator) tupleRep(file *gen.File, dir wit.Direction, t *wit.Tuple, goName string) string {
 	var b strings.Builder
 	if typ := t.Type(); typ != nil {
 		stringio.Write(&b, "[", strconv.Itoa(len(t.Types)), "]", g.typeRep(file, dir, typ))
 	} else if len(t.Types) == 0 || len(t.Types) > cm.MaxTuple {
 		// Force struct representation
-		return g.typeDefKindRep(file, dir, t.Despecialize(), "")
+		return g.typeDefKindRep(file, dir, t.Despecialize(), goName)
 	} else {
 		stringio.Write(&b, file.Import(g.opts.cmPackage), ".Tuple")
 		if len(t.Types) > 2 {
@@ -1858,13 +1858,17 @@ func (g *generator) defineExportedFunction(owner wit.Ident, f *wit.Function, dec
 	if compoundParams.typ == nil {
 		i := 0
 		for _, p := range callParams {
-			if p.typ == derefPointer(decl.wasm.params[i].typ) {
+			if i < len(decl.wasm.params) && p.typ == derefPointer(decl.wasm.params[i].typ) {
 				stringio.Write(&b, p.name, " := *", decl.wasm.params[i].name, "\n")
 				i++
 				continue
 			}
 			flat := p.typ.Flat()
-			stringio.Write(&b, p.name, " := ", g.liftType(file, dir, p.typ, g.liftTypeInput(file, dir, p.typ, decl.wasm.params[i:i+len(flat)])), "\n")
+			var input string
+			if len(flat) > 0 && len(decl.wasm.params) > 0 {
+				input = g.liftTypeInput(file, dir, p.typ, decl.wasm.params[i:i+len(flat)])
+			}
+			stringio.Write(&b, p.name, " := ", g.liftType(file, dir, p.typ, input), "\n")
 			i += len(flat)
 		}
 	}
@@ -1923,21 +1927,27 @@ func (g *generator) defineExportedFunction(owner wit.Ident, f *wit.Function, dec
 	if len(callResults) > 0 && compoundResults.typ == nil {
 		i := 0
 		for _, r := range callResults {
-			flat := r.typ.Flat()
-			wr := decl.wasm.results[i]
-			if r.typ == derefPointer(wr.typ) {
-				stringio.Write(&b, wr.name, " = &", r.name, "\n")
-				i++
-				continue
-			}
-			for j := range flat {
-				if j > 0 {
-					b.WriteString(", ")
+			if i < len(decl.wasm.results) {
+				wr := decl.wasm.results[i]
+				if r.typ == derefPointer(wr.typ) {
+					stringio.Write(&b, wr.name, " = &", r.name, "\n")
+					i++
+					continue
 				}
-				b.WriteString(decl.wasm.results[i].name)
-				i++
 			}
-			stringio.Write(&b, " = ", g.lowerType(file, dir, r.typ, r.name), "\n")
+			flat := r.typ.Flat()
+			if len(flat) == 0 {
+				stringio.Write(&b, "_ = ", r.name, "\n")
+			} else {
+				for j := range flat {
+					if j > 0 {
+						b.WriteString(", ")
+					}
+					b.WriteString(decl.wasm.results[i].name)
+					i++
+				}
+				stringio.Write(&b, " = ", g.lowerType(file, dir, r.typ, r.name), "\n")
+			}
 		}
 	}
 
