@@ -12,7 +12,9 @@ interface a {
 		rating: u32,
 		attributes: list<u32>,
 	}
+	record empty {}
 	handle: func(r: request) -> response;
+	handle-empty: func(e: empty) -> empty;
 }
 
 world imports {

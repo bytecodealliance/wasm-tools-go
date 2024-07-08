@@ -37,8 +37,7 @@ func Discriminant(n int) Type {
 	return U32{}
 }
 
-// Despecialize [despecializes] k if k implements [Despecializer].
-// Otherwise, it returns k unmodified.
+// Despecialize [despecializes] k if k can be despecialized. Otherwise, it returns k unmodified.
 // See the [canonical ABI documentation] for more information.
 //
 // [despecializes]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#despecialization

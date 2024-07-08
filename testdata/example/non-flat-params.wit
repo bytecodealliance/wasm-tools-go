@@ -1,11 +1,16 @@
 package example:non-flat-params;
 
 interface corner-case {
+	type t0 = tuple<>;
 	type t4 = tuple<u32, u32, u32, u32>;
 	type t16 = tuple<t4, t4, t4, t4>;
 	type t32 = tuple<t16, t16>;
 
 	f: func();
+
+	f0-void: func(t: tuple<>);
+	f0-u32: func(t: tuple<>) -> u32;
+	f0-t0: func(t: tuple<>) -> t0;
 
 	f4-void: func(t: t4);
 	f4-u32: func(t: t4) -> u32;
