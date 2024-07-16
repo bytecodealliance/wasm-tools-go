@@ -1,8 +1,6 @@
 package cm
 
-import (
-	"unsafe"
-)
+import "unsafe"
 
 // Reinterpret reinterprets the bits of type From into type T.
 // Will panic if the size of From is smaller than the size of To.
