@@ -2,6 +2,15 @@
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- `Tuple9`...`Tuple16` types in package `cm` to align with [component-model#373](https://github.com/WebAssembly/component-model/issues/373). Tuples with 9 to 16 types will no longer generate inline `struct` types.
+- Documentation for Canonical ABI lift and lower helper functions in package `cm`.
+
+### Changed
+- Removed outdated documentation in [design](./design/README.md).
+
 ## [v0.1.3] — 2024-07-08
 
 ### Added
