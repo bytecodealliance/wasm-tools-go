@@ -43,7 +43,7 @@ jobs:
       - name: Set up wasm-tools
         uses: bytecodealliance/actions/wasm-tools/setup@v1
         with:
-          version: v1.212.0
+          version: v1.213.0
 
       - name: Set up Go
         uses: actions/setup-go@v5
@@ -71,7 +71,7 @@ jobs:
     timeout-minutes: 15
     strategy:
       matrix:
-        tinygo-version: ["0.31.2"]
+        tinygo-version: ["0.31.2", "0.32.0"]
         go-version: ["1.22"]
     steps:
       - name: Checkout repo
@@ -82,7 +82,7 @@ jobs:
       - name: Set up wasm-tools
         uses: bytecodealliance/actions/wasm-tools/setup@v1
         with:
-          version: v1.212.0
+          version: v1.213.0
 
       - name: Set up Go
         uses: actions/setup-go@v5
@@ -108,7 +108,7 @@ jobs:
     strategy:
       matrix:
         wasmtime-version: ["21.0.1"]
-        tinygo-version: ["0.31.2"]
+        tinygo-version: ["0.31.2", "0.32.0"]
         go-version: ["1.22"] # WASI Preview 1 only available in Go 1.21 or later
     steps:
       - name: Checkout repo
@@ -119,7 +119,7 @@ jobs:
       - name: Set up wasm-tools
         uses: bytecodealliance/actions/wasm-tools/setup@v1
         with:
-          version: v1.212.0
+          version: v1.213.0
 
       - name: Set up Wasmtime
         uses: bytecodealliance/actions/wasmtime/setup@v1

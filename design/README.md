@@ -47,22 +47,3 @@ For each exported function that returns allocated memory, there is a [post-retur
 The post-return function name is `cabi_post_` followed by the fully-qualified function name. For example, the WIT function `example:foo/bar#echo` returning a `string` would have a post-return function named `cabi_post_example:foo/bar#echo`.
 
 The post-return function has the form of `(func (param flatten_functype($ft).results))`, where the arguments is a flattened representation of the function results.
-
-### Example in Go
-
-#### Generated Bindings
-
-```go
-package bar
-
-// imports omitted
-
-type Water cm.Resource
-
-//go:wasmimport [export]example:foo/bar [resource-new]water
-func wasmimport_WaterResourceNew(rep uintptr) Water
-
-func WaterResourceNew[Rep WaterInterface](rep Rep) Water {
-	return wasmimport_WaterResourceNew(*(*uintptr)(unsafe.Pointer(&rep)))
-}
-```

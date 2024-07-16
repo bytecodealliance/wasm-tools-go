@@ -77,6 +77,154 @@ type Tuple8[T0, T1, T2, T3, T4, T5, T6, T7 any] struct {
 	F7 T7
 }
 
-// MaxTuple specifies the maximum number of fields in a Tuple(n) type.
-// currently [Tuple8].
-const MaxTuple = 8
+// Tuple9 represents a [Component Model tuple] with 9 fields.
+//
+// [Component Model tuple]: https://component-model.bytecodealliance.org/design/wit.html#tuples
+type Tuple9[T0, T1, T2, T3, T4, T5, T6, T7, T8 any] struct {
+	F0 T0
+	F1 T1
+	F2 T2
+	F3 T3
+	F4 T4
+	F5 T5
+	F6 T6
+	F7 T7
+	F8 T8
+}
+
+// Tuple10 represents a [Component Model tuple] with 10 fields.
+//
+// [Component Model tuple]: https://component-model.bytecodealliance.org/design/wit.html#tuples
+type Tuple10[T0, T1, T2, T3, T4, T5, T6, T7, T8, T9 any] struct {
+	F0 T0
+	F1 T1
+	F2 T2
+	F3 T3
+	F4 T4
+	F5 T5
+	F6 T6
+	F7 T7
+	F8 T8
+	F9 T9
+}
+
+// Tuple11 represents a [Component Model tuple] with 11 fields.
+//
+// [Component Model tuple]: https://component-model.bytecodealliance.org/design/wit.html#tuples
+type Tuple11[T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10 any] struct {
+	F0  T0
+	F1  T1
+	F2  T2
+	F3  T3
+	F4  T4
+	F5  T5
+	F6  T6
+	F7  T7
+	F8  T8
+	F9  T9
+	F10 T10
+}
+
+// Tuple12 represents a [Component Model tuple] with 12 fields.
+//
+// [Component Model tuple]: https://component-model.bytecodealliance.org/design/wit.html#tuples
+type Tuple12[T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11 any] struct {
+	F0  T0
+	F1  T1
+	F2  T2
+	F3  T3
+	F4  T4
+	F5  T5
+	F6  T6
+	F7  T7
+	F8  T8
+	F9  T9
+	F10 T10
+	F11 T11
+}
+
+// Tuple13 represents a [Component Model tuple] with 13 fields.
+//
+// [Component Model tuple]: https://component-model.bytecodealliance.org/design/wit.html#tuples
+type Tuple13[T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12 any] struct {
+	F0  T0
+	F1  T1
+	F2  T2
+	F3  T3
+	F4  T4
+	F5  T5
+	F6  T6
+	F7  T7
+	F8  T8
+	F9  T9
+	F10 T10
+	F11 T11
+	F12 T12
+}
+
+// Tuple14 represents a [Component Model tuple] with 14 fields.
+//
+// [Component Model tuple]: https://component-model.bytecodealliance.org/design/wit.html#tuples
+type Tuple14[T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13 any] struct {
+	F0  T0
+	F1  T1
+	F2  T2
+	F3  T3
+	F4  T4
+	F5  T5
+	F6  T6
+	F7  T7
+	F8  T8
+	F9  T9
+	F10 T10
+	F11 T11
+	F12 T12
+	F13 T13
+}
+
+// Tuple15 represents a [Component Model tuple] with 15 fields.
+//
+// [Component Model tuple]: https://component-model.bytecodealliance.org/design/wit.html#tuples
+type Tuple15[T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14 any] struct {
+	F0  T0
+	F1  T1
+	F2  T2
+	F3  T3
+	F4  T4
+	F5  T5
+	F6  T6
+	F7  T7
+	F8  T8
+	F9  T9
+	F10 T10
+	F11 T11
+	F12 T12
+	F13 T13
+	F14 T14
+}
+
+// Tuple16 represents a [Component Model tuple] with 16 fields.
+//
+// [Component Model tuple]: https://component-model.bytecodealliance.org/design/wit.html#tuples
+type Tuple16[T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15 any] struct {
+	F0  T0
+	F1  T1
+	F2  T2
+	F3  T3
+	F4  T4
+	F5  T5
+	F6  T6
+	F7  T7
+	F8  T8
+	F9  T9
+	F10 T10
+	F11 T11
+	F12 T12
+	F13 T13
+	F14 T14
+	F15 T15
+}
+
+// MaxTuple specifies the maximum number of fields in a Tuple* type, currently [Tuple16].
+// See https://github.com/WebAssembly/component-model/issues/373 for more information.
+const MaxTuple = 16
