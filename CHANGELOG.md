@@ -2,7 +2,7 @@
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [v0.1.4] — 2024-07-16
 
 ### Added
 - `wit-bindgen-go generate` now accepts a `--cm` option to specify the Go import path to package `cm`. Used for custom or internal implementations of package `cm`. Defaults to `github.com/ydnar/wasm-tools-go/cm`.
@@ -63,7 +63,8 @@ Initial version, supporting [TinyGo](https://tinygo.org/) + [WASI](https://wasi.
 - Because Go does not have a native tagged union type, pointers represented in `variant` and `result` types may not be visible to the garbage collector and may be freed while still in use.
 - Support for mainline [Go](https://go.dev/).
 
-[Unreleased]: <https://github.com/ydnar/wasm-tools-go/compare/v0.1.3..HEAD>
+[Unreleased]: <https://github.com/ydnar/wasm-tools-go/compare/v0.1.4..HEAD>
+[v0.1.4]: <https://github.com/ydnar/wasm-tools-go/compare/v0.1.3...v0.1.4>
 [v0.1.3]: <https://github.com/ydnar/wasm-tools-go/compare/v0.1.2...v0.1.3>
 [v0.1.2]: <https://github.com/ydnar/wasm-tools-go/compare/v0.1.1...v0.1.2>
 [v0.1.1]: <https://github.com/ydnar/wasm-tools-go/compare/v0.1.0...v0.1.1>
