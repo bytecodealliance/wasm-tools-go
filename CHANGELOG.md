@@ -5,6 +5,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ## [Unreleased]
 
 ### Added
+- `wit-bindgen-go generate` now accepts a `--cm` option to specify the Go import path to package `cm`. Used for custom or internal implementations of package `cm`. Defaults to `github.com/ydnar/wasm-tools-go/cm`.
 - `Tuple9`...`Tuple16` types in package `cm` to align with [component-model#373](https://github.com/WebAssembly/component-model/issues/373). Tuples with 9 to 16 types will no longer generate inline `struct` types.
 - Documentation for Canonical ABI lift and lower helper functions in package `cm`.
 

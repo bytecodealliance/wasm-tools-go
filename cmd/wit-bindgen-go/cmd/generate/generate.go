@@ -45,6 +45,13 @@ var Command = &cli.Command{
 			Config:   cli.StringConfig{TrimSpace: true},
 			Usage:    "Go package root, e.g. github.com/org/repo/internal",
 		},
+		&cli.StringFlag{
+			Name:     "cm",
+			Value:    "",
+			OnlyOnce: true,
+			Config:   cli.StringConfig{TrimSpace: true},
+			Usage:    "Import path for the Component Model utility package, e.g. github.com/ydnar/wasm-tools-go/cm",
+		},
 		&cli.BoolFlag{
 			Name:  "versioned",
 			Usage: "emit versioned Go package(s) for each WIT version",
@@ -90,6 +97,7 @@ func action(ctx context.Context, cmd *cli.Command) error {
 		bindgen.World(cmd.String("world")),
 		bindgen.PackageRoot(pkgRoot),
 		bindgen.Versioned(cmd.Bool("versioned")),
+		bindgen.CMPackage(cmd.String("cm")),
 	)
 	if err != nil {
 		return err
