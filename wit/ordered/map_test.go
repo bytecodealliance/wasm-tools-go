@@ -1,8 +1,6 @@
 package ordered
 
-import (
-	"testing"
-)
+import "testing"
 
 func TestMap(t *testing.T) {
 	var m Map[int, int]

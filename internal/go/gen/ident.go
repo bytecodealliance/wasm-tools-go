@@ -1,8 +1,6 @@
 package gen
 
-import (
-	"strings"
-)
+import "strings"
 
 // Ident represents a package-level Go declaration.
 type Ident struct {

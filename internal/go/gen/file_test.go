@@ -1,8 +1,6 @@
 package gen
 
-import (
-	"testing"
-)
+import "testing"
 
 func TestFileHasContent(t *testing.T) {
 	positives := []File{
