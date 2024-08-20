@@ -34,21 +34,22 @@ jobs:
     strategy:
       matrix:
         go-version: ["1.22", "1.23"]
+        wasm-tools-version: ["v1.215.0"]
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
         with:
           submodules: recursive
 
-      - name: Set up wasm-tools
-        uses: bytecodealliance/actions/wasm-tools/setup@v1
-        with:
-          version: v1.215.0
-
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
           go-version: ${{ matrix.go-version }}
+
+      - name: Set up wasm-tools
+        uses: bytecodealliance/actions/wasm-tools/setup@v1
+        with:
+          version: ${{ matrix.wasm-tools-version }}
 
       - name: Run Go tests
         run: go test -v ./...
@@ -73,6 +74,7 @@ jobs:
       matrix:
         go-version: ["1.22", "1.23"]
         tinygo-version: ["0.31.2", "0.32.0", "0.33.0"]
+        wasm-tools-version: ["v1.215.0"]
         exclude:
           - go-version: "1.22"
             tinygo-version: "0.31.2"
@@ -84,11 +86,6 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Set up wasm-tools
-        uses: bytecodealliance/actions/wasm-tools/setup@v1
-        with:
-          version: v1.215.0
-
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
@@ -98,6 +95,11 @@ jobs:
         uses: acifani/setup-tinygo@v2
         with:
           tinygo-version: ${{ matrix.tinygo-version }}
+
+      - name: Set up wasm-tools
+        uses: bytecodealliance/actions/wasm-tools/setup@v1
+        with:
+          version: ${{ matrix.wasm-tools-version }}
 
       - name: Test with TinyGo
         run: tinygo test -stack-size=64KB -v ./...
@@ -114,6 +116,7 @@ jobs:
       matrix:
         go-version: ["1.22", "1.23"]
         tinygo-version: ["0.31.2", "0.32.0", "0.33.0"]
+        wasm-tools-version: ["v1.215.0"]
         wasmtime-version: ["24.0.0"]
         exclude:
           - go-version: "1.22"
@@ -126,16 +129,6 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Set up wasm-tools
-        uses: bytecodealliance/actions/wasm-tools/setup@v1
-        with:
-          version: v1.215.0
-
-      - name: Set up Wasmtime
-        uses: bytecodealliance/actions/wasmtime/setup@v1
-        with:
-          version: ${{ matrix.wasmtime-version }}
-
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
@@ -145,6 +138,16 @@ jobs:
         uses: acifani/setup-tinygo@v2
         with:
           tinygo-version: ${{ matrix.tinygo-version }}
+
+      - name: Set up wasm-tools
+        uses: bytecodealliance/actions/wasm-tools/setup@v1
+        with:
+          version: ${{ matrix.wasm-tools-version }}
+
+      - name: Set up Wasmtime
+        uses: bytecodealliance/actions/wasmtime/setup@v1
+        with:
+          version: ${{ matrix.wasmtime-version }}
 
       - name: Add Go wasm exec to $PATH
         run: echo "$(go env GOROOT)/misc/wasm" >> $GITHUB_PATH
