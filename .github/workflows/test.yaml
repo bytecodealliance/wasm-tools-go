@@ -34,7 +34,7 @@ jobs:
     strategy:
       matrix:
         go-version: ["1.22", "1.23"]
-        wasm-tools-version: ["v1.215.0"]
+        wasm-tools-version: ["v1.214.0"]
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -74,7 +74,7 @@ jobs:
       matrix:
         go-version: ["1.22", "1.23"]
         tinygo-version: ["0.31.2", "0.32.0", "0.33.0"]
-        wasm-tools-version: ["v1.215.0"]
+        wasm-tools-version: ["v1.214.0"]
         exclude:
           - go-version: "1.23"
             tinygo-version: "0.31.2"
@@ -116,7 +116,7 @@ jobs:
       matrix:
         go-version: ["1.22", "1.23"]
         tinygo-version: ["0.31.2", "0.32.0", "0.33.0"]
-        wasm-tools-version: ["v1.215.0"]
+        wasm-tools-version: ["v1.214.0"]
         wasmtime-version: ["24.0.0"]
         exclude:
           - go-version: "1.23"
