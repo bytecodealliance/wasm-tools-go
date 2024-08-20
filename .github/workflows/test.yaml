@@ -71,8 +71,8 @@ jobs:
     timeout-minutes: 15
     strategy:
       matrix:
-        tinygo-version: ["0.31.2", "0.32.0", "0.33.0"]
         go-version: ["1.22"]
+        tinygo-version: ["0.31.2", "0.32.0", "0.33.0"]
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -107,9 +107,9 @@ jobs:
     timeout-minutes: 15
     strategy:
       matrix:
-        wasmtime-version: ["21.0.1"]
-        tinygo-version: ["0.31.2", "0.32.0", "0.33.0"]
         go-version: ["1.22"] # WASI Preview 1 only available in Go 1.21 or later
+        tinygo-version: ["0.31.2", "0.32.0", "0.33.0"]
+        wasmtime-version: ["24.0.0"]
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
