@@ -1,12 +1,13 @@
-package bar:name {
-	world w1 {
-		import foo:name/i1;
-		import imp1: interface {
-			use foo:name/i1.{a};
-			fn: func(a: a);
-		}
+package bar:name;
+
+world w1 {
+	import foo:name/i1;
+	import imp1: interface {
+		use foo:name/i1.{a};
+		fn: func(a: a);
 	}
 }
+
 
 package foo:name {
 	interface i1 {

@@ -1,6 +1,7 @@
-package foo:bar {
-	interface types {}
-}
+package foo:bar;
+
+interface types {}
+
 
 package foo:foo {
 	world foo {

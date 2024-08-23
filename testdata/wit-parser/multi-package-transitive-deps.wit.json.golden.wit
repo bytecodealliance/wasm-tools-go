@@ -1,9 +1,10 @@
-package foo:bar {
-	world w-bar {
-		import foo:dep2/types;
-		import foo:dep1/types;
-	}
+package foo:bar;
+
+world w-bar {
+	import foo:dep2/types;
+	import foo:dep1/types;
 }
+
 
 package foo:dep1 {
 	interface types {

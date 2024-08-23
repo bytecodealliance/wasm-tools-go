@@ -1,13 +1,14 @@
-package foo:bar {
-	interface a {}
+package foo:bar;
 
-	interface b {}
+interface a {}
 
-	world bar-a {
-		import a;
-		import b;
-	}
+interface b {}
+
+world bar-a {
+	import a;
+	import b;
 }
+
 
 package foo:baz {
 	interface a {}
