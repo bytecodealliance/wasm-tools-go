@@ -58,20 +58,20 @@ func (r *Resolve) WIT(_ Node, _ string) string {
 	slices.SortFunc(packages, func(a, b *Package) int {
 		return strings.Compare(a.Name.String(), b.Name.String())
 	})
-	// Special case if only single package.
-	if len(packages) == 1 {
-		return packages[0].WIT(nil, "")
-	}
-	// Use single-file, multi-package style:
-	// https://github.com/WebAssembly/component-model/pull/340
-	// https://github.com/bytecodealliance/wasm-tools/pull/1577
 	var b strings.Builder
 	for i, p := range packages {
-		if i > 0 {
+		if i == 0 {
+			// Context == nil means write non-nested form of package
+			// https://github.com/bytecodealliance/wasm-tools/pull/1700
+			b.WriteString(p.WIT(nil, ""))
+		} else {
 			b.WriteRune('\n')
 			b.WriteRune('\n')
+			// Context == *Resolve means write single-file, multi-package style:
+			// https://github.com/WebAssembly/component-model/pull/340
+			// https://github.com/bytecodealliance/wasm-tools/pull/1577
+			b.WriteString(p.WIT(r, ""))
 		}
-		b.WriteString(p.WIT(r, ""))
 	}
 	return b.String()
 }
