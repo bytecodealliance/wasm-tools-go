@@ -4,6 +4,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Added
+- `wit-bindgen-go --version` now reports the module version and git revision of the `wit-bindgen-go` command.
+
 ### Changed
 - Omit the default `//go:build !wasip1` build tags from generated Go files. This enables `wit-bindgen-go` to target `GOOS=wasip1` (fixes [#147](https://github.com/ydnar/wasm-tools-go/issues/147)).
 
