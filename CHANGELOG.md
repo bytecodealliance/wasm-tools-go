@@ -2,6 +2,11 @@
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+- Omit the default `//go:build !wasip1` build tags from generated Go files. This enables `wit-bindgen-go` to target `GOOS=wasip1` (fixes [#147](https://github.com/ydnar/wasm-tools-go/issues/147)).
+
 ## [v0.1.4] — 2024-07-16
 
 ### Added
