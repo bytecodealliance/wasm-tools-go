@@ -39,7 +39,7 @@ outer:
 			if err != nil {
 				continue
 			}
-			if info.IsDir() && sameFile(dirInfo, info) {
+			if info.IsDir() && os.SameFile(dirInfo, info) {
 				path = filepath.Join(name, path)
 				continue outer
 			}
