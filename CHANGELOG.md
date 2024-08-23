@@ -2,7 +2,7 @@
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [v0.1.5] — 2024-08-23
 
 ### Added
 - `wit-bindgen-go --version` now reports the module version and git revision of the `wit-bindgen-go` command.
@@ -72,7 +72,8 @@ Initial version, supporting [TinyGo](https://tinygo.org/) + [WASI](https://wasi.
 - Because Go does not have a native tagged union type, pointers represented in `variant` and `result` types may not be visible to the garbage collector and may be freed while still in use.
 - Support for mainline [Go](https://go.dev/).
 
-[Unreleased]: <https://github.com/ydnar/wasm-tools-go/compare/v0.1.4..HEAD>
+[Unreleased]: <https://github.com/ydnar/wasm-tools-go/compare/v0.1.5..HEAD>
+[v0.1.5]: <https://github.com/ydnar/wasm-tools-go/compare/v0.1.4...v0.1.5>
 [v0.1.4]: <https://github.com/ydnar/wasm-tools-go/compare/v0.1.3...v0.1.4>
 [v0.1.3]: <https://github.com/ydnar/wasm-tools-go/compare/v0.1.2...v0.1.3>
 [v0.1.2]: <https://github.com/ydnar/wasm-tools-go/compare/v0.1.1...v0.1.2>
