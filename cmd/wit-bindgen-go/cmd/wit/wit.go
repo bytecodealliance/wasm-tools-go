@@ -16,7 +16,11 @@ var Command = &cli.Command{
 }
 
 func action(ctx context.Context, cmd *cli.Command) error {
-	res, err := witcli.LoadOne(cmd.Bool("force-wit"), cmd.Args().Slice()...)
+	path, err := witcli.ParsePaths(cmd.Args().Slice()...)
+	if err != nil {
+		return err
+	}
+	res, err := witcli.LoadOne(cmd.Bool("force-wit"), path)
 	if err != nil {
 		return err
 	}

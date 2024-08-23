@@ -7,11 +7,12 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/urfave/cli/v3"
 	"github.com/bytecodealliance/wasm-tools-go/internal/codec"
 	"github.com/bytecodealliance/wasm-tools-go/internal/go/gen"
+	wkg "github.com/bytecodealliance/wasm-tools-go/internal/oci"
 	"github.com/bytecodealliance/wasm-tools-go/internal/witcli"
 	"github.com/bytecodealliance/wasm-tools-go/wit/bindgen"
+	"github.com/urfave/cli/v3"
 )
 
 // Command is the CLI command for wit.
@@ -60,6 +61,14 @@ var Command = &cli.Command{
 			Name:  "dry-run",
 			Usage: "do not write files; print to stdout",
 		},
+		&cli.StringFlag{
+			Name:      "wit-out",
+			Usage:     "output directory for WIT files after pulling from OCI",
+			Value:     "./wit",
+			TakesFile: true,
+			OnlyOnce:  true,
+			Config:    cli.StringConfig{TrimSpace: true},
+		},
 	},
 	Action: action,
 }
@@ -87,7 +96,24 @@ func action(ctx context.Context, cmd *cli.Command) error {
 	}
 	fmt.Fprintf(os.Stderr, "Package root: %s\n", pkgRoot)
 
-	res, err := witcli.LoadOne(cmd.Bool("force-wit"), cmd.Args().Slice()...)
+	path, err := witcli.ParsePaths(cmd.Args().Slice()...)
+	if err != nil {
+		return err
+	}
+
+	// check if the path is a OCI path
+	if wkg.IsOCIPath(path) {
+		witOut := cmd.String("wit-out")
+		fmt.Fprintf(os.Stderr, "WIT output dir: %s\n", witOut)
+		fmt.Fprintf(os.Stderr, "Fetching OCI artifact %s\n", path)
+		err = wkg.PullWIT(ctx, path, witOut)
+		if err != nil {
+			return err
+		}
+		path = witOut
+	}
+
+	res, err := witcli.LoadOne(cmd.Bool("force-wit"), path)
 	if err != nil {
 		return err
 	}
