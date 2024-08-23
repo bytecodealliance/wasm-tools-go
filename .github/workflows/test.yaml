@@ -73,7 +73,7 @@ jobs:
     strategy:
       matrix:
         go-version: ["1.22", "1.23"]
-        tinygo-version: ["0.31.2", "0.32.0", "0.33.0"]
+        tinygo-version: ["0.32.0", "0.33.0"]
         wasm-tools-version: ["v1.214.0"]
         exclude:
           - go-version: "1.23"
@@ -102,7 +102,7 @@ jobs:
           version: ${{ matrix.wasm-tools-version }}
 
       - name: Test with TinyGo
-        run: tinygo test -stack-size=64KB -v ./...
+        run: tinygo test -v ./...
 
       - name: Verify repo is unchanged
         run: git diff --exit-code HEAD
@@ -115,7 +115,7 @@ jobs:
     strategy:
       matrix:
         go-version: ["1.22", "1.23"]
-        tinygo-version: ["0.31.2", "0.32.0", "0.33.0"]
+        tinygo-version: ["0.32.0", "0.33.0"]
         wasm-tools-version: ["v1.214.0"]
         wasmtime-version: ["24.0.0"]
         exclude:
@@ -152,17 +152,23 @@ jobs:
       - name: Add Go wasm exec to $PATH
         run: echo "$(go env GOROOT)/misc/wasm" >> $GITHUB_PATH
 
-      - name: Test WebAssembly with Go + Wasmtime
+      - name: Test wasm/wasip1 with Go
         env:
-          GOOS: wasip1
           GOARCH: wasm
+          GOOS: wasip1
         run: go test -v ./...
 
-      - name: Test WebAssembly with TinyGo + Wasmtime
-        env:
-          GOOS: wasip1
-          GOARCH: wasm
-        run: tinygo test -stack-size=64KB -v ./...
+      - name: Test wasm/wasip1 with TinyGo 0.32.0
+        if: ${{ matrix.tinygo-version == '0.32.0' }}
+        run: tinygo test -v -target=wasi ./...
+
+      - name: Test wasm/wasip1 with TinyGo >= 0.33.0
+        if: ${{ matrix.tinygo-version != '0.32.0' }}
+        run: tinygo test -v -target=wasip1 ./...
+
+      - name: Test wasm/wasip2 with TinyGo >= 0.33.0
+        if: ${{ matrix.tinygo-version != '0.32.0' }}
+        run: tinygo test -v -target=wasip2 ./...
 
       - name: Verify repo is unchanged
         run: git diff --exit-code HEAD
