@@ -5,10 +5,7 @@ import "unsafe"
 // realloc allocates or reallocates memory for Component Model calls across
 // the host-guest boundary.
 //
-// Note: the use of uintptr assumes 32-bit pointers when compiled for WebAssembly.
-//
-//go:export cabi_realloc
-//go:wasmexport cabi_realloc
+// Note: the use of uintptr assumes 32-bit pointers when compiled for wasm or wasm32.
 func realloc(ptr unsafe.Pointer, size, align, newsize uintptr) unsafe.Pointer {
 	if newsize <= size {
 		return unsafe.Add(ptr, offset(uintptr(ptr), align))
