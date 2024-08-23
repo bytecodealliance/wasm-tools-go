@@ -1,15 +1,16 @@
-package bar:name {
-	interface i2 {
-		type b = u32;
-	}
+package bar:name;
 
-	world w2 {
-		import i2;
-		import imp2: interface {
-			use i2.{b};
-		}
+interface i2 {
+	type b = u32;
+}
+
+world w2 {
+	import i2;
+	import imp2: interface {
+		use i2.{b};
 	}
 }
+
 
 package foo:name {
 	interface i1 {
