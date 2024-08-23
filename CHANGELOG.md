@@ -6,6 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Changed
 - Omit the default `//go:build !wasip1` build tags from generated Go files. This enables `wit-bindgen-go` to target `GOOS=wasip1` (fixes [#147](https://github.com/ydnar/wasm-tools-go/issues/147)).
+- Package `wit` now serializes multi-package WIT files with an un-nested “root” package. See [WebAssembly/component-model#380](https://github.com/WebAssembly/component-model/pull/380) and [bytecodealliance/wasm-tools#1700](https://github.com/bytecodealliance/wasm-tools/pull/1700).
 
 ## [v0.1.4] — 2024-07-16
 
