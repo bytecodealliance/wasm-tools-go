@@ -22,7 +22,7 @@ func TestFileHasContent(t *testing.T) {
 
 	negatives := []File{
 		{Name: "empty.go", GeneratedBy: "package testing"},
-		{Name: "build_tag_only.go", Build: "!wasip1"},
+		{Name: "build_tag_only.go", GoBuild: "!wasip1"},
 		{Name: "named_imports.go", Imports: map[string]string{"unsafe": "unsafe"}},
 		{Name: "assembly.s", Content: nil},
 	}
