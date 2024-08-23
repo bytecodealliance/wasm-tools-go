@@ -22,9 +22,8 @@ import (
 )
 
 const (
-	BuildDefault = "!wasip1"
-	cmPackage    = "github.com/ydnar/wasm-tools-go/cm"
-	emptyAsm     = `// This file exists for testing this package without WebAssembly,
+	cmPackage = "github.com/ydnar/wasm-tools-go/cm"
+	emptyAsm  = `// This file exists for testing this package without WebAssembly,
 // allowing empty function bodies with a //go:wasmimport directive.
 // See https://pkg.go.dev/cmd/compile for more information.
 `
@@ -2110,7 +2109,6 @@ func (g *generator) ensureEmptyAsm(pkg *gen.Package) error {
 func (g *generator) abiFile(pkg *gen.Package) *gen.File {
 	file := pkg.File("abi.go")
 	file.GeneratedBy = g.opts.generatedBy
-	file.Build = BuildDefault
 	return file
 }
 
@@ -2118,7 +2116,6 @@ func (g *generator) fileFor(id wit.Ident) *gen.File {
 	pkg := g.packageFor(id)
 	file := pkg.File(id.Extension + ".wit.go")
 	file.GeneratedBy = g.opts.generatedBy
-	file.Build = BuildDefault
 	return file
 }
 
@@ -2126,7 +2123,6 @@ func (g *generator) exportsFileFor(id wit.Ident) *gen.File {
 	pkg := g.packageFor(id)
 	file := pkg.File(id.Extension + ".exports.go")
 	file.GeneratedBy = g.opts.generatedBy
-	file.Build = BuildDefault
 	if len(file.Header) == 0 {
 		exports := file.GetName("Exports")
 		var b strings.Builder
