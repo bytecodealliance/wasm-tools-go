@@ -51,6 +51,10 @@ func (res *Resolve) ResolveCodec(v any) codec.Codec {
 	case *WorldItem:
 		return &worldItemCodec{v}
 
+	// Other
+	case *InterfaceRef:
+		return &interfaceRefCodec{v, res}
+
 	// Imported
 	case *semver.Version:
 		return &semverCodec{&v}
@@ -215,14 +219,25 @@ func (pn *Ident) DecodeString(s string) error {
 	return err
 }
 
-// DecodeField implements the [codec.FieldDecoder] interface
-// to decode a struct or JSON object.
-func (i *InterfaceRef) DecodeField(dec codec.Decoder, name string) error {
+// interfaceRefCodec translates WIT interface references into an *InterfaceRef.
+type interfaceRefCodec struct {
+	ref *InterfaceRef
+	*Resolve
+}
+
+// This exists to support legacy JSON from wasm-tools pre v1.209.0.
+// See https://github.com/ydnar/wasm-tools-go/issues/151.
+func (c *interfaceRefCodec) DecodeInt(i int) error {
+	c.ref.Interface = c.getInterface(i)
+	return nil
+}
+
+func (c *interfaceRefCodec) DecodeField(dec codec.Decoder, name string) error {
 	switch name {
 	case "id":
-		return dec.Decode(&i.Interface)
+		return dec.Decode(&c.ref.Interface)
 	case "stability":
-		return dec.Decode(&i.Stability)
+		return dec.Decode(c.ref.Stability)
 	}
 	return nil
 }
