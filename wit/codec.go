@@ -237,7 +237,7 @@ func (c *interfaceRefCodec) DecodeField(dec codec.Decoder, name string) error {
 	case "id":
 		return dec.Decode(&c.ref.Interface)
 	case "stability":
-		return dec.Decode(c.ref.Stability)
+		return dec.Decode(&c.ref.Stability)
 	}
 	return nil
 }
