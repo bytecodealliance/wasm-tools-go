@@ -1444,14 +1444,15 @@ func (_stability) isStability() {}
 // Stable features have an explicit since version and an optional feature name.
 type Stable struct {
 	_stability
-	Since   semver.Version
-	Feature string
+	Since      semver.Version
+	Deprecated semver.Version
 }
 
 // Unstable represents an unstable WIT feature defined by name.
 type Unstable struct {
 	_stability
-	Feature string
+	Feature    string
+	Deprecated semver.Version
 }
 
 // Docs represent WIT documentation text extracted from comments.

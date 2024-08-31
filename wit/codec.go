@@ -509,8 +509,8 @@ func (s *Stable) DecodeField(dec codec.Decoder, name string) error {
 	switch name {
 	case "since":
 		return dec.Decode(&s.Since)
-	case "feature":
-		return dec.Decode(&s.Feature)
+	case "deprecated":
+		return dec.Decode(&s.Deprecated)
 	}
 	return nil
 }
@@ -519,6 +519,8 @@ func (u *Unstable) DecodeField(dec codec.Decoder, name string) error {
 	switch name {
 	case "feature":
 		return dec.Decode(&u.Feature)
+	case "deprecated":
+		return dec.Decode(&u.Deprecated)
 	}
 	return nil
 }
