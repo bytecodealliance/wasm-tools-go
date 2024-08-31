@@ -61,12 +61,31 @@ This will emit JSON on `stdout`, which can be piped to a file or another program
 wasm-tools component wit -j --all-features example.wit > example.wit.json
 ```
 
+## Contributing
+
+Developing and testing `wit-bindgen-go` requires an up-to-date installation of [Go](https://go.dev), [TinyGo](https://tinygo.org), [Wasmtime](https://wasmtime.dev), and [`wasm-tools`](https://crates.io/crates/wasm-tools).
+
+Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in this project by you, as defined in the Apache-2.0 license, shall be licensed as above, without any additional terms or conditions.
+
+### Testing
+
+Tests are supported under both Go and TinyGo, on Linux, macOS, and WebAssembly.
+
+```sh
+go test ./...
+tinygo test ./...
+```
+
+Testing with WebAssembly (`wasip1`) requires an installation of [`go_wasip1_wasm32_exec`](https://go.dev/blog/wasi) and [Wasmtime](https://wasmtime.dev). WASI 0.2 `wasip2` is supported under TinyGo version 0.33.0 or later.
+
+```sh
+GOARCH=wasm GOOS=wasip1 go test ./...
+GOARCH=wasm GOOS=wasip1 tinygo test ./...
+tinygo test -target=wasip2 ./... # requires TinyGo 0.33.0 or later
+```
+
+The [testdata](./testdata) directory contains tests that validate the round-trip parsing and re-serialization of WIT files back into WIT. To rebuild the test files, run `make golden`. This will reregenerate the JSON intermediate representation and the equivalent `*.golden.wit` files.
+
 ## License
 
 This project is licensed under the Apache 2.0 license with the LLVM exception. See [LICENSE](LICENSE) for more details.
-
-### Contributing
-
-Developing and testing `wit-bindgen-go` requires an up-to-date installation of [Go](https://go.dev), [TinyGo](https://tinygo.org), and [`wasm-tools`](https://crates.io/crates/wasm-tools).
-
-Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in this project by you, as defined in the Apache-2.0 license, shall be licensed as above, without any additional terms or conditions.

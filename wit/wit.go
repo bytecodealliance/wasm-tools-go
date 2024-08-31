@@ -86,11 +86,13 @@ func (s *Stable) WIT(_ Node, _ string) string {
 	var b strings.Builder
 	b.WriteString("@since(version = ")
 	b.WriteString(s.Since.String())
-	if s.Feature != "" {
-		b.WriteString(", feature = ")
-		b.WriteString(s.Feature)
-	}
 	b.WriteRune(')')
+	if s.Deprecated != nil {
+		b.WriteRune('\n')
+		b.WriteString("@deprecated(version = ")
+		b.WriteString(s.Deprecated.String())
+		b.WriteRune(')')
+	}
 	return b.String()
 }
 
@@ -105,6 +107,12 @@ func (u *Unstable) WIT(_ Node, _ string) string {
 	b.WriteString("@unstable(feature = ")
 	b.WriteString(u.Feature)
 	b.WriteRune(')')
+	if u.Deprecated != nil {
+		b.WriteRune('\n')
+		b.WriteString("@deprecated(version = ")
+		b.WriteString(u.Deprecated.String())
+		b.WriteRune(')')
+	}
 	return b.String()
 }
 

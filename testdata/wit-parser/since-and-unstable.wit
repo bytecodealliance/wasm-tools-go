@@ -3,10 +3,10 @@ package a:b@1.0.1;
 @since(version = 1.0.0)
 interface foo1 {}
 
-@since(version = 1.0.0, feature = foo)
+@since(version = 1.0.0)
 interface foo2 {}
 
-@since(version = 1.0.0, feature = foo-bar)
+@since(version = 1.0.0)
 interface foo3 {}
 
 @unstable(feature = foo2)
@@ -86,4 +86,22 @@ world in-a-world {
 		@since(version = 1.0.0)
 		constructor();
 	}
+}
+
+interface deprecated1 {
+	@since(version = 1.0.0)
+	@deprecated(version = 1.0.1)
+	type t1 = u32;
+
+	@deprecated(version = 1.0.1)
+	@since(version = 1.0.0)
+	type t2 = u32;
+
+	@unstable(feature = foo)
+	@deprecated(version = 1.0.1)
+	type t3 = u32;
+
+	@deprecated(version = 1.0.1)
+	@unstable(feature = foo)
+	type t4 = u32;
 }
