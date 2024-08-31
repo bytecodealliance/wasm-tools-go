@@ -1445,14 +1445,14 @@ func (_stability) isStability() {}
 type Stable struct {
 	_stability
 	Since      semver.Version
-	Deprecated semver.Version
+	Deprecated *semver.Version
 }
 
 // Unstable represents an unstable WIT feature defined by name.
 type Unstable struct {
 	_stability
 	Feature    string
-	Deprecated semver.Version
+	Deprecated *semver.Version
 }
 
 // Docs represent WIT documentation text extracted from comments.

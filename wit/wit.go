@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"slices"
 	"strings"
-
-	"github.com/coreos/go-semver/semver"
 )
 
 // Node is the common interface implemented by the WIT ([WebAssembly Interface Type])
@@ -89,7 +87,7 @@ func (s *Stable) WIT(_ Node, _ string) string {
 	b.WriteString("@since(version = ")
 	b.WriteString(s.Since.String())
 	b.WriteRune(')')
-	if s.Deprecated != (semver.Version{}) {
+	if s.Deprecated != nil {
 		b.WriteRune('\n')
 		b.WriteString("@deprecated(version = ")
 		b.WriteString(s.Deprecated.String())
@@ -109,7 +107,7 @@ func (u *Unstable) WIT(_ Node, _ string) string {
 	b.WriteString("@unstable(feature = ")
 	b.WriteString(u.Feature)
 	b.WriteRune(')')
-	if u.Deprecated != (semver.Version{}) {
+	if u.Deprecated != nil {
 		b.WriteRune('\n')
 		b.WriteString("@deprecated(version = ")
 		b.WriteString(u.Deprecated.String())
