@@ -84,7 +84,7 @@ GOARCH=wasm GOOS=wasip1 tinygo test ./...
 tinygo test -target=wasip2 ./... # requires TinyGo 0.33.0 or later
 ```
 
-This package contains tests that validate the round-trip parsing and re-serialization of WIT files back into WIT. To rebuild the test files in the [testdata](./testdata) directory, run `make golden`. This will reregenerate the JSON intermediate representation and the equivalent `*.golden.wit` files.
+The [testdata](./testdata) directory contains tests that validate the round-trip parsing and re-serialization of WIT files back into WIT. To rebuild the test files, run `make golden`. This will reregenerate the JSON intermediate representation and the equivalent `*.golden.wit` files.
 
 ## License
 
