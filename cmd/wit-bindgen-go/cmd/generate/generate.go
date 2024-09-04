@@ -9,7 +9,7 @@ import (
 
 	"github.com/bytecodealliance/wasm-tools-go/internal/codec"
 	"github.com/bytecodealliance/wasm-tools-go/internal/go/gen"
-	wkg "github.com/bytecodealliance/wasm-tools-go/internal/oci"
+	"github.com/bytecodealliance/wasm-tools-go/internal/oci"
 	"github.com/bytecodealliance/wasm-tools-go/internal/witcli"
 	"github.com/bytecodealliance/wasm-tools-go/wit/bindgen"
 	"github.com/urfave/cli/v3"
@@ -102,11 +102,11 @@ func action(ctx context.Context, cmd *cli.Command) error {
 	}
 
 	// check if the path is a OCI path
-	if wkg.IsOCIPath(path) {
+	if oci.IsOCIPath(path) {
 		witOut := cmd.String("wit-out")
 		fmt.Fprintf(os.Stderr, "WIT output dir: %s\n", witOut)
 		fmt.Fprintf(os.Stderr, "Fetching OCI artifact %s\n", path)
-		err = wkg.PullWIT(ctx, path, witOut)
+		err = oci.PullWIT(ctx, path, witOut)
 		if err != nil {
 			return err
 		}

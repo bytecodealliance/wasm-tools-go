@@ -1,9 +1,8 @@
-package wkg
+package oci
 
 import (
 	"context"
 	"fmt"
-	"io"
 	"os"
 	"os/exec"
 
@@ -23,6 +22,11 @@ func IsOCIPath(path string) bool {
 // processes it with `wasm-tools`.
 // the WIT files are stored in the `<out>` directory
 func PullWIT(ctx context.Context, path, out string) error {
+	wasmTools, err := exec.LookPath("wasm-tools")
+	if err != nil {
+		return err
+	}
+
 	r, err := ref.New(path)
 	if err != nil {
 		return fmt.Errorf("failed to parse ref: %v", err)
@@ -61,32 +65,13 @@ func PullWIT(ctx context.Context, path, out string) error {
 	}
 	defer rdr.Close()
 
-	wasmFile := "webassembly_wit.wasm"
-
-	outFile, err := os.Create(wasmFile)
-	if err != nil {
-		return fmt.Errorf("failed to create output file: %v", err)
-	}
-	defer outFile.Close()
-
-	if _, err = io.Copy(outFile, rdr); err != nil {
-		return fmt.Errorf("failed to write to output file: %v", err)
-	}
-
-	wasmTools, err := exec.LookPath("wasm-tools")
-	if err != nil {
-		return err
-	}
-	wasmCmd := exec.Command(wasmTools, "component", "wit", wasmFile, "--out-dir", out)
+	wasmCmd := exec.Command(wasmTools, "component", "wit", "--out-dir", out)
+	wasmCmd.Stdin = rdr
 	wasmCmd.Stdout = os.Stdout
 	wasmCmd.Stderr = os.Stderr
+
 	if err := wasmCmd.Run(); err != nil {
 		return fmt.Errorf("failed to process artifact with wasm-tools: %w", err)
-	}
-
-	// Clean up the wasm file
-	if err := os.Remove(wasmFile); err != nil {
-		return fmt.Errorf("failed to remove wasm file: %w", err)
 	}
 
 	return nil
