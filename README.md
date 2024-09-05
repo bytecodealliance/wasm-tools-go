@@ -1,7 +1,7 @@
 # wasm-tools-go
 
-[![build status](https://img.shields.io/github/actions/workflow/status/ydnar/wasm-tools-go/test.yaml?branch=main)](https://github.com/bytecodealliance/wasm-tools-go/actions)
-[![pkg.go.dev](https://img.shields.io/badge/docs-pkg.go.dev-blue.svg)](https://pkg.go.dev/github.com/ydnar/wasm-tools-go)
+[![build status](https://img.shields.io/github/actions/workflow/status/bytecodealliance/wasm-tools-go/test.yaml?branch=main)](https://github.com/bytecodealliance/wasm-tools-go/actions)
+[![pkg.go.dev](https://img.shields.io/badge/docs-pkg.go.dev-blue.svg)](https://pkg.go.dev/github.com/bytecodealliance/wasm-tools-go)
 
 ## [WebAssembly](https://webassembly.org) + [WASI](https://wasi.dev) tools for [Go](https://go.dev)
 
