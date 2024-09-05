@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 **This project has moved!** `wasm-tools-go` is now an official [Bytecode Alliance](https://github.com/bytecodealliance) project.
 
-Going forward, please update your Go imports from `github.com/ydnar/wasm-tools-go` to `github.com/bytecodealliance/wasm-tools-go`. Thanks to [@ricochet](https://github.com/ricochet), [@mossaka](https://github.com/mossaka), and [@lxfontes](https://github.com/lxfontes) and others for their help making this possible.
+Going forward, please update your Go imports from `github.com/ydnar/wasm-tools-go` to `github.com/bytecodealliance/wasm-tools-go`. Thanks to [@ricochet](https://github.com/ricochet), [@mossaka](https://github.com/mossaka), [@lxfontes](https://github.com/lxfontes), and others for their help making this possible.
 
 ### Changed
 
