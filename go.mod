@@ -1,12 +1,12 @@
 module github.com/bytecodealliance/wasm-tools-go
 
-go 1.22
+go 1.22.0
 
 require (
 	github.com/coreos/go-semver v0.3.1
 	github.com/sergi/go-diff v1.3.1
 	github.com/urfave/cli/v3 v3.0.0-alpha9
-	golang.org/x/mod v0.20.0
+	golang.org/x/mod v0.21.0
 	golang.org/x/tools v0.24.0
 )
 
