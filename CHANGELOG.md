@@ -2,11 +2,14 @@
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [v0.2.0] — 2024-09-05
+
+**This project has moved!** `wasm-tools-go` is now an official [Bytecode Alliance](https://github.com/bytecodealliance) project.
+
+Going forward, please update your Go imports from `github.com/ydnar/wasm-tools-go` to `github.com/bytecodealliance/wasm-tools-go`. Thanks to [@ricochet](https://github.com/ricochet), [@mossaka](https://github.com/mossaka), [@lxfontes](https://github.com/lxfontes), and others for their help making this possible.
 
 ### Changed
 
-- `wasm-tools-go` is now an official [Bytecode Alliance](https://github.com/bytecodealliance) project. Thanks to [@ricochet](https://github.com/ricochet), [@mossaka](https://github.com/mossaka), and [@lxfontes](https://github.com/lxfontes) and others!
 - Added support for `@deprecated` directive implemented in [`wasm-tools#1687`](https://github.com/bytecodealliance/wasm-tools/pull/1687).
 - Removed support for `@since` feature gating implemented in [`wasm-tools#1741`](https://github.com/bytecodealliance/wasm-tools/pull/1741).
 
@@ -97,7 +100,8 @@ Initial version, supporting [TinyGo](https://tinygo.org/) + [WASI](https://wasi.
 - Because Go does not have a native tagged union type, pointers represented in `variant` and `result` types may not be visible to the garbage collector and may be freed while still in use.
 - Support for mainline [Go](https://go.dev/).
 
-[Unreleased]: https://github.com/bytecodealliance/wasm-tools-go/compare/v0.1.5..HEAD
+[Unreleased]: https://github.com/bytecodealliance/wasm-tools-go/compare/v0.2.0..HEAD
+[v0.2.0]: https://github.com/bytecodealliance/wasm-tools-go/compare/v0.1.5...v0.2.0
 [v0.1.5]: https://github.com/bytecodealliance/wasm-tools-go/compare/v0.1.4...v0.1.5
 [v0.1.4]: https://github.com/bytecodealliance/wasm-tools-go/compare/v0.1.3...v0.1.4
 [v0.1.3]: https://github.com/bytecodealliance/wasm-tools-go/compare/v0.1.2...v0.1.3
