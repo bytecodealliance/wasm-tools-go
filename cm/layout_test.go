@@ -5,7 +5,7 @@ import (
 	"testing"
 	"unsafe"
 
-	"github.com/ydnar/wasm-tools-go/internal/tinyunsafe"
+	"github.com/bytecodealliance/wasm-tools-go/internal/tinyunsafe"
 )
 
 func TestFieldAlignment(t *testing.T) {

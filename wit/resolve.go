@@ -9,8 +9,8 @@ import (
 	"unsafe"
 
 	"github.com/coreos/go-semver/semver"
-	"github.com/ydnar/wasm-tools-go/wit/iterate"
-	"github.com/ydnar/wasm-tools-go/wit/ordered"
+	"github.com/bytecodealliance/wasm-tools-go/wit/iterate"
+	"github.com/bytecodealliance/wasm-tools-go/wit/ordered"
 )
 
 // Resolve represents a fully resolved set of WIT ([WebAssembly Interface Type])

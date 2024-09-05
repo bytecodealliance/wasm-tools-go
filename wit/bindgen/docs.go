@@ -3,7 +3,7 @@ package bindgen
 import (
 	"strings"
 
-	"github.com/ydnar/wasm-tools-go/internal/go/gen"
+	"github.com/bytecodealliance/wasm-tools-go/internal/go/gen"
 )
 
 func formatDocComments(s string, indent bool) string {

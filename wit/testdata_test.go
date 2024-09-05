@@ -11,7 +11,7 @@ import (
 	"testing"
 
 	"github.com/sergi/go-diff/diffmatchpatch"
-	"github.com/ydnar/wasm-tools-go/internal/relpath"
+	"github.com/bytecodealliance/wasm-tools-go/internal/relpath"
 )
 
 var update = flag.Bool("update", false, "update golden files")

@@ -15,10 +15,10 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/ydnar/wasm-tools-go/internal/codec"
-	"github.com/ydnar/wasm-tools-go/internal/go/gen"
-	"github.com/ydnar/wasm-tools-go/internal/relpath"
-	"github.com/ydnar/wasm-tools-go/wit"
+	"github.com/bytecodealliance/wasm-tools-go/internal/codec"
+	"github.com/bytecodealliance/wasm-tools-go/internal/go/gen"
+	"github.com/bytecodealliance/wasm-tools-go/internal/relpath"
+	"github.com/bytecodealliance/wasm-tools-go/wit"
 	"golang.org/x/tools/go/packages"
 )
 

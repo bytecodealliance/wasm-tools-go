@@ -8,8 +8,8 @@ import (
 
 	"github.com/urfave/cli/v3"
 
-	"github.com/ydnar/wasm-tools-go/cmd/wit-bindgen-go/cmd/generate"
-	"github.com/ydnar/wasm-tools-go/cmd/wit-bindgen-go/cmd/wit"
+	"github.com/bytecodealliance/wasm-tools-go/cmd/wit-bindgen-go/cmd/generate"
+	"github.com/bytecodealliance/wasm-tools-go/cmd/wit-bindgen-go/cmd/wit"
 )
 
 var (
