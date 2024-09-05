@@ -23,7 +23,7 @@ type options struct {
 	packageRoot string
 
 	// cmPackage is the package path to the "cm" or Component Model package with basic types.
-	// Default: github.com/ydnar/wasm-tools-go/cm.
+	// Default: github.com/bytecodealliance/wasm-tools-go/cm.
 	cmPackage string
 
 	// versioned determines if Go packages are generated with version numbers.
@@ -66,7 +66,7 @@ func PackageRoot(path string) Option {
 }
 
 // CMPackage returns an [Option] that specifies the package path to the
-// Component Model utility package (default: github.com/ydnar/wasm-tools-go/cm).
+// Component Model utility package (default: github.com/bytecodealliance/wasm-tools-go/cm).
 func CMPackage(path string) Option {
 	return optionFunc(func(opts *options) error {
 		opts.cmPackage = path

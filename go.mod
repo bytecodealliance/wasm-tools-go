@@ -1,4 +1,4 @@
-module github.com/ydnar/wasm-tools-go
+module github.com/bytecodealliance/wasm-tools-go
 
 go 1.22
 

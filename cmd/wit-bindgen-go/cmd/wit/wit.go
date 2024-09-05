@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/urfave/cli/v3"
-	"github.com/ydnar/wasm-tools-go/internal/witcli"
+	"github.com/bytecodealliance/wasm-tools-go/internal/witcli"
 )
 
 // Command is the CLI command for wit.

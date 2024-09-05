@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/ydnar/wasm-tools-go/wit"
+	"github.com/bytecodealliance/wasm-tools-go/wit"
 )
 
 // LoadOne loads a single [wit.Resolve].

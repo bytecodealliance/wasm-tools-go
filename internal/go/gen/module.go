@@ -8,7 +8,7 @@ import (
 	"path"
 	"path/filepath"
 
-	"github.com/ydnar/wasm-tools-go/internal/relpath"
+	"github.com/bytecodealliance/wasm-tools-go/internal/relpath"
 	"golang.org/x/mod/modfile"
 )
 

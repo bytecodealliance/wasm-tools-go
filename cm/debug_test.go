@@ -5,7 +5,7 @@ import (
 	"strings"
 	"unsafe"
 
-	"github.com/ydnar/wasm-tools-go/internal/tinyunsafe"
+	"github.com/bytecodealliance/wasm-tools-go/internal/tinyunsafe"
 )
 
 func typeName(v any) string {
