@@ -972,16 +972,19 @@ func (f *Function) WIT(ctx Node, name string) string {
 	case worldExport:
 		b.WriteString("export ")
 	}
-	b.WriteString(escape(name))
 	var isConstructor, isMethod bool
 	switch f.Kind.(type) {
 	case *Constructor:
+		// constructor is a keyword in WIT, but should not be escaped as a function name
+		b.WriteString(name)
 		b.WriteRune('(')
 		isConstructor = true
 	case *Freestanding, *Method:
+		b.WriteString(escape(name))
 		b.WriteString(": func(")
 		isMethod = true
 	case *Static:
+		b.WriteString(escape(name))
 		b.WriteString(": static func(")
 	}
 	b.WriteString(paramsWIT(f.Params, isMethod))
