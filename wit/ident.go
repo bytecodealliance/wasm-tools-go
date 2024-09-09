@@ -37,8 +37,8 @@ func ParseIdent(s string) (Ident, error) {
 	var id Ident
 	name, ver, hasVer := strings.Cut(s, "@")
 	base, ext, hasExt := strings.Cut(name, "/")
-	id.Namespace, id.Package, _ = strings.Cut(base, ":")
-	id.Namespace, id.Package = escape(id.Namespace), escape(id.Package)
+	ns, pkg, _ := strings.Cut(base, ":")
+	id.Namespace, id.Package = escape(ns), escape(pkg)
 	if hasVer {
 		var err error
 		id.Version, err = semver.NewVersion(ver)
