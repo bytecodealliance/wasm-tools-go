@@ -732,7 +732,7 @@ func fieldName(name string, export bool) string {
 	if name[0] >= '0' && name[0] <= '9' {
 		name = "f" + name
 	}
-	return GoName(name, export)
+	return gen.UniqueName(GoName(name, export), gen.IsReserved)
 }
 
 func (g *generator) tupleRep(file *gen.File, dir wit.Direction, t *wit.Tuple, goName string) string {
