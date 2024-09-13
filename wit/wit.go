@@ -1044,7 +1044,7 @@ func (p *Package) WIT(ctx Node, _ string) string {
 	var b strings.Builder
 	b.WriteString(p.Docs.WIT(ctx, ""))
 	b.WriteString("package ")
-	b.WriteString(p.Name.String())
+	b.WriteString(p.Name.WIT(p, ""))
 	if multi {
 		b.WriteString(" {\n")
 	} else {
@@ -1085,4 +1085,20 @@ func (p *Package) WIT(ctx Node, _ string) string {
 		b.WriteRune('}')
 	}
 	return b.String()
+}
+
+// WITKind returns the WIT kind.
+func (id *Ident) WITKind() string { return "ident" }
+
+// WIT returns the [WIT] text format of [Ident] id.
+//
+// [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
+func (id *Ident) WIT(ctx Node, _ string) string {
+	ide := Ident{
+		Namespace: escape(id.Namespace),
+		Package:   escape(id.Package),
+		Extension: escape(id.Extension),
+		Version:   id.Version,
+	}
+	return ide.String()
 }
