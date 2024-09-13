@@ -1,0 +1,4 @@
+{
+	"inherits": ["wasip2"],
+	"emulator": "wasmtime --wasm component-model -Sinherit-network -Sallow-ip-name-lookup --dir={tmpDir}::/tmp {}"
+}

@@ -13,10 +13,11 @@ $(wit_files):
 golden: json
 	go test ./wit -update
 
-# generated writes test Go code to the filesystem
-.PHONY: generated
-generated: clean
+# generate writes generated Go files in tests and generated directories
+.PHONY: generate
+generate: clean json
 	go test ./wit/bindgen -write
+	cd tests && go generate ./
 
 .PHONY: clean
 clean:
