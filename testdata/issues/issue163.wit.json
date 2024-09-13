@@ -1,0 +1,220 @@
+{
+  "worlds": [
+    {
+      "name": "a",
+      "imports": {
+        "v-multiple": {
+          "type": 10
+        },
+        "f-multiple": {
+          "function": {
+            "name": "f-multiple",
+            "kind": "freestanding",
+            "params": [
+              {
+                "name": "x",
+                "type": 10
+              }
+            ],
+            "results": []
+          }
+        }
+      },
+      "exports": {
+        "f-multiple": {
+          "function": {
+            "name": "f-multiple",
+            "kind": "freestanding",
+            "params": [
+              {
+                "name": "x",
+                "type": 10
+              }
+            ],
+            "results": []
+          }
+        }
+      },
+      "package": 0
+    }
+  ],
+  "interfaces": [],
+  "types": [
+    {
+      "name": null,
+      "kind": {
+        "list": "u8"
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "tuple": {
+          "types": [
+            "s32",
+            "s32"
+          ]
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "tuple": {
+          "types": [
+            "u32",
+            "u32"
+          ]
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "tuple": {
+          "types": [
+            "s64",
+            "s64"
+          ]
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "tuple": {
+          "types": [
+            "u64",
+            "u64"
+          ]
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "tuple": {
+          "types": [
+            "f32",
+            "f32"
+          ]
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "tuple": {
+          "types": [
+            "f64",
+            "f64"
+          ]
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "tuple": {
+          "types": [
+            "char",
+            "char"
+          ]
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "tuple": {
+          "types": [
+            "bool",
+            "bool"
+          ]
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "tuple": {
+          "types": [
+            "s32",
+            0
+          ]
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": "v-multiple",
+      "kind": {
+        "variant": {
+          "cases": [
+            {
+              "name": "a",
+              "type": 0
+            },
+            {
+              "name": "c",
+              "type": 1
+            },
+            {
+              "name": "d",
+              "type": 2
+            },
+            {
+              "name": "e",
+              "type": 3
+            },
+            {
+              "name": "f",
+              "type": 4
+            },
+            {
+              "name": "g",
+              "type": 5
+            },
+            {
+              "name": "h",
+              "type": 6
+            },
+            {
+              "name": "i",
+              "type": 7
+            },
+            {
+              "name": "j",
+              "type": 8
+            },
+            {
+              "name": "k",
+              "type": 9
+            }
+          ]
+        }
+      },
+      "owner": {
+        "world": 0
+      }
+    }
+  ],
+  "packages": [
+    {
+      "name": "test:variants-unioning-types",
+      "interfaces": {},
+      "worlds": {
+        "a": 0
+      }
+    }
+  ]
+}

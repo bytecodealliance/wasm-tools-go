@@ -4,6 +4,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Changed
+
+- [#163](https://github.com/bytecodealliance/wasm-tools-go/issues/163): added `cm.F32ToU64()` and `cm.U64ToF32()` for flattening `f32` and `u64` types in the Canonical ABI.
+
 ### Fixed
 - [#161](https://github.com/bytecodealliance/wasm-tools-go/issues/161): correctly handle `constructor` as a WIT keyword in wit.
 - [#160](https://github.com/bytecodealliance/wasm-tools-go/issues/160): fixed the use of Go reserved keywords in function returns as result types.
