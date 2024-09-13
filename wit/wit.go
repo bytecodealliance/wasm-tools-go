@@ -431,24 +431,50 @@ func escape(name string) string {
 	return name
 }
 
+// A map of all [WIT keywords].
+//
+// [WIT keywords]: https://github.com/bytecodealliance/wasm-tools/blob/main/crates/wit-parser/src/ast/lex.rs#L524-L591
 var witKeywords = map[string]bool{
-	"enum":      true,
-	"export":    true,
-	"flags":     true,
-	"func":      true,
-	"future":    true,
-	"import":    true,
-	"include":   true,
-	"interface": true,
-	"package":   true,
-	"record":    true,
-	"resource":  true,
-	"result":    true,
-	"static":    true,
-	"stream":    true,
-	"type":      true,
-	"variant":   true,
-	"world":     true,
+	"as":          true,
+	"bool":        true,
+	"borrow":      true,
+	"char":        true,
+	"constructor": true,
+	"enum":        true,
+	"export":      true,
+	"f32":         true,
+	"f64":         true,
+	"flags":       true,
+	"from":        true,
+	"func":        true,
+	"future":      true,
+	"import":      true,
+	"include":     true,
+	"interface":   true,
+	"list":        true,
+	"option":      true,
+	"own":         true,
+	"package":     true,
+	"record":      true,
+	"resource":    true,
+	"result":      true,
+	"s16":         true,
+	"s32":         true,
+	"s64":         true,
+	"s8":          true,
+	"static":      true,
+	"stream":      true,
+	"string":      true,
+	"tuple":       true,
+	"type":        true,
+	"u16":         true,
+	"u32":         true,
+	"u64":         true,
+	"u8":          true,
+	"use":         true,
+	"variant":     true,
+	"wit":         true,
+	"world":       true,
 }
 
 func relativeName(o TypeOwner, p *Package) string {
@@ -946,16 +972,19 @@ func (f *Function) WIT(ctx Node, name string) string {
 	case worldExport:
 		b.WriteString("export ")
 	}
-	b.WriteString(escape(name))
 	var isConstructor, isMethod bool
 	switch f.Kind.(type) {
 	case *Constructor:
+		// constructor is a keyword in WIT, but should not be escaped as a function name
+		b.WriteString(name)
 		b.WriteRune('(')
 		isConstructor = true
 	case *Freestanding, *Method:
+		b.WriteString(escape(name))
 		b.WriteString(": func(")
 		isMethod = true
 	case *Static:
+		b.WriteString(escape(name))
 		b.WriteString(": static func(")
 	}
 	b.WriteString(paramsWIT(f.Params, isMethod))
@@ -1015,7 +1044,7 @@ func (p *Package) WIT(ctx Node, _ string) string {
 	var b strings.Builder
 	b.WriteString(p.Docs.WIT(ctx, ""))
 	b.WriteString("package ")
-	b.WriteString(p.Name.String())
+	b.WriteString(p.Name.WIT(p, ""))
 	if multi {
 		b.WriteString(" {\n")
 	} else {
@@ -1056,4 +1085,20 @@ func (p *Package) WIT(ctx Node, _ string) string {
 		b.WriteRune('}')
 	}
 	return b.String()
+}
+
+// WITKind returns the WIT kind.
+func (id *Ident) WITKind() string { return "ident" }
+
+// WIT returns the [WIT] text format of [Ident] id.
+//
+// [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
+func (id *Ident) WIT(ctx Node, _ string) string {
+	ide := Ident{
+		Namespace: escape(id.Namespace),
+		Package:   escape(id.Package),
+		Extension: escape(id.Extension),
+		Version:   id.Version,
+	}
+	return ide.String()
 }

@@ -84,7 +84,7 @@ func goFunction(file *gen.File, tdir, dir wit.Direction, f *wit.Function, goName
 		results: goParams(scope, tdir, f.Results),
 	}
 	if len(out.results) == 1 && out.results[0].name == "" {
-		out.results[0].name = "result"
+		out.results[0].name = scope.DeclareName("result")
 	}
 	if dir == wit.Imported && f.IsMethod() {
 		out.receiver = out.params[0]
@@ -732,7 +732,7 @@ func fieldName(name string, export bool) string {
 	if name[0] >= '0' && name[0] <= '9' {
 		name = "f" + name
 	}
-	return GoName(name, export)
+	return gen.UniqueName(GoName(name, export), gen.IsReserved)
 }
 
 func (g *generator) tupleRep(file *gen.File, dir wit.Direction, t *wit.Tuple, goName string) string {
@@ -1379,7 +1379,7 @@ func (g *generator) liftOption(file *gen.File, dir wit.Direction, t *wit.TypeDef
 	b.WriteString("if f0 == 0 {\n")
 	b.WriteString("return")
 	b.WriteString("}\n")
-	stringio.Write(&b, "return ", g.cmCall(afile, "Some["+g.typeRep(afile, dir, o.Type)+"]", g.liftVariantCase(afile, dir, o.Type, flat[1:])), "\n")
+	stringio.Write(&b, "return ", g.cast(file, dir, t, t, g.cmCall(afile, "Some["+g.typeRep(afile, dir, o.Type)+"]", g.liftVariantCase(afile, dir, o.Type, flat[1:]))), "\n")
 	return g.typeDefLiftFunction(file, dir, t, input, b.String())
 }
 
@@ -1498,6 +1498,14 @@ func (g *generator) cmCall(file *gen.File, f string, input string) string {
 	return file.Import(g.opts.cmPackage) + "." + f + "(" + input + ")"
 }
 
+func (g *generator) ensureParamImports(file *gen.File, dir wit.Direction, params []wit.Param) {
+	for i := range params {
+		// Ensure type is used in this file to get import path,
+		// otherwise short package name may collide with param name.
+		_ = g.typeRep(file, dir, params[i].Type)
+	}
+}
+
 func (g *generator) declareFunction(owner wit.Ident, dir wit.Direction, f *wit.Function) (funcDecl, error) {
 	// Setup
 	file := g.fileFor(owner)
@@ -1528,6 +1536,11 @@ func (g *generator) declareFunction(owner wit.Ident, dir wit.Direction, f *wit.F
 
 	if fdecl, ok := g.functions[dir][f]; ok {
 		return fdecl, nil
+	}
+
+	if dir == wit.Imported {
+		g.ensureParamImports(file, tdir, f.Params)
+		g.ensureParamImports(file, tdir, f.Results)
 	}
 
 	var funcName, wasmName string
@@ -1660,6 +1673,7 @@ func (g *generator) defineImportedFunction(_ wit.Ident, f *wit.Function, decl fu
 			g.declareTypeDef(file, dir, t, decl.wasm.name+"_results")
 			compoundResults.typ = t
 		} else if len(decl.f.results) > 0 && derefPointer(p.typ) == decl.f.results[0].typ {
+			last(callParams).name = decl.f.results[0].name // Ensure results local, not results_
 			pointerResult = p
 		}
 	}

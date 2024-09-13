@@ -1,0 +1,445 @@
+{
+  "worlds": [
+    {
+      "name": "the-world",
+      "imports": {
+        "interface-0": {
+          "interface": {
+            "id": 0
+          }
+        }
+      },
+      "exports": {
+        "interface-0": {
+          "interface": {
+            "id": 0
+          }
+        }
+      },
+      "package": 0
+    }
+  ],
+  "interfaces": [
+    {
+      "name": "keywords",
+      "types": {
+        "for": 0
+      },
+      "functions": {
+        "type": {
+          "name": "type",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "type",
+              "type": "u32"
+            }
+          ],
+          "results": [
+            {
+              "name": "type",
+              "type": "u32"
+            },
+            {
+              "name": "flags",
+              "type": "s32"
+            }
+          ]
+        },
+        "variant": {
+          "name": "variant",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "enum",
+              "type": "s32"
+            }
+          ],
+          "results": []
+        },
+        "interface": {
+          "name": "interface",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "interface",
+              "type": "s32"
+            }
+          ],
+          "results": []
+        },
+        "throw": {
+          "name": "throw",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "throw",
+              "type": "s32"
+            }
+          ],
+          "results": []
+        },
+        "new": {
+          "name": "new",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "new",
+              "type": "s32"
+            }
+          ],
+          "results": []
+        },
+        "package": {
+          "name": "package",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "package",
+              "type": "s32"
+            }
+          ],
+          "results": []
+        },
+        "final": {
+          "name": "final",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "final",
+              "type": "s32"
+            }
+          ],
+          "results": []
+        },
+        "auto": {
+          "name": "auto",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "auto",
+              "type": "s32"
+            }
+          ],
+          "results": []
+        },
+        "else": {
+          "name": "else",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "for",
+              "type": "s32"
+            }
+          ],
+          "results": []
+        },
+        "long": {
+          "name": "long",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "long",
+              "type": "s32"
+            }
+          ],
+          "results": []
+        },
+        "switch": {
+          "name": "switch",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "switch",
+              "type": "s32"
+            }
+          ],
+          "results": []
+        },
+        "break": {
+          "name": "break",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "break",
+              "type": "s32"
+            }
+          ],
+          "results": []
+        },
+        "register": {
+          "name": "register",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "register",
+              "type": "s32"
+            }
+          ],
+          "results": []
+        },
+        "typedef": {
+          "name": "typedef",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "typedef",
+              "type": "s32"
+            }
+          ],
+          "results": []
+        },
+        "case": {
+          "name": "case",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "case",
+              "type": "s32"
+            }
+          ],
+          "results": []
+        },
+        "extern": {
+          "name": "extern",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "extern",
+              "type": "s32"
+            }
+          ],
+          "results": []
+        },
+        "char": {
+          "name": "char",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "char",
+              "type": "s32"
+            }
+          ],
+          "results": []
+        },
+        "float": {
+          "name": "float",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "float",
+              "type": "s32"
+            }
+          ],
+          "results": []
+        },
+        "short": {
+          "name": "short",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "short",
+              "type": "s32"
+            }
+          ],
+          "results": []
+        },
+        "unsigned": {
+          "name": "unsigned",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "unsigned",
+              "type": "s32"
+            }
+          ],
+          "results": []
+        },
+        "const": {
+          "name": "const",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "const",
+              "type": "s32"
+            }
+          ],
+          "results": []
+        },
+        "signed": {
+          "name": "signed",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "signed",
+              "type": "s32"
+            }
+          ],
+          "results": []
+        },
+        "void": {
+          "name": "void",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "void",
+              "type": "s32"
+            }
+          ],
+          "results": []
+        },
+        "continue": {
+          "name": "continue",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "continue",
+              "type": "s32"
+            }
+          ],
+          "results": []
+        },
+        "goto": {
+          "name": "goto",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "goto",
+              "type": "s32"
+            }
+          ],
+          "results": []
+        },
+        "sizeof": {
+          "name": "sizeof",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "sizeof",
+              "type": "s32"
+            }
+          ],
+          "results": []
+        },
+        "volatile": {
+          "name": "volatile",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "volatile",
+              "type": "s32"
+            }
+          ],
+          "results": []
+        },
+        "default": {
+          "name": "default",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "default",
+              "type": "s32"
+            }
+          ],
+          "results": []
+        },
+        "if": {
+          "name": "if",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "if",
+              "type": "s32"
+            }
+          ],
+          "results": []
+        },
+        "static": {
+          "name": "static",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "static",
+              "type": "s32"
+            }
+          ],
+          "results": []
+        },
+        "while": {
+          "name": "while",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "while",
+              "type": "s32"
+            }
+          ],
+          "results": []
+        },
+        "do": {
+          "name": "do",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "do",
+              "type": "s32"
+            }
+          ],
+          "results": []
+        },
+        "int": {
+          "name": "int",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "int",
+              "type": "s32"
+            }
+          ],
+          "results": []
+        },
+        "struct": {
+          "name": "struct",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "struct",
+              "type": "s32"
+            }
+          ],
+          "results": []
+        }
+      },
+      "package": 0
+    }
+  ],
+  "types": [
+    {
+      "name": "for",
+      "kind": {
+        "record": {
+          "fields": [
+            {
+              "name": "return",
+              "type": "u32"
+            }
+          ]
+        }
+      },
+      "owner": {
+        "interface": 0
+      }
+    }
+  ],
+  "packages": [
+    {
+      "name": "foo:foo",
+      "interfaces": {
+        "keywords": 0
+      },
+      "worlds": {
+        "the-world": 0
+      }
+    }
+  ]
+}

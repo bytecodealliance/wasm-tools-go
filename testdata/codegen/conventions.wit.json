@@ -1,0 +1,152 @@
+{
+  "worlds": [
+    {
+      "name": "the-world",
+      "imports": {
+        "interface-0": {
+          "interface": {
+            "id": 0
+          }
+        }
+      },
+      "exports": {
+        "interface-0": {
+          "interface": {
+            "id": 0
+          }
+        }
+      },
+      "package": 0
+    }
+  ],
+  "interfaces": [
+    {
+      "name": "conventions",
+      "types": {
+        "ludicrous-speed": 0
+      },
+      "functions": {
+        "kebab-case": {
+          "name": "kebab-case",
+          "kind": "freestanding",
+          "params": [],
+          "results": []
+        },
+        "foo": {
+          "name": "foo",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "x",
+              "type": 0
+            }
+          ],
+          "results": []
+        },
+        "function-with-dashes": {
+          "name": "function-with-dashes",
+          "kind": "freestanding",
+          "params": [],
+          "results": []
+        },
+        "function-with-no-weird-characters": {
+          "name": "function-with-no-weird-characters",
+          "kind": "freestanding",
+          "params": [],
+          "results": []
+        },
+        "apple": {
+          "name": "apple",
+          "kind": "freestanding",
+          "params": [],
+          "results": []
+        },
+        "apple-pear": {
+          "name": "apple-pear",
+          "kind": "freestanding",
+          "params": [],
+          "results": []
+        },
+        "apple-pear-grape": {
+          "name": "apple-pear-grape",
+          "kind": "freestanding",
+          "params": [],
+          "results": []
+        },
+        "a0": {
+          "name": "a0",
+          "kind": "freestanding",
+          "params": [],
+          "results": []
+        },
+        "is-XML": {
+          "name": "is-XML",
+          "kind": "freestanding",
+          "params": [],
+          "results": [],
+          "docs": {
+            "contents": "Comment out identifiers that collide when mapped to snake_case, for now; see\nhttps://github.com/WebAssembly/component-model/issues/118\nAPPLE: func()\nAPPLE-pear-GRAPE: func()\napple-PEAR-grape: func()"
+          }
+        },
+        "explicit": {
+          "name": "explicit",
+          "kind": "freestanding",
+          "params": [],
+          "results": []
+        },
+        "explicit-kebab": {
+          "name": "explicit-kebab",
+          "kind": "freestanding",
+          "params": [],
+          "results": []
+        },
+        "bool": {
+          "name": "bool",
+          "kind": "freestanding",
+          "params": [],
+          "results": [],
+          "docs": {
+            "contents": "Identifiers with the same name as keywords are quoted."
+          }
+        }
+      },
+      "package": 0
+    }
+  ],
+  "types": [
+    {
+      "name": "ludicrous-speed",
+      "kind": {
+        "record": {
+          "fields": [
+            {
+              "name": "how-fast-are-you-going",
+              "type": "u32"
+            },
+            {
+              "name": "i-am-going-extremely-slow",
+              "type": "u64"
+            }
+          ]
+        }
+      },
+      "owner": {
+        "interface": 0
+      }
+    }
+  ],
+  "packages": [
+    {
+      "name": "foo:foo",
+      "docs": {
+        "contents": "hello 🐱 world"
+      },
+      "interfaces": {
+        "conventions": 0
+      },
+      "worlds": {
+        "the-world": 0
+      }
+    }
+  ]
+}
