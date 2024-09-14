@@ -1,3 +1,5 @@
+//go:build !wasip1 && !wasip2
+
 package oci
 
 import (
