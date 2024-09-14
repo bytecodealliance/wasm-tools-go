@@ -4,7 +4,7 @@ package oci
 
 import (
 	"context"
-	"fmt"
+	"errors"
 )
 
 // IsOCIPath checks if a given path is an OCI path
@@ -13,5 +13,5 @@ func IsOCIPath(path string) bool {
 }
 
 func PullWIT(ctx context.Context, path, out string) error {
-	return fmt.Errorf("OCI not supported on WASI")
+	return errors.New("OCI not supported on WASI or TinyGo")
 }
