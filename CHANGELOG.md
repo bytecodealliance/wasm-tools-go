@@ -29,6 +29,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Generated structs and structs in package `cm` now include a [`HostLayout` field](https://github.com/golang/go/issues/66408) in order to conform with the [relaxed types proposal](https://github.com/golang/go/issues/66984) for `GOARCH=wasm32`. The `cm.HostLayout` type is an alias for `structs.HostLayout` on Go 1.23 or later, and a polyfill for Go 1.22 or earlier.
 - [#163](https://github.com/bytecodealliance/wasm-tools-go/issues/163): added `cm.F32ToU64()` and `cm.U64ToF32()` for flattening `f32` and `u64` types in the Canonical ABI.
 - Test data from [bytecodealliance/wit-bindgen/tests/codegen](https://github.com/bytecodealliance/wit-bindgen/tree/main/tests/codegen).
+- `wit-bindgen-go generate` now accepts a remote registry reference to pull down a WIT package and generate the Go code. Example: `wit-bindgen-go generate ghcr.io/webassembly/wasi/http:0.2.0`.
 
 ### Fixed
 
