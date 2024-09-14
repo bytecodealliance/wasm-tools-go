@@ -1,9 +1,8 @@
 // Package tests exists as a standalone module in the wasm-tools-go repository for
 // testing Go code generated from WIT using wit-bindgen-go.
 // There are no user-importable packages in this module.
-package tests
 
-import _ "github.com/bytecodealliance/wasm-tools-go/cmd/wit-bindgen-go"
+package tests
 
 //go:generate rm -rf ./generated/*
 //go:generate mkdir -p ./generated
