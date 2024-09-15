@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - [#161](https://github.com/bytecodealliance/wasm-tools-go/issues/161): correctly handle `constructor` as a WIT keyword in wit.
 - [#160](https://github.com/bytecodealliance/wasm-tools-go/issues/160): fixed the use of Go reserved keywords in function returns as result types.
 - [#159](https://github.com/bytecodealliance/wasm-tools-go/pull/159): all WIT keywords, including those in package names, are correctly escaped.
+- [#167](https://github.com/bytecodealliance/wasm-tools-go/issues/167): fixed a logic flaw in TestHasBorrow
 
 ## [v0.2.0] — 2024-09-05
 
