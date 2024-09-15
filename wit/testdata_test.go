@@ -486,15 +486,16 @@ func TestHasBorrow(t *testing.T) {
 	err := loadTestdata(func(path string, res *Resolve) error {
 		t.Run(path, func(t *testing.T) {
 			for _, td := range res.TypeDefs {
-				// skipping anonymous types
-				// see https://github.com/bytecodealliance/wasm-tools-go/issues/167
-				if td.Name != nil {
-					wit := td.Kind.WIT(nil, "")
-					a := strings.Contains(wit, "borrow<")
-					b := HasBorrow(td)
-					if a != b {
-						t.Errorf("has \"borrow<\": %t != HasBorrow(td): %t (%s)", a, b, wit)
-					}
+				if td.Name == nil {
+					// Skip anonymous types here. This is tested elsewhere.
+					// https://github.com/bytecodealliance/wasm-tools-go/issues/167
+					continue
+				}
+				wit := td.Kind.WIT(nil, "")
+				a := strings.Contains(wit, "borrow<")
+				b := HasBorrow(td)
+				if a != b {
+					t.Errorf("has \"borrow<\": %t != HasBorrow(td): %t (%s)", a, b, wit)
 				}
 			}
 		})
