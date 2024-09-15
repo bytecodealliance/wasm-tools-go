@@ -74,36 +74,6 @@ type param struct {
 	dir  wit.Direction
 }
 
-func (g *generator) goFunction(file *gen.File, tdir, dir wit.Direction, f *wit.Function, goName string) function {
-	scope := gen.NewScope(file)
-	out := function{
-		file:    file,
-		scope:   scope,
-		name:    goName,
-		params:  g.goParams(scope, tdir, f.Params),
-		results: g.goParams(scope, tdir, f.Results),
-	}
-	if len(out.results) == 1 && out.results[0].name == "" {
-		out.results[0].name = scope.DeclareName("result")
-	}
-	if dir == wit.Imported && f.IsMethod() {
-		out.receiver = out.params[0]
-		// out.params = out.params[1:]
-	}
-	return out
-}
-
-func (g *generator) goParams(scope gen.Scope, dir wit.Direction, params []wit.Param) []param {
-	out := make([]param, len(params))
-	for i, p := range params {
-		tdir, _ := g.typeDir(dir, p.Type)
-		out[i].name = scope.DeclareName(GoName(p.Name, false))
-		out[i].typ = p.Type
-		out[i].dir = tdir
-	}
-	return out
-}
-
 type typeUse struct {
 	pkg *gen.Package
 	dir wit.Direction
@@ -1528,6 +1498,36 @@ func (g *generator) ensureParamImports(file *gen.File, dir wit.Direction, params
 		// otherwise short package name may collide with param name.
 		_ = g.typeRep(file, dir, params[i].Type)
 	}
+}
+
+func (g *generator) goFunction(file *gen.File, tdir, dir wit.Direction, f *wit.Function, goName string) function {
+	scope := gen.NewScope(file)
+	out := function{
+		file:    file,
+		scope:   scope,
+		name:    goName,
+		params:  g.goParams(scope, tdir, f.Params),
+		results: g.goParams(scope, tdir, f.Results),
+	}
+	if len(out.results) == 1 && out.results[0].name == "" {
+		out.results[0].name = scope.DeclareName("result")
+	}
+	if dir == wit.Imported && f.IsMethod() {
+		out.receiver = out.params[0]
+		// out.params = out.params[1:]
+	}
+	return out
+}
+
+func (g *generator) goParams(scope gen.Scope, dir wit.Direction, params []wit.Param) []param {
+	out := make([]param, len(params))
+	for i, p := range params {
+		tdir, _ := g.typeDir(dir, p.Type)
+		out[i].name = scope.DeclareName(GoName(p.Name, false))
+		out[i].typ = p.Type
+		out[i].dir = tdir
+	}
+	return out
 }
 
 func (g *generator) declareFunction(owner wit.Ident, dir wit.Direction, f *wit.Function) (funcDecl, error) {
