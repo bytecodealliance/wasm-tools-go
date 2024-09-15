@@ -1,0 +1,81 @@
+{
+  "worlds": [
+    {
+      "name": "x",
+      "imports": {
+        "y": {
+          "type": 0
+        },
+        "r": {
+          "type": 2
+        },
+        "f": {
+          "function": {
+            "name": "f",
+            "kind": "freestanding",
+            "params": [
+              {
+                "name": "a",
+                "type": 3
+              }
+            ],
+            "results": []
+          }
+        }
+      },
+      "exports": {},
+      "package": 0
+    }
+  ],
+  "interfaces": [],
+  "types": [
+    {
+      "name": "y",
+      "kind": "resource",
+      "owner": {
+        "world": 0
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "borrow": 0
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": "r",
+      "kind": {
+        "record": {
+          "fields": [
+            {
+              "name": "y",
+              "type": 1
+            }
+          ]
+        }
+      },
+      "owner": {
+        "world": 0
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "list": 2
+      },
+      "owner": null
+    }
+  ],
+  "packages": [
+    {
+      "name": "issues:issue167",
+      "interfaces": {},
+      "worlds": {
+        "x": 0
+      }
+    }
+  ]
+}

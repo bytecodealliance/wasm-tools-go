@@ -10,8 +10,8 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/sergi/go-diff/diffmatchpatch"
 	"github.com/bytecodealliance/wasm-tools-go/internal/relpath"
+	"github.com/sergi/go-diff/diffmatchpatch"
 )
 
 var update = flag.Bool("update", false, "update golden files")
@@ -486,11 +486,15 @@ func TestHasBorrow(t *testing.T) {
 	err := loadTestdata(func(path string, res *Resolve) error {
 		t.Run(path, func(t *testing.T) {
 			for _, td := range res.TypeDefs {
-				wit := td.Kind.WIT(nil, "")
-				a := strings.Contains(wit, "borrow<")
-				b := HasBorrow(td)
-				if a != b {
-					t.Errorf("has \"borrow<\": %t != HasBorrow(td): %t (%s)", a, b, wit)
+				// skipping anonymous types
+				// see https://github.com/bytecodealliance/wasm-tools-go/issues/167
+				if td.Name != nil {
+					wit := td.Kind.WIT(nil, "")
+					a := strings.Contains(wit, "borrow<")
+					b := HasBorrow(td)
+					if a != b {
+						t.Errorf("has \"borrow<\": %t != HasBorrow(td): %t (%s)", a, b, wit)
+					}
 				}
 			}
 		})
@@ -498,6 +502,43 @@ func TestHasBorrow(t *testing.T) {
 	})
 	if err != nil {
 		t.Error(err)
+	}
+	testCases := []struct {
+		name     string
+		typeDef  *TypeDef
+		expected bool
+	}{
+		{
+			name:     "Simple borrow",
+			typeDef:  &TypeDef{Kind: &Borrow{}},
+			expected: true,
+		},
+		{
+			name: "Nested borrow in record",
+			typeDef: &TypeDef{Kind: &Record{
+				Fields: []Field{
+					{Type: &TypeDef{Kind: &Borrow{}}},
+				},
+			}},
+			expected: true,
+		},
+		{
+			name: "Nested borrow in list of records",
+			typeDef: &TypeDef{Kind: &List{Type: &TypeDef{Kind: &Record{
+				Fields: []Field{
+					{Type: &TypeDef{Kind: &Borrow{}}},
+				},
+			}}}},
+			expected: true,
+		},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			result := HasBorrow(tc.typeDef)
+			if result != tc.expected {
+				t.Errorf("HasBorrow(%s) = %t; want %t", tc.name, result, tc.expected)
+			}
+		})
 	}
 }
 
