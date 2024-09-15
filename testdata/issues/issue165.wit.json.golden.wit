@@ -1,0 +1,15 @@
+/// https://github.com/bytecodealliance/wasm-tools-go/issues/165
+package issues:issue165;
+
+interface types {
+	resource z {
+		constructor(a: f64);
+	}
+}
+
+world resources {
+	import types;
+	use types.{z};
+	record big { x1: borrow<z> }
+	export big-record: func(r: big);
+}
