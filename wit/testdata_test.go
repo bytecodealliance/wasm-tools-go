@@ -481,13 +481,13 @@ func TestHasPointer(t *testing.T) {
 	}
 }
 
-// TestHasBorrow verifies that HasBorrow returns true for all WIT types that contain a borrow<T>.
-func TestHasBorrow(t *testing.T) {
+// TestHasBorrowOnNamedTypes verifies that HasBorrow returns true for all named WIT types that contain a borrow<T>.
+func TestHasBorrowOnNamedTypes(t *testing.T) {
 	err := loadTestdata(func(path string, res *Resolve) error {
 		t.Run(path, func(t *testing.T) {
 			for _, td := range res.TypeDefs {
 				if td.Name == nil {
-					// Skip anonymous types here. This is tested elsewhere.
+					// Skip anonymous types here. This is tested on `TestHasBorrow`.
 					// https://github.com/bytecodealliance/wasm-tools-go/issues/167
 					continue
 				}
@@ -503,43 +503,6 @@ func TestHasBorrow(t *testing.T) {
 	})
 	if err != nil {
 		t.Error(err)
-	}
-	testCases := []struct {
-		name     string
-		typeDef  *TypeDef
-		expected bool
-	}{
-		{
-			name:     "Simple borrow",
-			typeDef:  &TypeDef{Kind: &Borrow{}},
-			expected: true,
-		},
-		{
-			name: "Nested borrow in record",
-			typeDef: &TypeDef{Kind: &Record{
-				Fields: []Field{
-					{Type: &TypeDef{Kind: &Borrow{}}},
-				},
-			}},
-			expected: true,
-		},
-		{
-			name: "Nested borrow in list of records",
-			typeDef: &TypeDef{Kind: &List{Type: &TypeDef{Kind: &Record{
-				Fields: []Field{
-					{Type: &TypeDef{Kind: &Borrow{}}},
-				},
-			}}}},
-			expected: true,
-		},
-	}
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			result := HasBorrow(tc.typeDef)
-			if result != tc.expected {
-				t.Errorf("HasBorrow(%s) = %t; want %t", tc.name, result, tc.expected)
-			}
-		})
 	}
 }
 

@@ -174,3 +174,44 @@ func witFor[T Node](nodes ...T) []string {
 	}
 	return out
 }
+
+// TestHasBorrow verifies that HasBorrow returns true for WIT types that contain a Borrow type.
+func TestHasBorrow(t *testing.T) {
+	testCases := []struct {
+		name     string
+		typeDef  *TypeDef
+		expected bool
+	}{
+		{
+			name:     "Simple borrow",
+			typeDef:  &TypeDef{Kind: &Borrow{}},
+			expected: true,
+		},
+		{
+			name: "Nested borrow in record",
+			typeDef: &TypeDef{Kind: &Record{
+				Fields: []Field{
+					{Type: &TypeDef{Kind: &Borrow{}}},
+				},
+			}},
+			expected: true,
+		},
+		{
+			name: "Nested borrow in list of records",
+			typeDef: &TypeDef{Kind: &List{Type: &TypeDef{Kind: &Record{
+				Fields: []Field{
+					{Type: &TypeDef{Kind: &Borrow{}}},
+				},
+			}}}},
+			expected: true,
+		},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			result := HasBorrow(tc.typeDef)
+			if result != tc.expected {
+				t.Errorf("HasBorrow(%s) = %t; want %t", tc.name, result, tc.expected)
+			}
+		})
+	}
+}
