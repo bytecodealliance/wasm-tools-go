@@ -1,0 +1,92 @@
+{
+  "worlds": [
+    {
+      "name": "bindings",
+      "imports": {},
+      "exports": {
+        "interface-0": {
+          "interface": {
+            "id": 0
+          }
+        }
+      },
+      "package": 0
+    }
+  ],
+  "interfaces": [
+    {
+      "name": "component",
+      "types": {
+        "unused-enum": 0,
+        "unused-record": 1,
+        "unused-variant": 2
+      },
+      "functions": {},
+      "package": 0
+    }
+  ],
+  "types": [
+    {
+      "name": "unused-enum",
+      "kind": {
+        "enum": {
+          "cases": [
+            {
+              "name": "unused"
+            }
+          ]
+        }
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": "unused-record",
+      "kind": {
+        "record": {
+          "fields": [
+            {
+              "name": "x",
+              "type": "u32"
+            }
+          ]
+        }
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": "unused-variant",
+      "kind": {
+        "variant": {
+          "cases": [
+            {
+              "name": "enum",
+              "type": 0
+            },
+            {
+              "name": "record",
+              "type": 1
+            }
+          ]
+        }
+      },
+      "owner": {
+        "interface": 0
+      }
+    }
+  ],
+  "packages": [
+    {
+      "name": "foo:bar",
+      "interfaces": {
+        "component": 0
+      },
+      "worlds": {
+        "bindings": 0
+      }
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+package foo:bar;
+
+interface component {
+	enum unused-enum { unused }
+	record unused-record { x: u32 }
+	variant unused-variant {
+		%enum(unused-enum),
+		%record(unused-record),
+	}
+}
+
+world bindings {
+	export component;
+}

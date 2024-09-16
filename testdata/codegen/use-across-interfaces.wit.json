@@ -1,0 +1,155 @@
+{
+  "worlds": [
+    {
+      "name": "baz",
+      "imports": {
+        "interface-0": {
+          "interface": {
+            "id": 0
+          }
+        },
+        "interface-1": {
+          "interface": {
+            "id": 1
+          }
+        },
+        "baz": {
+          "interface": {
+            "id": 2
+          }
+        }
+      },
+      "exports": {},
+      "package": 0
+    }
+  ],
+  "interfaces": [
+    {
+      "name": "foo",
+      "types": {
+        "headers": 1,
+        "a": 2
+      },
+      "functions": {
+        "x": {
+          "name": "x",
+          "kind": "freestanding",
+          "params": [],
+          "results": [
+            {
+              "type": 2
+            }
+          ]
+        }
+      },
+      "package": 0
+    },
+    {
+      "name": "bar",
+      "types": {
+        "a": 3
+      },
+      "functions": {
+        "x": {
+          "name": "x",
+          "kind": "freestanding",
+          "params": [],
+          "results": [
+            {
+              "type": 3
+            }
+          ]
+        }
+      },
+      "package": 0
+    },
+    {
+      "name": null,
+      "types": {
+        "a": 4
+      },
+      "functions": {
+        "x": {
+          "name": "x",
+          "kind": "freestanding",
+          "params": [],
+          "results": [
+            {
+              "type": 4
+            }
+          ]
+        }
+      },
+      "package": 0
+    }
+  ],
+  "types": [
+    {
+      "name": null,
+      "kind": {
+        "tuple": {
+          "types": [
+            "string",
+            "string"
+          ]
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": "headers",
+      "kind": {
+        "list": 0
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": "a",
+      "kind": {
+        "record": {
+          "fields": [
+            {
+              "name": "headers",
+              "type": 1
+            }
+          ]
+        }
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": "a",
+      "kind": {
+        "type": 2
+      },
+      "owner": {
+        "interface": 1
+      }
+    },
+    {
+      "name": "a",
+      "kind": {
+        "type": 2
+      },
+      "owner": {
+        "interface": 2
+      }
+    }
+  ],
+  "packages": [
+    {
+      "name": "foo:foo",
+      "interfaces": {
+        "foo": 0,
+        "bar": 1
+      },
+      "worlds": {
+        "baz": 0
+      }
+    }
+  ]
+}

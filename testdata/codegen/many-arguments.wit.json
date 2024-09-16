@@ -1,0 +1,220 @@
+{
+  "worlds": [
+    {
+      "name": "the-world",
+      "imports": {
+        "interface-0": {
+          "interface": {
+            "id": 0
+          }
+        }
+      },
+      "exports": {
+        "interface-0": {
+          "interface": {
+            "id": 0
+          }
+        }
+      },
+      "package": 0
+    }
+  ],
+  "interfaces": [
+    {
+      "name": "manyarg",
+      "types": {
+        "big-struct": 0
+      },
+      "functions": {
+        "many-args": {
+          "name": "many-args",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "a1",
+              "type": "u64"
+            },
+            {
+              "name": "a2",
+              "type": "u64"
+            },
+            {
+              "name": "a3",
+              "type": "u64"
+            },
+            {
+              "name": "a4",
+              "type": "u64"
+            },
+            {
+              "name": "a5",
+              "type": "u64"
+            },
+            {
+              "name": "a6",
+              "type": "u64"
+            },
+            {
+              "name": "a7",
+              "type": "u64"
+            },
+            {
+              "name": "a8",
+              "type": "u64"
+            },
+            {
+              "name": "a9",
+              "type": "u64"
+            },
+            {
+              "name": "a10",
+              "type": "u64"
+            },
+            {
+              "name": "a11",
+              "type": "u64"
+            },
+            {
+              "name": "a12",
+              "type": "u64"
+            },
+            {
+              "name": "a13",
+              "type": "u64"
+            },
+            {
+              "name": "a14",
+              "type": "u64"
+            },
+            {
+              "name": "a15",
+              "type": "u64"
+            },
+            {
+              "name": "a16",
+              "type": "u64"
+            }
+          ],
+          "results": []
+        },
+        "big-argument": {
+          "name": "big-argument",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "x",
+              "type": 0
+            }
+          ],
+          "results": []
+        }
+      },
+      "package": 0
+    }
+  ],
+  "types": [
+    {
+      "name": "big-struct",
+      "kind": {
+        "record": {
+          "fields": [
+            {
+              "name": "a1",
+              "type": "string"
+            },
+            {
+              "name": "a2",
+              "type": "string"
+            },
+            {
+              "name": "a3",
+              "type": "string"
+            },
+            {
+              "name": "a4",
+              "type": "string"
+            },
+            {
+              "name": "a5",
+              "type": "string"
+            },
+            {
+              "name": "a6",
+              "type": "string"
+            },
+            {
+              "name": "a7",
+              "type": "string"
+            },
+            {
+              "name": "a8",
+              "type": "string"
+            },
+            {
+              "name": "a9",
+              "type": "string"
+            },
+            {
+              "name": "a10",
+              "type": "string"
+            },
+            {
+              "name": "a11",
+              "type": "string"
+            },
+            {
+              "name": "a12",
+              "type": "string"
+            },
+            {
+              "name": "a13",
+              "type": "string"
+            },
+            {
+              "name": "a14",
+              "type": "string"
+            },
+            {
+              "name": "a15",
+              "type": "string"
+            },
+            {
+              "name": "a16",
+              "type": "string"
+            },
+            {
+              "name": "a17",
+              "type": "string"
+            },
+            {
+              "name": "a18",
+              "type": "string"
+            },
+            {
+              "name": "a19",
+              "type": "string"
+            },
+            {
+              "name": "a20",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "owner": {
+        "interface": 0
+      }
+    }
+  ],
+  "packages": [
+    {
+      "name": "many:arguments",
+      "interfaces": {
+        "manyarg": 0
+      },
+      "worlds": {
+        "the-world": 0
+      }
+    }
+  ]
+}

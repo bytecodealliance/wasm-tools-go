@@ -1,0 +1,96 @@
+{
+  "worlds": [
+    {
+      "name": "wasi",
+      "imports": {
+        "interface-0": {
+          "interface": {
+            "id": 0
+          }
+        }
+      },
+      "exports": {},
+      "package": 0
+    }
+  ],
+  "interfaces": [
+    {
+      "name": "tcp",
+      "types": {
+        "ipv6-socket-address": 0
+      },
+      "functions": {
+        "connect": {
+          "name": "connect",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "local-address",
+              "type": 0
+            },
+            {
+              "name": "remote-address",
+              "type": 0
+            }
+          ],
+          "results": [
+            {
+              "type": 1
+            }
+          ]
+        }
+      },
+      "package": 0
+    }
+  ],
+  "types": [
+    {
+      "name": "ipv6-socket-address",
+      "kind": {
+        "tuple": {
+          "types": [
+            "u16",
+            "u16",
+            "u16",
+            "u16",
+            "u16",
+            "u16",
+            "u16",
+            "u16",
+            "u16",
+            "u16"
+          ]
+        }
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "tuple": {
+          "types": [
+            "u32",
+            "u32"
+          ]
+        }
+      },
+      "owner": null
+    }
+  ],
+  "packages": [
+    {
+      "name": "foo:foo",
+      "docs": {
+        "contents": "This test generates multiple `RetArea` structs."
+      },
+      "interfaces": {
+        "tcp": 0
+      },
+      "worlds": {
+        "wasi": 0
+      }
+    }
+  ]
+}

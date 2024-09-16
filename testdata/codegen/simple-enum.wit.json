@@ -1,0 +1,123 @@
+{
+  "worlds": [
+    {
+      "name": "the-world",
+      "imports": {
+        "interface-0": {
+          "interface": {
+            "id": 0
+          }
+        }
+      },
+      "exports": {
+        "interface-0": {
+          "interface": {
+            "id": 0
+          }
+        }
+      },
+      "package": 0
+    }
+  ],
+  "interfaces": [
+    {
+      "name": "enums",
+      "types": {
+        "e1": 0,
+        "e2": 1
+      },
+      "functions": {
+        "e1-arg": {
+          "name": "e1-arg",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "x",
+              "type": 0
+            }
+          ],
+          "results": []
+        },
+        "e2-arg": {
+          "name": "e2-arg",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "x",
+              "type": 1
+            }
+          ],
+          "results": []
+        },
+        "e1-ret": {
+          "name": "e1-ret",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "x",
+              "type": 0
+            }
+          ],
+          "results": [
+            {
+              "type": 1
+            }
+          ]
+        }
+      },
+      "package": 0
+    }
+  ],
+  "types": [
+    {
+      "name": "e1",
+      "kind": {
+        "enum": {
+          "cases": [
+            {
+              "name": "a"
+            },
+            {
+              "name": "b"
+            },
+            {
+              "name": "c"
+            }
+          ]
+        }
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": "e2",
+      "kind": {
+        "enum": {
+          "cases": [
+            {
+              "name": "something"
+            },
+            {
+              "name": "else"
+            }
+          ]
+        }
+      },
+      "owner": {
+        "interface": 0
+      }
+    }
+  ],
+  "packages": [
+    {
+      "name": "foo:foo",
+      "interfaces": {
+        "enums": 0
+      },
+      "worlds": {
+        "the-world": 0
+      }
+    }
+  ]
+}

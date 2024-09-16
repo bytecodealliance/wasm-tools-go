@@ -1,0 +1,135 @@
+{
+  "worlds": [
+    {
+      "name": "resources",
+      "imports": {
+        "interface-0": {
+          "interface": {
+            "id": 0
+          }
+        },
+        "e2": {
+          "interface": {
+            "id": 1
+          }
+        }
+      },
+      "exports": {},
+      "package": 0
+    }
+  ],
+  "interfaces": [
+    {
+      "name": "e1",
+      "types": {
+        "x": 0
+      },
+      "functions": {
+        "[method]x.fun": {
+          "name": "[method]x.fun",
+          "kind": {
+            "method": 0
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 1
+            }
+          ],
+          "results": [
+            {
+              "type": 3
+            }
+          ]
+        }
+      },
+      "package": 0
+    },
+    {
+      "name": null,
+      "types": {
+        "x": 4
+      },
+      "functions": {
+        "use-res": {
+          "name": "use-res",
+          "kind": "freestanding",
+          "params": [],
+          "results": [
+            {
+              "type": 5
+            }
+          ]
+        }
+      },
+      "package": 0
+    }
+  ],
+  "types": [
+    {
+      "name": "x",
+      "kind": "resource",
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "borrow": 0
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "own": 0
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "tuple": {
+          "types": [
+            2
+          ]
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": "x",
+      "kind": {
+        "type": 0
+      },
+      "owner": {
+        "interface": 1
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "own": 4
+        }
+      },
+      "owner": null
+    }
+  ],
+  "packages": [
+    {
+      "name": "my:resources",
+      "interfaces": {
+        "e1": 0
+      },
+      "worlds": {
+        "resources": 0
+      }
+    }
+  ]
+}

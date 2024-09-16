@@ -1,0 +1,102 @@
+{
+  "worlds": [
+    {
+      "name": "foo-world",
+      "imports": {
+        "interface-0": {
+          "interface": {
+            "id": 0
+          }
+        }
+      },
+      "exports": {},
+      "package": 0
+    }
+  ],
+  "interfaces": [
+    {
+      "name": "foo-bar",
+      "types": {
+        "foo": 0,
+        "bar": 1
+      },
+      "functions": {
+        "fetch": {
+          "name": "fetch",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "x",
+              "type": 0
+            }
+          ],
+          "results": [
+            {
+              "type": 2
+            }
+          ]
+        }
+      },
+      "package": 0
+    }
+  ],
+  "types": [
+    {
+      "name": "foo",
+      "kind": {
+        "record": {
+          "fields": [
+            {
+              "name": "type",
+              "type": "string"
+            },
+            {
+              "name": "anything",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": "bar",
+      "kind": {
+        "record": {
+          "fields": [
+            {
+              "name": "anything",
+              "type": "u16"
+            }
+          ]
+        }
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "result": {
+          "ok": 1,
+          "err": null
+        }
+      },
+      "owner": null
+    }
+  ],
+  "packages": [
+    {
+      "name": "foo:foo",
+      "interfaces": {
+        "foo-bar": 0
+      },
+      "worlds": {
+        "foo-world": 0
+      }
+    }
+  ]
+}

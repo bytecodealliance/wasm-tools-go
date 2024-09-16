@@ -1,0 +1,144 @@
+{
+  "worlds": [
+    {
+      "name": "the-world",
+      "imports": {
+        "interface-0": {
+          "interface": {
+            "id": 0
+          }
+        }
+      },
+      "exports": {
+        "interface-0": {
+          "interface": {
+            "id": 0
+          }
+        }
+      },
+      "package": 0
+    }
+  ],
+  "interfaces": [
+    {
+      "name": "simple",
+      "types": {},
+      "functions": {
+        "f1": {
+          "name": "f1",
+          "kind": "freestanding",
+          "params": [],
+          "results": []
+        },
+        "f2": {
+          "name": "f2",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "a",
+              "type": "u32"
+            }
+          ],
+          "results": []
+        },
+        "f3": {
+          "name": "f3",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "a",
+              "type": "u32"
+            },
+            {
+              "name": "b",
+              "type": "u32"
+            }
+          ],
+          "results": []
+        },
+        "f4": {
+          "name": "f4",
+          "kind": "freestanding",
+          "params": [],
+          "results": [
+            {
+              "type": "u32"
+            }
+          ]
+        },
+        "f5": {
+          "name": "f5",
+          "kind": "freestanding",
+          "params": [],
+          "results": [
+            {
+              "type": 0
+            }
+          ]
+        },
+        "f6": {
+          "name": "f6",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "a",
+              "type": "u32"
+            },
+            {
+              "name": "b",
+              "type": "u32"
+            },
+            {
+              "name": "c",
+              "type": "u32"
+            }
+          ],
+          "results": [
+            {
+              "type": 1
+            }
+          ]
+        }
+      },
+      "package": 0
+    }
+  ],
+  "types": [
+    {
+      "name": null,
+      "kind": {
+        "tuple": {
+          "types": [
+            "u32",
+            "u32"
+          ]
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "tuple": {
+          "types": [
+            "u32",
+            "u32",
+            "u32"
+          ]
+        }
+      },
+      "owner": null
+    }
+  ],
+  "packages": [
+    {
+      "name": "foo:foo",
+      "interfaces": {
+        "simple": 0
+      },
+      "worlds": {
+        "the-world": 0
+      }
+    }
+  ]
+}

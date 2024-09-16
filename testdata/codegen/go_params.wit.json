@@ -1,0 +1,107 @@
+{
+  "worlds": [
+    {
+      "name": "go-params",
+      "imports": {
+        "error-code": {
+          "function": {
+            "name": "error-code",
+            "kind": "freestanding",
+            "params": [
+              {
+                "name": "err",
+                "type": "u32"
+              }
+            ],
+            "results": [
+              {
+                "type": 0
+              }
+            ]
+          }
+        },
+        "error-code2": {
+          "function": {
+            "name": "error-code2",
+            "kind": "freestanding",
+            "params": [
+              {
+                "name": "ret",
+                "type": "u32"
+              }
+            ],
+            "results": [
+              {
+                "type": 0
+              }
+            ]
+          }
+        },
+        "error-code3": {
+          "function": {
+            "name": "error-code3",
+            "kind": "freestanding",
+            "params": [
+              {
+                "name": "err",
+                "type": "u32"
+              },
+              {
+                "name": "ret",
+                "type": 0
+              }
+            ],
+            "results": [
+              {
+                "type": 1
+              }
+            ]
+          }
+        },
+        "error-code4": {
+          "function": {
+            "name": "error-code4",
+            "kind": "freestanding",
+            "params": [],
+            "results": [
+              {
+                "type": 1
+              }
+            ]
+          }
+        }
+      },
+      "exports": {},
+      "package": 0
+    }
+  ],
+  "interfaces": [],
+  "types": [
+    {
+      "name": null,
+      "kind": {
+        "option": "u32"
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "result": {
+          "ok": "u32",
+          "err": null
+        }
+      },
+      "owner": null
+    }
+  ],
+  "packages": [
+    {
+      "name": "foo:foo",
+      "interfaces": {},
+      "worlds": {
+        "go-params": 0
+      }
+    }
+  ]
+}

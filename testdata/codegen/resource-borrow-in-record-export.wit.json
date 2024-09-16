@@ -1,0 +1,91 @@
+{
+  "worlds": [
+    {
+      "name": "x",
+      "imports": {},
+      "exports": {
+        "interface-0": {
+          "interface": {
+            "id": 0
+          }
+        }
+      },
+      "package": 0
+    }
+  ],
+  "interfaces": [
+    {
+      "name": "foo4",
+      "types": {
+        "y": 0,
+        "r": 2
+      },
+      "functions": {
+        "f": {
+          "name": "f",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "a",
+              "type": 3
+            }
+          ],
+          "results": []
+        }
+      },
+      "package": 0
+    }
+  ],
+  "types": [
+    {
+      "name": "y",
+      "kind": "resource",
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "borrow": 0
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": "r",
+      "kind": {
+        "record": {
+          "fields": [
+            {
+              "name": "y",
+              "type": 1
+            }
+          ]
+        }
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "list": 2
+      },
+      "owner": null
+    }
+  ],
+  "packages": [
+    {
+      "name": "foo:bar",
+      "interfaces": {
+        "foo4": 0
+      },
+      "worlds": {
+        "x": 0
+      }
+    }
+  ]
+}

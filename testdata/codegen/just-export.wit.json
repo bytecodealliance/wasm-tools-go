@@ -1,0 +1,80 @@
+{
+  "worlds": [
+    {
+      "name": "foo",
+      "imports": {},
+      "exports": {
+        "generate": {
+          "function": {
+            "name": "generate",
+            "kind": "freestanding",
+            "params": [
+              {
+                "name": "name",
+                "type": "string"
+              },
+              {
+                "name": "wit",
+                "type": 0
+              }
+            ],
+            "results": [
+              {
+                "type": 3
+              }
+            ]
+          }
+        }
+      },
+      "package": 0
+    }
+  ],
+  "interfaces": [],
+  "types": [
+    {
+      "name": null,
+      "kind": {
+        "list": "u8"
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "tuple": {
+          "types": [
+            "string",
+            0
+          ]
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "list": 1
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "result": {
+          "ok": 2,
+          "err": "string"
+        }
+      },
+      "owner": null
+    }
+  ],
+  "packages": [
+    {
+      "name": "foo:foo",
+      "interfaces": {},
+      "worlds": {
+        "foo": 0
+      }
+    }
+  ]
+}

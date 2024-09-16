@@ -1,0 +1,900 @@
+{
+  "worlds": [
+    {
+      "name": "my-world",
+      "imports": {
+        "interface-0": {
+          "interface": {
+            "id": 0
+          }
+        }
+      },
+      "exports": {
+        "interface-0": {
+          "interface": {
+            "id": 0
+          }
+        }
+      },
+      "package": 0
+    }
+  ],
+  "interfaces": [
+    {
+      "name": "variants",
+      "types": {
+        "e1": 0,
+        "empty": 1,
+        "v1": 2,
+        "casts1": 3,
+        "casts2": 4,
+        "casts3": 5,
+        "casts4": 6,
+        "casts5": 7,
+        "casts6": 10,
+        "my-errno": 11,
+        "is-clone": 12,
+        "no-data": 13
+      },
+      "functions": {
+        "e1-arg": {
+          "name": "e1-arg",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "x",
+              "type": 0
+            }
+          ],
+          "results": []
+        },
+        "e1-result": {
+          "name": "e1-result",
+          "kind": "freestanding",
+          "params": [],
+          "results": [
+            {
+              "type": 0
+            }
+          ]
+        },
+        "v1-arg": {
+          "name": "v1-arg",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "x",
+              "type": 2
+            }
+          ],
+          "results": []
+        },
+        "v1-result": {
+          "name": "v1-result",
+          "kind": "freestanding",
+          "params": [],
+          "results": [
+            {
+              "type": 2
+            }
+          ]
+        },
+        "bool-arg": {
+          "name": "bool-arg",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "x",
+              "type": "bool"
+            }
+          ],
+          "results": []
+        },
+        "bool-result": {
+          "name": "bool-result",
+          "kind": "freestanding",
+          "params": [],
+          "results": [
+            {
+              "type": "bool"
+            }
+          ]
+        },
+        "option-arg": {
+          "name": "option-arg",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "a",
+              "type": 14
+            },
+            {
+              "name": "b",
+              "type": 16
+            },
+            {
+              "name": "c",
+              "type": 17
+            },
+            {
+              "name": "d",
+              "type": 18
+            },
+            {
+              "name": "e",
+              "type": 19
+            },
+            {
+              "name": "g",
+              "type": 20
+            }
+          ],
+          "results": []
+        },
+        "option-result": {
+          "name": "option-result",
+          "kind": "freestanding",
+          "params": [],
+          "results": [
+            {
+              "type": 21
+            }
+          ]
+        },
+        "casts": {
+          "name": "casts",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "a",
+              "type": 3
+            },
+            {
+              "name": "b",
+              "type": 4
+            },
+            {
+              "name": "c",
+              "type": 5
+            },
+            {
+              "name": "d",
+              "type": 6
+            },
+            {
+              "name": "e",
+              "type": 7
+            },
+            {
+              "name": "f",
+              "type": 10
+            }
+          ],
+          "results": [
+            {
+              "type": 22
+            }
+          ]
+        },
+        "result-arg": {
+          "name": "result-arg",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "a",
+              "type": 23
+            },
+            {
+              "name": "b",
+              "type": 24
+            },
+            {
+              "name": "c",
+              "type": 25
+            },
+            {
+              "name": "d",
+              "type": 26
+            },
+            {
+              "name": "e",
+              "type": 27
+            },
+            {
+              "name": "f",
+              "type": 29
+            }
+          ],
+          "results": []
+        },
+        "result-result": {
+          "name": "result-result",
+          "kind": "freestanding",
+          "params": [],
+          "results": [
+            {
+              "type": 30
+            }
+          ]
+        },
+        "return-result-sugar": {
+          "name": "return-result-sugar",
+          "kind": "freestanding",
+          "params": [],
+          "results": [
+            {
+              "type": 31
+            }
+          ]
+        },
+        "return-result-sugar2": {
+          "name": "return-result-sugar2",
+          "kind": "freestanding",
+          "params": [],
+          "results": [
+            {
+              "type": 32
+            }
+          ]
+        },
+        "return-result-sugar3": {
+          "name": "return-result-sugar3",
+          "kind": "freestanding",
+          "params": [],
+          "results": [
+            {
+              "type": 33
+            }
+          ]
+        },
+        "return-result-sugar4": {
+          "name": "return-result-sugar4",
+          "kind": "freestanding",
+          "params": [],
+          "results": [
+            {
+              "type": 35
+            }
+          ]
+        },
+        "return-option-sugar": {
+          "name": "return-option-sugar",
+          "kind": "freestanding",
+          "params": [],
+          "results": [
+            {
+              "type": 36
+            }
+          ]
+        },
+        "return-option-sugar2": {
+          "name": "return-option-sugar2",
+          "kind": "freestanding",
+          "params": [],
+          "results": [
+            {
+              "type": 37
+            }
+          ]
+        },
+        "result-simple": {
+          "name": "result-simple",
+          "kind": "freestanding",
+          "params": [],
+          "results": [
+            {
+              "type": 38
+            }
+          ]
+        },
+        "is-clone-arg": {
+          "name": "is-clone-arg",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "a",
+              "type": 12
+            }
+          ],
+          "results": []
+        },
+        "is-clone-return": {
+          "name": "is-clone-return",
+          "kind": "freestanding",
+          "params": [],
+          "results": [
+            {
+              "type": 12
+            }
+          ]
+        },
+        "return-named-option": {
+          "name": "return-named-option",
+          "kind": "freestanding",
+          "params": [],
+          "results": [
+            {
+              "name": "a",
+              "type": 39
+            }
+          ]
+        },
+        "return-named-result": {
+          "name": "return-named-result",
+          "kind": "freestanding",
+          "params": [],
+          "results": [
+            {
+              "name": "a",
+              "type": 40
+            }
+          ]
+        },
+        "consumes-no-data": {
+          "name": "consumes-no-data",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "x",
+              "type": 13
+            }
+          ],
+          "results": []
+        },
+        "produces-no-data": {
+          "name": "produces-no-data",
+          "kind": "freestanding",
+          "params": [],
+          "results": [
+            {
+              "type": 13
+            }
+          ]
+        }
+      },
+      "package": 0
+    }
+  ],
+  "types": [
+    {
+      "name": "e1",
+      "kind": {
+        "enum": {
+          "cases": [
+            {
+              "name": "a"
+            }
+          ]
+        }
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": "empty",
+      "kind": {
+        "record": {
+          "fields": [
+            {
+              "name": "not-empty-anymore",
+              "type": "bool"
+            }
+          ]
+        }
+      },
+      "owner": {
+        "interface": 0
+      },
+      "docs": {
+        "contents": "NB: this record used to be empty, but that's no longer valid, so now it's\nnon-empty. Don't want to delete the whole test however."
+      }
+    },
+    {
+      "name": "v1",
+      "kind": {
+        "variant": {
+          "cases": [
+            {
+              "name": "a",
+              "type": null
+            },
+            {
+              "name": "c",
+              "type": 0
+            },
+            {
+              "name": "d",
+              "type": "string"
+            },
+            {
+              "name": "e",
+              "type": 1
+            },
+            {
+              "name": "f",
+              "type": null
+            },
+            {
+              "name": "g",
+              "type": "u32"
+            }
+          ]
+        }
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": "casts1",
+      "kind": {
+        "variant": {
+          "cases": [
+            {
+              "name": "a",
+              "type": "s32"
+            },
+            {
+              "name": "b",
+              "type": "f32"
+            }
+          ]
+        }
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": "casts2",
+      "kind": {
+        "variant": {
+          "cases": [
+            {
+              "name": "a",
+              "type": "f64"
+            },
+            {
+              "name": "b",
+              "type": "f32"
+            }
+          ]
+        }
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": "casts3",
+      "kind": {
+        "variant": {
+          "cases": [
+            {
+              "name": "a",
+              "type": "f64"
+            },
+            {
+              "name": "b",
+              "type": "u64"
+            }
+          ]
+        }
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": "casts4",
+      "kind": {
+        "variant": {
+          "cases": [
+            {
+              "name": "a",
+              "type": "u32"
+            },
+            {
+              "name": "b",
+              "type": "s64"
+            }
+          ]
+        }
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": "casts5",
+      "kind": {
+        "variant": {
+          "cases": [
+            {
+              "name": "a",
+              "type": "f32"
+            },
+            {
+              "name": "b",
+              "type": "s64"
+            }
+          ]
+        }
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "tuple": {
+          "types": [
+            "f32",
+            "u32"
+          ]
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "tuple": {
+          "types": [
+            "u32",
+            "u32"
+          ]
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": "casts6",
+      "kind": {
+        "variant": {
+          "cases": [
+            {
+              "name": "a",
+              "type": 8
+            },
+            {
+              "name": "b",
+              "type": 9
+            }
+          ]
+        }
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": "my-errno",
+      "kind": {
+        "enum": {
+          "cases": [
+            {
+              "name": "bad1"
+            },
+            {
+              "name": "bad2"
+            }
+          ]
+        }
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": "is-clone",
+      "kind": {
+        "record": {
+          "fields": [
+            {
+              "name": "v1",
+              "type": 2
+            }
+          ]
+        }
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": "no-data",
+      "kind": {
+        "variant": {
+          "cases": [
+            {
+              "name": "a",
+              "type": null
+            },
+            {
+              "name": "b",
+              "type": null
+            }
+          ]
+        }
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "option": "bool"
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "tuple": {
+          "types": [
+            "u32"
+          ]
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "option": 15
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "option": "u32"
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "option": 0
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "option": "f32"
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "option": 14
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "tuple": {
+          "types": [
+            14,
+            16,
+            17,
+            18,
+            19,
+            20
+          ]
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "tuple": {
+          "types": [
+            3,
+            4,
+            5,
+            6,
+            7,
+            10
+          ]
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "result": {
+          "ok": null,
+          "err": null
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "result": {
+          "ok": null,
+          "err": 0
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "result": {
+          "ok": 0,
+          "err": null
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "result": {
+          "ok": 15,
+          "err": 15
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "result": {
+          "ok": "u32",
+          "err": 2
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "list": "u8"
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "result": {
+          "ok": "string",
+          "err": 28
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "tuple": {
+          "types": [
+            23,
+            24,
+            25,
+            26,
+            27,
+            29
+          ]
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "result": {
+          "ok": "s32",
+          "err": 11
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "result": {
+          "ok": null,
+          "err": 11
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "result": {
+          "ok": 11,
+          "err": 11
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "tuple": {
+          "types": [
+            "s32",
+            "u32"
+          ]
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "result": {
+          "ok": 34,
+          "err": 11
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "option": "s32"
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "option": 11
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "result": {
+          "ok": "u32",
+          "err": "s32"
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "option": "u8"
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "result": {
+          "ok": "u8",
+          "err": 11
+        }
+      },
+      "owner": null
+    }
+  ],
+  "packages": [
+    {
+      "name": "foo:foo",
+      "interfaces": {
+        "variants": 0
+      },
+      "worlds": {
+        "my-world": 0
+      }
+    }
+  ]
+}

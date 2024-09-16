@@ -1,0 +1,279 @@
+{
+  "worlds": [
+    {
+      "name": "my-world",
+      "imports": {
+        "interface-0": {
+          "interface": {
+            "id": 0
+          }
+        }
+      },
+      "exports": {
+        "interface-0": {
+          "interface": {
+            "id": 0
+          }
+        }
+      },
+      "package": 0
+    }
+  ],
+  "interfaces": [
+    {
+      "name": "option-simple",
+      "types": {
+        "empty": 0,
+        "o-one": 2,
+        "o-nested": 5,
+        "o1": 6,
+        "o2": 7,
+        "o3": 8,
+        "o4": 10
+      },
+      "functions": {
+        "oint-arg": {
+          "name": "oint-arg",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "x",
+              "type": 11
+            }
+          ],
+          "results": []
+        },
+        "oint-result": {
+          "name": "oint-result",
+          "kind": "freestanding",
+          "params": [],
+          "results": [
+            {
+              "type": 11
+            }
+          ]
+        },
+        "o1-arg": {
+          "name": "o1-arg",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "x",
+              "type": 6
+            }
+          ],
+          "results": []
+        },
+        "o1-result": {
+          "name": "o1-result",
+          "kind": "freestanding",
+          "params": [],
+          "results": [
+            {
+              "type": 6
+            }
+          ]
+        },
+        "o2-arg": {
+          "name": "o2-arg",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "x",
+              "type": 7
+            }
+          ],
+          "results": []
+        },
+        "o2-result": {
+          "name": "o2-result",
+          "kind": "freestanding",
+          "params": [],
+          "results": [
+            {
+              "type": 7
+            }
+          ]
+        },
+        "o3-arg": {
+          "name": "o3-arg",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "x",
+              "type": 8
+            }
+          ],
+          "results": []
+        },
+        "o3-result": {
+          "name": "o3-result",
+          "kind": "freestanding",
+          "params": [],
+          "results": [
+            {
+              "type": 8
+            }
+          ]
+        },
+        "o4-arg": {
+          "name": "o4-arg",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "x",
+              "type": 10
+            }
+          ],
+          "results": []
+        },
+        "o4-result": {
+          "name": "o4-result",
+          "kind": "freestanding",
+          "params": [],
+          "results": [
+            {
+              "type": 10
+            }
+          ]
+        }
+      },
+      "package": 0
+    }
+  ],
+  "types": [
+    {
+      "name": "empty",
+      "kind": {
+        "record": {
+          "fields": [
+            {
+              "name": "not-empty-anymore",
+              "type": "bool"
+            }
+          ]
+        }
+      },
+      "owner": {
+        "interface": 0
+      },
+      "docs": {
+        "contents": "NB: this record used to be empty, but that's no longer valid, so now it's\nnon-empty. Don't want to delete the whole test however."
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "option": "bool"
+      },
+      "owner": null
+    },
+    {
+      "name": "o-one",
+      "kind": {
+        "record": {
+          "fields": [
+            {
+              "name": "a",
+              "type": 1
+            }
+          ]
+        }
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "option": 2
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "option": 3
+      },
+      "owner": null
+    },
+    {
+      "name": "o-nested",
+      "kind": {
+        "record": {
+          "fields": [
+            {
+              "name": "a",
+              "type": 4
+            }
+          ]
+        }
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": "o1",
+      "kind": {
+        "option": 2
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": "o2",
+      "kind": {
+        "option": 0
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": "o3",
+      "kind": {
+        "option": 5
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "option": 5
+      },
+      "owner": null
+    },
+    {
+      "name": "o4",
+      "kind": {
+        "option": 9
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "option": "s32"
+      },
+      "owner": null
+    }
+  ],
+  "packages": [
+    {
+      "name": "foo:foo",
+      "interfaces": {
+        "option-simple": 0
+      },
+      "worlds": {
+        "my-world": 0
+      }
+    }
+  ]
+}

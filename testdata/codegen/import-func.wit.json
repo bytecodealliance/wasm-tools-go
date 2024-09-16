@@ -1,0 +1,97 @@
+{
+  "worlds": [
+    {
+      "name": "foo",
+      "imports": {
+        "foo": {
+          "function": {
+            "name": "foo",
+            "kind": "freestanding",
+            "params": [],
+            "results": []
+          }
+        },
+        "foo1": {
+          "function": {
+            "name": "foo1",
+            "kind": "freestanding",
+            "params": [],
+            "results": [
+              {
+                "type": "string"
+              }
+            ]
+          }
+        },
+        "foo2": {
+          "function": {
+            "name": "foo2",
+            "kind": "freestanding",
+            "params": [
+              {
+                "name": "x",
+                "type": "string"
+              }
+            ],
+            "results": []
+          }
+        },
+        "foo3": {
+          "function": {
+            "name": "foo3",
+            "kind": "freestanding",
+            "params": [
+              {
+                "name": "x",
+                "type": 0
+              }
+            ],
+            "results": [
+              {
+                "type": 2
+              }
+            ]
+          }
+        }
+      },
+      "exports": {},
+      "package": 0
+    }
+  ],
+  "interfaces": [],
+  "types": [
+    {
+      "name": null,
+      "kind": {
+        "list": "u8"
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "option": "u32"
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "result": {
+          "ok": 1,
+          "err": "string"
+        }
+      },
+      "owner": null
+    }
+  ],
+  "packages": [
+    {
+      "name": "foo:foo",
+      "interfaces": {},
+      "worlds": {
+        "foo": 0
+      }
+    }
+  ]
+}

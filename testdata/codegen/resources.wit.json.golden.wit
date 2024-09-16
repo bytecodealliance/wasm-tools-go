@@ -1,0 +1,46 @@
+package my:resources;
+
+interface types {
+	resource z {
+		constructor(a: f64);
+	}
+}
+
+world resources {
+	import imports: interface {
+		resource y {
+			constructor(a: f64);
+			get-a: func() -> f64;
+			set-a: func(a: f64);
+			add: static func(y: y, a: f64) -> y;
+		}
+	}
+	import types;
+	use types.{z};
+	variant includes-borrow { a, b(borrow<z>) }
+	record big {
+		x1: borrow<z>,
+		x2: borrow<z>,
+		x3: borrow<z>,
+		x4: borrow<z>,
+		x5: borrow<z>,
+		x6: borrow<z>,
+		x7: borrow<z>,
+		x8: borrow<z>,
+		x9: borrow<z>,
+		x10: borrow<z>,
+	}
+	export add: func(a: borrow<z>, b: borrow<z>) -> z;
+	export maybe-with-z: func(a: option<borrow<z>>);
+	export variant-with-z: func(a: includes-borrow);
+	export maybe-variant-with-z: func(a: option<includes-borrow>);
+	export big-record: func(r: big);
+	export exports: interface {
+		resource x {
+			constructor(a: f64);
+			get-a: func() -> f64;
+			set-a: func(a: f64);
+			add: static func(x: x, a: f64) -> x;
+		}
+	}
+}

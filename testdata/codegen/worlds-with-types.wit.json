@@ -1,0 +1,117 @@
+{
+  "worlds": [
+    {
+      "name": "foo",
+      "imports": {
+        "interface-0": {
+          "interface": {
+            "id": 0
+          }
+        },
+        "type1": {
+          "type": 1
+        },
+        "type2": {
+          "type": 2
+        },
+        "type3": {
+          "type": 3
+        }
+      },
+      "exports": {
+        "foo": {
+          "function": {
+            "name": "foo",
+            "kind": "freestanding",
+            "params": [],
+            "results": [
+              {
+                "type": 4
+              }
+            ]
+          }
+        }
+      },
+      "package": 0
+    }
+  ],
+  "interfaces": [
+    {
+      "name": "i",
+      "types": {
+        "type1": 0
+      },
+      "functions": {},
+      "package": 0
+    }
+  ],
+  "types": [
+    {
+      "name": "type1",
+      "kind": {
+        "type": "u32"
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": "type1",
+      "kind": {
+        "type": 0
+      },
+      "owner": {
+        "world": 0
+      }
+    },
+    {
+      "name": "type2",
+      "kind": {
+        "type": "u32"
+      },
+      "owner": {
+        "world": 0
+      }
+    },
+    {
+      "name": "type3",
+      "kind": {
+        "record": {
+          "fields": [
+            {
+              "name": "r",
+              "type": "u32"
+            }
+          ]
+        }
+      },
+      "owner": {
+        "world": 0
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "tuple": {
+          "types": [
+            1,
+            2,
+            3
+          ]
+        }
+      },
+      "owner": null
+    }
+  ],
+  "packages": [
+    {
+      "name": "foo:foo",
+      "interfaces": {
+        "i": 0
+      },
+      "worlds": {
+        "foo": 0
+      }
+    }
+  ]
+}
