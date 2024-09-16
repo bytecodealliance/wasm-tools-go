@@ -177,40 +177,36 @@ func witFor[T Node](nodes ...T) []string {
 
 // TestHasBorrow verifies that HasBorrow returns true for WIT types that contain a Borrow type.
 func TestHasBorrow(t *testing.T) {
+	makeBorrow := func() *TypeDef { return &TypeDef{Kind: &Borrow{}} }
+	makeTypeDef := func(kind TypeDefKind) *TypeDef { return &TypeDef{Kind: kind} }
+
 	testCases := []struct {
 		name     string
 		typeDef  *TypeDef
 		expected bool
 	}{
-		{
-			name:     "Simple borrow",
-			typeDef:  &TypeDef{Kind: &Borrow{}},
-			expected: true,
-		},
-		{
-			name: "Nested borrow in record",
-			typeDef: &TypeDef{Kind: &Record{
-				Fields: []Field{
-					{Type: &TypeDef{Kind: &Borrow{}}},
-				},
-			}},
-			expected: true,
-		},
-		{
-			name: "Nested borrow in list of records",
-			typeDef: &TypeDef{Kind: &List{Type: &TypeDef{Kind: &Record{
-				Fields: []Field{
-					{Type: &TypeDef{Kind: &Borrow{}}},
-				},
-			}}}},
-			expected: true,
-		},
+		{"Simple Borrow", makeBorrow(), true},
+		{"Record with Borrow", makeTypeDef(&Record{Fields: []Field{{Type: makeBorrow()}}}), true},
+		{"List of Record with Borrow", makeTypeDef(&List{Type: makeTypeDef(&Record{Fields: []Field{{Type: makeBorrow()}}})}), true},
+		{"Record without Borrow", makeTypeDef(&Record{Fields: []Field{{Type: makeTypeDef(&String{})}}}), false},
+		{"Nested Option with Borrow", makeTypeDef(&Option{Type: makeBorrow()}), true},
+		{"Nested Option without Borrow", makeTypeDef(&Option{Type: makeTypeDef(&String{})}), false},
+		{"Variant with Borrow", makeTypeDef(&Variant{Cases: []Case{{Type: makeBorrow()}}}), true},
+		{"Variant without Borrow", makeTypeDef(&Variant{Cases: []Case{{Type: makeTypeDef(&String{})}}}), false},
+		{"Result with Borrow in Ok", makeTypeDef(&Result{OK: makeBorrow(), Err: makeTypeDef(&String{})}), true},
+		{"Result with Borrow in Err", makeTypeDef(&Result{OK: makeTypeDef(&String{}), Err: makeBorrow()}), true},
+		{"Result without Borrow", makeTypeDef(&Result{OK: makeTypeDef(&String{}), Err: makeTypeDef(&String{})}), false},
+		{"Future with Borrow", makeTypeDef(&Future{Type: makeBorrow()}), true},
+		{"Future without Borrow", makeTypeDef(&Future{Type: makeTypeDef(&String{})}), false},
+		{"Tuple with Borrow", makeTypeDef(&Tuple{Types: []Type{makeTypeDef(&String{}), makeBorrow()}}), true},
+		{"Tuple without Borrow", makeTypeDef(&Tuple{Types: []Type{makeTypeDef(&String{}), makeTypeDef(&String{})}}), false},
+		{"Enum without Borrow", makeTypeDef(&Enum{Cases: []EnumCase{{Name: "A"}, {Name: "B"}}}), false},
 	}
+
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			result := HasBorrow(tc.typeDef)
-			if result != tc.expected {
-				t.Errorf("HasBorrow(%s) = %t; want %t", tc.name, result, tc.expected)
+			if result := HasBorrow(tc.typeDef); result != tc.expected {
+				t.Errorf("HasBorrow(%q) = %t; want %t", tc.name, result, tc.expected)
 			}
 		})
 	}
