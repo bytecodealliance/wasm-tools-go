@@ -22,3 +22,9 @@ generate: clean json
 .PHONY: clean
 clean:
 	rm -rf ./generated/*
+
+# test runs Go and TinyGo tests
+.PHONY: test
+test:
+	go test -v ./...
+	cd tests && tinygo test -v -target=wasip2 ./...
