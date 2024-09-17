@@ -10,8 +10,8 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/sergi/go-diff/diffmatchpatch"
 	"github.com/bytecodealliance/wasm-tools-go/internal/relpath"
+	"github.com/sergi/go-diff/diffmatchpatch"
 )
 
 var update = flag.Bool("update", false, "update golden files")
@@ -481,11 +481,16 @@ func TestHasPointer(t *testing.T) {
 	}
 }
 
-// TestHasBorrow verifies that HasBorrow returns true for all WIT types that contain a borrow<T>.
-func TestHasBorrow(t *testing.T) {
+// TestHasBorrowOnNamedTypes verifies that HasBorrow returns true for all named WIT types that contain a borrow<T>.
+func TestHasBorrowOnNamedTypes(t *testing.T) {
 	err := loadTestdata(func(path string, res *Resolve) error {
 		t.Run(path, func(t *testing.T) {
 			for _, td := range res.TypeDefs {
+				if td.Name == nil {
+					// Skip anonymous types here. This is tested on `TestHasBorrow`.
+					// https://github.com/bytecodealliance/wasm-tools-go/issues/167
+					continue
+				}
 				wit := td.Kind.WIT(nil, "")
 				a := strings.Contains(wit, "borrow<")
 				b := HasBorrow(td)
