@@ -15,4 +15,6 @@ world resources {
 	}
 
 	export big-record: func(r: big);
+
+	export maybe-with-z: func(a: option<borrow<z>>);
 }

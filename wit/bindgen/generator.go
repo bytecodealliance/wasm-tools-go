@@ -1373,7 +1373,7 @@ func (g *generator) liftOption(file *gen.File, dir wit.Direction, t *wit.TypeDef
 	b.WriteString("if f0 == 0 {\n")
 	b.WriteString("return")
 	b.WriteString("}\n")
-	stringio.Write(&b, "return ", g.cast(file, dir, t, t, g.cmCall(afile, "Some["+g.typeRep(afile, dir, o.Type)+"]", g.liftVariantCase(afile, dir, o.Type, flat[1:]))), "\n")
+	stringio.Write(&b, "return ", g.cast(afile, dir, t, t, g.cmCall(afile, "Some["+g.typeRep(afile, dir, o.Type)+"]", g.liftVariantCase(afile, dir, o.Type, flat[1:]))), "\n")
 	return g.typeDefLiftFunction(file, dir, t, input, b.String())
 }
 
@@ -1410,7 +1410,7 @@ func (g *generator) liftPrimitive(file *gen.File, dir wit.Direction, t wit.Type,
 
 func (g *generator) cast(file *gen.File, dir wit.Direction, from, to wit.Type, input string) string {
 	if castable(from, to) {
-		return "(" + g.typeRep(file, wit.Imported, to) + ")(" + input + ")"
+		return "(" + g.typeRep(file, dir, to) + ")(" + input + ")"
 	}
 	t := derefPointer(to)
 	if t != nil {

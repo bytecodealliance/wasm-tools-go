@@ -28,6 +28,19 @@
             ],
             "results": []
           }
+        },
+        "maybe-with-z": {
+          "function": {
+            "name": "maybe-with-z",
+            "kind": "freestanding",
+            "params": [
+              {
+                "name": "a",
+                "type": 4
+              }
+            ],
+            "results": []
+          }
         }
       },
       "package": 0
@@ -53,7 +66,7 @@
           ],
           "results": [
             {
-              "type": 4
+              "type": 5
             }
           ]
         }
@@ -102,6 +115,13 @@
       "owner": {
         "world": 0
       }
+    },
+    {
+      "name": null,
+      "kind": {
+        "option": 2
+      },
+      "owner": null
     },
     {
       "name": null,
