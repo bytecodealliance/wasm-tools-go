@@ -3,6 +3,7 @@
 package oci
 
 import (
+	"bytes"
 	"context"
 	"errors"
 )
@@ -12,6 +13,6 @@ func IsOCIPath(path string) bool {
 	return false
 }
 
-func PullWIT(ctx context.Context, path, out string) error {
-	return errors.New("OCI not supported on WASI or TinyGo")
+func PullWIT(ctx context.Context, path string) (*bytes.Buffer, error) {
+	return nil, errors.New("OCI not supported on WASI or TinyGo")
 }
