@@ -1,9 +1,11 @@
 package generate
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 
@@ -96,13 +98,15 @@ func action(ctx context.Context, cmd *cli.Command) error {
 
 	// check if the path is a OCI path
 	var res *wit.Resolve
+	var rawBytes []byte
 	if oci.IsOCIPath(path) {
 		fmt.Fprintf(os.Stderr, "Fetching OCI artifact %s\n", path)
 		bytes, err := oci.PullWIT(ctx, path)
+		rawBytes = bytes.Bytes()
 		if err != nil {
 			return err
 		}
-		res, err = wit.DecodeJSON(bytes)
+		res, err = wit.LoadWITFromBuffer(bytes)
 	} else {
 		res, err = witcli.LoadOne(cmd.Bool("force-wit"), path)
 	}
@@ -178,5 +182,32 @@ func action(ctx context.Context, cmd *cli.Command) error {
 		}
 	}
 
+	witDir := filepath.Join(out, "wit")
+	err = os.MkdirAll(witDir, outPerm)
+	if err != nil {
+		return err
+	}
+	witFilePath := filepath.Join(witDir, "webassembly.wit.wasm")
+
+	fmt.Fprintf(os.Stderr, "Generated WIT file: %s\n", witFilePath)
+
+	wasmTools, err := exec.LookPath("wasm-tools")
+	if err != nil {
+		return err
+	}
+	var stderr bytes.Buffer
+
+	wasmCmd := exec.Command(wasmTools, "component", "wit", "--wat", "--all-features", "--output", witFilePath)
+	if rawBytes != nil {
+		wasmCmd.Stdin = bytes.NewReader(rawBytes)
+	} else {
+		wasmCmd.Args = append(wasmCmd.Args, path)
+	}
+
+	err = wasmCmd.Run()
+	if err != nil {
+		fmt.Fprint(os.Stderr, stderr.String())
+		return err
+	}
 	return nil
 }

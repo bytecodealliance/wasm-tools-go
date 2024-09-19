@@ -6,7 +6,8 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"os/exec"
+	"io"
+	"os"
 
 	"github.com/regclient/regclient"
 	"github.com/regclient/regclient/types/manifest"
@@ -15,6 +16,10 @@ import (
 
 // IsOCIPath checks if a given path is an OCI path
 func IsOCIPath(path string) bool {
+	if _, err := os.Stat(path); err == nil {
+		return false
+	}
+
 	_, err := ref.New(path)
 	return err == nil
 }
@@ -22,13 +27,8 @@ func IsOCIPath(path string) bool {
 // PullWIT fetches an OCI artifact from a given OCI path
 // It invokes "regclient" APIs to pull the artifact and then
 // processes it with `wasm-tools`.
-// The output is returned as a buffer.
+// The output is returned as raw bytes.
 func PullWIT(ctx context.Context, path string) (*bytes.Buffer, error) {
-	wasmTools, err := exec.LookPath("wasm-tools")
-	if err != nil {
-		return nil, err
-	}
-
 	r, err := ref.New(path)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse ref: %v", err)
@@ -67,16 +67,11 @@ func PullWIT(ctx context.Context, path string) (*bytes.Buffer, error) {
 	}
 	defer rdr.Close()
 
-	var stdout bytes.Buffer
-	var stderr bytes.Buffer
-	wasmCmd := exec.Command(wasmTools, "component", "wit", "-j", "--all-features")
-	wasmCmd.Stdin = rdr
-	wasmCmd.Stdout = &stdout
-	wasmCmd.Stderr = &stderr
-
-	if err := wasmCmd.Run(); err != nil {
-		return nil, fmt.Errorf("wasm-tools command failed: %s: %w", stderr.String(), err)
+	// Read the blob content into a buffer
+	var buf bytes.Buffer
+	_, err = io.Copy(&buf, rdr)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read blob content: %v", err)
 	}
-
-	return &stdout, nil
+	return &buf, nil
 }

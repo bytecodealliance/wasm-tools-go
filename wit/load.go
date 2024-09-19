@@ -55,3 +55,33 @@ func LoadWIT(path string) (*Resolve, error) {
 
 	return DecodeJSON(&stdout)
 }
+
+// LoadWITFromBuffer loads WIT data from a provided buffer by processing it through wasm-tools.
+// It expects the buffer to contain valid WIT data and processes it through `wasm-tools`.
+// The result is returned as a *Resolve.
+func LoadWITFromBuffer(buffer *bytes.Buffer) (*Resolve, error) {
+	wasmTools, err := exec.LookPath("wasm-tools")
+	if err != nil {
+		return nil, err
+	}
+
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+
+	// Command to run `wasm-tools component wit -j --all-features`
+	cmd := exec.Command(wasmTools, "component", "wit", "-j", "--all-features")
+	cmd.Stdin = buffer   // Use the buffer content as input
+	cmd.Stdout = &stdout // Capture the output
+	cmd.Stderr = &stderr // Capture the stderr
+
+	// Run the command
+	err = cmd.Run()
+	if err != nil {
+		// If an error occurs, print stderr and return the error
+		fmt.Fprint(os.Stderr, stderr.String())
+		return nil, err
+	}
+
+	// Decode the output JSON from `wasm-tools` into a Resolve structure
+	return DecodeJSON(&stdout)
+}
