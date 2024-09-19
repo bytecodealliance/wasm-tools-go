@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - [#161](https://github.com/bytecodealliance/wasm-tools-go/issues/161): correctly handle `constructor` as a WIT keyword in wit.
 - [#165](https://github.com/bytecodealliance/wasm-tools-go/issues/165): fixed use of imported types in exported functions.
 - [#167](https://github.com/bytecodealliance/wasm-tools-go/issues/167): fixed a logic flaw in `TestHasBorrow`.
+- [#170](https://github.com/bytecodealliance/wasm-tools-go/issues/170): resolve implied names for interface imports and exports in a world.
 
 ## [v0.2.0] — 2024-09-05
 
