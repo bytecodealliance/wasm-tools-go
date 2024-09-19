@@ -106,7 +106,7 @@ func action(ctx context.Context, cmd *cli.Command) error {
 		if err != nil {
 			return err
 		}
-		res, err = wit.LoadWITFromBuffer(bytes)
+		res, err = wit.LoadWITFromBuffer(bytes.Bytes())
 	} else {
 		res, err = witcli.LoadOne(cmd.Bool("force-wit"), path)
 	}
