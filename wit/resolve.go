@@ -8,9 +8,9 @@ import (
 	"strings"
 	"unsafe"
 
-	"github.com/coreos/go-semver/semver"
 	"github.com/bytecodealliance/wasm-tools-go/wit/iterate"
 	"github.com/bytecodealliance/wasm-tools-go/wit/ordered"
+	"github.com/coreos/go-semver/semver"
 )
 
 // Resolve represents a fully resolved set of WIT ([WebAssembly Interface Type])
@@ -125,6 +125,44 @@ type Interface struct {
 	Package   *Package  // the Package this Interface belongs to
 	Stability Stability // WIT @since or @unstable (nil if unknown)
 	Docs      Docs
+}
+
+// InterfaceName performs a best-effort guess at the [Interface] name,
+// which may be found by scanning its parent package.
+func (i *Interface) InterfaceName() string {
+	if i.Name != nil {
+		return *i.Name
+	}
+	if i.Package == nil {
+		return ""
+	}
+	var done bool
+	var name string
+	scanWorldItem := func(key string, item WorldItem) bool {
+		if ref, ok := item.(*InterfaceRef); ok && ref.Interface == i && key != "" {
+			name = key
+			done = true
+		}
+		return !done
+	}
+	i.Package.Worlds.All()(func(_ string, w *World) bool {
+		w.Imports.All()(scanWorldItem)
+		if !done {
+			w.Exports.All()(scanWorldItem)
+		}
+		return !done
+	})
+	if done {
+		return name
+	}
+	i.Package.Interfaces.All()(func(key string, face *Interface) bool {
+		if face == i && key != "" {
+			name = key
+			done = true
+		}
+		return !done
+	})
+	return name
 }
 
 // AllFunctions returns a [sequence] that yields each [Function] in an [Interface].

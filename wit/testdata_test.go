@@ -361,10 +361,9 @@ func TestInterfaceNameIsNotNil(t *testing.T) {
 					name += "#" + *face.Name
 				}
 				t.Run(name, func(t *testing.T) {
-					// TODO: fix this, since anonymous imported interfaces have nil Name field
-					// if face.Name == nil {
-					// 	t.Error("Name is nil")
-					// }
+					if face.InterfaceName() == "" {
+						t.Error("empty or nil name")
+					}
 				})
 			}
 		})
@@ -421,8 +420,8 @@ func TestTypeDefRootOwnerNamesNotNil(t *testing.T) {
 							t.Error("Owner.Name is empty")
 						}
 					case *Interface:
-						if owner.Name == nil {
-							t.Error("Owner.Name is nil")
+						if owner.InterfaceName() == "" {
+							t.Error("Owner.Name is nil or Owner.InterfaceName() is empty")
 						}
 					}
 				})

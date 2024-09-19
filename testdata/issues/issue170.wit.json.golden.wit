@@ -1,0 +1,12 @@
+package issues:issue170;
+
+world w {
+	export example: interface {
+		resource r {
+			constructor(a: f64);
+			get-a: func() -> f64;
+			set-a: func(a: f64);
+			add: static func(r: r, a: f64) -> r;
+		}
+	}
+}
