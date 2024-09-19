@@ -7,22 +7,11 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"os"
 
 	"github.com/regclient/regclient"
 	"github.com/regclient/regclient/types/manifest"
 	"github.com/regclient/regclient/types/ref"
 )
-
-// IsOCIPath checks if a given path is an OCI path
-func IsOCIPath(path string) bool {
-	if _, err := os.Stat(path); err == nil {
-		return false
-	}
-
-	_, err := ref.New(path)
-	return err == nil
-}
 
 // PullWIT fetches an OCI artifact from a given OCI path
 // It invokes "regclient" APIs to pull the artifact and then

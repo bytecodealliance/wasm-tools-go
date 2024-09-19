@@ -1,4 +1,4 @@
-//go:build !wasip1 && !wasip2 && !tinygo
+//go:build !tinygo
 
 package oci
 
