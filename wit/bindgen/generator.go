@@ -544,10 +544,9 @@ func typeDefOwner(t *wit.TypeDef) wit.Ident {
 		id.Extension = owner.Name
 	case *wit.Interface:
 		id = owner.Package.Name
-		if owner.Name == nil {
-			id.Extension = "unknown"
-		} else {
-			id.Extension = *owner.Name
+		id.Extension = owner.InterfaceName()
+		if id.Extension == "" {
+			panic(fmt.Sprintf("BUG: unnamed interface owner of %#v", t))
 		}
 	}
 	return id
