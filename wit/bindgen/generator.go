@@ -74,35 +74,6 @@ type param struct {
 	dir  wit.Direction
 }
 
-func goFunction(file *gen.File, tdir, dir wit.Direction, f *wit.Function, goName string) function {
-	scope := gen.NewScope(file)
-	out := function{
-		file:    file,
-		scope:   scope,
-		name:    goName,
-		params:  goParams(scope, tdir, f.Params),
-		results: goParams(scope, tdir, f.Results),
-	}
-	if len(out.results) == 1 && out.results[0].name == "" {
-		out.results[0].name = scope.DeclareName("result")
-	}
-	if dir == wit.Imported && f.IsMethod() {
-		out.receiver = out.params[0]
-		// out.params = out.params[1:]
-	}
-	return out
-}
-
-func goParams(scope gen.Scope, dir wit.Direction, params []wit.Param) []param {
-	out := make([]param, len(params))
-	for i := range params {
-		out[i].name = scope.DeclareName(GoName(params[i].Name, false))
-		out[i].typ = params[i].Type
-		out[i].dir = dir
-	}
-	return out
-}
-
 type typeUse struct {
 	pkg *gen.Package
 	dir wit.Direction
@@ -593,15 +564,38 @@ func declareDirectedName(scope gen.Scope, dir wit.Direction, name string) string
 	return scope.DeclareName(name)
 }
 
-func (g *generator) typeDecl(dir wit.Direction, t *wit.TypeDef) (typeDecl, bool) {
-	if decl, ok := g.types[dir][t]; ok {
+// typeDecl returns the typeDecl for [wit.Direction] dir and [wit.TypeDef] t, and whether it was declared.
+func (g *generator) typeDecl(dir wit.Direction, t *wit.TypeDef) (decl typeDecl, ok bool) {
+	if decl, ok = g.types[dir][t]; ok {
 		return decl, true
 	}
 	// This may return an exported type used by an imported function, which is disallowed,
 	// except for Component Model administrative functions like resource.drop.
 	// TODO: figure out a way to enforce that constraint here.
-	decl, ok := g.types[^dir&1][t]
+	decl, ok = g.types[^dir&1][t]
 	return decl, ok
+}
+
+// typeDir returns the declared type direction (imported or exported) for t.
+// If t is not a *[wit.TypeDef], then it returns dir, false.
+// If t is not declared, it returns dir, false.
+// If t is declared, but in the other direction, it returns the other direction, true.
+func (g *generator) typeDir(dir wit.Direction, t wit.Type) (tdir wit.Direction, ok bool) {
+	td, ok := t.(*wit.TypeDef)
+	if !ok {
+		return dir, false
+	}
+	if _, ok = g.types[dir][td]; ok {
+		return dir, true
+	}
+	// This may return an exported type used by an imported function, which is disallowed,
+	// except for Component Model administrative functions like resource.drop.
+	// TODO: figure out a way to enforce that constraint here.
+	dir2 := ^dir & 1
+	if _, ok = g.types[dir2][td]; ok {
+		return dir2, true
+	}
+	return dir, false
 }
 
 func (g *generator) typeDefRep(file *gen.File, dir wit.Direction, t *wit.TypeDef, goName string) string {
@@ -1057,7 +1051,7 @@ func (g *generator) typeDefLowerFunction(file *gen.File, dir wit.Direction, t *w
 	if !ok {
 		afile := g.abiFile(file.Package)
 		name := afile.DeclareName("lower_" + g.typeDefGoName(dir, t))
-		f = goFunction(afile, dir, wit.Imported, wit.LowerFunction(t), name)
+		f = g.goFunction(afile, dir, wit.Imported, wit.LowerFunction(t), name)
 		g.lowerFunctions[use] = f
 		stringio.Write(afile, "func ", name, g.functionSignature(afile, f), " {\n", body, "}\n\n")
 	}
@@ -1272,7 +1266,7 @@ func (g *generator) typeDefLiftFunction(file *gen.File, dir wit.Direction, t *wi
 	if !ok {
 		afile := g.abiFile(file.Package)
 		name := afile.DeclareName("lift_" + g.typeDefGoName(dir, t))
-		f = goFunction(afile, dir, wit.Imported, wit.LiftFunction(t), name)
+		f = g.goFunction(afile, dir, wit.Imported, wit.LiftFunction(t), name)
 		g.liftFunctions[use] = f
 		stringio.Write(afile, "func ", name, g.functionSignature(afile, f), " {\n", body, "}\n\n")
 	}
@@ -1379,7 +1373,7 @@ func (g *generator) liftOption(file *gen.File, dir wit.Direction, t *wit.TypeDef
 	b.WriteString("if f0 == 0 {\n")
 	b.WriteString("return")
 	b.WriteString("}\n")
-	stringio.Write(&b, "return ", g.cast(file, dir, t, t, g.cmCall(afile, "Some["+g.typeRep(afile, dir, o.Type)+"]", g.liftVariantCase(afile, dir, o.Type, flat[1:]))), "\n")
+	stringio.Write(&b, "return ", g.cast(afile, dir, t, t, g.cmCall(afile, "Some["+g.typeRep(afile, dir, o.Type)+"]", g.liftVariantCase(afile, dir, o.Type, flat[1:]))), "\n")
 	return g.typeDefLiftFunction(file, dir, t, input, b.String())
 }
 
@@ -1416,7 +1410,7 @@ func (g *generator) liftPrimitive(file *gen.File, dir wit.Direction, t wit.Type,
 
 func (g *generator) cast(file *gen.File, dir wit.Direction, from, to wit.Type, input string) string {
 	if castable(from, to) {
-		return "(" + g.typeRep(file, wit.Imported, to) + ")(" + input + ")"
+		return "(" + g.typeRep(file, dir, to) + ")(" + input + ")"
 	}
 	t := derefPointer(to)
 	if t != nil {
@@ -1504,6 +1498,36 @@ func (g *generator) ensureParamImports(file *gen.File, dir wit.Direction, params
 		// otherwise short package name may collide with param name.
 		_ = g.typeRep(file, dir, params[i].Type)
 	}
+}
+
+func (g *generator) goFunction(file *gen.File, tdir, dir wit.Direction, f *wit.Function, goName string) function {
+	scope := gen.NewScope(file)
+	out := function{
+		file:    file,
+		scope:   scope,
+		name:    goName,
+		params:  g.goParams(scope, tdir, f.Params),
+		results: g.goParams(scope, tdir, f.Results),
+	}
+	if len(out.results) == 1 && out.results[0].name == "" {
+		out.results[0].name = scope.DeclareName("result")
+	}
+	if dir == wit.Imported && f.IsMethod() {
+		out.receiver = out.params[0]
+		// out.params = out.params[1:]
+	}
+	return out
+}
+
+func (g *generator) goParams(scope gen.Scope, dir wit.Direction, params []wit.Param) []param {
+	out := make([]param, len(params))
+	for i, p := range params {
+		tdir, _ := g.typeDir(dir, p.Type)
+		out[i].name = scope.DeclareName(GoName(p.Name, false))
+		out[i].typ = p.Type
+		out[i].dir = tdir
+	}
+	return out
 }
 
 func (g *generator) declareFunction(owner wit.Ident, dir wit.Direction, f *wit.Function) (funcDecl, error) {
@@ -1594,8 +1618,8 @@ func (g *generator) declareFunction(owner wit.Ident, dir wit.Direction, f *wit.F
 	}
 
 	fdecl := funcDecl{
-		f:          goFunction(file, tdir, dir, f, funcName),
-		wasm:       goFunction(file, tdir, dir, wasm, wasmName),
+		f:          g.goFunction(file, tdir, dir, f, funcName),
+		wasm:       g.goFunction(file, tdir, dir, wasm, wasmName),
 		linkerName: linkerName,
 	}
 	g.functions[dir][f] = fdecl
@@ -1879,9 +1903,9 @@ func (g *generator) defineExportedFunction(owner wit.Ident, f *wit.Function, dec
 			flat := p.typ.Flat()
 			var input string
 			if len(flat) > 0 && len(decl.wasm.params) > 0 {
-				input = g.liftTypeInput(file, dir, p.typ, decl.wasm.params[i:i+len(flat)])
+				input = g.liftTypeInput(file, p.dir, p.typ, decl.wasm.params[i:i+len(flat)])
 			}
-			stringio.Write(&b, p.name, " := ", g.liftType(file, dir, p.typ, input), "\n")
+			stringio.Write(&b, p.name, " := ", g.liftType(file, p.dir, p.typ, input), "\n")
 			i += len(flat)
 		}
 	}
