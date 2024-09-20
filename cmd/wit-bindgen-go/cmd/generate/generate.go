@@ -197,11 +197,14 @@ func action(ctx context.Context, cmd *cli.Command) error {
 	}
 	var stderr bytes.Buffer
 
-	wasmCmd := exec.Command(wasmTools, "component", "wit", "--wat", "--all-features", "--output", witFilePath)
+	wasmCmd := exec.Command(wasmTools, "component", "wit", "--wasm", "--all-features", "--output", witFilePath)
+
 	if rawBytes != nil {
 		wasmCmd.Stdin = bytes.NewReader(rawBytes)
-	} else {
+	} else if cmd.Bool("force-wit") || !strings.HasSuffix(path, ".json") {
 		wasmCmd.Args = append(wasmCmd.Args, path)
+	} else {
+		wasmCmd.Stdin = bytes.NewReader([]byte(res.WIT(nil, "")))
 	}
 
 	err = wasmCmd.Run()
