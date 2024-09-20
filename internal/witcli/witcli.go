@@ -14,7 +14,7 @@ import (
 // If forceWIT is true, it will always process input through wasm-tools.
 func LoadOne(forceWIT bool, path string) (*wit.Resolve, error) {
 	if forceWIT || !strings.HasSuffix(path, ".json") {
-		return wit.LoadWIT(path)
+		return wit.LoadWITFromPath(path)
 	}
 	return wit.LoadJSON(path)
 }

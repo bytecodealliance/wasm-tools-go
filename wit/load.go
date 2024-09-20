@@ -2,7 +2,9 @@ package wit
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 )
@@ -12,8 +14,9 @@ import (
 //
 // [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
 func LoadJSON(path string) (*Resolve, error) {
-	if path == "" || path == "-" {
-		return DecodeJSON(os.Stdin)
+	r := getReader(path)
+	if r != nil {
+		return DecodeJSON(r)
 	}
 	f, err := os.Open(path)
 	if err != nil {
@@ -23,32 +26,57 @@ func LoadJSON(path string) (*Resolve, error) {
 	return DecodeJSON(f)
 }
 
-// LoadWIT loads [WIT] data from path by processing it through [wasm-tools].
+// LoadWITFromPath loads [WIT] data from path by processing it through [wasm-tools].
 // This will fail if wasm-tools is not in $PATH.
 // If path is "" or "-", it reads from os.Stdin.
 //
 // [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
 // [wasm-tools]: https://crates.io/crates/wasm-tools
-func LoadWIT(path string) (*Resolve, error) {
+func LoadWITFromPath(path string) (*Resolve, error) {
+	r := getReader(path)
+	return loadWIT(path, r)
+}
+
+// LoadWITFromBuffer loads [WIT] data from a buffer by processing it through [wasm-tools].
+// This will fail if wasm-tools is not in $PATH.
+//
+// [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
+// [wasm-tools]: https://crates.io/crates/wasm-tools
+func LoadWITFromBuffer(buffer []byte) (*Resolve, error) {
+	r := bytes.NewReader(buffer)
+	return loadWIT("", r)
+}
+
+// loadWIT loads WIT data from path or reader by processing it through wasm-tools.
+// It accepts either a path or an io.Reader as input, but not both.
+// If the path is not "" and "-", it will be used as the input file.
+// Otherwise, the reader will be used as the input.
+func loadWIT(path string, reader io.Reader) (*Resolve, error) {
+	if path != "" && reader != nil {
+		return nil, errors.New("cannot set both path and reader; provide only one")
+	}
+
 	wasmTools, err := exec.LookPath("wasm-tools")
 	if err != nil {
 		return nil, err
 	}
 
-	var stdout bytes.Buffer
-	var stderr bytes.Buffer
+	var stdout, stderr bytes.Buffer
 
-	cmd := exec.Command(wasmTools, "component", "wit", "-j", "--all-features")
-	cmd.Stdout = &stdout
-	cmd.Stderr = &stderr
-	if path == "" || path == "-" {
-		cmd.Stdin = os.Stdin
-	} else {
-		cmd.Args = append(cmd.Args, path)
+	cmdArgs := []string{"component", "wit", "-j", "--all-features"}
+	if path != "" && path != "-" {
+		cmdArgs = append(cmdArgs, path)
 	}
 
-	err = cmd.Run()
-	if err != nil {
+	cmd := exec.Command(wasmTools, cmdArgs...)
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
+
+	if reader != nil {
+		cmd.Stdin = reader
+	}
+
+	if err := cmd.Run(); err != nil {
 		fmt.Fprint(os.Stderr, stderr.String())
 		return nil, err
 	}
@@ -56,32 +84,9 @@ func LoadWIT(path string) (*Resolve, error) {
 	return DecodeJSON(&stdout)
 }
 
-// LoadWITFromBuffer loads WIT data from a provided buffer by processing it through wasm-tools.
-// It expects the buffer to contain valid WIT data and processes it through `wasm-tools`.
-// The result is returned as a *Resolve.
-func LoadWITFromBuffer(buffer []byte) (*Resolve, error) {
-	wasmTools, err := exec.LookPath("wasm-tools")
-	if err != nil {
-		return nil, err
+func getReader(path string) io.ReadCloser {
+	if path == "" || path == "-" {
+		return os.Stdin
 	}
-
-	var stdout bytes.Buffer
-	var stderr bytes.Buffer
-
-	// Command to run `wasm-tools component wit -j --all-features`
-	cmd := exec.Command(wasmTools, "component", "wit", "-j", "--all-features")
-	cmd.Stdin = bytes.NewReader(buffer) // Use the buffer content as input
-	cmd.Stdout = &stdout                // Capture the output
-	cmd.Stderr = &stderr                // Capture the stderr
-
-	// Run the command
-	err = cmd.Run()
-	if err != nil {
-		// If an error occurs, print stderr and return the error
-		fmt.Fprint(os.Stderr, stderr.String())
-		return nil, err
-	}
-
-	// Decode the output JSON from `wasm-tools` into a Resolve structure
-	return DecodeJSON(&stdout)
+	return nil
 }
