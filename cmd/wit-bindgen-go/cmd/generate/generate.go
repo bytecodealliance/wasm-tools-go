@@ -68,16 +68,57 @@ var Command = &cli.Command{
 	Action: action,
 }
 
-func action(ctx context.Context, cmd *cli.Command) error {
-	dryRun := cmd.Bool("dry-run")
+type Config struct {
+	DryRun      bool
+	OutDir      string
+	OutPerm     os.FileMode
+	PackageRoot string
+	World       string
+	CMPackage   string
+	Versioned   bool
+	ForceWIT    bool
+	Path        string
+}
 
-	out := cmd.String("out")
-	info, err := os.Stat(out)
+func action(ctx context.Context, cmd *cli.Command) error {
+	config, err := parseFlags(cmd)
 	if err != nil {
 		return err
 	}
+
+	res, err := loadWITModule(ctx, config)
+	if err != nil {
+		return err
+	}
+
+	packages, err := bindgen.Go(res,
+		bindgen.GeneratedBy(cmd.Root().Name),
+		bindgen.World(config.World),
+		bindgen.PackageRoot(config.PackageRoot),
+		bindgen.Versioned(config.Versioned),
+		bindgen.CMPackage(config.CMPackage),
+	)
+	if err != nil {
+		return err
+	}
+
+	if err := writeGoPackages(packages, config); err != nil {
+		return err
+	}
+
+	return writeWITPackage(res, config)
+}
+
+func parseFlags(cmd *cli.Command) (*Config, error) {
+	dryRun := cmd.Bool("dry-run")
+	out := cmd.String("out")
+
+	info, err := os.Stat(out)
+	if err != nil {
+		return nil, err
+	}
 	if !info.IsDir() {
-		return fmt.Errorf("%s is not a directory", out)
+		return nil, fmt.Errorf("%s is not a directory", out)
 	}
 	fmt.Fprintf(os.Stderr, "Output dir: %s\n", out)
 	outPerm := info.Mode().Perm()
@@ -86,59 +127,54 @@ func action(ctx context.Context, cmd *cli.Command) error {
 	if !cmd.IsSet("package-root") {
 		pkgRoot, err = gen.PackagePath(out)
 		if err != nil {
-			return err
+			return nil, err
 		}
 	}
 	fmt.Fprintf(os.Stderr, "Package root: %s\n", pkgRoot)
 
 	path, err := witcli.ParsePaths(cmd.Args().Slice()...)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	// check if the path is a OCI path
-	var res *wit.Resolve
-	var rawBytes []byte
-	if oci.IsOCIPath(path) {
-		fmt.Fprintf(os.Stderr, "Fetching OCI artifact %s\n", path)
-		bytes, err := oci.PullWIT(ctx, path)
-		rawBytes = bytes.Bytes()
+	return &Config{
+		DryRun:      dryRun,
+		OutDir:      out,
+		OutPerm:     outPerm,
+		PackageRoot: pkgRoot,
+		World:       cmd.String("world"),
+		CMPackage:   cmd.String("cm"),
+		Versioned:   cmd.Bool("versioned"),
+		ForceWIT:    cmd.Bool("force-wit"),
+		Path:        path,
+	}, nil
+}
+
+func loadWITModule(ctx context.Context, config *Config) (*wit.Resolve, error) {
+	if oci.IsOCIPath(config.Path) {
+		fmt.Fprintf(os.Stderr, "Fetching OCI artifact %s\n", config.Path)
+		bytes, err := oci.PullWIT(ctx, config.Path)
 		if err != nil {
-			return err
+			return nil, err
 		}
-		res, err = wit.LoadWITFromBuffer(bytes.Bytes())
-	} else {
-		res, err = witcli.LoadOne(cmd.Bool("force-wit"), path)
+		return wit.LoadWITFromBuffer(bytes.Bytes())
 	}
 
-	if err != nil {
-		return err
-	}
+	return witcli.LoadOne(config.ForceWIT, config.Path)
+}
 
-	packages, err := bindgen.Go(res,
-		bindgen.GeneratedBy(cmd.Root().Name),
-		bindgen.World(cmd.String("world")),
-		bindgen.PackageRoot(pkgRoot),
-		bindgen.Versioned(cmd.Bool("versioned")),
-		bindgen.CMPackage(cmd.String("cm")),
-	)
-	if err != nil {
-		return err
-	}
+func writeGoPackages(packages []*gen.Package, config *Config) error {
 	fmt.Fprintf(os.Stderr, "Generated %d package(s)\n", len(packages))
-
 	for _, pkg := range packages {
 		if !pkg.HasContent() {
 			fmt.Fprintf(os.Stderr, "Skipping empty package: %s\n", pkg.Path)
 			continue
 		}
-
 		fmt.Fprintf(os.Stderr, "Generated package: %s\n", pkg.Path)
 
 		for _, filename := range codec.SortedKeys(pkg.Files) {
 			file := pkg.Files[filename]
-
-			dir := filepath.Join(out, strings.TrimPrefix(file.Package.Path, pkgRoot))
+			dir := filepath.Join(config.OutDir, strings.TrimPrefix(file.Package.Path, config.PackageRoot))
 			path := filepath.Join(dir, file.Name)
 
 			if !file.HasContent() {
@@ -146,14 +182,13 @@ func action(ctx context.Context, cmd *cli.Command) error {
 				continue
 			}
 
-			err := os.MkdirAll(dir, outPerm)
-			if err != nil {
+			if err := os.MkdirAll(dir, config.OutPerm); err != nil {
 				return err
 			}
 
-			b, err := file.Bytes()
+			content, err := file.Bytes()
 			if err != nil {
-				if b == nil {
+				if content == nil {
 					return err
 				}
 				fmt.Fprintf(os.Stderr, "Error formatting file: %v\n", err)
@@ -161,54 +196,39 @@ func action(ctx context.Context, cmd *cli.Command) error {
 				fmt.Fprintf(os.Stderr, "Generated file: %s\n", path)
 			}
 
-			if dryRun {
-				fmt.Println(string(b))
+			if config.DryRun {
+				fmt.Println(string(content))
 				fmt.Println()
 				continue
 			}
 
-			f, err := os.Create(path)
-			if err != nil {
+			if err := os.WriteFile(path, content, config.OutPerm); err != nil {
 				return err
-			}
-			n, err := f.Write(b)
-			f.Close()
-			if err != nil {
-				return err
-			}
-			if n != len(b) {
-				return fmt.Errorf("wrote %d bytes to %s, expected %d", n, path, len(b))
 			}
 		}
 	}
+	return nil
+}
 
-	witDir := filepath.Join(out, "wit")
-	err = os.MkdirAll(witDir, outPerm)
-	if err != nil {
+func writeWITPackage(res *wit.Resolve, config *Config) error {
+	witDir := filepath.Join(config.OutDir, "wit")
+	if err := os.MkdirAll(witDir, config.OutPerm); err != nil {
 		return err
 	}
 	witFilePath := filepath.Join(witDir, "webassembly.wit.wasm")
-
 	fmt.Fprintf(os.Stderr, "Generated WIT file: %s\n", witFilePath)
 
 	wasmTools, err := exec.LookPath("wasm-tools")
 	if err != nil {
 		return err
 	}
+
 	var stderr bytes.Buffer
-
 	wasmCmd := exec.Command(wasmTools, "component", "wit", "--wasm", "--all-features", "--output", witFilePath)
+	wasmCmd.Stderr = &stderr
+	wasmCmd.Stdin = bytes.NewReader([]byte(res.WIT(nil, "")))
 
-	if rawBytes != nil {
-		wasmCmd.Stdin = bytes.NewReader(rawBytes)
-	} else if cmd.Bool("force-wit") || !strings.HasSuffix(path, ".json") {
-		wasmCmd.Args = append(wasmCmd.Args, path)
-	} else {
-		wasmCmd.Stdin = bytes.NewReader([]byte(res.WIT(nil, "")))
-	}
-
-	err = wasmCmd.Run()
-	if err != nil {
+	if err := wasmCmd.Run(); err != nil {
 		fmt.Fprint(os.Stderr, stderr.String())
 		return err
 	}
