@@ -1,4 +1,4 @@
-package test:variants-unioning-types;
+package issues:issue163;
 
 world a {
 	variant v-multiple {
