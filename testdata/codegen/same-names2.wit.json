@@ -1,0 +1,30 @@
+{
+  "worlds": [
+    {
+      "name": "name2",
+      "imports": {},
+      "exports": {
+        "name2": {
+          "function": {
+            "name": "name2",
+            "kind": "freestanding",
+            "params": [],
+            "results": []
+          }
+        }
+      },
+      "package": 0
+    }
+  ],
+  "interfaces": [],
+  "types": [],
+  "packages": [
+    {
+      "name": "name2:name2",
+      "interfaces": {},
+      "worlds": {
+        "name2": 0
+      }
+    }
+  ]
+}

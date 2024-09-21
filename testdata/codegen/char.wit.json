@@ -1,0 +1,70 @@
+{
+  "worlds": [
+    {
+      "name": "the-world",
+      "imports": {
+        "interface-0": {
+          "interface": {
+            "id": 0
+          }
+        }
+      },
+      "exports": {
+        "interface-0": {
+          "interface": {
+            "id": 0
+          }
+        }
+      },
+      "package": 0
+    }
+  ],
+  "interfaces": [
+    {
+      "name": "chars",
+      "types": {},
+      "functions": {
+        "take-char": {
+          "name": "take-char",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "x",
+              "type": "char"
+            }
+          ],
+          "results": [],
+          "docs": {
+            "contents": "A function that accepts a character"
+          }
+        },
+        "return-char": {
+          "name": "return-char",
+          "kind": "freestanding",
+          "params": [],
+          "results": [
+            {
+              "type": "char"
+            }
+          ],
+          "docs": {
+            "contents": "A function that returns a character"
+          }
+        }
+      },
+      "package": 0
+    }
+  ],
+  "types": [],
+  "packages": [
+    {
+      "name": "foo:foo",
+      "interfaces": {
+        "chars": 0
+      },
+      "worlds": {
+        "the-world": 0
+      }
+    }
+  ]
+}

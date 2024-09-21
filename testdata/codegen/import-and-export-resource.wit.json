@@ -1,0 +1,105 @@
+{
+  "worlds": [
+    {
+      "name": "resources",
+      "imports": {
+        "interface-0": {
+          "interface": {
+            "id": 0
+          }
+        }
+      },
+      "exports": {
+        "interface-0": {
+          "interface": {
+            "id": 0
+          }
+        }
+      },
+      "package": 0
+    }
+  ],
+  "interfaces": [
+    {
+      "name": "baz",
+      "types": {
+        "x": 0
+      },
+      "functions": {
+        "[constructor]x": {
+          "name": "[constructor]x",
+          "kind": {
+            "constructor": 0
+          },
+          "params": [
+            {
+              "name": "s",
+              "type": "string"
+            }
+          ],
+          "results": [
+            {
+              "type": 2
+            }
+          ]
+        },
+        "[method]x.get": {
+          "name": "[method]x.get",
+          "kind": {
+            "method": 0
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 1
+            }
+          ],
+          "results": [
+            {
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "package": 0
+    }
+  ],
+  "types": [
+    {
+      "name": "x",
+      "kind": "resource",
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "borrow": 0
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "own": 0
+        }
+      },
+      "owner": null
+    }
+  ],
+  "packages": [
+    {
+      "name": "my:resources",
+      "interfaces": {
+        "baz": 0
+      },
+      "worlds": {
+        "resources": 0
+      }
+    }
+  ]
+}

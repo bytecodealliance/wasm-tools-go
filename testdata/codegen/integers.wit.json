@@ -1,0 +1,273 @@
+{
+  "worlds": [
+    {
+      "name": "the-world",
+      "imports": {
+        "interface-0": {
+          "interface": {
+            "id": 0
+          }
+        }
+      },
+      "exports": {
+        "interface-0": {
+          "interface": {
+            "id": 0
+          }
+        }
+      },
+      "package": 0
+    }
+  ],
+  "interfaces": [
+    {
+      "name": "integers",
+      "types": {},
+      "functions": {
+        "a1": {
+          "name": "a1",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "x",
+              "type": "u8"
+            }
+          ],
+          "results": []
+        },
+        "a2": {
+          "name": "a2",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "x",
+              "type": "s8"
+            }
+          ],
+          "results": []
+        },
+        "a3": {
+          "name": "a3",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "x",
+              "type": "u16"
+            }
+          ],
+          "results": []
+        },
+        "a4": {
+          "name": "a4",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "x",
+              "type": "s16"
+            }
+          ],
+          "results": []
+        },
+        "a5": {
+          "name": "a5",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "x",
+              "type": "u32"
+            }
+          ],
+          "results": []
+        },
+        "a6": {
+          "name": "a6",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "x",
+              "type": "s32"
+            }
+          ],
+          "results": []
+        },
+        "a7": {
+          "name": "a7",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "x",
+              "type": "u64"
+            }
+          ],
+          "results": []
+        },
+        "a8": {
+          "name": "a8",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "x",
+              "type": "s64"
+            }
+          ],
+          "results": []
+        },
+        "a9": {
+          "name": "a9",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "p1",
+              "type": "u8"
+            },
+            {
+              "name": "p2",
+              "type": "s8"
+            },
+            {
+              "name": "p3",
+              "type": "u16"
+            },
+            {
+              "name": "p4",
+              "type": "s16"
+            },
+            {
+              "name": "p5",
+              "type": "u32"
+            },
+            {
+              "name": "p6",
+              "type": "s32"
+            },
+            {
+              "name": "p7",
+              "type": "u64"
+            },
+            {
+              "name": "p8",
+              "type": "s64"
+            }
+          ],
+          "results": []
+        },
+        "r1": {
+          "name": "r1",
+          "kind": "freestanding",
+          "params": [],
+          "results": [
+            {
+              "type": "u8"
+            }
+          ]
+        },
+        "r2": {
+          "name": "r2",
+          "kind": "freestanding",
+          "params": [],
+          "results": [
+            {
+              "type": "s8"
+            }
+          ]
+        },
+        "r3": {
+          "name": "r3",
+          "kind": "freestanding",
+          "params": [],
+          "results": [
+            {
+              "type": "u16"
+            }
+          ]
+        },
+        "r4": {
+          "name": "r4",
+          "kind": "freestanding",
+          "params": [],
+          "results": [
+            {
+              "type": "s16"
+            }
+          ]
+        },
+        "r5": {
+          "name": "r5",
+          "kind": "freestanding",
+          "params": [],
+          "results": [
+            {
+              "type": "u32"
+            }
+          ]
+        },
+        "r6": {
+          "name": "r6",
+          "kind": "freestanding",
+          "params": [],
+          "results": [
+            {
+              "type": "s32"
+            }
+          ]
+        },
+        "r7": {
+          "name": "r7",
+          "kind": "freestanding",
+          "params": [],
+          "results": [
+            {
+              "type": "u64"
+            }
+          ]
+        },
+        "r8": {
+          "name": "r8",
+          "kind": "freestanding",
+          "params": [],
+          "results": [
+            {
+              "type": "s64"
+            }
+          ]
+        },
+        "pair-ret": {
+          "name": "pair-ret",
+          "kind": "freestanding",
+          "params": [],
+          "results": [
+            {
+              "type": 0
+            }
+          ]
+        }
+      },
+      "package": 0
+    }
+  ],
+  "types": [
+    {
+      "name": null,
+      "kind": {
+        "tuple": {
+          "types": [
+            "s64",
+            "u8"
+          ]
+        }
+      },
+      "owner": null
+    }
+  ],
+  "packages": [
+    {
+      "name": "foo:foo",
+      "interfaces": {
+        "integers": 0
+      },
+      "worlds": {
+        "the-world": 0
+      }
+    }
+  ]
+}

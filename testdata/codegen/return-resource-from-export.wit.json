@@ -1,0 +1,55 @@
+{
+  "worlds": [
+    {
+      "name": "foo",
+      "imports": {
+        "x": {
+          "type": 0
+        }
+      },
+      "exports": {
+        "return-resource": {
+          "function": {
+            "name": "return-resource",
+            "kind": "freestanding",
+            "params": [],
+            "results": [
+              {
+                "type": 1
+              }
+            ]
+          }
+        }
+      },
+      "package": 0
+    }
+  ],
+  "interfaces": [],
+  "types": [
+    {
+      "name": "x",
+      "kind": "resource",
+      "owner": {
+        "world": 0
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "own": 0
+        }
+      },
+      "owner": null
+    }
+  ],
+  "packages": [
+    {
+      "name": "test:test",
+      "interfaces": {},
+      "worlds": {
+        "foo": 0
+      }
+    }
+  ]
+}

@@ -1,0 +1,55 @@
+{
+  "worlds": [
+    {
+      "name": "name5",
+      "imports": {
+        "name5": {
+          "type": 0
+        }
+      },
+      "exports": {
+        "x": {
+          "function": {
+            "name": "x",
+            "kind": "freestanding",
+            "params": [],
+            "results": [
+              {
+                "type": 0
+              }
+            ]
+          }
+        }
+      },
+      "package": 0
+    }
+  ],
+  "interfaces": [],
+  "types": [
+    {
+      "name": "name5",
+      "kind": {
+        "record": {
+          "fields": [
+            {
+              "name": "r",
+              "type": "bool"
+            }
+          ]
+        }
+      },
+      "owner": {
+        "world": 0
+      }
+    }
+  ],
+  "packages": [
+    {
+      "name": "name5:name5",
+      "interfaces": {},
+      "worlds": {
+        "name5": 0
+      }
+    }
+  ]
+}

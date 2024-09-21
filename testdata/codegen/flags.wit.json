@@ -1,0 +1,418 @@
+{
+  "worlds": [
+    {
+      "name": "the-flags",
+      "imports": {
+        "interface-0": {
+          "interface": {
+            "id": 0
+          }
+        }
+      },
+      "exports": {
+        "interface-0": {
+          "interface": {
+            "id": 0
+          }
+        }
+      },
+      "package": 0
+    }
+  ],
+  "interfaces": [
+    {
+      "name": "flags",
+      "types": {
+        "flag1": 0,
+        "flag2": 1,
+        "flag4": 2,
+        "flag8": 3,
+        "flag16": 4,
+        "flag32": 5,
+        "withdashes": 6
+      },
+      "functions": {
+        "roundtrip-flag1": {
+          "name": "roundtrip-flag1",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "x",
+              "type": 0
+            }
+          ],
+          "results": [
+            {
+              "type": 0
+            }
+          ]
+        },
+        "roundtrip-flag2": {
+          "name": "roundtrip-flag2",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "x",
+              "type": 1
+            }
+          ],
+          "results": [
+            {
+              "type": 1
+            }
+          ]
+        },
+        "roundtrip-flag4": {
+          "name": "roundtrip-flag4",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "x",
+              "type": 2
+            }
+          ],
+          "results": [
+            {
+              "type": 2
+            }
+          ]
+        },
+        "roundtrip-flag8": {
+          "name": "roundtrip-flag8",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "x",
+              "type": 3
+            }
+          ],
+          "results": [
+            {
+              "type": 3
+            }
+          ]
+        },
+        "roundtrip-flag16": {
+          "name": "roundtrip-flag16",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "x",
+              "type": 4
+            }
+          ],
+          "results": [
+            {
+              "type": 4
+            }
+          ]
+        },
+        "roundtrip-flag32": {
+          "name": "roundtrip-flag32",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "x",
+              "type": 5
+            }
+          ],
+          "results": [
+            {
+              "type": 5
+            }
+          ]
+        }
+      },
+      "package": 0
+    }
+  ],
+  "types": [
+    {
+      "name": "flag1",
+      "kind": {
+        "flags": {
+          "flags": [
+            {
+              "name": "b0"
+            }
+          ]
+        }
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": "flag2",
+      "kind": {
+        "flags": {
+          "flags": [
+            {
+              "name": "b0"
+            },
+            {
+              "name": "b1"
+            }
+          ]
+        }
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": "flag4",
+      "kind": {
+        "flags": {
+          "flags": [
+            {
+              "name": "b0"
+            },
+            {
+              "name": "b1"
+            },
+            {
+              "name": "b2"
+            },
+            {
+              "name": "b3"
+            }
+          ]
+        }
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": "flag8",
+      "kind": {
+        "flags": {
+          "flags": [
+            {
+              "name": "b0"
+            },
+            {
+              "name": "b1"
+            },
+            {
+              "name": "b2"
+            },
+            {
+              "name": "b3"
+            },
+            {
+              "name": "b4"
+            },
+            {
+              "name": "b5"
+            },
+            {
+              "name": "b6"
+            },
+            {
+              "name": "b7"
+            }
+          ]
+        }
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": "flag16",
+      "kind": {
+        "flags": {
+          "flags": [
+            {
+              "name": "b0"
+            },
+            {
+              "name": "b1"
+            },
+            {
+              "name": "b2"
+            },
+            {
+              "name": "b3"
+            },
+            {
+              "name": "b4"
+            },
+            {
+              "name": "b5"
+            },
+            {
+              "name": "b6"
+            },
+            {
+              "name": "b7"
+            },
+            {
+              "name": "b8"
+            },
+            {
+              "name": "b9"
+            },
+            {
+              "name": "b10"
+            },
+            {
+              "name": "b11"
+            },
+            {
+              "name": "b12"
+            },
+            {
+              "name": "b13"
+            },
+            {
+              "name": "b14"
+            },
+            {
+              "name": "b15"
+            }
+          ]
+        }
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": "flag32",
+      "kind": {
+        "flags": {
+          "flags": [
+            {
+              "name": "b0"
+            },
+            {
+              "name": "b1"
+            },
+            {
+              "name": "b2"
+            },
+            {
+              "name": "b3"
+            },
+            {
+              "name": "b4"
+            },
+            {
+              "name": "b5"
+            },
+            {
+              "name": "b6"
+            },
+            {
+              "name": "b7"
+            },
+            {
+              "name": "b8"
+            },
+            {
+              "name": "b9"
+            },
+            {
+              "name": "b10"
+            },
+            {
+              "name": "b11"
+            },
+            {
+              "name": "b12"
+            },
+            {
+              "name": "b13"
+            },
+            {
+              "name": "b14"
+            },
+            {
+              "name": "b15"
+            },
+            {
+              "name": "b16"
+            },
+            {
+              "name": "b17"
+            },
+            {
+              "name": "b18"
+            },
+            {
+              "name": "b19"
+            },
+            {
+              "name": "b20"
+            },
+            {
+              "name": "b21"
+            },
+            {
+              "name": "b22"
+            },
+            {
+              "name": "b23"
+            },
+            {
+              "name": "b24"
+            },
+            {
+              "name": "b25"
+            },
+            {
+              "name": "b26"
+            },
+            {
+              "name": "b27"
+            },
+            {
+              "name": "b28"
+            },
+            {
+              "name": "b29"
+            },
+            {
+              "name": "b30"
+            },
+            {
+              "name": "b31"
+            }
+          ]
+        }
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": "withdashes",
+      "kind": {
+        "flags": {
+          "flags": [
+            {
+              "name": "with-dashes"
+            }
+          ]
+        }
+      },
+      "owner": {
+        "interface": 0
+      }
+    }
+  ],
+  "packages": [
+    {
+      "name": "foo:foo",
+      "interfaces": {
+        "flags": 0
+      },
+      "worlds": {
+        "the-flags": 0
+      }
+    }
+  ]
+}

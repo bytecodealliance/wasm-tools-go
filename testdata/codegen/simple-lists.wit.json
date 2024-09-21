@@ -1,0 +1,125 @@
+{
+  "worlds": [
+    {
+      "name": "my-world",
+      "imports": {
+        "interface-0": {
+          "interface": {
+            "id": 0
+          }
+        }
+      },
+      "exports": {
+        "interface-0": {
+          "interface": {
+            "id": 0
+          }
+        }
+      },
+      "package": 0
+    }
+  ],
+  "interfaces": [
+    {
+      "name": "simple-lists",
+      "types": {},
+      "functions": {
+        "simple-list1": {
+          "name": "simple-list1",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "l",
+              "type": 0
+            }
+          ],
+          "results": []
+        },
+        "simple-list2": {
+          "name": "simple-list2",
+          "kind": "freestanding",
+          "params": [],
+          "results": [
+            {
+              "type": 0
+            }
+          ]
+        },
+        "simple-list3": {
+          "name": "simple-list3",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "a",
+              "type": 0
+            },
+            {
+              "name": "b",
+              "type": 0
+            }
+          ],
+          "results": [
+            {
+              "type": 1
+            }
+          ]
+        },
+        "simple-list4": {
+          "name": "simple-list4",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "l",
+              "type": 2
+            }
+          ],
+          "results": [
+            {
+              "type": 2
+            }
+          ]
+        }
+      },
+      "package": 0
+    }
+  ],
+  "types": [
+    {
+      "name": null,
+      "kind": {
+        "list": "u32"
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "tuple": {
+          "types": [
+            0,
+            0
+          ]
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "list": 0
+      },
+      "owner": null
+    }
+  ],
+  "packages": [
+    {
+      "name": "foo:foo",
+      "interfaces": {
+        "simple-lists": 0
+      },
+      "worlds": {
+        "my-world": 0
+      }
+    }
+  ]
+}

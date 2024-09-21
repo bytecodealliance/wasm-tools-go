@@ -1,0 +1,47 @@
+{
+  "worlds": [
+    {
+      "name": "type",
+      "imports": {
+        "interface-0": {
+          "interface": {
+            "id": 0
+          }
+        }
+      },
+      "exports": {},
+      "package": 0
+    }
+  ],
+  "interfaces": [
+    {
+      "name": "foo-bar",
+      "types": {},
+      "functions": {
+        "hello": {
+          "name": "hello",
+          "kind": "freestanding",
+          "params": [],
+          "results": [
+            {
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "package": 0
+    }
+  ],
+  "types": [],
+  "packages": [
+    {
+      "name": "foo:foo",
+      "interfaces": {
+        "foo-bar": 0
+      },
+      "worlds": {
+        "type": 0
+      }
+    }
+  ]
+}

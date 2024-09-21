@@ -1,0 +1,73 @@
+{
+  "worlds": [
+    {
+      "name": "bindings",
+      "imports": {
+        "interface-0": {
+          "interface": {
+            "id": 0
+          }
+        }
+      },
+      "exports": {
+        "init": {
+          "function": {
+            "name": "init",
+            "kind": "freestanding",
+            "params": [
+              {
+                "name": "baz",
+                "type": "string"
+              }
+            ],
+            "results": []
+          }
+        }
+      },
+      "package": 0
+    }
+  ],
+  "interfaces": [
+    {
+      "name": "my-import",
+      "types": {
+        "address": 0
+      },
+      "functions": {},
+      "package": 0
+    }
+  ],
+  "types": [
+    {
+      "name": "address",
+      "kind": {
+        "record": {
+          "fields": [
+            {
+              "name": "field",
+              "type": "u32"
+            },
+            {
+              "name": "attribute",
+              "type": "bool"
+            }
+          ]
+        }
+      },
+      "owner": {
+        "interface": 0
+      }
+    }
+  ],
+  "packages": [
+    {
+      "name": "foo:bar",
+      "interfaces": {
+        "my-import": 0
+      },
+      "worlds": {
+        "bindings": 0
+      }
+    }
+  ]
+}

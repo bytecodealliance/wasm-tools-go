@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Added
 
 - [#163](https://github.com/bytecodealliance/wasm-tools-go/issues/163): added `cm.F32ToU64()` and `cm.U64ToF32()` for flattening `f32` and `u64` types in the Canonical ABI.
+- Test data from [bytecodealliance/wit-bindgen/tests/codegen](https://github.com/bytecodealliance/wit-bindgen/tree/main/tests/codegen)
 
 ### Fixed
 

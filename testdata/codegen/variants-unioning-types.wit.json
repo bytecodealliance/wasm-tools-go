@@ -1,0 +1,723 @@
+{
+  "worlds": [
+    {
+      "name": "a",
+      "imports": {
+        "v-u32": {
+          "type": 2
+        },
+        "v-s32": {
+          "type": 4
+        },
+        "v-f32": {
+          "type": 6
+        },
+        "v-f64": {
+          "type": 8
+        },
+        "v-u64": {
+          "type": 10
+        },
+        "v-s64": {
+          "type": 12
+        },
+        "v-bool": {
+          "type": 14
+        },
+        "v-char": {
+          "type": 16
+        },
+        "v-string": {
+          "type": 18
+        },
+        "v-tuple-with-list": {
+          "type": 20
+        },
+        "v-multiple": {
+          "type": 21
+        },
+        "v-f32-f64": {
+          "type": 22
+        },
+        "v-s32-f64": {
+          "type": 23
+        },
+        "v-s64-f32": {
+          "type": 24
+        },
+        "v-string-u64": {
+          "type": 25
+        },
+        "f-u32": {
+          "function": {
+            "name": "f-u32",
+            "kind": "freestanding",
+            "params": [
+              {
+                "name": "x",
+                "type": 2
+              }
+            ],
+            "results": []
+          }
+        },
+        "f-s32": {
+          "function": {
+            "name": "f-s32",
+            "kind": "freestanding",
+            "params": [
+              {
+                "name": "x",
+                "type": 4
+              }
+            ],
+            "results": []
+          }
+        },
+        "f-f32": {
+          "function": {
+            "name": "f-f32",
+            "kind": "freestanding",
+            "params": [
+              {
+                "name": "x",
+                "type": 6
+              }
+            ],
+            "results": []
+          }
+        },
+        "f-f64": {
+          "function": {
+            "name": "f-f64",
+            "kind": "freestanding",
+            "params": [
+              {
+                "name": "x",
+                "type": 8
+              }
+            ],
+            "results": []
+          }
+        },
+        "f-u64": {
+          "function": {
+            "name": "f-u64",
+            "kind": "freestanding",
+            "params": [
+              {
+                "name": "x",
+                "type": 10
+              }
+            ],
+            "results": []
+          }
+        },
+        "f-s64": {
+          "function": {
+            "name": "f-s64",
+            "kind": "freestanding",
+            "params": [
+              {
+                "name": "x",
+                "type": 12
+              }
+            ],
+            "results": []
+          }
+        },
+        "f-bool": {
+          "function": {
+            "name": "f-bool",
+            "kind": "freestanding",
+            "params": [
+              {
+                "name": "x",
+                "type": 14
+              }
+            ],
+            "results": []
+          }
+        },
+        "f-char": {
+          "function": {
+            "name": "f-char",
+            "kind": "freestanding",
+            "params": [
+              {
+                "name": "x",
+                "type": 16
+              }
+            ],
+            "results": []
+          }
+        },
+        "f-string": {
+          "function": {
+            "name": "f-string",
+            "kind": "freestanding",
+            "params": [
+              {
+                "name": "x",
+                "type": 18
+              }
+            ],
+            "results": []
+          }
+        },
+        "f-tuple-with-list": {
+          "function": {
+            "name": "f-tuple-with-list",
+            "kind": "freestanding",
+            "params": [
+              {
+                "name": "x",
+                "type": 20
+              }
+            ],
+            "results": []
+          }
+        },
+        "f-multiple": {
+          "function": {
+            "name": "f-multiple",
+            "kind": "freestanding",
+            "params": [
+              {
+                "name": "x",
+                "type": 21
+              }
+            ],
+            "results": []
+          }
+        },
+        "f-f32-f64": {
+          "function": {
+            "name": "f-f32-f64",
+            "kind": "freestanding",
+            "params": [
+              {
+                "name": "x",
+                "type": 22
+              }
+            ],
+            "results": []
+          }
+        },
+        "f-s32-f64": {
+          "function": {
+            "name": "f-s32-f64",
+            "kind": "freestanding",
+            "params": [
+              {
+                "name": "x",
+                "type": 23
+              }
+            ],
+            "results": []
+          }
+        },
+        "f-s64-f32": {
+          "function": {
+            "name": "f-s64-f32",
+            "kind": "freestanding",
+            "params": [
+              {
+                "name": "x",
+                "type": 24
+              }
+            ],
+            "results": []
+          }
+        }
+      },
+      "exports": {
+        "f-string-u64": {
+          "function": {
+            "name": "f-string-u64",
+            "kind": "freestanding",
+            "params": [
+              {
+                "name": "x",
+                "type": 25
+              }
+            ],
+            "results": []
+          }
+        }
+      },
+      "package": 0
+    }
+  ],
+  "interfaces": [],
+  "types": [
+    {
+      "name": null,
+      "kind": {
+        "list": "u8"
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "tuple": {
+          "types": [
+            "u32",
+            "u32"
+          ]
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": "v-u32",
+      "kind": {
+        "variant": {
+          "cases": [
+            {
+              "name": "a",
+              "type": 0
+            },
+            {
+              "name": "b",
+              "type": 1
+            }
+          ]
+        }
+      },
+      "owner": {
+        "world": 0
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "tuple": {
+          "types": [
+            "s32",
+            "s32"
+          ]
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": "v-s32",
+      "kind": {
+        "variant": {
+          "cases": [
+            {
+              "name": "a",
+              "type": 0
+            },
+            {
+              "name": "b",
+              "type": 3
+            }
+          ]
+        }
+      },
+      "owner": {
+        "world": 0
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "tuple": {
+          "types": [
+            "f32",
+            "f32"
+          ]
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": "v-f32",
+      "kind": {
+        "variant": {
+          "cases": [
+            {
+              "name": "a",
+              "type": 0
+            },
+            {
+              "name": "b",
+              "type": 5
+            }
+          ]
+        }
+      },
+      "owner": {
+        "world": 0
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "tuple": {
+          "types": [
+            "f64",
+            "f64"
+          ]
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": "v-f64",
+      "kind": {
+        "variant": {
+          "cases": [
+            {
+              "name": "a",
+              "type": 0
+            },
+            {
+              "name": "b",
+              "type": 7
+            }
+          ]
+        }
+      },
+      "owner": {
+        "world": 0
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "tuple": {
+          "types": [
+            "u64",
+            "u64"
+          ]
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": "v-u64",
+      "kind": {
+        "variant": {
+          "cases": [
+            {
+              "name": "a",
+              "type": 0
+            },
+            {
+              "name": "b",
+              "type": 9
+            }
+          ]
+        }
+      },
+      "owner": {
+        "world": 0
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "tuple": {
+          "types": [
+            "s64",
+            "s64"
+          ]
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": "v-s64",
+      "kind": {
+        "variant": {
+          "cases": [
+            {
+              "name": "a",
+              "type": 0
+            },
+            {
+              "name": "b",
+              "type": 11
+            }
+          ]
+        }
+      },
+      "owner": {
+        "world": 0
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "tuple": {
+          "types": [
+            "bool",
+            "bool"
+          ]
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": "v-bool",
+      "kind": {
+        "variant": {
+          "cases": [
+            {
+              "name": "a",
+              "type": 0
+            },
+            {
+              "name": "b",
+              "type": 13
+            }
+          ]
+        }
+      },
+      "owner": {
+        "world": 0
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "tuple": {
+          "types": [
+            "char",
+            "char"
+          ]
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": "v-char",
+      "kind": {
+        "variant": {
+          "cases": [
+            {
+              "name": "a",
+              "type": 0
+            },
+            {
+              "name": "b",
+              "type": 15
+            }
+          ]
+        }
+      },
+      "owner": {
+        "world": 0
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "tuple": {
+          "types": [
+            "string",
+            "string"
+          ]
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": "v-string",
+      "kind": {
+        "variant": {
+          "cases": [
+            {
+              "name": "a",
+              "type": 0
+            },
+            {
+              "name": "b",
+              "type": 17
+            }
+          ]
+        }
+      },
+      "owner": {
+        "world": 0
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "tuple": {
+          "types": [
+            "s32",
+            0
+          ]
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": "v-tuple-with-list",
+      "kind": {
+        "variant": {
+          "cases": [
+            {
+              "name": "a",
+              "type": 0
+            },
+            {
+              "name": "b",
+              "type": 19
+            }
+          ]
+        }
+      },
+      "owner": {
+        "world": 0
+      }
+    },
+    {
+      "name": "v-multiple",
+      "kind": {
+        "variant": {
+          "cases": [
+            {
+              "name": "a",
+              "type": 0
+            },
+            {
+              "name": "c",
+              "type": 3
+            },
+            {
+              "name": "d",
+              "type": 1
+            },
+            {
+              "name": "e",
+              "type": 11
+            },
+            {
+              "name": "f",
+              "type": 9
+            },
+            {
+              "name": "g",
+              "type": 5
+            },
+            {
+              "name": "h",
+              "type": 7
+            },
+            {
+              "name": "i",
+              "type": 15
+            },
+            {
+              "name": "j",
+              "type": 13
+            },
+            {
+              "name": "k",
+              "type": 19
+            }
+          ]
+        }
+      },
+      "owner": {
+        "world": 0
+      }
+    },
+    {
+      "name": "v-f32-f64",
+      "kind": {
+        "variant": {
+          "cases": [
+            {
+              "name": "a",
+              "type": "f32"
+            },
+            {
+              "name": "b",
+              "type": "f64"
+            }
+          ]
+        }
+      },
+      "owner": {
+        "world": 0
+      }
+    },
+    {
+      "name": "v-s32-f64",
+      "kind": {
+        "variant": {
+          "cases": [
+            {
+              "name": "a",
+              "type": "s32"
+            },
+            {
+              "name": "b",
+              "type": "f64"
+            }
+          ]
+        }
+      },
+      "owner": {
+        "world": 0
+      }
+    },
+    {
+      "name": "v-s64-f32",
+      "kind": {
+        "variant": {
+          "cases": [
+            {
+              "name": "a",
+              "type": "s64"
+            },
+            {
+              "name": "b",
+              "type": "f32"
+            }
+          ]
+        }
+      },
+      "owner": {
+        "world": 0
+      }
+    },
+    {
+      "name": "v-string-u64",
+      "kind": {
+        "variant": {
+          "cases": [
+            {
+              "name": "a",
+              "type": "string"
+            },
+            {
+              "name": "b",
+              "type": "u64"
+            }
+          ]
+        }
+      },
+      "owner": {
+        "world": 0
+      }
+    }
+  ],
+  "packages": [
+    {
+      "name": "test:variants-unioning-types",
+      "interfaces": {},
+      "worlds": {
+        "a": 0
+      }
+    }
+  ]
+}

@@ -1,0 +1,554 @@
+{
+  "worlds": [
+    {
+      "name": "my-world",
+      "imports": {
+        "interface-0": {
+          "interface": {
+            "id": 0
+          }
+        }
+      },
+      "exports": {
+        "interface-0": {
+          "interface": {
+            "id": 0
+          }
+        }
+      },
+      "package": 0
+    }
+  ],
+  "interfaces": [
+    {
+      "name": "option-result",
+      "types": {
+        "empty": 0,
+        "o-one": 2,
+        "o-nested": 5,
+        "o1": 6,
+        "o2": 7,
+        "o4": 9,
+        "r1": 10,
+        "r2": 11,
+        "r3": 12,
+        "r4": 13,
+        "r5": 14,
+        "r6": 15,
+        "r7": 16,
+        "o5": 18,
+        "o6": 21
+      },
+      "functions": {
+        "o5-arg": {
+          "name": "o5-arg",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "x",
+              "type": 18
+            }
+          ],
+          "results": []
+        },
+        "o5-result": {
+          "name": "o5-result",
+          "kind": "freestanding",
+          "params": [],
+          "results": [
+            {
+              "type": 18
+            }
+          ]
+        },
+        "o6-arg": {
+          "name": "o6-arg",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "x",
+              "type": 21
+            }
+          ],
+          "results": []
+        },
+        "o6-result": {
+          "name": "o6-result",
+          "kind": "freestanding",
+          "params": [],
+          "results": [
+            {
+              "type": 21
+            }
+          ]
+        },
+        "r1-arg": {
+          "name": "r1-arg",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "x",
+              "type": 10
+            }
+          ],
+          "results": []
+        },
+        "r1-result": {
+          "name": "r1-result",
+          "kind": "freestanding",
+          "params": [],
+          "results": [
+            {
+              "type": 10
+            }
+          ]
+        },
+        "r2-arg": {
+          "name": "r2-arg",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "x",
+              "type": 11
+            }
+          ],
+          "results": []
+        },
+        "r2-result": {
+          "name": "r2-result",
+          "kind": "freestanding",
+          "params": [],
+          "results": [
+            {
+              "type": 11
+            }
+          ]
+        },
+        "r3-arg": {
+          "name": "r3-arg",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "x",
+              "type": 12
+            }
+          ],
+          "results": []
+        },
+        "r3-result": {
+          "name": "r3-result",
+          "kind": "freestanding",
+          "params": [],
+          "results": [
+            {
+              "type": 12
+            }
+          ]
+        },
+        "r4-arg": {
+          "name": "r4-arg",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "x",
+              "type": 13
+            }
+          ],
+          "results": []
+        },
+        "r4-result": {
+          "name": "r4-result",
+          "kind": "freestanding",
+          "params": [],
+          "results": [
+            {
+              "type": 13
+            }
+          ]
+        },
+        "r5-arg": {
+          "name": "r5-arg",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "x",
+              "type": 14
+            }
+          ],
+          "results": []
+        },
+        "r5-result": {
+          "name": "r5-result",
+          "kind": "freestanding",
+          "params": [],
+          "results": [
+            {
+              "type": 14
+            }
+          ]
+        },
+        "r6-arg": {
+          "name": "r6-arg",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "x",
+              "type": 15
+            }
+          ],
+          "results": []
+        },
+        "r6-result": {
+          "name": "r6-result",
+          "kind": "freestanding",
+          "params": [],
+          "results": [
+            {
+              "type": 15
+            }
+          ]
+        },
+        "r7-arg": {
+          "name": "r7-arg",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "x",
+              "type": 16
+            }
+          ],
+          "results": []
+        },
+        "r7-result": {
+          "name": "r7-result",
+          "kind": "freestanding",
+          "params": [],
+          "results": [
+            {
+              "type": 16
+            }
+          ]
+        },
+        "multi": {
+          "name": "multi",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "x",
+              "type": 16
+            },
+            {
+              "name": "y",
+              "type": 16
+            }
+          ],
+          "results": [
+            {
+              "type": 22
+            }
+          ]
+        },
+        "multi-option": {
+          "name": "multi-option",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "x",
+              "type": 16
+            },
+            {
+              "name": "y",
+              "type": 16
+            }
+          ],
+          "results": [
+            {
+              "type": 24
+            }
+          ]
+        }
+      },
+      "package": 0
+    }
+  ],
+  "types": [
+    {
+      "name": "empty",
+      "kind": {
+        "record": {
+          "fields": [
+            {
+              "name": "not-empty-anymore",
+              "type": "bool"
+            }
+          ]
+        }
+      },
+      "owner": {
+        "interface": 0
+      },
+      "docs": {
+        "contents": "NB: this record used to be empty, but that's no longer valid, so now it's\nnon-empty. Don't want to delete the whole test however."
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "option": "bool"
+      },
+      "owner": null
+    },
+    {
+      "name": "o-one",
+      "kind": {
+        "record": {
+          "fields": [
+            {
+              "name": "a",
+              "type": 1
+            }
+          ]
+        }
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "option": 2
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "option": 3
+      },
+      "owner": null
+    },
+    {
+      "name": "o-nested",
+      "kind": {
+        "record": {
+          "fields": [
+            {
+              "name": "a",
+              "type": 4
+            }
+          ]
+        }
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": "o1",
+      "kind": {
+        "option": 2
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": "o2",
+      "kind": {
+        "option": 0
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "option": 5
+      },
+      "owner": null
+    },
+    {
+      "name": "o4",
+      "kind": {
+        "option": 8
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": "r1",
+      "kind": {
+        "result": {
+          "ok": null,
+          "err": null
+        }
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": "r2",
+      "kind": {
+        "result": {
+          "ok": null,
+          "err": 0
+        }
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": "r3",
+      "kind": {
+        "result": {
+          "ok": 0,
+          "err": null
+        }
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": "r4",
+      "kind": {
+        "result": {
+          "ok": 0,
+          "err": 0
+        }
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": "r5",
+      "kind": {
+        "result": {
+          "ok": 3,
+          "err": 6
+        }
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": "r6",
+      "kind": {
+        "result": {
+          "ok": 4,
+          "err": 7
+        }
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": "r7",
+      "kind": {
+        "result": {
+          "ok": 4,
+          "err": 9
+        }
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "result": {
+          "ok": null,
+          "err": null
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": "o5",
+      "kind": {
+        "option": 17
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "option": 17
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "result": {
+          "ok": 19,
+          "err": null
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": "o6",
+      "kind": {
+        "option": 20
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "tuple": {
+          "types": [
+            16,
+            16,
+            16
+          ]
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "tuple": {
+          "types": [
+            16,
+            16
+          ]
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "option": 23
+      },
+      "owner": null
+    }
+  ],
+  "packages": [
+    {
+      "name": "foo:foo",
+      "interfaces": {
+        "option-result": 0
+      },
+      "worlds": {
+        "my-world": 0
+      }
+    }
+  ]
+}

@@ -1,0 +1,75 @@
+{
+  "worlds": [
+    {
+      "name": "bindings",
+      "imports": {
+        "interface-0": {
+          "interface": {
+            "id": 0
+          }
+        }
+      },
+      "exports": {},
+      "package": 0
+    }
+  ],
+  "interfaces": [
+    {
+      "name": "component",
+      "types": {
+        "value": 0
+      },
+      "functions": {
+        "query-eval": {
+          "name": "query-eval",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "q",
+              "type": "u64"
+            }
+          ],
+          "results": [
+            {
+              "type": 1
+            }
+          ]
+        }
+      },
+      "package": 0
+    }
+  ],
+  "types": [
+    {
+      "name": "value",
+      "kind": {
+        "tuple": {
+          "types": [
+            "u32"
+          ]
+        }
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "list": 0
+      },
+      "owner": null
+    }
+  ],
+  "packages": [
+    {
+      "name": "foo:foo",
+      "interfaces": {
+        "component": 0
+      },
+      "worlds": {
+        "bindings": 0
+      }
+    }
+  ]
+}

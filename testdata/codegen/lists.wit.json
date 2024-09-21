@@ -1,0 +1,726 @@
+{
+  "worlds": [
+    {
+      "name": "the-lists",
+      "imports": {
+        "interface-0": {
+          "interface": {
+            "id": 0
+          }
+        }
+      },
+      "exports": {
+        "interface-0": {
+          "interface": {
+            "id": 0
+          }
+        }
+      },
+      "package": 0
+    }
+  ],
+  "interfaces": [
+    {
+      "name": "lists",
+      "types": {
+        "other-record": 1,
+        "some-record": 3,
+        "other-variant": 4,
+        "some-variant": 6,
+        "load-store-all-sizes": 8
+      },
+      "functions": {
+        "list-u8-param": {
+          "name": "list-u8-param",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "x",
+              "type": 0
+            }
+          ],
+          "results": []
+        },
+        "list-u16-param": {
+          "name": "list-u16-param",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "x",
+              "type": 9
+            }
+          ],
+          "results": []
+        },
+        "list-u32-param": {
+          "name": "list-u32-param",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "x",
+              "type": 10
+            }
+          ],
+          "results": []
+        },
+        "list-u64-param": {
+          "name": "list-u64-param",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "x",
+              "type": 11
+            }
+          ],
+          "results": []
+        },
+        "list-s8-param": {
+          "name": "list-s8-param",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "x",
+              "type": 12
+            }
+          ],
+          "results": []
+        },
+        "list-s16-param": {
+          "name": "list-s16-param",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "x",
+              "type": 13
+            }
+          ],
+          "results": []
+        },
+        "list-s32-param": {
+          "name": "list-s32-param",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "x",
+              "type": 14
+            }
+          ],
+          "results": []
+        },
+        "list-s64-param": {
+          "name": "list-s64-param",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "x",
+              "type": 15
+            }
+          ],
+          "results": []
+        },
+        "list-f32-param": {
+          "name": "list-f32-param",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "x",
+              "type": 16
+            }
+          ],
+          "results": []
+        },
+        "list-f64-param": {
+          "name": "list-f64-param",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "x",
+              "type": 17
+            }
+          ],
+          "results": []
+        },
+        "list-u8-ret": {
+          "name": "list-u8-ret",
+          "kind": "freestanding",
+          "params": [],
+          "results": [
+            {
+              "type": 0
+            }
+          ]
+        },
+        "list-u16-ret": {
+          "name": "list-u16-ret",
+          "kind": "freestanding",
+          "params": [],
+          "results": [
+            {
+              "type": 9
+            }
+          ]
+        },
+        "list-u32-ret": {
+          "name": "list-u32-ret",
+          "kind": "freestanding",
+          "params": [],
+          "results": [
+            {
+              "type": 10
+            }
+          ]
+        },
+        "list-u64-ret": {
+          "name": "list-u64-ret",
+          "kind": "freestanding",
+          "params": [],
+          "results": [
+            {
+              "type": 11
+            }
+          ]
+        },
+        "list-s8-ret": {
+          "name": "list-s8-ret",
+          "kind": "freestanding",
+          "params": [],
+          "results": [
+            {
+              "type": 12
+            }
+          ]
+        },
+        "list-s16-ret": {
+          "name": "list-s16-ret",
+          "kind": "freestanding",
+          "params": [],
+          "results": [
+            {
+              "type": 13
+            }
+          ]
+        },
+        "list-s32-ret": {
+          "name": "list-s32-ret",
+          "kind": "freestanding",
+          "params": [],
+          "results": [
+            {
+              "type": 14
+            }
+          ]
+        },
+        "list-s64-ret": {
+          "name": "list-s64-ret",
+          "kind": "freestanding",
+          "params": [],
+          "results": [
+            {
+              "type": 15
+            }
+          ]
+        },
+        "list-f32-ret": {
+          "name": "list-f32-ret",
+          "kind": "freestanding",
+          "params": [],
+          "results": [
+            {
+              "type": 16
+            }
+          ]
+        },
+        "list-f64-ret": {
+          "name": "list-f64-ret",
+          "kind": "freestanding",
+          "params": [],
+          "results": [
+            {
+              "type": 17
+            }
+          ]
+        },
+        "tuple-list": {
+          "name": "tuple-list",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "x",
+              "type": 19
+            }
+          ],
+          "results": [
+            {
+              "type": 21
+            }
+          ]
+        },
+        "string-list-arg": {
+          "name": "string-list-arg",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "a",
+              "type": 22
+            }
+          ],
+          "results": []
+        },
+        "string-list-ret": {
+          "name": "string-list-ret",
+          "kind": "freestanding",
+          "params": [],
+          "results": [
+            {
+              "type": 22
+            }
+          ]
+        },
+        "tuple-string-list": {
+          "name": "tuple-string-list",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "x",
+              "type": 24
+            }
+          ],
+          "results": [
+            {
+              "type": 26
+            }
+          ]
+        },
+        "string-list": {
+          "name": "string-list",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "x",
+              "type": 22
+            }
+          ],
+          "results": [
+            {
+              "type": 22
+            }
+          ]
+        },
+        "record-list": {
+          "name": "record-list",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "x",
+              "type": 27
+            }
+          ],
+          "results": [
+            {
+              "type": 2
+            }
+          ]
+        },
+        "record-list-reverse": {
+          "name": "record-list-reverse",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "x",
+              "type": 2
+            }
+          ],
+          "results": [
+            {
+              "type": 27
+            }
+          ]
+        },
+        "variant-list": {
+          "name": "variant-list",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "x",
+              "type": 28
+            }
+          ],
+          "results": [
+            {
+              "type": 5
+            }
+          ]
+        },
+        "load-store-everything": {
+          "name": "load-store-everything",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "a",
+              "type": 8
+            }
+          ],
+          "results": [
+            {
+              "type": 8
+            }
+          ]
+        }
+      },
+      "package": 0
+    }
+  ],
+  "types": [
+    {
+      "name": null,
+      "kind": {
+        "list": "u8"
+      },
+      "owner": null
+    },
+    {
+      "name": "other-record",
+      "kind": {
+        "record": {
+          "fields": [
+            {
+              "name": "a1",
+              "type": "u32"
+            },
+            {
+              "name": "a2",
+              "type": "u64"
+            },
+            {
+              "name": "a3",
+              "type": "s32"
+            },
+            {
+              "name": "a4",
+              "type": "s64"
+            },
+            {
+              "name": "b",
+              "type": "string"
+            },
+            {
+              "name": "c",
+              "type": 0
+            }
+          ]
+        }
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "list": 1
+      },
+      "owner": null
+    },
+    {
+      "name": "some-record",
+      "kind": {
+        "record": {
+          "fields": [
+            {
+              "name": "x",
+              "type": "string"
+            },
+            {
+              "name": "y",
+              "type": 1
+            },
+            {
+              "name": "z",
+              "type": 2
+            },
+            {
+              "name": "c1",
+              "type": "u32"
+            },
+            {
+              "name": "c2",
+              "type": "u64"
+            },
+            {
+              "name": "c3",
+              "type": "s32"
+            },
+            {
+              "name": "c4",
+              "type": "s64"
+            }
+          ]
+        }
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": "other-variant",
+      "kind": {
+        "variant": {
+          "cases": [
+            {
+              "name": "a",
+              "type": null
+            },
+            {
+              "name": "b",
+              "type": "u32"
+            },
+            {
+              "name": "c",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "list": 4
+      },
+      "owner": null
+    },
+    {
+      "name": "some-variant",
+      "kind": {
+        "variant": {
+          "cases": [
+            {
+              "name": "a",
+              "type": "string"
+            },
+            {
+              "name": "b",
+              "type": null
+            },
+            {
+              "name": "c",
+              "type": "u32"
+            },
+            {
+              "name": "d",
+              "type": 5
+            }
+          ]
+        }
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "tuple": {
+          "types": [
+            "string",
+            "u8",
+            "s8",
+            "u16",
+            "s16",
+            "u32",
+            "s32",
+            "u64",
+            "s64",
+            "f32",
+            "f64",
+            "char"
+          ]
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": "load-store-all-sizes",
+      "kind": {
+        "list": 7
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "list": "u16"
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "list": "u32"
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "list": "u64"
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "list": "s8"
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "list": "s16"
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "list": "s32"
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "list": "s64"
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "list": "f32"
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "list": "f64"
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "tuple": {
+          "types": [
+            "u8",
+            "s8"
+          ]
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "list": 18
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "tuple": {
+          "types": [
+            "s64",
+            "u32"
+          ]
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "list": 20
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "list": "string"
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "tuple": {
+          "types": [
+            "u8",
+            "string"
+          ]
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "list": 23
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "tuple": {
+          "types": [
+            "string",
+            "u8"
+          ]
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "list": 25
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "list": 3
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "list": 6
+      },
+      "owner": null
+    }
+  ],
+  "packages": [
+    {
+      "name": "foo:foo",
+      "interfaces": {
+        "lists": 0
+      },
+      "worlds": {
+        "the-lists": 0
+      }
+    }
+  ]
+}

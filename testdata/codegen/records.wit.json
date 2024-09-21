@@ -1,0 +1,350 @@
+{
+  "worlds": [
+    {
+      "name": "the-world",
+      "imports": {
+        "interface-0": {
+          "interface": {
+            "id": 0
+          }
+        }
+      },
+      "exports": {
+        "interface-0": {
+          "interface": {
+            "id": 0
+          }
+        }
+      },
+      "package": 0
+    }
+  ],
+  "interfaces": [
+    {
+      "name": "records",
+      "types": {
+        "empty": 0,
+        "scalars": 1,
+        "really-flags": 2,
+        "aggregates": 3,
+        "tuple-typedef": 4,
+        "int-typedef": 5,
+        "tuple-typedef2": 6
+      },
+      "functions": {
+        "tuple-arg": {
+          "name": "tuple-arg",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "x",
+              "type": 7
+            }
+          ],
+          "results": []
+        },
+        "tuple-result": {
+          "name": "tuple-result",
+          "kind": "freestanding",
+          "params": [],
+          "results": [
+            {
+              "type": 7
+            }
+          ]
+        },
+        "empty-arg": {
+          "name": "empty-arg",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "x",
+              "type": 0
+            }
+          ],
+          "results": []
+        },
+        "empty-result": {
+          "name": "empty-result",
+          "kind": "freestanding",
+          "params": [],
+          "results": [
+            {
+              "type": 0
+            }
+          ]
+        },
+        "scalar-arg": {
+          "name": "scalar-arg",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "x",
+              "type": 1
+            }
+          ],
+          "results": []
+        },
+        "scalar-result": {
+          "name": "scalar-result",
+          "kind": "freestanding",
+          "params": [],
+          "results": [
+            {
+              "type": 1
+            }
+          ]
+        },
+        "flags-arg": {
+          "name": "flags-arg",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "x",
+              "type": 2
+            }
+          ],
+          "results": []
+        },
+        "flags-result": {
+          "name": "flags-result",
+          "kind": "freestanding",
+          "params": [],
+          "results": [
+            {
+              "type": 2
+            }
+          ]
+        },
+        "aggregate-arg": {
+          "name": "aggregate-arg",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "x",
+              "type": 3
+            }
+          ],
+          "results": []
+        },
+        "aggregate-result": {
+          "name": "aggregate-result",
+          "kind": "freestanding",
+          "params": [],
+          "results": [
+            {
+              "type": 3
+            }
+          ]
+        },
+        "typedef-inout": {
+          "name": "typedef-inout",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "e",
+              "type": 6
+            }
+          ],
+          "results": [
+            {
+              "type": "s32"
+            }
+          ]
+        }
+      },
+      "package": 0
+    }
+  ],
+  "types": [
+    {
+      "name": "empty",
+      "kind": {
+        "record": {
+          "fields": [
+            {
+              "name": "not-empty-anymore",
+              "type": "bool"
+            }
+          ]
+        }
+      },
+      "owner": {
+        "interface": 0
+      },
+      "docs": {
+        "contents": "NB: this record used to be empty, but that's no longer valid, so now it's\nnon-empty. Don't want to delete the whole test however."
+      }
+    },
+    {
+      "name": "scalars",
+      "kind": {
+        "record": {
+          "fields": [
+            {
+              "name": "a",
+              "type": "u32",
+              "docs": {
+                "contents": "The first field, named a"
+              }
+            },
+            {
+              "name": "b",
+              "type": "u32",
+              "docs": {
+                "contents": "The second field, named b"
+              }
+            }
+          ]
+        }
+      },
+      "owner": {
+        "interface": 0
+      },
+      "docs": {
+        "contents": "A record containing two scalar fields\nthat both have the same type"
+      }
+    },
+    {
+      "name": "really-flags",
+      "kind": {
+        "record": {
+          "fields": [
+            {
+              "name": "a",
+              "type": "bool"
+            },
+            {
+              "name": "b",
+              "type": "bool"
+            },
+            {
+              "name": "c",
+              "type": "bool"
+            },
+            {
+              "name": "d",
+              "type": "bool"
+            },
+            {
+              "name": "e",
+              "type": "bool"
+            },
+            {
+              "name": "f",
+              "type": "bool"
+            },
+            {
+              "name": "g",
+              "type": "bool"
+            },
+            {
+              "name": "h",
+              "type": "bool"
+            },
+            {
+              "name": "i",
+              "type": "bool"
+            }
+          ]
+        }
+      },
+      "owner": {
+        "interface": 0
+      },
+      "docs": {
+        "contents": "A record that is really just flags\nAll of the fields are bool"
+      }
+    },
+    {
+      "name": "aggregates",
+      "kind": {
+        "record": {
+          "fields": [
+            {
+              "name": "a",
+              "type": 1
+            },
+            {
+              "name": "b",
+              "type": "u32"
+            },
+            {
+              "name": "c",
+              "type": 0
+            },
+            {
+              "name": "d",
+              "type": "string"
+            },
+            {
+              "name": "e",
+              "type": 2
+            }
+          ]
+        }
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": "tuple-typedef",
+      "kind": {
+        "tuple": {
+          "types": [
+            "s32"
+          ]
+        }
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": "int-typedef",
+      "kind": {
+        "type": "s32"
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": "tuple-typedef2",
+      "kind": {
+        "tuple": {
+          "types": [
+            5
+          ]
+        }
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "tuple": {
+          "types": [
+            "char",
+            "u32"
+          ]
+        }
+      },
+      "owner": null
+    }
+  ],
+  "packages": [
+    {
+      "name": "foo:foo",
+      "interfaces": {
+        "records": 0
+      },
+      "worlds": {
+        "the-world": 0
+      }
+    }
+  ]
+}

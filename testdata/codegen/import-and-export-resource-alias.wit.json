@@ -1,0 +1,139 @@
+{
+  "worlds": [
+    {
+      "name": "resources",
+      "imports": {
+        "interface-0": {
+          "interface": {
+            "id": 0
+          }
+        }
+      },
+      "exports": {
+        "interface-0": {
+          "interface": {
+            "id": 0
+          }
+        }
+      },
+      "package": 0
+    }
+  ],
+  "interfaces": [
+    {
+      "name": "foo",
+      "types": {
+        "x": 0,
+        "y": 1
+      },
+      "functions": {
+        "[constructor]x": {
+          "name": "[constructor]x",
+          "kind": {
+            "constructor": 0
+          },
+          "params": [
+            {
+              "name": "s",
+              "type": "string"
+            }
+          ],
+          "results": [
+            {
+              "type": 3
+            }
+          ]
+        },
+        "[method]x.get": {
+          "name": "[method]x.get",
+          "kind": {
+            "method": 0
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 2
+            }
+          ],
+          "results": [
+            {
+              "type": "string"
+            }
+          ]
+        },
+        "transmogriphy": {
+          "name": "transmogriphy",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "y",
+              "type": 4
+            }
+          ],
+          "results": [
+            {
+              "type": 3
+            }
+          ]
+        }
+      },
+      "package": 0
+    }
+  ],
+  "types": [
+    {
+      "name": "x",
+      "kind": "resource",
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": "y",
+      "kind": {
+        "type": 0
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "borrow": 0
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "own": 0
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "own": 1
+        }
+      },
+      "owner": null
+    }
+  ],
+  "packages": [
+    {
+      "name": "my:resources",
+      "interfaces": {
+        "foo": 0
+      },
+      "worlds": {
+        "resources": 0
+      }
+    }
+  ]
+}

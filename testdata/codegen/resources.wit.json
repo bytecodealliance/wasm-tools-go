@@ -1,0 +1,491 @@
+{
+  "worlds": [
+    {
+      "name": "resources",
+      "imports": {
+        "imports": {
+          "interface": {
+            "id": 2
+          }
+        },
+        "interface-0": {
+          "interface": {
+            "id": 0
+          }
+        },
+        "z": {
+          "type": 1
+        },
+        "includes-borrow": {
+          "type": 3
+        },
+        "big": {
+          "type": 4
+        }
+      },
+      "exports": {
+        "add": {
+          "function": {
+            "name": "add",
+            "kind": "freestanding",
+            "params": [
+              {
+                "name": "a",
+                "type": 2
+              },
+              {
+                "name": "b",
+                "type": 2
+              }
+            ],
+            "results": [
+              {
+                "type": 14
+              }
+            ]
+          }
+        },
+        "maybe-with-z": {
+          "function": {
+            "name": "maybe-with-z",
+            "kind": "freestanding",
+            "params": [
+              {
+                "name": "a",
+                "type": 5
+              }
+            ],
+            "results": []
+          }
+        },
+        "variant-with-z": {
+          "function": {
+            "name": "variant-with-z",
+            "kind": "freestanding",
+            "params": [
+              {
+                "name": "a",
+                "type": 3
+              }
+            ],
+            "results": []
+          }
+        },
+        "maybe-variant-with-z": {
+          "function": {
+            "name": "maybe-variant-with-z",
+            "kind": "freestanding",
+            "params": [
+              {
+                "name": "a",
+                "type": 6
+              }
+            ],
+            "results": []
+          }
+        },
+        "big-record": {
+          "function": {
+            "name": "big-record",
+            "kind": "freestanding",
+            "params": [
+              {
+                "name": "r",
+                "type": 4
+              }
+            ],
+            "results": []
+          }
+        },
+        "exports": {
+          "interface": {
+            "id": 1
+          }
+        }
+      },
+      "package": 0
+    }
+  ],
+  "interfaces": [
+    {
+      "name": "types",
+      "types": {
+        "z": 0
+      },
+      "functions": {
+        "[constructor]z": {
+          "name": "[constructor]z",
+          "kind": {
+            "constructor": 0
+          },
+          "params": [
+            {
+              "name": "a",
+              "type": "f64"
+            }
+          ],
+          "results": [
+            {
+              "type": 11
+            }
+          ]
+        }
+      },
+      "package": 0
+    },
+    {
+      "name": null,
+      "types": {
+        "x": 7
+      },
+      "functions": {
+        "[constructor]x": {
+          "name": "[constructor]x",
+          "kind": {
+            "constructor": 7
+          },
+          "params": [
+            {
+              "name": "a",
+              "type": "f64"
+            }
+          ],
+          "results": [
+            {
+              "type": 12
+            }
+          ]
+        },
+        "[method]x.get-a": {
+          "name": "[method]x.get-a",
+          "kind": {
+            "method": 7
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 8
+            }
+          ],
+          "results": [
+            {
+              "type": "f64"
+            }
+          ]
+        },
+        "[method]x.set-a": {
+          "name": "[method]x.set-a",
+          "kind": {
+            "method": 7
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 8
+            },
+            {
+              "name": "a",
+              "type": "f64"
+            }
+          ],
+          "results": []
+        },
+        "[static]x.add": {
+          "name": "[static]x.add",
+          "kind": {
+            "static": 7
+          },
+          "params": [
+            {
+              "name": "x",
+              "type": 12
+            },
+            {
+              "name": "a",
+              "type": "f64"
+            }
+          ],
+          "results": [
+            {
+              "type": 12
+            }
+          ]
+        }
+      },
+      "package": 0
+    },
+    {
+      "name": null,
+      "types": {
+        "y": 9
+      },
+      "functions": {
+        "[constructor]y": {
+          "name": "[constructor]y",
+          "kind": {
+            "constructor": 9
+          },
+          "params": [
+            {
+              "name": "a",
+              "type": "f64"
+            }
+          ],
+          "results": [
+            {
+              "type": 13
+            }
+          ]
+        },
+        "[method]y.get-a": {
+          "name": "[method]y.get-a",
+          "kind": {
+            "method": 9
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 10
+            }
+          ],
+          "results": [
+            {
+              "type": "f64"
+            }
+          ]
+        },
+        "[method]y.set-a": {
+          "name": "[method]y.set-a",
+          "kind": {
+            "method": 9
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 10
+            },
+            {
+              "name": "a",
+              "type": "f64"
+            }
+          ],
+          "results": []
+        },
+        "[static]y.add": {
+          "name": "[static]y.add",
+          "kind": {
+            "static": 9
+          },
+          "params": [
+            {
+              "name": "y",
+              "type": 13
+            },
+            {
+              "name": "a",
+              "type": "f64"
+            }
+          ],
+          "results": [
+            {
+              "type": 13
+            }
+          ]
+        }
+      },
+      "package": 0
+    }
+  ],
+  "types": [
+    {
+      "name": "z",
+      "kind": "resource",
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": "z",
+      "kind": {
+        "type": 0
+      },
+      "owner": {
+        "world": 0
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "borrow": 1
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": "includes-borrow",
+      "kind": {
+        "variant": {
+          "cases": [
+            {
+              "name": "a",
+              "type": null
+            },
+            {
+              "name": "b",
+              "type": 2
+            }
+          ]
+        }
+      },
+      "owner": {
+        "world": 0
+      }
+    },
+    {
+      "name": "big",
+      "kind": {
+        "record": {
+          "fields": [
+            {
+              "name": "x1",
+              "type": 2
+            },
+            {
+              "name": "x2",
+              "type": 2
+            },
+            {
+              "name": "x3",
+              "type": 2
+            },
+            {
+              "name": "x4",
+              "type": 2
+            },
+            {
+              "name": "x5",
+              "type": 2
+            },
+            {
+              "name": "x6",
+              "type": 2
+            },
+            {
+              "name": "x7",
+              "type": 2
+            },
+            {
+              "name": "x8",
+              "type": 2
+            },
+            {
+              "name": "x9",
+              "type": 2
+            },
+            {
+              "name": "x10",
+              "type": 2
+            }
+          ]
+        }
+      },
+      "owner": {
+        "world": 0
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "option": 2
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "option": 3
+      },
+      "owner": null
+    },
+    {
+      "name": "x",
+      "kind": "resource",
+      "owner": {
+        "interface": 1
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "borrow": 7
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": "y",
+      "kind": "resource",
+      "owner": {
+        "interface": 2
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "borrow": 9
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "own": 0
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "own": 7
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "own": 9
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "own": 1
+        }
+      },
+      "owner": null
+    }
+  ],
+  "packages": [
+    {
+      "name": "my:resources",
+      "interfaces": {
+        "types": 0
+      },
+      "worlds": {
+        "resources": 0
+      }
+    }
+  ]
+}
