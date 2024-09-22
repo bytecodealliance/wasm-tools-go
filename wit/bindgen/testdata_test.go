@@ -15,11 +15,12 @@ import (
 	"sync"
 	"testing"
 
+	"golang.org/x/tools/go/packages"
+
 	"github.com/bytecodealliance/wasm-tools-go/internal/codec"
 	"github.com/bytecodealliance/wasm-tools-go/internal/go/gen"
 	"github.com/bytecodealliance/wasm-tools-go/internal/relpath"
 	"github.com/bytecodealliance/wasm-tools-go/wit"
-	"golang.org/x/tools/go/packages"
 )
 
 var writeGoFiles = flag.Bool("write", false, "write generated Go files")
@@ -192,10 +193,10 @@ func validateGeneratedGo(t *testing.T, res *wit.Resolve, origin string) {
 			if def == nil || def.Parent() != goPkg.Types.Scope() {
 				continue
 			}
-			// t.Logf("Def: %s", id.String())
-			if !pkg.HasName(id.String()) {
-				// TODO: reenable this test
-				// t.Errorf("name %s not found in generated package %s", id.String(), pkg.Path)
+			name := id.String()
+			// t.Logf("Def: %s %T", name, def.Type())
+			if name != "init" && !pkg.HasName(name) {
+				t.Errorf("name %s not found in generated package %s", name, pkg.Path)
 			}
 		}
 
