@@ -706,7 +706,7 @@ func (g *generator) recordRep(file *gen.File, dir wit.Direction, r *wit.Record, 
 	var b strings.Builder
 	cm := file.Import(g.opts.cmPackage)
 	b.WriteString("struct {\n")
-	stringio.Write(&b, "_ ", cm, ".HostLayout")
+	stringio.Write(&b, cm, ".HostLayout")
 	for i, f := range r.Fields {
 		if i == 0 || i > 0 && f.Docs.Contents != "" {
 			b.WriteRune('\n')
