@@ -704,7 +704,9 @@ func (g *generator) primitiveRep(p wit.Primitive) string {
 func (g *generator) recordRep(file *gen.File, dir wit.Direction, r *wit.Record, goName string) string {
 	exported := len(goName) == 0 || token.IsExported(goName)
 	var b strings.Builder
-	b.WriteString("struct {")
+	cm := file.Import(g.opts.cmPackage)
+	b.WriteString("struct {\n")
+	stringio.Write(&b, "_ ", cm, ".HostLayout")
 	for i, f := range r.Fields {
 		if i == 0 || i > 0 && f.Docs.Contents != "" {
 			b.WriteRune('\n')
@@ -1723,11 +1725,11 @@ func (g *generator) defineImportedFunction(_ wit.Ident, f *wit.Function, decl fu
 	if pointerParam.typ != nil {
 		stringio.Write(&b, callParams[0].name, " := &", decl.f.params[0].name, "\n")
 	} else if compoundParams.typ != nil {
+		cm := file.Import(g.opts.cmPackage)
 		stringio.Write(&b, compoundParams.name, " := ", g.typeRep(file, compoundParams.dir, compoundParams.typ), "{ ")
-		for i, p := range decl.f.params {
-			if i > 0 {
-				b.WriteString(", ")
-			}
+		stringio.Write(&b, cm, ".HostLayout{}")
+		for _, p := range decl.f.params {
+			b.WriteString(", ")
 			b.WriteString(p.name)
 		}
 		b.WriteString(" }\n")
