@@ -4,7 +4,7 @@ package cm
 //
 // [Component Model tuple]: https://component-model.bytecodealliance.org/design/wit.html#tuples
 type Tuple[T0, T1 any] struct {
-	HostLayout
+	_  HostLayout
 	F0 T0
 	F1 T1
 }
@@ -13,7 +13,7 @@ type Tuple[T0, T1 any] struct {
 //
 // [Component Model tuple]: https://component-model.bytecodealliance.org/design/wit.html#tuples
 type Tuple3[T0, T1, T2 any] struct {
-	HostLayout
+	_  HostLayout
 	F0 T0
 	F1 T1
 	F2 T2
@@ -23,7 +23,7 @@ type Tuple3[T0, T1, T2 any] struct {
 //
 // [Component Model tuple]: https://component-model.bytecodealliance.org/design/wit.html#tuples
 type Tuple4[T0, T1, T2, T3 any] struct {
-	HostLayout
+	_  HostLayout
 	F0 T0
 	F1 T1
 	F2 T2
@@ -34,7 +34,7 @@ type Tuple4[T0, T1, T2, T3 any] struct {
 //
 // [Component Model tuple]: https://component-model.bytecodealliance.org/design/wit.html#tuples
 type Tuple5[T0, T1, T2, T3, T4 any] struct {
-	HostLayout
+	_  HostLayout
 	F0 T0
 	F1 T1
 	F2 T2
@@ -46,7 +46,7 @@ type Tuple5[T0, T1, T2, T3, T4 any] struct {
 //
 // [Component Model tuple]: https://component-model.bytecodealliance.org/design/wit.html#tuples
 type Tuple6[T0, T1, T2, T3, T4, T5 any] struct {
-	HostLayout
+	_  HostLayout
 	F0 T0
 	F1 T1
 	F2 T2
@@ -59,7 +59,7 @@ type Tuple6[T0, T1, T2, T3, T4, T5 any] struct {
 //
 // [Component Model tuple]: https://component-model.bytecodealliance.org/design/wit.html#tuples
 type Tuple7[T0, T1, T2, T3, T4, T5, T6 any] struct {
-	HostLayout
+	_  HostLayout
 	F0 T0
 	F1 T1
 	F2 T2
@@ -73,7 +73,7 @@ type Tuple7[T0, T1, T2, T3, T4, T5, T6 any] struct {
 //
 // [Component Model tuple]: https://component-model.bytecodealliance.org/design/wit.html#tuples
 type Tuple8[T0, T1, T2, T3, T4, T5, T6, T7 any] struct {
-	HostLayout
+	_  HostLayout
 	F0 T0
 	F1 T1
 	F2 T2
@@ -88,7 +88,7 @@ type Tuple8[T0, T1, T2, T3, T4, T5, T6, T7 any] struct {
 //
 // [Component Model tuple]: https://component-model.bytecodealliance.org/design/wit.html#tuples
 type Tuple9[T0, T1, T2, T3, T4, T5, T6, T7, T8 any] struct {
-	HostLayout
+	_  HostLayout
 	F0 T0
 	F1 T1
 	F2 T2
@@ -104,7 +104,7 @@ type Tuple9[T0, T1, T2, T3, T4, T5, T6, T7, T8 any] struct {
 //
 // [Component Model tuple]: https://component-model.bytecodealliance.org/design/wit.html#tuples
 type Tuple10[T0, T1, T2, T3, T4, T5, T6, T7, T8, T9 any] struct {
-	HostLayout
+	_  HostLayout
 	F0 T0
 	F1 T1
 	F2 T2
@@ -121,7 +121,7 @@ type Tuple10[T0, T1, T2, T3, T4, T5, T6, T7, T8, T9 any] struct {
 //
 // [Component Model tuple]: https://component-model.bytecodealliance.org/design/wit.html#tuples
 type Tuple11[T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10 any] struct {
-	HostLayout
+	_   HostLayout
 	F0  T0
 	F1  T1
 	F2  T2
@@ -139,7 +139,7 @@ type Tuple11[T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10 any] struct {
 //
 // [Component Model tuple]: https://component-model.bytecodealliance.org/design/wit.html#tuples
 type Tuple12[T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11 any] struct {
-	HostLayout
+	_   HostLayout
 	F0  T0
 	F1  T1
 	F2  T2
@@ -158,7 +158,7 @@ type Tuple12[T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11 any] struct {
 //
 // [Component Model tuple]: https://component-model.bytecodealliance.org/design/wit.html#tuples
 type Tuple13[T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12 any] struct {
-	HostLayout
+	_   HostLayout
 	F0  T0
 	F1  T1
 	F2  T2
@@ -178,7 +178,7 @@ type Tuple13[T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12 any] struct {
 //
 // [Component Model tuple]: https://component-model.bytecodealliance.org/design/wit.html#tuples
 type Tuple14[T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13 any] struct {
-	HostLayout
+	_   HostLayout
 	F0  T0
 	F1  T1
 	F2  T2
@@ -199,7 +199,7 @@ type Tuple14[T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13 any] str
 //
 // [Component Model tuple]: https://component-model.bytecodealliance.org/design/wit.html#tuples
 type Tuple15[T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14 any] struct {
-	HostLayout
+	_   HostLayout
 	F0  T0
 	F1  T1
 	F2  T2
@@ -221,7 +221,7 @@ type Tuple15[T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14 any
 //
 // [Component Model tuple]: https://component-model.bytecodealliance.org/design/wit.html#tuples
 type Tuple16[T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15 any] struct {
-	HostLayout
+	_   HostLayout
 	F0  T0
 	F1  T1
 	F2  T2

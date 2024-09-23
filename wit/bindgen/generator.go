@@ -706,7 +706,7 @@ func (g *generator) recordRep(file *gen.File, dir wit.Direction, r *wit.Record, 
 	var b strings.Builder
 	cm := file.Import(g.opts.cmPackage)
 	b.WriteString("struct {\n")
-	stringio.Write(&b, cm, ".HostLayout")
+	stringio.Write(&b, "_ ", cm, ".HostLayout")
 	for i, f := range r.Fields {
 		if i == 0 || i > 0 && f.Docs.Contents != "" {
 			b.WriteRune('\n')
@@ -1725,12 +1725,13 @@ func (g *generator) defineImportedFunction(_ wit.Ident, f *wit.Function, decl fu
 	if pointerParam.typ != nil {
 		stringio.Write(&b, callParams[0].name, " := &", decl.f.params[0].name, "\n")
 	} else if compoundParams.typ != nil {
-		cm := file.Import(g.opts.cmPackage)
 		stringio.Write(&b, compoundParams.name, " := ", g.typeRep(file, compoundParams.dir, compoundParams.typ), "{ ")
-		stringio.Write(&b, cm, ".HostLayout{}")
-		for _, p := range decl.f.params {
-			b.WriteString(", ")
-			b.WriteString(p.name)
+		for i, p := range decl.f.params {
+			if i > 0 {
+				b.WriteString(", ")
+			}
+			// compound parameter struct field names are identical to parameter names
+			stringio.Write(&b, p.name, ": ", p.name)
 		}
 		b.WriteString(" }\n")
 	} else if len(callParams) > 0 {
