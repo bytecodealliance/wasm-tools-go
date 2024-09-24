@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"go/token"
+	"path"
 	"path/filepath"
 	"runtime"
 	"slices"
@@ -47,8 +48,11 @@ type typeDecl struct {
 }
 
 type funcDecl struct {
-	f          function // The exported Go function
-	wasm       function // The wasmimport or wasmexport function
+	owner      wit.TypeOwner
+	dir        wit.Direction
+	f          *wit.Function
+	goFunc     function // The Go function
+	wasmFunc   function // The wasmimport or wasmexport function
 	linkerName string   // The wasmimport or wasmexport mangled linker name
 }
 
@@ -91,23 +95,26 @@ type generator struct {
 	// packages are Go packages indexed on Go package paths.
 	packages map[string]*gen.Package
 
-	// witPackages map WIT identifier paths to Go packages.
-	witPackages map[string]*gen.Package
+	// witPackages map wit.TypeOwner (World, Interface) to Go packages.
+	witPackages map[wit.TypeOwner]*gen.Package
 
-	// exportScopes map WIT identifier paths to export scopes.
-	exportScopes map[string]gen.Scope
+	// exportScopes map wit.TypeOwner to export scopes.
+	exportScopes map[wit.TypeOwner]gen.Scope
+
+	// moduleNames map wit.TypeOwner to the wasmimport/wasmexport module names.
+	moduleNames map[wit.TypeOwner]string
 
 	// types map wit.TypeDef to their Go equivalent.
 	// It is indexed on wit.Direction, either Imported or Exported.
-	types [2]map[*wit.TypeDef]typeDecl
+	types [2]map[*wit.TypeDef]*typeDecl
 
 	// functions map wit.Function to their Go equivalent.
 	// It is indexed on wit.Direction, either Imported or Exported.
-	functions [2]map[*wit.Function]funcDecl
+	functions [2]map[*wit.Function]*funcDecl
 
 	// defined represent whether a world, interface, type, or function has been defined.
 	// It is indexed on wit.Direction, either Imported or Exported.
-	defined [2]map[any]bool
+	defined [2]map[wit.Node]bool
 
 	// ABI shapes for any type, use for variant and result Shape type parameters.
 	shapes map[typeUse]string
@@ -120,16 +127,17 @@ type generator struct {
 func newGenerator(res *wit.Resolve, opts ...Option) (*generator, error) {
 	g := &generator{
 		packages:       make(map[string]*gen.Package),
-		witPackages:    make(map[string]*gen.Package),
-		exportScopes:   make(map[string]gen.Scope),
+		witPackages:    make(map[wit.TypeOwner]*gen.Package),
+		exportScopes:   make(map[wit.TypeOwner]gen.Scope),
+		moduleNames:    make(map[wit.TypeOwner]string),
 		shapes:         make(map[typeUse]string),
 		lowerFunctions: make(map[typeUse]function),
 		liftFunctions:  make(map[typeUse]function),
 	}
 	for i := 0; i < 2; i++ {
-		g.types[i] = make(map[*wit.TypeDef]typeDecl)
-		g.functions[i] = make(map[*wit.Function]funcDecl)
-		g.defined[i] = make(map[any]bool)
+		g.types[i] = make(map[*wit.TypeDef]*typeDecl)
+		g.functions[i] = make(map[*wit.Function]*funcDecl)
+		g.defined[i] = make(map[wit.Node]bool)
 	}
 	err := g.opts.apply(opts...)
 	if err != nil {
@@ -183,7 +191,7 @@ func (g *generator) detectVersionedPackages() {
 
 // define marks a world, interface, type, or function as defined.
 // It returns true if was newly defined.
-func (g *generator) define(dir wit.Direction, v any) (defined bool) {
+func (g *generator) define(dir wit.Direction, v wit.Node) (defined bool) {
 	if g.defined[dir][v] {
 		return false
 	}
@@ -198,7 +206,10 @@ func (g *generator) defineWorlds() error {
 	// fmt.Fprintf(os.Stderr, "Generating Go for %d world(s)\n", len(g.res.Worlds))
 	for i, w := range g.res.Worlds {
 		if matchWorld(w, g.opts.world) || (g.opts.world == "" && i == len(g.res.Worlds)-1) {
-			g.defineWorld(w)
+			err := g.defineWorld(w)
+			if err != nil {
+				return err
+			}
 		}
 	}
 	return nil
@@ -223,12 +234,18 @@ func (g *generator) defineWorld(w *wit.World) error {
 	}
 	id := w.Package.Name
 	id.Extension = w.Name
-	pkg := g.packageFor(id)
-	file := g.fileFor(id)
+
+	g.moduleNames[w] = id.String()
+
+	pkg, err := g.newPackage(w, nil, "")
+	if err != nil {
+		return err
+	}
+	file := g.fileFor(w)
 
 	{
 		var b strings.Builder
-		stringio.Write(&b, "Package ", pkg.Name, " represents the ", w.WITKind(), " \"", id.String(), "\".\n")
+		stringio.Write(&b, "Package ", pkg.Name, " represents the ", w.WITKind(), " \"", g.moduleNames[w], "\".\n")
 		if w.Docs.Contents != "" {
 			b.WriteString("\n")
 			b.WriteString(w.Docs.Contents)
@@ -236,17 +253,16 @@ func (g *generator) defineWorld(w *wit.World) error {
 		file.PackageDocs = b.String()
 	}
 
-	var err error
 	w.Imports.All()(func(name string, v wit.WorldItem) bool {
 		switch v := v.(type) {
 		case *wit.InterfaceRef:
 			// TODO: handle Stability
-			err = g.defineInterface(wit.Imported, v.Interface, name)
+			err = g.defineInterface(w, wit.Imported, v.Interface, name)
 		case *wit.TypeDef:
 			err = g.defineTypeDef(wit.Imported, v, name)
 		case *wit.Function:
 			if v.IsFreestanding() {
-				err = g.defineFunction(id, wit.Imported, v)
+				err = g.defineFunction(w, wit.Imported, v)
 			}
 		}
 		return err == nil
@@ -259,13 +275,13 @@ func (g *generator) defineWorld(w *wit.World) error {
 		switch v := v.(type) {
 		case *wit.InterfaceRef:
 			// TODO: handle Stability
-			err = g.defineInterface(wit.Exported, v.Interface, name)
+			err = g.defineInterface(w, wit.Exported, v.Interface, name)
 		case *wit.TypeDef:
 			// WIT does not currently allow worlds to export types.
 			err = errors.New("exported type in world " + w.Name)
 		case *wit.Function:
 			if v.IsFreestanding() {
-				err = g.defineFunction(id, wit.Exported, v)
+				err = g.defineFunction(w, wit.Exported, v)
 			}
 		}
 		return err == nil
@@ -274,21 +290,29 @@ func (g *generator) defineWorld(w *wit.World) error {
 	return err
 }
 
-func (g *generator) defineInterface(dir wit.Direction, i *wit.Interface, name string) error {
+func (g *generator) defineInterface(w *wit.World, dir wit.Direction, i *wit.Interface, name string) error {
 	if !g.define(dir, i) {
 		return nil
 	}
-	if i.Name != nil {
+
+	if i.Name == nil {
+		g.moduleNames[i] = name
+	} else {
 		name = *i.Name
+		id := i.Package.Name
+		id.Extension = name
+		g.moduleNames[i] = id.String()
 	}
-	id := i.Package.Name
-	id.Extension = name
-	pkg := g.packageFor(id)
-	file := g.fileFor(id)
+
+	pkg, err := g.newPackage(w, i, name)
+	if err != nil {
+		return err
+	}
+	file := g.fileFor(i)
 
 	{
 		var b strings.Builder
-		stringio.Write(&b, "Package ", pkg.Name, " represents the ", dir.String(), " ", i.WITKind(), " \"", id.String(), "\".\n")
+		stringio.Write(&b, "Package ", pkg.Name, " represents the ", dir.String(), " ", i.WITKind(), " \"", g.moduleNames[i], "\".\n")
 		if i.Docs.Contents != "" {
 			b.WriteString("\n")
 			b.WriteString(i.Docs.Contents)
@@ -318,7 +342,7 @@ func (g *generator) defineInterface(dir wit.Direction, i *wit.Interface, name st
 	// Define standalone functions
 	i.Functions.All()(func(_ string, f *wit.Function) bool {
 		if f.IsFreestanding() {
-			g.defineFunction(id, dir, f)
+			g.defineFunction(i, dir, f)
 		}
 		return true
 	})
@@ -342,11 +366,9 @@ func (g *generator) defineTypeDef(dir wit.Direction, t *wit.TypeDef, name string
 	if err != nil {
 		return err
 	}
-	owner := typeDefOwner(t)
 
 	// If an alias, get root
 	root := t.Root()
-	rootOwner := typeDefOwner(root)
 	rootName := name
 	if root.Name != nil {
 		rootName = *root.Name
@@ -358,7 +380,7 @@ func (g *generator) defineTypeDef(dir wit.Direction, t *wit.TypeDef, name string
 	if wit.HasResource(t) {
 		stringio.Write(&b, dir.String(), " ")
 	}
-	stringio.Write(&b, root.WITKind(), " \"", rootOwner.String(), "#", rootName, "\".\n")
+	stringio.Write(&b, root.WITKind(), " \"", g.moduleNames[root.Owner], "#", rootName, "\".\n")
 	b.WriteString("//\n")
 	if root != t {
 		// Type alias
@@ -383,10 +405,10 @@ func (g *generator) defineTypeDef(dir wit.Direction, t *wit.TypeDef, name string
 
 	// Emit type namespace in exports file.
 	if dir == wit.Exported {
-		xfile := g.exportsFileFor(owner)
-		scope := g.exportScopes[owner.String()]
+		xfile := g.exportsFileFor(t.Owner)
+		scope := g.exportScopes[t.Owner]
 		goName := scope.GetName(GoName(*t.Name, true))
-		stringio.Write(xfile, "\n// ", goName, " represents the caller-defined exports for ", root.WITKind(), " \"", rootOwner.String(), "#", rootName, "\".\n")
+		stringio.Write(xfile, "\n// ", goName, " represents the caller-defined exports for ", root.WITKind(), " \"", g.moduleNames[root.Owner], "#", rootName, "\".\n")
 		stringio.Write(xfile, goName, " struct {")
 	}
 
@@ -394,7 +416,7 @@ func (g *generator) defineTypeDef(dir wit.Direction, t *wit.TypeDef, name string
 	switch dir {
 	case wit.Imported:
 		if f := t.ResourceDrop(); f != nil {
-			err := g.defineFunction(owner, wit.Imported, f)
+			err := g.defineFunction(t.Owner, wit.Imported, f)
 			if err != nil {
 				return nil
 			}
@@ -402,28 +424,28 @@ func (g *generator) defineTypeDef(dir wit.Direction, t *wit.TypeDef, name string
 
 	case wit.Exported:
 		if f := t.ResourceNew(); f != nil {
-			err := g.defineFunction(owner, importedWithExportedTypes, f)
+			err := g.defineFunction(t.Owner, importedWithExportedTypes, f)
 			if err != nil {
 				return nil
 			}
 		}
 
 		if f := t.ResourceRep(); f != nil {
-			err := g.defineFunction(owner, importedWithExportedTypes, f)
+			err := g.defineFunction(t.Owner, importedWithExportedTypes, f)
 			if err != nil {
 				return nil
 			}
 		}
 
 		if f := t.ResourceDrop(); f != nil {
-			err := g.defineFunction(owner, importedWithExportedTypes, f)
+			err := g.defineFunction(t.Owner, importedWithExportedTypes, f)
 			if err != nil {
 				return nil
 			}
 		}
 
 		if f := t.Destructor(); f != nil {
-			err := g.defineFunction(owner, dir, f)
+			err := g.defineFunction(t.Owner, dir, f)
 			if err != nil {
 				return nil
 			}
@@ -434,21 +456,21 @@ func (g *generator) defineTypeDef(dir wit.Direction, t *wit.TypeDef, name string
 	}
 
 	if f := t.Constructor(); f != nil {
-		err := g.defineFunction(owner, dir, f)
+		err := g.defineFunction(t.Owner, dir, f)
 		if err != nil {
 			return nil
 		}
 	}
 
 	for _, f := range t.StaticFunctions() {
-		err := g.defineFunction(owner, dir, f)
+		err := g.defineFunction(t.Owner, dir, f)
 		if err != nil {
 			return nil
 		}
 	}
 
 	for _, f := range t.Methods() {
-		err := g.defineFunction(owner, dir, f)
+		err := g.defineFunction(t.Owner, dir, f)
 		if err != nil {
 			return nil
 		}
@@ -456,29 +478,28 @@ func (g *generator) defineTypeDef(dir wit.Direction, t *wit.TypeDef, name string
 
 	// End struct definition here.
 	if dir == wit.Exported {
-		xfile := g.exportsFileFor(owner)
+		xfile := g.exportsFileFor(t.Owner)
 		stringio.Write(xfile, "\n}\n")
 	}
 
 	return nil
 }
 
-func (g *generator) declareTypeDef(file *gen.File, dir wit.Direction, t *wit.TypeDef, goName string) (typeDecl, error) {
+func (g *generator) declareTypeDef(file *gen.File, dir wit.Direction, t *wit.TypeDef, goName string) (*typeDecl, error) {
 	decl, ok := g.types[dir][t]
 	if ok {
 		return decl, nil
 	}
 	if goName == "" {
 		if t.Name == nil {
-			return typeDecl{}, errors.New("BUG: cannot declare unnamed wit.TypeDef")
+			return nil, errors.New("BUG: cannot declare unnamed wit.TypeDef")
 		}
 		goName = GoName(*t.Name, true)
 	}
-	owner := typeDefOwner(t)
 	if file == nil {
-		file = g.fileFor(owner)
+		file = g.fileFor(t.Owner)
 	}
-	decl = typeDecl{
+	decl = &typeDecl{
 		file:  file,
 		name:  declareDirectedName(file, dir, goName),
 		scope: gen.NewScope(nil),
@@ -486,8 +507,8 @@ func (g *generator) declareTypeDef(file *gen.File, dir wit.Direction, t *wit.Typ
 	g.types[dir][t] = decl
 
 	// Declare the export scope for this type.
-	if dir == wit.Exported && g.exportScopes[owner.String()] != nil {
-		g.exportScopes[owner.String()].DeclareName(goName)
+	if dir == wit.Exported && g.exportScopes[t.Owner] != nil {
+		g.exportScopes[t.Owner].DeclareName(goName)
 	}
 
 	// If an imported and exported version of a TypeDef are identical, declare the other.
@@ -518,7 +539,7 @@ func (g *generator) declareTypeDef(file *gen.File, dir wit.Direction, t *wit.Typ
 					}
 				}
 				if err != nil {
-					return typeDecl{}, err
+					return nil, err
 				}
 				if count >= 2 {
 					break
@@ -536,22 +557,6 @@ func (g *generator) declareTypeDef(file *gen.File, dir wit.Direction, t *wit.Typ
 	return decl, nil
 }
 
-func typeDefOwner(t *wit.TypeDef) wit.Ident {
-	var id wit.Ident
-	switch owner := t.Owner.(type) {
-	case *wit.World:
-		id = owner.Package.Name
-		id.Extension = owner.Name
-	case *wit.Interface:
-		id = owner.Package.Name
-		id.Extension = owner.InterfaceName()
-		if id.Extension == "" {
-			panic(fmt.Sprintf("BUG: unnamed interface owner of %#v", t))
-		}
-	}
-	return id
-}
-
 func declareDirectedName(scope gen.Scope, dir wit.Direction, name string) string {
 	if dir == wit.Exported && scope.HasName(name) {
 		if token.IsExported(name) {
@@ -564,7 +569,7 @@ func declareDirectedName(scope gen.Scope, dir wit.Direction, name string) string
 }
 
 // typeDecl returns the typeDecl for [wit.Direction] dir and [wit.TypeDef] t, and whether it was declared.
-func (g *generator) typeDecl(dir wit.Direction, t *wit.TypeDef) (decl typeDecl, ok bool) {
+func (g *generator) typeDecl(dir wit.Direction, t *wit.TypeDef) (decl *typeDecl, ok bool) {
 	if decl, ok = g.types[dir][t]; ok {
 		return decl, true
 	}
@@ -1531,32 +1536,39 @@ func (g *generator) goParams(scope gen.Scope, dir wit.Direction, params []wit.Pa
 	return out
 }
 
-func (g *generator) declareFunction(owner wit.Ident, dir wit.Direction, f *wit.Function) (funcDecl, error) {
-	// Setup
+func (g *generator) declareFunction(owner wit.TypeOwner, dir wit.Direction, f *wit.Function) (*funcDecl, error) {
 	file := g.fileFor(owner)
-
 	var scope gen.Scope = file
 	wasm := f.CoreFunction(dir)
 	tdir := dir
-	var pfx, linkerName string
+	module := g.moduleNames[owner]
+	if _, ok := owner.(*wit.World); ok {
+		module = "$root"
+	}
+	var goPrefix, linkerName string
+
 	switch dir {
 	case wit.Imported:
-		pfx = "wasmimport_"
-		linkerName = owner.String() + " " + f.Name
+		goPrefix = "wasmimport_"
+		linkerName = module + " " + f.Name
 
 	case wit.Exported:
-		scope = g.exportScopes[owner.String()]
-		pfx = "wasmexport_"
-		linkerName = owner.String() + "#" + f.Name
+		scope = g.exportScopes[owner]
+		goPrefix = "wasmexport_"
+		if module == "$root" {
+			linkerName = f.Name
+		} else {
+			linkerName = module + "#" + f.Name
+		}
 
 	case importedWithExportedTypes:
 		dir = wit.Imported  // Imported function...
 		tdir = wit.Exported // ...with exported types
-		pfx = "wasmimport_"
-		linkerName = "[export]" + owner.String() + " " + f.Name
+		goPrefix = "wasmimport_"
+		linkerName = "[export]" + module + " " + f.Name
 
 	default:
-		return funcDecl{}, errors.New("BUG: unknown direction " + dir.String())
+		return nil, errors.New("BUG: unknown direction " + dir.String())
 	}
 
 	if fdecl, ok := g.functions[dir][f]; ok {
@@ -1573,7 +1585,7 @@ func (g *generator) declareFunction(owner wit.Ident, dir wit.Direction, f *wit.F
 	case *wit.Freestanding:
 		baseName := GoName(f.BaseName(), true)
 		funcName = declareDirectedName(scope, dir, baseName)
-		wasmName = file.DeclareName(pfx + baseName)
+		wasmName = file.DeclareName(goPrefix + baseName)
 
 	case *wit.Constructor:
 		t := f.Type().(*wit.TypeDef)
@@ -1583,7 +1595,7 @@ func (g *generator) declareFunction(owner wit.Ident, dir wit.Direction, f *wit.F
 			baseName = GoName(f.BaseName(), true)
 		}
 		funcName = declareDirectedName(scope, dir, baseName)
-		wasmName = file.DeclareName(pfx + baseName)
+		wasmName = file.DeclareName(goPrefix + baseName)
 
 	case *wit.Static:
 		t := f.Type().(*wit.TypeDef)
@@ -1593,34 +1605,37 @@ func (g *generator) declareFunction(owner wit.Ident, dir wit.Direction, f *wit.F
 			baseName = GoName(f.BaseName(), true)
 		}
 		funcName = declareDirectedName(scope, dir, baseName)
-		wasmName = file.DeclareName(pfx + baseName)
+		wasmName = file.DeclareName(goPrefix + baseName)
 
 	case *wit.Method:
 		t := f.Type().(*wit.TypeDef)
-		if t.Package().Name.Package != owner.Package {
-			return funcDecl{}, fmt.Errorf("cannot emit functions in package %s to type %s", owner.Package, t.Package().Name.String())
+		if t.Owner != owner {
+			return nil, fmt.Errorf("cannot emit methods in package %s on type %s", owner.WITPackage().Name.String(), t.TypeName())
 		}
 		td, _ := g.typeDecl(tdir, t)
 		switch dir {
 		case wit.Imported:
 			funcName = td.scope.DeclareName(GoName(f.BaseName(), true))
 			if wasm.IsMethod() {
-				wasmName = td.scope.DeclareName(pfx + funcName)
+				wasmName = td.scope.DeclareName(goPrefix + funcName)
 			} else {
-				wasmName = file.DeclareName(pfx + td.name + funcName)
+				wasmName = file.DeclareName(goPrefix + td.name + funcName)
 			}
 		case wit.Exported:
 			// baseName := td.name + GoName(f.BaseName(), true)
 			// funcName = g.declareDirectedName(file, dir, baseName)
 			// wasmName = file.DeclareName(pfx + baseName)
 			funcName = td.scope.DeclareName(GoName(f.BaseName(), true))
-			wasmName = file.DeclareName(pfx + GoName(*t.Name, true) + GoName(f.BaseName(), true))
+			wasmName = file.DeclareName(goPrefix + GoName(*t.Name, true) + GoName(f.BaseName(), true))
 		}
 	}
 
-	fdecl := funcDecl{
-		f:          g.goFunction(file, tdir, dir, f, funcName),
-		wasm:       g.goFunction(file, tdir, dir, wasm, wasmName),
+	fdecl := &funcDecl{
+		owner:      owner,
+		dir:        dir,
+		f:          f,
+		goFunc:     g.goFunction(file, tdir, dir, f, funcName),
+		wasmFunc:   g.goFunction(file, tdir, dir, wasm, wasmName),
 		linkerName: linkerName,
 	}
 	g.functions[dir][f] = fdecl
@@ -1630,7 +1645,7 @@ func (g *generator) declareFunction(owner wit.Ident, dir wit.Direction, f *wit.F
 // FIXME: this is a fun hack
 const importedWithExportedTypes = 2
 
-func (g *generator) defineFunction(owner wit.Ident, dir wit.Direction, f *wit.Function) error {
+func (g *generator) defineFunction(owner wit.TypeOwner, dir wit.Direction, f *wit.Function) error {
 	decl, err := g.declareFunction(owner, dir, f)
 	if err != nil {
 		return err
@@ -1638,9 +1653,9 @@ func (g *generator) defineFunction(owner wit.Ident, dir wit.Direction, f *wit.Fu
 
 	switch dir {
 	case wit.Imported, importedWithExportedTypes:
-		return g.defineImportedFunction(owner, f, decl)
+		return g.defineImportedFunction(decl)
 	case wit.Exported:
-		err := g.defineExportedFunction(owner, f, decl)
+		err := g.defineExportedFunction(decl)
 		if err != nil {
 			return err
 		}
@@ -1658,22 +1673,22 @@ func (g *generator) defineFunction(owner wit.Ident, dir wit.Direction, f *wit.Fu
 	return nil
 }
 
-func (g *generator) defineImportedFunction(_ wit.Ident, f *wit.Function, decl funcDecl) error {
+func (g *generator) defineImportedFunction(decl *funcDecl) error {
 	dir := wit.Imported
-	if !g.define(dir, f) {
+	if !g.define(dir, decl.f) {
 		return nil
 	}
 
-	file := decl.f.file
+	file := decl.goFunc.file
 
 	// Bridging between Go and wasm function
-	callParams := slices.Clone(decl.wasm.params)
+	callParams := slices.Clone(decl.wasmFunc.params)
 	for i := range callParams {
-		callParams[i].name = decl.f.scope.DeclareName(callParams[i].name)
+		callParams[i].name = decl.goFunc.scope.DeclareName(callParams[i].name)
 	}
-	callResults := slices.Clone(decl.wasm.results)
+	callResults := slices.Clone(decl.wasmFunc.results)
 	for i := range callResults {
-		callResults[i].name = decl.f.scope.DeclareName(callResults[i].name)
+		callResults[i].name = decl.goFunc.scope.DeclareName(callResults[i].name)
 	}
 
 	var compoundParams param
@@ -1683,22 +1698,22 @@ func (g *generator) defineImportedFunction(_ wit.Ident, f *wit.Function, decl fu
 	if len(callParams) > 0 {
 		p := callParams[0]
 		t := derefAnonRecord(p.typ)
-		if len(decl.f.params) > 0 && t != nil {
+		if len(decl.goFunc.params) > 0 && t != nil {
 			compoundParams = p
-			g.declareTypeDef(file, dir, t, decl.wasm.name+"_params")
+			g.declareTypeDef(file, dir, t, decl.wasmFunc.name+"_params")
 			compoundParams.typ = t
-		} else if len(decl.f.params) > 0 && derefPointer(p.typ) == decl.f.params[0].typ {
+		} else if len(decl.goFunc.params) > 0 && derefPointer(p.typ) == decl.goFunc.params[0].typ {
 			pointerParam = p
 		}
 
 		p = *last(callParams)
 		t = derefAnonRecord(p.typ)
-		if len(decl.f.results) > 0 && t != nil && t != compoundParams.typ {
+		if len(decl.goFunc.results) > 0 && t != nil && t != compoundParams.typ {
 			compoundResults = p
-			g.declareTypeDef(file, dir, t, decl.wasm.name+"_results")
+			g.declareTypeDef(file, dir, t, decl.wasmFunc.name+"_results")
 			compoundResults.typ = t
-		} else if len(decl.f.results) > 0 && derefPointer(p.typ) == decl.f.results[0].typ {
-			last(callParams).name = decl.f.results[0].name // Ensure results local, not results_
+		} else if len(decl.goFunc.results) > 0 && derefPointer(p.typ) == decl.goFunc.results[0].typ {
+			last(callParams).name = decl.goFunc.results[0].name // Ensure results local, not results_
 			pointerResult = p
 		}
 	}
@@ -1706,27 +1721,27 @@ func (g *generator) defineImportedFunction(_ wit.Ident, f *wit.Function, decl fu
 	var b bytes.Buffer
 
 	// Emit docs
-	b.WriteString(g.functionDocs(dir, f, decl.f.name))
+	b.WriteString(g.functionDocs(dir, decl.f, decl.goFunc.name))
 
 	// Emit Go function
 	b.WriteString("//go:nosplit\n")
 	b.WriteString("func ")
-	if decl.f.isMethod() {
-		stringio.Write(&b, "(", decl.f.receiver.name, " ", g.typeRep(file, decl.f.receiver.dir, decl.f.receiver.typ), ") ", decl.f.name)
+	if decl.goFunc.isMethod() {
+		stringio.Write(&b, "(", decl.goFunc.receiver.name, " ", g.typeRep(file, decl.goFunc.receiver.dir, decl.goFunc.receiver.typ), ") ", decl.goFunc.name)
 	} else {
-		b.WriteString(decl.f.name)
+		b.WriteString(decl.goFunc.name)
 	}
-	b.WriteString(g.functionSignature(file, decl.f))
+	b.WriteString(g.functionSignature(file, decl.goFunc))
 
 	// Emit function body
 	b.WriteString(" {\n")
 
 	// Lower into wasmimport variables
 	if pointerParam.typ != nil {
-		stringio.Write(&b, callParams[0].name, " := &", decl.f.params[0].name, "\n")
+		stringio.Write(&b, callParams[0].name, " := &", decl.goFunc.params[0].name, "\n")
 	} else if compoundParams.typ != nil {
 		stringio.Write(&b, compoundParams.name, " := ", g.typeRep(file, compoundParams.dir, compoundParams.typ), "{ ")
-		for i, p := range decl.f.params {
+		for i, p := range decl.goFunc.params {
 			if i > 0 {
 				b.WriteString(", ")
 			}
@@ -1736,7 +1751,7 @@ func (g *generator) defineImportedFunction(_ wit.Ident, f *wit.Function, decl fu
 		b.WriteString(" }\n")
 	} else if len(callParams) > 0 {
 		i := 0
-		for _, p := range decl.f.params {
+		for _, p := range decl.goFunc.params {
 			flat := p.typ.Flat()
 			for j := range flat {
 				if j > 0 {
@@ -1764,7 +1779,7 @@ func (g *generator) defineImportedFunction(_ wit.Ident, f *wit.Function, decl fu
 		}
 		b.WriteString(" := ")
 	}
-	stringio.Write(&b, decl.wasm.name, "(")
+	stringio.Write(&b, decl.wasmFunc.name, "(")
 	for i, p := range callParams {
 		if i > 0 {
 			b.WriteString(", ")
@@ -1791,7 +1806,7 @@ func (g *generator) defineImportedFunction(_ wit.Ident, f *wit.Function, decl fu
 		b.WriteString("\n")
 	} else if len(callResults) > 0 {
 		i := 0
-		for _, r := range decl.f.results {
+		for _, r := range decl.goFunc.results {
 			flat := r.typ.Flat()
 			stringio.Write(&b, r.name, " = ", g.liftType(file, r.dir, r.typ, g.liftTypeInput(file, r.dir, r.typ, callResults[i:i+len(flat)])), "\n")
 			i += len(flat)
@@ -1806,26 +1821,26 @@ func (g *generator) defineImportedFunction(_ wit.Ident, f *wit.Function, decl fu
 	stringio.Write(&b, "//go:wasmimport ", decl.linkerName, "\n")
 	b.WriteString("//go:noescape\n")
 	b.WriteString("func ")
-	if decl.wasm.isMethod() {
-		stringio.Write(&b, "(", decl.wasm.receiver.name, " ", g.typeRep(file, decl.wasm.receiver.dir, decl.wasm.receiver.typ), ") ", decl.wasm.name)
+	if decl.wasmFunc.isMethod() {
+		stringio.Write(&b, "(", decl.wasmFunc.receiver.name, " ", g.typeRep(file, decl.wasmFunc.receiver.dir, decl.wasmFunc.receiver.typ), ") ", decl.wasmFunc.name)
 	} else {
-		b.WriteString(decl.wasm.name)
+		b.WriteString(decl.wasmFunc.name)
 	}
-	b.WriteString(g.functionSignature(file, decl.wasm))
+	b.WriteString(g.functionSignature(file, decl.wasmFunc))
 
 	b.WriteString("\n\n")
 
 	// Emit shared types
 	if t, ok := compoundParams.typ.(*wit.TypeDef); ok {
 		td, _ := g.typeDecl(dir, t)
-		stringio.Write(&b, "// ", td.name, " represents the flattened function params for [", decl.wasm.name, "].\n")
+		stringio.Write(&b, "// ", td.name, " represents the flattened function params for [", decl.wasmFunc.name, "].\n")
 		stringio.Write(&b, "// See the Canonical ABI flattening rules for more information.\n")
 		stringio.Write(&b, "type ", td.name, " ", g.typeDefRep(file, dir, t, td.name), "\n\n")
 	}
 
 	if t, ok := compoundResults.typ.(*wit.TypeDef); ok {
 		td, _ := g.typeDecl(dir, t)
-		stringio.Write(&b, "// ", td.name, " represents the flattened function results for [", decl.wasm.name, "].\n")
+		stringio.Write(&b, "// ", td.name, " represents the flattened function results for [", decl.wasmFunc.name, "].\n")
 		stringio.Write(&b, "// See the Canonical ABI flattening rules for more information.\n")
 		stringio.Write(&b, "type ", td.name, " ", g.typeDefRep(file, dir, t, td.name), "\n\n")
 	}
@@ -1836,51 +1851,51 @@ func (g *generator) defineImportedFunction(_ wit.Ident, f *wit.Function, decl fu
 	return g.ensureEmptyAsm(file.Package)
 }
 
-func (g *generator) defineExportedFunction(owner wit.Ident, f *wit.Function, decl funcDecl) error {
+func (g *generator) defineExportedFunction(decl *funcDecl) error {
 	dir := wit.Exported
-	if !g.define(dir, f) {
+	if !g.define(dir, decl.f) {
 		return nil
 	}
-	file := decl.f.file
-	scope := g.exportScopes[owner.String()]
+	file := decl.goFunc.file
+	scope := g.exportScopes[decl.owner]
 
 	// Bridging between wasm and Go function
-	callParams := slices.Clone(decl.f.params)
+	callParams := slices.Clone(decl.goFunc.params)
 	for i := range callParams {
-		callParams[i].name = decl.wasm.scope.DeclareName(callParams[i].name)
+		callParams[i].name = decl.wasmFunc.scope.DeclareName(callParams[i].name)
 	}
-	callResults := slices.Clone(decl.f.results)
+	callResults := slices.Clone(decl.goFunc.results)
 	for i := range callResults {
-		callResults[i].name = decl.wasm.scope.DeclareName(callResults[i].name)
+		callResults[i].name = decl.wasmFunc.scope.DeclareName(callResults[i].name)
 	}
 
 	var compoundParams param
 	var compoundResults param
-	if len(decl.wasm.params) > 0 {
-		p := decl.wasm.params[0]
+	if len(decl.wasmFunc.params) > 0 {
+		p := decl.wasmFunc.params[0]
 		t := derefAnonRecord(p.typ)
 		if len(callParams) > 0 && t != nil {
 			compoundParams = p
-			g.declareTypeDef(file, dir, t, decl.wasm.name+"_params")
+			g.declareTypeDef(file, dir, t, decl.wasmFunc.name+"_params")
 			compoundParams.typ = t
 		}
 	}
 
-	if len(decl.wasm.results) > 0 {
-		r := decl.wasm.results[0]
+	if len(decl.wasmFunc.results) > 0 {
+		r := decl.wasmFunc.results[0]
 		t := derefAnonRecord(r.typ)
 		if len(callResults) > 0 && t != nil {
 			compoundResults = r
-			g.declareTypeDef(file, dir, t, decl.wasm.name+"_results")
+			g.declareTypeDef(file, dir, t, decl.wasmFunc.name+"_results")
 			compoundResults.typ = t
 		}
 	}
 
 	// Emit exports declaration in exports file
 	{
-		xfile := g.exportsFileFor(owner)
-		stringio.Write(xfile, "\n", g.functionDocs(dir, f, decl.f.name))
-		stringio.Write(xfile, decl.f.name, " func", g.functionSignature(xfile, decl.f), "\n")
+		xfile := g.exportsFileFor(decl.owner)
+		stringio.Write(xfile, "\n", g.functionDocs(dir, decl.f, decl.goFunc.name))
+		stringio.Write(xfile, decl.goFunc.name, " func", g.functionSignature(xfile, decl.goFunc), "\n")
 	}
 
 	var b bytes.Buffer
@@ -1888,7 +1903,7 @@ func (g *generator) defineExportedFunction(owner wit.Ident, f *wit.Function, dec
 	// Emit wasmexport function
 	stringio.Write(&b, "//go:wasmexport ", decl.linkerName, "\n")
 	stringio.Write(&b, "//export ", decl.linkerName, "\n") // TODO: remove this once TinyGo supports go:wasmexport.
-	stringio.Write(&b, "func ", decl.wasm.name, g.functionSignature(file, decl.wasm))
+	stringio.Write(&b, "func ", decl.wasmFunc.name, g.functionSignature(file, decl.wasmFunc))
 
 	// Emit function body
 	b.WriteString(" {\n")
@@ -1897,15 +1912,15 @@ func (g *generator) defineExportedFunction(owner wit.Ident, f *wit.Function, dec
 	if compoundParams.typ == nil {
 		i := 0
 		for _, p := range callParams {
-			if i < len(decl.wasm.params) && p.typ == derefPointer(decl.wasm.params[i].typ) {
-				stringio.Write(&b, p.name, " := *", decl.wasm.params[i].name, "\n")
+			if i < len(decl.wasmFunc.params) && p.typ == derefPointer(decl.wasmFunc.params[i].typ) {
+				stringio.Write(&b, p.name, " := *", decl.wasmFunc.params[i].name, "\n")
 				i++
 				continue
 			}
 			flat := p.typ.Flat()
 			var input string
-			if len(flat) > 0 && len(decl.wasm.params) > 0 {
-				input = g.liftTypeInput(file, p.dir, p.typ, decl.wasm.params[i:i+len(flat)])
+			if len(flat) > 0 && len(decl.wasmFunc.params) > 0 {
+				input = g.liftTypeInput(file, p.dir, p.typ, decl.wasmFunc.params[i:i+len(flat)])
 			}
 			stringio.Write(&b, p.name, " := ", g.liftType(file, p.dir, p.typ, input), "\n")
 			i += len(flat)
@@ -1934,9 +1949,9 @@ func (g *generator) defineExportedFunction(owner wit.Ident, f *wit.Function, dec
 	}
 
 	// Emit caller-defined function name
-	fqName := file.GetName("Exports") + "." + decl.f.name
-	if t := f.Type(); t != nil {
-		fqName = file.GetName("Exports") + "." + scope.GetName(GoName(t.TypeName(), true)) + "." + decl.f.name
+	fqName := file.GetName("Exports") + "." + decl.goFunc.name
+	if t := decl.f.Type(); t != nil {
+		fqName = file.GetName("Exports") + "." + scope.GetName(GoName(t.TypeName(), true)) + "." + decl.goFunc.name
 	}
 	stringio.Write(&b, fqName, "(")
 
@@ -1966,8 +1981,8 @@ func (g *generator) defineExportedFunction(owner wit.Ident, f *wit.Function, dec
 	if len(callResults) > 0 && compoundResults.typ == nil {
 		i := 0
 		for _, r := range callResults {
-			if i < len(decl.wasm.results) {
-				wr := decl.wasm.results[i]
+			if i < len(decl.wasmFunc.results) {
+				wr := decl.wasmFunc.results[i]
 				if r.typ == derefPointer(wr.typ) {
 					stringio.Write(&b, wr.name, " = &", r.name, "\n")
 					i++
@@ -1982,7 +1997,7 @@ func (g *generator) defineExportedFunction(owner wit.Ident, f *wit.Function, dec
 					if j > 0 {
 						b.WriteString(", ")
 					}
-					b.WriteString(decl.wasm.results[i].name)
+					b.WriteString(decl.wasmFunc.results[i].name)
 					i++
 				}
 				stringio.Write(&b, " = ", g.lowerType(file, dir, r.typ, r.name), "\n")
@@ -1994,23 +2009,23 @@ func (g *generator) defineExportedFunction(owner wit.Ident, f *wit.Function, dec
 	b.WriteString("}\n\n")
 
 	// Emit default function body
-	if strings.HasPrefix(f.Name, "[dtor]") || strings.HasPrefix(f.Name, "cabi_post_") {
+	if strings.HasPrefix(decl.f.Name, "[dtor]") || strings.HasPrefix(decl.f.Name, "cabi_post_") {
 		stringio.Write(&b, "func init() {")
-		stringio.Write(&b, fqName, " = func", g.functionSignature(file, decl.f), " {}\n")
+		stringio.Write(&b, fqName, " = func", g.functionSignature(file, decl.goFunc), " {}\n")
 		b.WriteString("}\n\n")
 	}
 
 	// Emit shared types
 	if t, ok := compoundParams.typ.(*wit.TypeDef); ok {
 		td, _ := g.typeDecl(dir, t)
-		stringio.Write(&b, "// ", td.name, " represents the flattened function params for [", decl.wasm.name, "].\n")
+		stringio.Write(&b, "// ", td.name, " represents the flattened function params for [", decl.wasmFunc.name, "].\n")
 		stringio.Write(&b, "// See the Canonical ABI flattening rules for more information.\n")
 		stringio.Write(&b, "type ", td.name, " ", g.typeDefRep(file, dir, t, td.name), "\n\n")
 	}
 
 	if t, ok := compoundResults.typ.(*wit.TypeDef); ok {
 		td, _ := g.typeDecl(dir, t)
-		stringio.Write(&b, "// ", td.name, " represents the flattened function results for [", decl.wasm.name, "].\n")
+		stringio.Write(&b, "// ", td.name, " represents the flattened function results for [", decl.wasmFunc.name, "].\n")
 		stringio.Write(&b, "// See the Canonical ABI flattening rules for more information.\n")
 		stringio.Write(&b, "type ", td.name, " ", g.typeDefRep(file, dir, t, td.name), "\n\n")
 	}
@@ -2152,21 +2167,21 @@ func (g *generator) abiFile(pkg *gen.Package) *gen.File {
 	return file
 }
 
-func (g *generator) fileFor(id wit.Ident) *gen.File {
-	pkg := g.packageFor(id)
-	file := pkg.File(id.Extension + ".wit.go")
+func (g *generator) fileFor(owner wit.TypeOwner) *gen.File {
+	pkg := g.packageFor(owner)
+	file := pkg.File(path.Base(pkg.Path) + ".wit.go")
 	file.GeneratedBy = g.opts.generatedBy
 	return file
 }
 
-func (g *generator) exportsFileFor(id wit.Ident) *gen.File {
-	pkg := g.packageFor(id)
-	file := pkg.File(id.Extension + ".exports.go")
+func (g *generator) exportsFileFor(owner wit.TypeOwner) *gen.File {
+	pkg := g.packageFor(owner)
+	file := pkg.File(path.Base(pkg.Path) + ".exports.go")
 	file.GeneratedBy = g.opts.generatedBy
 	if len(file.Header) == 0 {
 		exports := file.GetName("Exports")
 		var b strings.Builder
-		stringio.Write(&b, "// ", exports, " represents the caller-defined exports from \"", id.String(), "\".\n")
+		stringio.Write(&b, "// ", exports, " represents the caller-defined exports from \"", g.moduleNames[owner], "\".\n")
 		stringio.Write(&b, "var ", exports, " struct {")
 		file.Header = b.String()
 	}
@@ -2174,11 +2189,41 @@ func (g *generator) exportsFileFor(id wit.Ident) *gen.File {
 	return file
 }
 
-func (g *generator) packageFor(id wit.Ident) *gen.Package {
-	// Find existing
-	pkg := g.witPackages[id.String()]
+func (g *generator) packageFor(owner wit.TypeOwner) *gen.Package {
+	return g.witPackages[owner]
+}
+
+func (g *generator) newPackage(w *wit.World, i *wit.Interface, name string) (*gen.Package, error) {
+	var owner wit.TypeOwner
+	var id wit.Ident
+
+	if i == nil {
+		// Derive Go package from the WIT world
+		owner = w
+		id = w.Package.Name
+		id.Extension = w.Name
+		name = id.Extension
+	} else {
+		owner = i
+		if i.Name == nil {
+			// Derive Go package from the interface declared in the WIT world
+			if i.Package != w.Package {
+				return nil, fmt.Errorf("BUG: nested interface package %q != world package %q", i.Package.Name.String(), w.Package.Name.String())
+			}
+			id = w.Package.Name
+			id.Extension = w.Name
+		} else {
+			// Derive Go package from package-scoped interface
+			name = *i.Name
+			id = i.Package.Name
+			id.Extension = name
+		}
+	}
+
+	// Don’t create the same package twice
+	pkg := g.witPackages[owner]
 	if pkg != nil {
-		return pkg
+		return pkg, nil
 	}
 
 	// Create the package path and name
@@ -2191,25 +2236,28 @@ func (g *generator) packageFor(id wit.Ident) *gen.Package {
 		segments = append(segments, "v"+id.Version.String())
 	}
 	segments = append(segments, id.Extension)
+	if name != id.Extension {
+		segments = append(segments, name) // for anonymous interfaces nested under worlds
+	}
 	path := strings.Join(segments, "/")
 
 	// TODO: write tests for this
-	name := GoPackageName(id.Extension)
+	goName := GoPackageName(name)
 	// Ensure local name doesn’t conflict with Go keywords or predeclared identifiers
-	if gen.UniqueName(name, gen.IsReserved) != name {
+	if gen.UniqueName(goName, gen.IsReserved) != goName {
 		// Try with package prefix, like error -> ioerror
-		name = FlatName(id.Package + name)
-		if gen.UniqueName(name, gen.IsReserved) != name {
+		goName = FlatName(id.Package + goName)
+		if gen.UniqueName(goName, gen.IsReserved) != goName {
 			// Try with namespace prefix, like ioerror -> wasiioerror
-			name = gen.UniqueName(FlatName(id.Namespace+name), gen.IsReserved)
+			goName = gen.UniqueName(FlatName(id.Namespace+goName), gen.IsReserved)
 		}
 	}
 
-	pkg = gen.NewPackage(path + "#" + name)
+	pkg = gen.NewPackage(path + "#" + goName)
 	g.packages[pkg.Path] = pkg
-	g.witPackages[id.String()] = pkg
-	g.exportScopes[id.String()] = gen.NewScope(nil)
+	g.witPackages[owner] = pkg
+	g.exportScopes[owner] = gen.NewScope(nil)
 	pkg.DeclareName("Exports")
 
-	return pkg
+	return pkg, nil
 }

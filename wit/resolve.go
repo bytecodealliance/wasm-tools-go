@@ -62,6 +62,11 @@ type World struct {
 	Docs      Docs
 }
 
+// WITPackage returns the [Package] this [World] belongs to.
+func (w *World) WITPackage() *Package {
+	return w.Package
+}
+
 // AllFunctions returns a [sequence] that yields each [Function] in a [World].
 // The sequence stops if yield returns false.
 //
@@ -127,42 +132,9 @@ type Interface struct {
 	Docs      Docs
 }
 
-// InterfaceName performs a best-effort guess at the [Interface] name,
-// which may be found by scanning its parent package.
-func (i *Interface) InterfaceName() string {
-	if i.Name != nil {
-		return *i.Name
-	}
-	if i.Package == nil {
-		return ""
-	}
-	var done bool
-	var name string
-	scanWorldItem := func(key string, item WorldItem) bool {
-		if ref, ok := item.(*InterfaceRef); ok && ref.Interface == i && key != "" {
-			name = key
-			done = true
-		}
-		return !done
-	}
-	i.Package.Worlds.All()(func(_ string, w *World) bool {
-		w.Imports.All()(scanWorldItem)
-		if !done {
-			w.Exports.All()(scanWorldItem)
-		}
-		return !done
-	})
-	if done {
-		return name
-	}
-	i.Package.Interfaces.All()(func(key string, face *Interface) bool {
-		if face == i && key != "" {
-			name = key
-			done = true
-		}
-		return !done
-	})
-	return name
+// WITPackage returns the [Package] this [Interface] belongs to.
+func (i *Interface) WITPackage() *Package {
+	return i.Package
 }
 
 // AllFunctions returns a [sequence] that yields each [Function] in an [Interface].
@@ -214,17 +186,6 @@ func (t *TypeDef) Root() *TypeDef {
 			return t
 		}
 	}
-}
-
-// Package returns the [Package] that t is associated with, if any.
-func (t *TypeDef) Package() *Package {
-	switch owner := t.Owner.(type) {
-	case *Interface:
-		return owner.Package
-	case *World:
-		return owner.Package
-	}
-	return nil
 }
 
 // Constructor returns the constructor for [TypeDef] t, or nil if none.
@@ -1042,6 +1003,7 @@ func (s *Stream) hasResource() bool { return HasResource(s.Element) || HasResour
 type TypeOwner interface {
 	Node
 	AllFunctions() iterate.Seq[*Function]
+	WITPackage() *Package
 	isTypeOwner()
 }
 
