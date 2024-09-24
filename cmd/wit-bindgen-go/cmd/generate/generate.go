@@ -68,48 +68,49 @@ var Command = &cli.Command{
 	Action: action,
 }
 
-type Config struct {
-	DryRun      bool
-	OutDir      string
-	OutPerm     os.FileMode
-	PackageRoot string
-	World       string
-	CMPackage   string
-	Versioned   bool
-	ForceWIT    bool
-	Path        string
+// Config is the configuration for the `generate` command.
+type config struct {
+	dryRun    bool
+	out       string
+	outPerm   os.FileMode
+	pkgRoot   string
+	world     string
+	cm        string
+	versioned bool
+	forceWIT  bool
+	path      string
 }
 
 func action(ctx context.Context, cmd *cli.Command) error {
-	config, err := parseFlags(cmd)
+	cfg, err := parseFlags(cmd)
 	if err != nil {
 		return err
 	}
 
-	res, err := loadWITModule(ctx, config)
+	res, err := loadWITModule(ctx, cfg)
 	if err != nil {
 		return err
 	}
 
 	packages, err := bindgen.Go(res,
 		bindgen.GeneratedBy(cmd.Root().Name),
-		bindgen.World(config.World),
-		bindgen.PackageRoot(config.PackageRoot),
-		bindgen.Versioned(config.Versioned),
-		bindgen.CMPackage(config.CMPackage),
+		bindgen.World(cfg.world),
+		bindgen.PackageRoot(cfg.pkgRoot),
+		bindgen.Versioned(cfg.versioned),
+		bindgen.CMPackage(cfg.cm),
 	)
 	if err != nil {
 		return err
 	}
 
-	if err := writeGoPackages(packages, config); err != nil {
+	if err := writeGoPackages(packages, cfg); err != nil {
 		return err
 	}
 
-	return writeWITPackage(res, config)
+	return writeWITPackage(res, cfg)
 }
 
-func parseFlags(cmd *cli.Command) (*Config, error) {
+func parseFlags(cmd *cli.Command) (*config, error) {
 	dryRun := cmd.Bool("dry-run")
 	out := cmd.String("out")
 
@@ -136,34 +137,34 @@ func parseFlags(cmd *cli.Command) (*Config, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	return &Config{
-		DryRun:      dryRun,
-		OutDir:      out,
-		OutPerm:     outPerm,
-		PackageRoot: pkgRoot,
-		World:       cmd.String("world"),
-		CMPackage:   cmd.String("cm"),
-		Versioned:   cmd.Bool("versioned"),
-		ForceWIT:    cmd.Bool("force-wit"),
-		Path:        path,
+	world, cm, versioned, forceWIT := cmd.String("world"), cmd.String("cm"), cmd.Bool("versioned"), cmd.Bool("force-wit")
+	return &config{
+		dryRun,
+		out,
+		outPerm,
+		pkgRoot,
+		world,
+		cm,
+		versioned,
+		forceWIT,
+		path,
 	}, nil
 }
 
-func loadWITModule(ctx context.Context, config *Config) (*wit.Resolve, error) {
-	if oci.IsOCIPath(config.Path) {
-		fmt.Fprintf(os.Stderr, "Fetching OCI artifact %s\n", config.Path)
-		bytes, err := oci.PullWIT(ctx, config.Path)
+func loadWITModule(ctx context.Context, cfg *config) (*wit.Resolve, error) {
+	if oci.IsOCIPath(cfg.path) {
+		fmt.Fprintf(os.Stderr, "Fetching OCI artifact %s\n", cfg.path)
+		bytes, err := oci.PullWIT(ctx, cfg.path)
 		if err != nil {
 			return nil, err
 		}
 		return wit.LoadWITFromBuffer(bytes.Bytes())
 	}
 
-	return witcli.LoadOne(config.ForceWIT, config.Path)
+	return witcli.LoadOne(cfg.forceWIT, cfg.path)
 }
 
-func writeGoPackages(packages []*gen.Package, config *Config) error {
+func writeGoPackages(packages []*gen.Package, cfg *config) error {
 	fmt.Fprintf(os.Stderr, "Generated %d package(s)\n", len(packages))
 	for _, pkg := range packages {
 		if !pkg.HasContent() {
@@ -174,7 +175,7 @@ func writeGoPackages(packages []*gen.Package, config *Config) error {
 
 		for _, filename := range codec.SortedKeys(pkg.Files) {
 			file := pkg.Files[filename]
-			dir := filepath.Join(config.OutDir, strings.TrimPrefix(file.Package.Path, config.PackageRoot))
+			dir := filepath.Join(cfg.out, strings.TrimPrefix(file.Package.Path, cfg.pkgRoot))
 			path := filepath.Join(dir, file.Name)
 
 			if !file.HasContent() {
@@ -182,7 +183,7 @@ func writeGoPackages(packages []*gen.Package, config *Config) error {
 				continue
 			}
 
-			if err := os.MkdirAll(dir, config.OutPerm); err != nil {
+			if err := os.MkdirAll(dir, cfg.outPerm); err != nil {
 				return err
 			}
 
@@ -196,13 +197,13 @@ func writeGoPackages(packages []*gen.Package, config *Config) error {
 				fmt.Fprintf(os.Stderr, "Generated file: %s\n", path)
 			}
 
-			if config.DryRun {
+			if cfg.dryRun {
 				fmt.Println(string(content))
 				fmt.Println()
 				continue
 			}
 
-			if err := os.WriteFile(path, content, config.OutPerm); err != nil {
+			if err := os.WriteFile(path, content, cfg.outPerm); err != nil {
 				return err
 			}
 		}
@@ -210,9 +211,9 @@ func writeGoPackages(packages []*gen.Package, config *Config) error {
 	return nil
 }
 
-func writeWITPackage(res *wit.Resolve, config *Config) error {
-	witDir := filepath.Join(config.OutDir, "wit")
-	if err := os.MkdirAll(witDir, config.OutPerm); err != nil {
+func writeWITPackage(res *wit.Resolve, cfg *config) error {
+	witDir := filepath.Join(cfg.out, "wit")
+	if err := os.MkdirAll(witDir, cfg.outPerm); err != nil {
 		return err
 	}
 	witFilePath := filepath.Join(witDir, "webassembly.wit.wasm")
