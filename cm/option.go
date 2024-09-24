@@ -25,6 +25,7 @@ func Some[T any](v T) Option[T] {
 // The first byte is a bool representing none or some,
 // followed by storage for the associated type T.
 type option[T any] struct {
+	_      HostLayout
 	isSome bool
 	some   T
 }

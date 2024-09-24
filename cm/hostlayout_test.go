@@ -10,6 +10,7 @@ import (
 
 func TestFieldAlignment(t *testing.T) {
 	var v1 struct {
+		_   HostLayout
 		_   bool
 		_   [0][7]byte
 		u64 uint64
@@ -22,6 +23,7 @@ func TestFieldAlignment(t *testing.T) {
 	}
 
 	var v2 struct {
+		_ HostLayout
 		_ bool
 		_ [0][7]byte
 		_ [0][51]float64
@@ -40,6 +42,7 @@ func TestFieldAlignment(t *testing.T) {
 
 	// size 1
 	var v3 struct {
+		_ HostLayout
 		_ struct{}
 		b bool // offset 0
 	}
@@ -52,6 +55,7 @@ func TestFieldAlignment(t *testing.T) {
 
 	// size 0
 	var v4 struct {
+		_ HostLayout
 		_ [0]uint32
 		b bool // offset 0!
 	}

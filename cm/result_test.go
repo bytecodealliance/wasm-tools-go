@@ -183,6 +183,7 @@ func TestIssue95Struct(t *testing.T) {
 	type (
 		// structResult  Result[structVariant, stringStruct, structVariant]
 		stringStruct struct {
+			_ HostLayout
 			// i int
 			s string
 		}

@@ -21,6 +21,7 @@ type Result[Shape, OK, Err any] struct{ result[Shape, OK, Err] }
 
 // result represents the internal representation of a Component Model result type.
 type result[Shape, OK, Err any] struct {
+	_     HostLayout
 	isErr bool
 	_     [0]OK
 	_     [0]Err

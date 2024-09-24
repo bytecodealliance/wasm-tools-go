@@ -27,6 +27,7 @@ func ToList[S ~[]T, T any](s S) List[T] {
 // It is intended to be embedded in a [List], so embedding types maintain
 // the methods defined on this type.
 type list[T any] struct {
+	_    HostLayout
 	data *T
 	len  uint
 }

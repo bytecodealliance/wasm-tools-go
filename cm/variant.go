@@ -47,6 +47,7 @@ func Case[T any, V ~struct{ variant[Tag, Shape, Align] }, Tag Discriminant, Shap
 // variant is the internal representation of a Component Model variant.
 // Shape and Align must be non-zero sized types.
 type variant[Tag Discriminant, Shape, Align any] struct {
+	_    HostLayout
 	tag  Tag
 	_    [0]Align
 	data Shape // [unsafe.Sizeof(*(*Shape)(unsafe.Pointer(nil)))]byte
