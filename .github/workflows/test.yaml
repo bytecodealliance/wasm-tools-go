@@ -174,7 +174,7 @@ jobs:
 
       - name: Test generated Go with TinyGo >= 0.33.0
         if: ${{ matrix.tinygo-version != '0.32.0' }}
-        run: cd tests && tinygo test -v -target=./wasip2.json ./...
+        run: tinygo test ./tests -v -target=./wasip2.json ./...
 
       - name: Verify repo is unchanged
         run: git diff --exit-code HEAD
