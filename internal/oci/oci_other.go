@@ -3,7 +3,6 @@
 package oci
 
 import (
-	"bytes"
 	"context"
 	"fmt"
 	"io"
@@ -17,7 +16,7 @@ import (
 // It invokes "regclient" APIs to pull the artifact and then
 // processes it with `wasm-tools`.
 // The output is returned as raw bytes.
-func PullWIT(ctx context.Context, path string) (*bytes.Buffer, error) {
+func PullWIT(ctx context.Context, path string) ([]byte, error) {
 	r, err := ref.New(path)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse ref: %v", err)
@@ -57,10 +56,10 @@ func PullWIT(ctx context.Context, path string) (*bytes.Buffer, error) {
 	defer rdr.Close()
 
 	// Read the blob content into a buffer
-	var buf bytes.Buffer
-	_, err = io.Copy(&buf, rdr)
+	var buf []byte
+	_, err = io.ReadFull(rdr, buf)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read blob content: %v", err)
 	}
-	return &buf, nil
+	return buf, nil
 }

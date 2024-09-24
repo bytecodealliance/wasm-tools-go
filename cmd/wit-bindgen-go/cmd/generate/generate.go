@@ -154,11 +154,11 @@ func parseFlags(cmd *cli.Command) (*config, error) {
 func loadWITModule(ctx context.Context, cfg *config) (*wit.Resolve, error) {
 	if oci.IsOCIPath(cfg.path) {
 		fmt.Fprintf(os.Stderr, "Fetching OCI artifact %s\n", cfg.path)
-		bytes, err := oci.PullWIT(ctx, cfg.path)
-		if err != nil {
+		if bytes, err := oci.PullWIT(ctx, cfg.path); err != nil {
 			return nil, err
+		} else {
+			return wit.LoadWITFromBuffer(bytes)
 		}
-		return wit.LoadWITFromBuffer(bytes.Bytes())
 	}
 
 	return witcli.LoadOne(cfg.forceWIT, cfg.path)

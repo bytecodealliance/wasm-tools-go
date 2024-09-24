@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/urfave/cli/v3"
 	"github.com/bytecodealliance/wasm-tools-go/internal/witcli"
+	"github.com/urfave/cli/v3"
 )
 
 // Command is the CLI command for wit.
@@ -16,7 +16,7 @@ var Command = &cli.Command{
 }
 
 func action(ctx context.Context, cmd *cli.Command) error {
-	path, err := witcli.ParsePaths(cmd.Args().Slice()...)
+	path, err := witcli.LoadPath(cmd.Args().Slice()...)
 	if err != nil {
 		return err
 	}
