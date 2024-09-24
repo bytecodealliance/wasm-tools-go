@@ -19,9 +19,10 @@ func LoadOne(forceWIT bool, path string) (*wit.Resolve, error) {
 	return wit.LoadJSON(path)
 }
 
-// An error is returned if len(paths) > 1.
+// LoadPath parses paths and returns the first path.
 // If paths is empty, returns "-".
-func ParsePaths(paths ...string) (string, error) {
+// If paths has more than one element, returns an error.
+func LoadPath(paths ...string) (string, error) {
 	var path string
 	switch len(paths) {
 	case 0:

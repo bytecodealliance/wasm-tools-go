@@ -133,7 +133,7 @@ func parseFlags(cmd *cli.Command) (*config, error) {
 	}
 	fmt.Fprintf(os.Stderr, "Package root: %s\n", pkgRoot)
 
-	path, err := witcli.ParsePaths(cmd.Args().Slice()...)
+	path, err := witcli.LoadPath(cmd.Args().Slice()...)
 	if err != nil {
 		return nil, err
 	}
