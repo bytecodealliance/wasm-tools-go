@@ -3,11 +3,10 @@
 package oci
 
 import (
-	"bytes"
 	"context"
 	"errors"
 )
 
-func PullWIT(ctx context.Context, path string) (*bytes.Buffer, error) {
+func PullWIT(ctx context.Context, path string) ([]byte, error) {
 	return nil, errors.New("OCI not supported on WASI or TinyGo")
 }
