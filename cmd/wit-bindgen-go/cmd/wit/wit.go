@@ -20,7 +20,7 @@ func action(ctx context.Context, cmd *cli.Command) error {
 	if err != nil {
 		return err
 	}
-	res, err := witcli.LoadOne(cmd.Bool("force-wit"), path)
+	res, err := witcli.LoadOne(ctx, cmd.Bool("force-wit"), path)
 	if err != nil {
 		return err
 	}

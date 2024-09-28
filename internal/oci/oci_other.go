@@ -3,6 +3,7 @@
 package oci
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"io"
@@ -56,10 +57,10 @@ func PullWIT(ctx context.Context, path string) ([]byte, error) {
 	defer rdr.Close()
 
 	// Read the blob content into a buffer
-	var buf []byte
-	_, err = io.ReadFull(rdr, buf)
+	var buf bytes.Buffer
+	_, err = io.Copy(&buf, rdr)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read blob content: %v", err)
 	}
-	return buf, nil
+	return buf.Bytes(), nil
 }

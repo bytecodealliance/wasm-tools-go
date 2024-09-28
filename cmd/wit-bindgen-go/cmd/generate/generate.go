@@ -11,7 +11,6 @@ import (
 
 	"github.com/bytecodealliance/wasm-tools-go/internal/codec"
 	"github.com/bytecodealliance/wasm-tools-go/internal/go/gen"
-	"github.com/bytecodealliance/wasm-tools-go/internal/oci"
 	"github.com/bytecodealliance/wasm-tools-go/internal/witcli"
 	"github.com/bytecodealliance/wasm-tools-go/wit"
 	"github.com/bytecodealliance/wasm-tools-go/wit/bindgen"
@@ -87,7 +86,7 @@ func action(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
-	res, err := loadWITModule(ctx, cfg)
+	res, err := witcli.LoadOne(ctx, cfg.forceWIT, cfg.path)
 	if err != nil {
 		return err
 	}
@@ -149,19 +148,6 @@ func parseFlags(cmd *cli.Command) (*config, error) {
 		forceWIT,
 		path,
 	}, nil
-}
-
-func loadWITModule(ctx context.Context, cfg *config) (*wit.Resolve, error) {
-	if oci.IsOCIPath(cfg.path) {
-		fmt.Fprintf(os.Stderr, "Fetching OCI artifact %s\n", cfg.path)
-		if bytes, err := oci.PullWIT(ctx, cfg.path); err != nil {
-			return nil, err
-		} else {
-			return wit.LoadWITFromBuffer(bytes)
-		}
-	}
-
-	return witcli.LoadOne(cfg.forceWIT, cfg.path)
 }
 
 func writeGoPackages(packages []*gen.Package, cfg *config) error {
