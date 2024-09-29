@@ -101,10 +101,7 @@ func (r *result[Shape, OK, Err]) validate() {
 // OK returns an OK result with shape Shape and type OK and Err.
 // Pass Result[OK, OK, Err] or Result[Err, OK, Err] as the first type argument.
 func OK[R AnyResult[Shape, OK, Err], Shape, OK, Err any](ok OK) R {
-	var r struct {
-		_ HostLayout
-		result[Shape, OK, Err]
-	}
+	var r Result[Shape, OK, Err]
 	r.validate()
 	r.isErr = ResultOK
 	*((*OK)(unsafe.Pointer(&r.data))) = ok
@@ -114,10 +111,7 @@ func OK[R AnyResult[Shape, OK, Err], Shape, OK, Err any](ok OK) R {
 // Err returns an error result with shape Shape and type OK and Err.
 // Pass Result[OK, OK, Err] or Result[Err, OK, Err] as the first type argument.
 func Err[R AnyResult[Shape, OK, Err], Shape, OK, Err any](err Err) R {
-	var r struct {
-		_ HostLayout
-		result[Shape, OK, Err]
-	}
+	var r Result[Shape, OK, Err]
 	r.validate()
 	r.isErr = ResultErr
 	*((*Err)(unsafe.Pointer(&r.data))) = err
