@@ -24,13 +24,13 @@ func LiftString[T ~string, Data unsafe.Pointer | uintptr | *uint8, Len uint | ui
 }
 
 // LowerList lowers a [List] into a pair of Core WebAssembly types.
-func LowerList[L ~struct{ list[T] }, T any](list L) (*T, uint32) {
+func LowerList[L AnyList[T], T any](list L) (*T, uint32) {
 	l := (*List[T])(unsafe.Pointer(&list))
 	return l.data, uint32(l.len)
 }
 
 // LiftList lifts Core WebAssembly types into a [List].
-func LiftList[L ~struct{ list[T] }, T any, Data unsafe.Pointer | uintptr | *T, Len uint | uintptr | uint32 | uint64](data Data, len Len) L {
+func LiftList[L AnyList[T], T any, Data unsafe.Pointer | uintptr | *T, Len uint | uintptr | uint32 | uint64](data Data, len Len) L {
 	return L(NewList((*T)(unsafe.Pointer(data)), uint(len)))
 }
 
