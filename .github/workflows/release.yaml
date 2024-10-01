@@ -1,0 +1,73 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.*'
+
+jobs:
+  build:
+    name: Build Binaries
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        goos: [linux, windows, darwin]
+        goarch: [amd64, arm64]
+        wasm-tools-version: ["1.216.0"]
+        exclude:
+          - goos: windows
+            goarch: arm64
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Set up wasm-tools
+        uses: bytecodealliance/actions/wasm-tools/setup@v1
+        with:
+          version: ${{ matrix.wasm-tools-version }}
+
+      - name: Run Go tests
+        run: go test -v ./...
+
+      - name: Build Binary
+        run: |
+          mkdir -p build
+          GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build -o build/wit-bindgen-go_${{ matrix.goos }}_${{ matrix.goarch }} ./cmd/wit-bindgen-go
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: wit-bindgen-go_${{ matrix.goos }}_${{ matrix.goarch }}
+          path: build/wit-bindgen-go_${{ matrix.goos }}_${{ matrix.goarch }}
+          retention-days: 1
+
+  release:
+    name: Create GitHub Release
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: '**'  # downloads all artifacts
+          path: build/
+
+      - name: Create Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ls build/
+          gh release create "${{ github.ref_name }}" \
+            --notes-file changelog.md \
+            --title "${{ github.ref_name }}" \
+            build/*
