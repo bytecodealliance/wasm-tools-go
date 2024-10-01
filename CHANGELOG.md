@@ -9,6 +9,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Added type constraints `AnyList`, `AnyResult`, and `AnyVariant` in package `cm` to constrain generic functions accepting any of those types.
 - All `struct` types in package `cm` now include `structs.HostLayout` on Go 1.23 or later.
 
+### Fixed
+
+- `wit-bindgen-go --version` now displays the version without empty `()`.
+
 ## [v0.2.1] — 2024-09-26
 
 ### Added
