@@ -39,13 +39,15 @@ jobs:
       - name: Build Binary
         run: |
           mkdir -p build
-          GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build -o build/wit-bindgen-go_${{ matrix.goos }}_${{ matrix.goarch }} ./cmd/wit-bindgen-go
+          GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build -o wit-bindgen-go ./cmd/wit-bindgen-go
+          tar -czvf build/wit-bindgen-go-${{ matrix.goos }}-${{ matrix.goarch }}.tgz wit-bindgen-go
+          rm wit-bindgen-go
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: wit-bindgen-go_${{ matrix.goos }}_${{ matrix.goarch }}
-          path: build/wit-bindgen-go_${{ matrix.goos }}_${{ matrix.goarch }}
+          path: build/wit-bindgen-go-${{ matrix.goos }}-${{ matrix.goarch }}.tgz
           retention-days: 1
 
   release:
