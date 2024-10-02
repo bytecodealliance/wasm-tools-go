@@ -8,16 +8,6 @@
             "id": 0
           }
         },
-        "interface-1": {
-          "interface": {
-            "id": 1
-          }
-        },
-        "inline": {
-          "interface": {
-            "id": 3
-          }
-        },
         "t2-renamed": {
           "type": 39
         },
@@ -32,6 +22,11 @@
         },
         "empty": {
           "type": 43
+        },
+        "interface-1": {
+          "interface": {
+            "id": 1
+          }
         },
         "print": {
           "function": {
@@ -48,6 +43,11 @@
               }
             ],
             "results": []
+          }
+        },
+        "inline": {
+          "interface": {
+            "id": 3
           }
         }
       },
