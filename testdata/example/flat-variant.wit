@@ -4,16 +4,16 @@ interface a {
 	variant numbers {
 		one,
 		two(string),
-		three(float64),
+		three(f64),
 		four(option<string>),
 		five(bool),
 	}
 
-	f0: func(f: float64);
+	f0: func(f: f64);
 
 	f1: func(v: numbers);
 
-	type optional-float = option<float64>;
+	type optional-float = option<f64>;
 
 	variant v32 {
 		one,

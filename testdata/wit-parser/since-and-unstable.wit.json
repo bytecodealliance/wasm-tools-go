@@ -25,26 +25,6 @@
     {
       "name": "in-a-world",
       "imports": {
-        "y": {
-          "interface": {
-            "id": 7,
-            "stability": {
-              "stable": {
-                "since": "1.0.0"
-              }
-            }
-          }
-        },
-        "interface-5": {
-          "interface": {
-            "id": 5,
-            "stability": {
-              "stable": {
-                "since": "1.0.0"
-              }
-            }
-          }
-        },
         "t1": {
           "type": 13
         },
@@ -72,6 +52,26 @@
             "kind": "freestanding",
             "params": [],
             "results": [],
+            "stability": {
+              "stable": {
+                "since": "1.0.0"
+              }
+            }
+          }
+        },
+        "y": {
+          "interface": {
+            "id": 7,
+            "stability": {
+              "stable": {
+                "since": "1.0.0"
+              }
+            }
+          }
+        },
+        "interface-5": {
+          "interface": {
+            "id": 5,
             "stability": {
               "stable": {
                 "since": "1.0.0"
