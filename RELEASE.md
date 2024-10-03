@@ -4,17 +4,19 @@ This document describes the steps to release a new version of the `wit-bindgen-g
 
 ## 1. Update the [CHANGELOG.md](./CHANGELOG.md)
 
-Update the `CHANGELOG.md` file with the changes that are part of the new release, and make sure `Unreleased` is renamed to the new version number. Make a PR with these changes.
+* Add the latest changes to CHANGELOG.md.
+* Rename the Unreleased section to reflect the new version number.
+* Submit a pull request (PR) with these updates.
 
 ## 2. Create a new release
 
-Once the PR is merged, create a new release on GitHub with the same version number as the one in the `CHANGELOG.md` file as the tag name.
+Once the PR is merged, tag the new version in Git:
 
 ```sh
 git tag -a v0.3.0 -m "Release v0.3.0"
 ```
 
-Push the tag to GitHub.
+Push the tag to GitHub:
 
 ```sh
 git push upstream v0.3.0
