@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - Added type constraints `AnyList`, `AnyResult`, and `AnyVariant` in package `cm` to constrain generic functions accepting any of those types.
 - All `struct` types in package `cm` now include `structs.HostLayout` on Go 1.23 or later.
+- Added a release workflow to publish tagged releases to GitHub.
 
 ### Fixed
 
