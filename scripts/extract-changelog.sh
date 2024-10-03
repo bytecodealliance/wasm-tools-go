@@ -7,6 +7,6 @@ version=$1
 awk -v ver="$version" '
 /^## \[.*\]/ {
   if (p) exit
-  if ($0 ~ "^## \\[" ver "\\]") { p=1 }
+  if ($0 ~ "^## \\[" ver "\\]") { p=1; next }
 }
 p' CHANGELOG.md
