@@ -55,8 +55,8 @@ jobs:
       - name: Download Artifacts
         uses: actions/download-artifact@v4
         with:
-          name: '**'  # downloads all artifacts
           path: build/
+          merge-multiple: true # all artifacts are downloaded to this directory
 
       - name: Extract Release Notes
         run: |
@@ -69,7 +69,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          ls build/
+          ls -R build/
           TAG_NAME=${GITHUB_REF#refs/tags/}
           if [[ "$TAG_NAME" =~ .+-pre.* ]]; then
             PRERELEASE_ARGS="--prerelease --latest=false"
