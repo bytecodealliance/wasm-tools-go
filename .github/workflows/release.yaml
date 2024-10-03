@@ -14,7 +14,6 @@ jobs:
       matrix:
         goos: [linux, windows, darwin]
         goarch: [amd64, arm64]
-        wasm-tools-version: ["1.216.0"]
         exclude:
           - goos: windows
             goarch: arm64
@@ -27,11 +26,6 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
-
-      - name: Set up wasm-tools
-        uses: bytecodealliance/actions/wasm-tools/setup@v1
-        with:
-          version: ${{ matrix.wasm-tools-version }}
 
       - name: Run Go tests
         run: go test -v ./...
