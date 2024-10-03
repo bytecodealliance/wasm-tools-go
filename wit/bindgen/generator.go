@@ -823,8 +823,8 @@ func (g *generator) enumRep(file *gen.File, dir wit.Direction, e *wit.Enum, goNa
 	for _, c := range e.Cases {
 		stringio.Write(&b, `"`, c.Name, `"`, ",\n")
 	}
-
 	b.WriteString("}\n\n")
+
 	b.WriteString(formatDocComments("String implements [fmt.Stringer], returning the enum case name of e.", true))
 	stringio.Write(&b, "func (e ", goName, ") String() string {\n")
 	stringio.Write(&b, "return ", stringsName, "[e]\n")
@@ -848,6 +848,9 @@ func (g *generator) variantRep(file *gen.File, dir wit.Direction, v *wit.Variant
 		typeShape = g.typeRep(file, dir, shape)
 	}
 
+	scope := gen.NewScope(file)
+	scope.DeclareName("String") // For fmt.Stringer
+
 	// Emit type
 	var b strings.Builder
 	cm := file.Import(g.opts.cmPackage)
@@ -856,7 +859,7 @@ func (g *generator) variantRep(file *gen.File, dir wit.Direction, v *wit.Variant
 	// Emit cases
 	for i, c := range v.Cases {
 		caseNum := strconv.Itoa(i)
-		caseName := GoName(c.Name, true)
+		caseName := scope.DeclareName(GoName(c.Name, true))
 		constructorName := file.DeclareName(goName + caseName)
 		typeRep := g.typeRep(file, dir, c.Type)
 
@@ -891,6 +894,19 @@ func (g *generator) variantRep(file *gen.File, dir wit.Direction, v *wit.Variant
 			b.WriteString("}\n\n")
 		}
 	}
+
+	stringsName := file.DeclareName("strings" + GoName(goName, true))
+	stringio.Write(&b, "var ", stringsName, " = [", fmt.Sprintf("%d", len(v.Cases)), "]string {\n")
+	for _, c := range v.Cases {
+		stringio.Write(&b, `"`, c.Name, `"`, ",\n")
+	}
+	b.WriteString("}\n\n")
+
+	b.WriteString(formatDocComments("String implements [fmt.Stringer], returning the variant case name of v.", true))
+	stringio.Write(&b, "func (v ", goName, ") String() string {\n")
+	stringio.Write(&b, "return ", stringsName, "[v.Tag()]\n")
+	b.WriteString("}\n\n")
+
 	return b.String()
 }
 
