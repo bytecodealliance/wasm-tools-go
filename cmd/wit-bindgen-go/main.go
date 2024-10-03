@@ -13,8 +13,9 @@ import (
 )
 
 var (
-	version  = ""
-	revision = ""
+	version       = ""
+	revision      = ""
+	versionString = ""
 )
 
 func init() {
@@ -28,6 +29,13 @@ func init() {
 		case "vcs.revision":
 			revision = s.Value
 		}
+	}
+	if version == "" {
+		version = "(none)"
+	}
+	versionString = version
+	if revision != "" {
+		versionString += " (" + revision + ")"
 	}
 }
 
@@ -45,7 +53,7 @@ func main() {
 				Usage: "force loading WIT via wasm-tools",
 			},
 		},
-		Version: fmt.Sprintf("%v (%v)", version, revision),
+		Version: versionString,
 	}
 
 	err := cmd.Run(context.Background(), os.Args)
