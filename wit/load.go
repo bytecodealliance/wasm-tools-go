@@ -52,7 +52,7 @@ func ParseWIT(buffer []byte) (*Resolve, error) {
 // If the path is not "" and "-", it will be used as the input file.
 // Otherwise, the reader will be used as the input.
 func loadWIT(path string, reader io.Reader) (*Resolve, error) {
-	if path != "" && reader != nil {
+	if (path != "" && path != "-") && reader != nil {
 		return nil, errors.New("cannot set both path and reader; provide only one")
 	}
 
@@ -71,10 +71,7 @@ func loadWIT(path string, reader io.Reader) (*Resolve, error) {
 	cmd := exec.Command(wasmTools, cmdArgs...)
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
-
-	if reader != nil {
-		cmd.Stdin = reader
-	}
+	cmd.Stdin = reader
 
 	if err := cmd.Run(); err != nil {
 		fmt.Fprint(os.Stderr, stderr.String())
