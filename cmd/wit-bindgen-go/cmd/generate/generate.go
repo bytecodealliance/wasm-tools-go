@@ -7,11 +7,11 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/urfave/cli/v3"
 	"github.com/bytecodealliance/wasm-tools-go/internal/codec"
 	"github.com/bytecodealliance/wasm-tools-go/internal/go/gen"
 	"github.com/bytecodealliance/wasm-tools-go/internal/witcli"
 	"github.com/bytecodealliance/wasm-tools-go/wit/bindgen"
+	"github.com/urfave/cli/v3"
 )
 
 // Command is the CLI command for wit.
@@ -64,16 +64,54 @@ var Command = &cli.Command{
 	Action: action,
 }
 
-func action(ctx context.Context, cmd *cli.Command) error {
-	dryRun := cmd.Bool("dry-run")
+// Config is the configuration for the `generate` command.
+type config struct {
+	dryRun    bool
+	out       string
+	outPerm   os.FileMode
+	pkgRoot   string
+	world     string
+	cm        string
+	versioned bool
+	forceWIT  bool
+	path      string
+}
 
-	out := cmd.String("out")
-	info, err := os.Stat(out)
+func action(ctx context.Context, cmd *cli.Command) error {
+	cfg, err := parseFlags(cmd)
 	if err != nil {
 		return err
 	}
+
+	res, err := witcli.LoadWIT(ctx, cfg.forceWIT, cfg.path)
+	if err != nil {
+		return err
+	}
+
+	packages, err := bindgen.Go(res,
+		bindgen.GeneratedBy(cmd.Root().Name),
+		bindgen.World(cfg.world),
+		bindgen.PackageRoot(cfg.pkgRoot),
+		bindgen.Versioned(cfg.versioned),
+		bindgen.CMPackage(cfg.cm),
+	)
+	if err != nil {
+		return err
+	}
+
+	return writeGoPackages(packages, cfg)
+}
+
+func parseFlags(cmd *cli.Command) (*config, error) {
+	dryRun := cmd.Bool("dry-run")
+	out := cmd.String("out")
+
+	info, err := os.Stat(out)
+	if err != nil {
+		return nil, err
+	}
 	if !info.IsDir() {
-		return fmt.Errorf("%s is not a directory", out)
+		return nil, fmt.Errorf("%s is not a directory", out)
 	}
 	fmt.Fprintf(os.Stderr, "Output dir: %s\n", out)
 	outPerm := info.Mode().Perm()
@@ -82,40 +120,41 @@ func action(ctx context.Context, cmd *cli.Command) error {
 	if !cmd.IsSet("package-root") {
 		pkgRoot, err = gen.PackagePath(out)
 		if err != nil {
-			return err
+			return nil, err
 		}
 	}
 	fmt.Fprintf(os.Stderr, "Package root: %s\n", pkgRoot)
 
-	res, err := witcli.LoadOne(cmd.Bool("force-wit"), cmd.Args().Slice()...)
+	path, err := witcli.LoadPath(cmd.Args().Slice()...)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	packages, err := bindgen.Go(res,
-		bindgen.GeneratedBy(cmd.Root().Name),
-		bindgen.World(cmd.String("world")),
-		bindgen.PackageRoot(pkgRoot),
-		bindgen.Versioned(cmd.Bool("versioned")),
-		bindgen.CMPackage(cmd.String("cm")),
-	)
-	if err != nil {
-		return err
-	}
+	return &config{
+		dryRun,
+		out,
+		outPerm,
+		pkgRoot,
+		cmd.String("world"),
+		cmd.String("cm"),
+		cmd.Bool("versioned"),
+		cmd.Bool("force-wit"),
+		path,
+	}, nil
+}
+
+func writeGoPackages(packages []*gen.Package, cfg *config) error {
 	fmt.Fprintf(os.Stderr, "Generated %d package(s)\n", len(packages))
-
 	for _, pkg := range packages {
 		if !pkg.HasContent() {
 			fmt.Fprintf(os.Stderr, "Skipping empty package: %s\n", pkg.Path)
 			continue
 		}
-
 		fmt.Fprintf(os.Stderr, "Generated package: %s\n", pkg.Path)
 
 		for _, filename := range codec.SortedKeys(pkg.Files) {
 			file := pkg.Files[filename]
-
-			dir := filepath.Join(out, strings.TrimPrefix(file.Package.Path, pkgRoot))
+			dir := filepath.Join(cfg.out, strings.TrimPrefix(file.Package.Path, cfg.pkgRoot))
 			path := filepath.Join(dir, file.Name)
 
 			if !file.HasContent() {
@@ -123,14 +162,13 @@ func action(ctx context.Context, cmd *cli.Command) error {
 				continue
 			}
 
-			err := os.MkdirAll(dir, outPerm)
-			if err != nil {
+			if err := os.MkdirAll(dir, cfg.outPerm); err != nil {
 				return err
 			}
 
-			b, err := file.Bytes()
+			content, err := file.Bytes()
 			if err != nil {
-				if b == nil {
+				if content == nil {
 					return err
 				}
 				fmt.Fprintf(os.Stderr, "Error formatting file: %v\n", err)
@@ -138,26 +176,16 @@ func action(ctx context.Context, cmd *cli.Command) error {
 				fmt.Fprintf(os.Stderr, "Generated file: %s\n", path)
 			}
 
-			if dryRun {
-				fmt.Println(string(b))
+			if cfg.dryRun {
+				fmt.Println(string(content))
 				fmt.Println()
 				continue
 			}
 
-			f, err := os.Create(path)
-			if err != nil {
+			if err := os.WriteFile(path, content, cfg.outPerm); err != nil {
 				return err
-			}
-			n, err := f.Write(b)
-			f.Close()
-			if err != nil {
-				return err
-			}
-			if n != len(b) {
-				return fmt.Errorf("wrote %d bytes to %s, expected %d", n, path, len(b))
 			}
 		}
 	}
-
 	return nil
 }

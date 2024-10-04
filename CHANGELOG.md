@@ -4,6 +4,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Added
+
+- `wit-bindgen-go generate` now accepts a remote registry reference to pull down a WIT package and generate the Go code. Example: `wit-bindgen-go generate ghcr.io/webassembly/wasi/http:0.2.0`.
+
 ### Fixed
 
 - `cm.Option[T].Value()` method now value receiver (not pointer receiver), so it can be chained.
