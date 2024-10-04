@@ -2,15 +2,15 @@
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [v0.2.2] — 2024-10-03
 
 ### Added
 
-- Added type constraints `AnyList`, `AnyResult`, and `AnyVariant` in package `cm` to constrain generic functions accepting any of those types.
 - All `struct` types in package `cm` now include `structs.HostLayout` on Go 1.23 or later.
-- Added a release workflow to publish tagged releases to GitHub.
+- Added type constraints `AnyList`, `AnyResult`, and `AnyVariant` in package `cm` to constrain generic functions accepting any of those types.
 - Variant types now implement `fmt.Stringer`, with a `String` method. Breaking: variant cases named `string` map to `String_` in Go.
 - `cm.Option[T]` types now have a `Value()` convenience method that returns the zero value for `T` if the option represents the none case. For example, this simplifies getting an empty string or slice from `option<string>` or `option<list<T>>`, respectively.
+- Added a release workflow to publish tagged releases to GitHub.
 
 ### Fixed
 
@@ -132,7 +132,8 @@ Initial version, supporting [TinyGo](https://tinygo.org/) + [WASI](https://wasi.
 - Because Go does not have a native tagged union type, pointers represented in `variant` and `result` types may not be visible to the garbage collector and may be freed while still in use.
 - Support for mainline [Go](https://go.dev/).
 
-[Unreleased]: <https://github.com/bytecodealliance/wasm-tools-go/compare/v0.2.1..HEAD>
+[Unreleased]: <https://github.com/bytecodealliance/wasm-tools-go/compare/v0.2.2..HEAD>
+[v0.2.2]: <https://github.com/bytecodealliance/wasm-tools-go/compare/v0.2.1..v0.2.2>
 [v0.2.1]: <https://github.com/bytecodealliance/wasm-tools-go/compare/v0.2.0...v0.2.1>
 [v0.2.0]: <https://github.com/bytecodealliance/wasm-tools-go/compare/v0.1.5...v0.2.0>
 [v0.1.5]: <https://github.com/bytecodealliance/wasm-tools-go/compare/v0.1.4...v0.1.5>
