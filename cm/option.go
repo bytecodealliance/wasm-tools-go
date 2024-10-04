@@ -49,7 +49,8 @@ func (o *option[T]) Some() *T {
 
 // Value returns T if o represents the some case,
 // or the zero value of T if o represents the none case.
-func (o *option[T]) Value() T {
+// This does not have a pointer receiver, so it can be chained.
+func (o option[T]) Value() T {
 	if !o.isSome {
 		var zero T
 		return zero
