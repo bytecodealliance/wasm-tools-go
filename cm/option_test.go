@@ -57,4 +57,11 @@ func TestOption(t *testing.T) {
 	if got, want := o5.Value(), (List[string]{}); got != want {
 		t.Errorf("o4.Value: %v, expected %v", got, want)
 	}
+
+	f := func(s string) Option[string] {
+		return Some(s)
+	}
+	if got, want := f("hello").Value(), "hello"; got != want {
+		t.Errorf("Value: %v, expected %v", got, want)
+	}
 }
