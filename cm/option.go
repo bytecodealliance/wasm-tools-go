@@ -46,3 +46,13 @@ func (o *option[T]) Some() *T {
 	}
 	return nil
 }
+
+// Value returns T if o represents the some case,
+// or the zero value of T if o represents the none case.
+func (o *option[T]) Value() T {
+	if !o.isSome {
+		var zero T
+		return zero
+	}
+	return o.some
+}

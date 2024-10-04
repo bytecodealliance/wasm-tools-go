@@ -9,6 +9,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Added type constraints `AnyList`, `AnyResult`, and `AnyVariant` in package `cm` to constrain generic functions accepting any of those types.
 - All `struct` types in package `cm` now include `structs.HostLayout` on Go 1.23 or later.
 - Added a release workflow to publish tagged releases to GitHub.
+- Variant types now implement `fmt.Stringer`, with a `String` method. Breaking: variant cases named `string` map to `String_` in Go.
+- `cm.Option[T]` types now have a `Value()` convenience method that returns the zero value for `T` if the option represents the none case. For example, this simplifies getting an empty string or slice from `option<string>` or `option<list<T>>`, respectively.
 
 ### Fixed
 
