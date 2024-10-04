@@ -83,7 +83,7 @@ func action(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
-	res, err := witcli.LoadOne(ctx, cfg.forceWIT, cfg.path)
+	res, err := witcli.LoadWIT(ctx, cfg.forceWIT, cfg.path)
 	if err != nil {
 		return err
 	}
@@ -129,16 +129,16 @@ func parseFlags(cmd *cli.Command) (*config, error) {
 	if err != nil {
 		return nil, err
 	}
-	world, cm, versioned, forceWIT := cmd.String("world"), cmd.String("cm"), cmd.Bool("versioned"), cmd.Bool("force-wit")
+
 	return &config{
 		dryRun,
 		out,
 		outPerm,
 		pkgRoot,
-		world,
-		cm,
-		versioned,
-		forceWIT,
+		cmd.String("world"),
+		cmd.String("cm"),
+		cmd.Bool("versioned"),
+		cmd.Bool("force-wit"),
 		path,
 	}, nil
 }

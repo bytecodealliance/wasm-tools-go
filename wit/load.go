@@ -14,7 +14,7 @@ import (
 //
 // [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
 func LoadJSON(path string) (*Resolve, error) {
-	r := getReader(path)
+	r := reader(path)
 	if r != nil {
 		return DecodeJSON(r)
 	}
@@ -26,23 +26,23 @@ func LoadJSON(path string) (*Resolve, error) {
 	return DecodeJSON(f)
 }
 
-// LoadWITFromPath loads [WIT] data from path by processing it through [wasm-tools].
+// LoadWIT loads [WIT] data from path by processing it through [wasm-tools].
 // This will fail if wasm-tools is not in $PATH.
 // If path is "" or "-", it reads from os.Stdin.
 //
 // [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
 // [wasm-tools]: https://crates.io/crates/wasm-tools
-func LoadWITFromPath(path string) (*Resolve, error) {
-	r := getReader(path)
+func LoadWIT(path string) (*Resolve, error) {
+	r := reader(path)
 	return loadWIT(path, r)
 }
 
-// LoadWITFromBuffer loads [WIT] data from a buffer by processing it through [wasm-tools].
+// ParseWIT parses [WIT] data from a buffer by processing it through [wasm-tools].
 // This will fail if wasm-tools is not in $PATH.
 //
 // [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
 // [wasm-tools]: https://crates.io/crates/wasm-tools
-func LoadWITFromBuffer(buffer []byte) (*Resolve, error) {
+func ParseWIT(buffer []byte) (*Resolve, error) {
 	r := bytes.NewReader(buffer)
 	return loadWIT("", r)
 }
@@ -84,7 +84,7 @@ func loadWIT(path string, reader io.Reader) (*Resolve, error) {
 	return DecodeJSON(&stdout)
 }
 
-func getReader(path string) io.ReadCloser {
+func reader(path string) io.ReadCloser {
 	if path == "" || path == "-" {
 		return os.Stdin
 	}
