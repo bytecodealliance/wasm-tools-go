@@ -6,7 +6,7 @@ world bindings {
 
 interface component {
     variant unused-variant {
-		%string,
+        %string,
         %enum(unused-enum),
         %record(unused-record)
     }
