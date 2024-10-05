@@ -18,11 +18,11 @@ type AnyList[T any] interface {
 }
 
 // NewList returns a List[T] from data and len.
-func NewList[T any](data *T, len uintptr) List[T] {
+func NewList[T any, Len int | uint | uintptr | int32 | uint32 | int64 | uint64](data *T, len Len) List[T] {
 	return List[T]{
 		list: list[T]{
 			data: data,
-			len:  len,
+			len:  uintptr(len),
 		},
 	}
 }
