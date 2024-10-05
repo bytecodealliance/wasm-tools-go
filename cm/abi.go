@@ -19,7 +19,7 @@ func LowerString[S ~string](s S) (*byte, uint32) {
 }
 
 // LiftString lifts Core WebAssembly types into a [string].
-func LiftString[T ~string, Data unsafe.Pointer | uintptr | *uint8, Len uint | uintptr | uint32 | uint64](data Data, len Len) T {
+func LiftString[T ~string, Data unsafe.Pointer | uintptr | *uint8, Len int | uint | uintptr | uint32 | uint64](data Data, len Len) T {
 	return T(unsafe.String((*uint8)(unsafe.Pointer(data)), int(len)))
 }
 
@@ -30,8 +30,8 @@ func LowerList[L AnyList[T], T any](list L) (*T, uint32) {
 }
 
 // LiftList lifts Core WebAssembly types into a [List].
-func LiftList[L AnyList[T], T any, Data unsafe.Pointer | uintptr | *T, Len uint | uintptr | uint32 | uint64](data Data, len Len) L {
-	return L(NewList((*T)(unsafe.Pointer(data)), uint(len)))
+func LiftList[L AnyList[T], T any, Data unsafe.Pointer | uintptr | *T, Len int | uint | uintptr | uint32 | uint64](data Data, len Len) L {
+	return L(NewList((*T)(unsafe.Pointer(data)), uintptr(len)))
 }
 
 // BoolToU32 converts a value whose underlying type is [bool] into a [uint32].

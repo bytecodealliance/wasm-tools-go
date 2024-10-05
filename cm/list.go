@@ -18,7 +18,7 @@ type AnyList[T any] interface {
 }
 
 // NewList returns a List[T] from data and len.
-func NewList[T any](data *T, len uint) List[T] {
+func NewList[T any](data *T, len uintptr) List[T] {
 	return List[T]{
 		list: list[T]{
 			data: data,
@@ -31,7 +31,7 @@ func NewList[T any](data *T, len uint) List[T] {
 // The underlying slice data is not copied, and the resulting List points at the
 // same array storage as the slice.
 func ToList[S ~[]T, T any](s S) List[T] {
-	return NewList[T](unsafe.SliceData([]T(s)), uint(len(s)))
+	return NewList[T](unsafe.SliceData([]T(s)), uintptr(len(s)))
 }
 
 // list represents the internal representation of a Component Model list.
@@ -40,7 +40,7 @@ func ToList[S ~[]T, T any](s S) List[T] {
 type list[T any] struct {
 	_    HostLayout
 	data *T
-	len  uint
+	len  uintptr
 }
 
 // Slice returns a Go slice representing the List.
@@ -54,7 +54,7 @@ func (l list[T]) Data() *T {
 }
 
 // Len returns the length of the list.
-// TODO: should this return an int instead of a uint?
-func (l list[T]) Len() uint {
+// TODO: should this return an int instead of a uintptr?
+func (l list[T]) Len() uintptr {
 	return l.len
 }
