@@ -2,6 +2,11 @@ package cm
 
 import "unsafe"
 
+// AnyInteger is a type constraint for any integer type.
+type AnyInteger interface {
+	~int | ~uint | ~uintptr | ~int8 | ~uint8 | ~int16 | ~uint16 | ~int32 | ~uint32 | ~int64 | ~uint64
+}
+
 // Reinterpret reinterprets the bits of type From into type T.
 // Will panic if the size of From is smaller than the size of To.
 func Reinterpret[T, From any](from From) (to T) {
@@ -19,7 +24,7 @@ func LowerString[S ~string](s S) (*byte, uint32) {
 }
 
 // LiftString lifts Core WebAssembly types into a [string].
-func LiftString[T ~string, Data unsafe.Pointer | uintptr | *uint8, Len int | uint | uintptr | uint32 | uint64](data Data, len Len) T {
+func LiftString[T ~string, Data unsafe.Pointer | uintptr | *uint8, Len AnyInteger](data Data, len Len) T {
 	return T(unsafe.String((*uint8)(unsafe.Pointer(data)), int(len)))
 }
 
@@ -30,8 +35,8 @@ func LowerList[L AnyList[T], T any](list L) (*T, uint32) {
 }
 
 // LiftList lifts Core WebAssembly types into a [List].
-func LiftList[L AnyList[T], T any, Data unsafe.Pointer | uintptr | *T, Len int | uint | uintptr | uint32 | uint64](data Data, len Len) L {
-	return L(NewList((*T)(unsafe.Pointer(data)), uintptr(len)))
+func LiftList[L AnyList[T], T any, Data unsafe.Pointer | uintptr | *T, Len AnyInteger](data Data, len Len) L {
+	return L(NewList((*T)(unsafe.Pointer(data)), len))
 }
 
 // BoolToU32 converts a value whose underlying type is [bool] into a [uint32].

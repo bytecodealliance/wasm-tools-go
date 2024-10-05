@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Changed
 
 - `cm.List` now stores list length as a `uintptr`, permitted by the [Go wasm types proposal](https://github.com/golang/go/issues/66984). It was previously a `uint`, which was removed from the list of permitted types. There should be no change in the memory layout in TinyGo `GOARCH=wasm` or Go `GOARCH=wasm32` using 32-bit pointers.
+- The helper functions `cm.NewList`, `cm.LiftList`, and `cm.LiftString` now accept any integer type for `len`, defined as `cm.AnyInteger`.
 - `cm.Option[T].Value()` method now value receiver (not pointer receiver), so it can be chained.
 
 ## [v0.2.2] — 2024-10-03
