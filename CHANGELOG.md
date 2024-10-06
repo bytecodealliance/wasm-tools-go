@@ -2,6 +2,12 @@
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- Generated variant shape types (`...Shape`) now include [`structs.HostLayout`](https://github.com/golang/go/issues/66984).
+
 ## [v0.2.3] — 2024-10-05
 
 ### Added
