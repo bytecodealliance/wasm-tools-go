@@ -709,9 +709,8 @@ func (g *generator) primitiveRep(p wit.Primitive) string {
 func (g *generator) recordRep(file *gen.File, dir wit.Direction, r *wit.Record, goName string) string {
 	exported := len(goName) == 0 || token.IsExported(goName)
 	var b strings.Builder
-	cm := file.Import(g.opts.cmPackage)
 	b.WriteString("struct {\n")
-	stringio.Write(&b, "_ ", cm, ".HostLayout")
+	stringio.Write(&b, "_ ", file.Import(g.opts.cmPackage), ".HostLayout")
 	for i, f := range r.Fields {
 		if i == 0 || i > 0 && f.Docs.Contents != "" {
 			b.WriteRune('\n')
@@ -1002,6 +1001,7 @@ func (g *generator) typeDefShape(file *gen.File, dir wit.Direction, t *wit.TypeD
 		var b bytes.Buffer
 		stringio.Write(&b, "// ", name, " is used for storage in variant or result types.\n")
 		stringio.Write(&b, "type ", name, " struct {\n")
+		stringio.Write(&b, "_ ", afile.Import(g.opts.cmPackage), ".HostLayout\n")
 		stringio.Write(&b, "shape [", afile.Import("unsafe"), ".Sizeof(", g.typeRep(afile, dir, t), "{})]byte\n")
 		b.WriteString("}\n\n")
 		afile.Write(b.Bytes())
