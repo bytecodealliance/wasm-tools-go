@@ -53,7 +53,7 @@ func (*Resolve) WITKind() string { return "resolve" }
 // WIT returns the [WIT] text format for [Resolve] r.
 //
 // [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
-func (r *Resolve) WIT(_ Node, _ string) string {
+func (r *Resolve) WIT(ctx Node, _ string) string {
 	packages := slices.Clone(r.Packages)
 	slices.SortFunc(packages, func(a, b *Package) int {
 		return strings.Compare(a.Name.String(), b.Name.String())
@@ -61,16 +61,11 @@ func (r *Resolve) WIT(_ Node, _ string) string {
 	var b strings.Builder
 	for i, p := range packages {
 		if i == 0 {
-			// Context == nil means write non-nested form of package
-			// https://github.com/bytecodealliance/wasm-tools/pull/1700
-			b.WriteString(p.WIT(nil, ""))
+			// Write first package with implied name, which renders package WIT without nested braces.
+			b.WriteString(p.WIT(ctx, ""))
 		} else {
-			b.WriteRune('\n')
-			b.WriteRune('\n')
-			// Context == *Resolve means write single-file, multi-package style:
-			// https://github.com/WebAssembly/component-model/pull/340
-			// https://github.com/bytecodealliance/wasm-tools/pull/1577
-			b.WriteString(p.WIT(r, ""))
+			b.WriteString("\n\n")
+			b.WriteString(p.WIT(ctx, p.Name.WIT(p, "")))
 		}
 	}
 	return b.String()
@@ -1037,10 +1032,11 @@ func (p *Param) WIT(_ Node, _ string) string {
 func (*Package) WITKind() string { return "package" }
 
 // WIT returns the [WIT] text format of [Package] p.
+// Specify name to render braced, multi-package form.
 //
 // [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
-func (p *Package) WIT(ctx Node, _ string) string {
-	_, multi := ctx.(*Resolve)
+func (p *Package) WIT(ctx Node, name string) string {
+	multi := name != ""
 	var b strings.Builder
 	b.WriteString(p.Docs.WIT(ctx, ""))
 	b.WriteString("package ")
