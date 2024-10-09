@@ -1,0 +1,3450 @@
+{
+  "worlds": [
+    {
+      "name": "proxy",
+      "imports": {
+        "interface-1": {
+          "interface": {
+            "id": 1
+          }
+        },
+        "interface-6": {
+          "interface": {
+            "id": 6
+          }
+        },
+        "interface-0": {
+          "interface": {
+            "id": 0
+          }
+        },
+        "interface-2": {
+          "interface": {
+            "id": 2
+          }
+        },
+        "interface-9": {
+          "interface": {
+            "id": 9
+          }
+        },
+        "interface-8": {
+          "interface": {
+            "id": 8
+          }
+        },
+        "interface-4": {
+          "interface": {
+            "id": 4
+          }
+        },
+        "interface-5": {
+          "interface": {
+            "id": 5
+          }
+        },
+        "interface-3": {
+          "interface": {
+            "id": 3
+          }
+        },
+        "interface-11": {
+          "interface": {
+            "id": 11
+          }
+        },
+        "interface-7": {
+          "interface": {
+            "id": 7
+          }
+        }
+      },
+      "exports": {
+        "interface-10": {
+          "interface": {
+            "id": 10
+          }
+        }
+      },
+      "package": 4,
+      "docs": {
+        "contents": "The `wasi:http/proxy` world captures a widely-implementable intersection of\nhosts that includes HTTP forward and reverse proxies. Components targeting\nthis world may concurrently stream in and out any number of incoming and\noutgoing HTTP requests."
+      }
+    }
+  ],
+  "interfaces": [
+    {
+      "name": "error",
+      "types": {
+        "error": 0
+      },
+      "functions": {
+        "[method]error.to-debug-string": {
+          "name": "[method]error.to-debug-string",
+          "kind": {
+            "method": 0
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 1
+            }
+          ],
+          "results": [
+            {
+              "type": "string"
+            }
+          ],
+          "docs": {
+            "contents": "Returns a string that is suitable to assist humans in debugging\nthis error.\n\nWARNING: The returned string should not be consumed mechanically!\nIt may change across platforms, hosts, or other implementation\ndetails. Parsing this string is a major platform-compatibility\nhazard."
+          }
+        }
+      },
+      "package": 0
+    },
+    {
+      "name": "poll",
+      "types": {
+        "pollable": 2
+      },
+      "functions": {
+        "[method]pollable.block": {
+          "name": "[method]pollable.block",
+          "kind": {
+            "method": 2
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 3
+            }
+          ],
+          "results": [],
+          "docs": {
+            "contents": "`block` returns immediately if the pollable is ready, and otherwise\nblocks until ready.\n\nThis function is equivalent to calling `poll.poll` on a list\ncontaining only this pollable."
+          }
+        },
+        "[method]pollable.ready": {
+          "name": "[method]pollable.ready",
+          "kind": {
+            "method": 2
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 3
+            }
+          ],
+          "results": [
+            {
+              "type": "bool"
+            }
+          ],
+          "docs": {
+            "contents": "Return the readiness of a pollable. This function never blocks.\n\nReturns `true` when the pollable is ready, and `false` otherwise."
+          }
+        },
+        "poll": {
+          "name": "poll",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "in",
+              "type": 4
+            }
+          ],
+          "results": [
+            {
+              "type": 5
+            }
+          ],
+          "docs": {
+            "contents": "Poll for completion on a set of pollables.\n\nThis function takes a list of pollables, which identify I/O sources of\ninterest, and waits until one or more of the events is ready for I/O.\n\nThe result `list<u32>` contains one or more indices of handles in the\nargument list that is ready for I/O.\n\nIf the list contains more elements than can be indexed with a `u32`\nvalue, this function traps.\n\nA timeout can be implemented by adding a pollable from the\nwasi-clocks API to the list.\n\nThis function does not return a `result`; polling in itself does not\ndo any I/O so it doesn't fail. If any of the I/O sources identified by\nthe pollables has an error, it is indicated by marking the source as\nbeing reaedy for I/O."
+          }
+        }
+      },
+      "docs": {
+        "contents": "A poll API intended to let users wait for I/O events on multiple handles\nat once."
+      },
+      "package": 0
+    },
+    {
+      "name": "streams",
+      "types": {
+        "error": 6,
+        "pollable": 7,
+        "stream-error": 9,
+        "input-stream": 10,
+        "output-stream": 11
+      },
+      "functions": {
+        "[method]input-stream.blocking-read": {
+          "name": "[method]input-stream.blocking-read",
+          "kind": {
+            "method": 10
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 12
+            },
+            {
+              "name": "len",
+              "type": "u64"
+            }
+          ],
+          "results": [
+            {
+              "type": 14
+            }
+          ],
+          "docs": {
+            "contents": "Read bytes from a stream, after blocking until at least one byte can\nbe read. Except for blocking, behavior is identical to `read`."
+          }
+        },
+        "[method]input-stream.blocking-skip": {
+          "name": "[method]input-stream.blocking-skip",
+          "kind": {
+            "method": 10
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 12
+            },
+            {
+              "name": "len",
+              "type": "u64"
+            }
+          ],
+          "results": [
+            {
+              "type": 15
+            }
+          ],
+          "docs": {
+            "contents": "Skip bytes from a stream, after blocking until at least one byte\ncan be skipped. Except for blocking behavior, identical to `skip`."
+          }
+        },
+        "[method]input-stream.read": {
+          "name": "[method]input-stream.read",
+          "kind": {
+            "method": 10
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 12
+            },
+            {
+              "name": "len",
+              "type": "u64"
+            }
+          ],
+          "results": [
+            {
+              "type": 14
+            }
+          ],
+          "docs": {
+            "contents": "Perform a non-blocking read from the stream.\n\nWhen the source of a `read` is binary data, the bytes from the source\nare returned verbatim. When the source of a `read` is known to the\nimplementation to be text, bytes containing the UTF-8 encoding of the\ntext are returned.\n\nThis function returns a list of bytes containing the read data,\nwhen successful. The returned list will contain up to `len` bytes;\nit may return fewer than requested, but not more. The list is\nempty when no bytes are available for reading at this time. The\npollable given by `subscribe` will be ready when more bytes are\navailable.\n\nThis function fails with a `stream-error` when the operation\nencounters an error, giving `last-operation-failed`, or when the\nstream is closed, giving `closed`.\n\nWhen the caller gives a `len` of 0, it represents a request to\nread 0 bytes. If the stream is still open, this call should\nsucceed and return an empty list, or otherwise fail with `closed`.\n\nThe `len` parameter is a `u64`, which could represent a list of u8 which\nis not possible to allocate in wasm32, or not desirable to allocate as\nas a return value by the callee. The callee may return a list of bytes\nless than `len` in size while more bytes are available for reading."
+          }
+        },
+        "[method]input-stream.skip": {
+          "name": "[method]input-stream.skip",
+          "kind": {
+            "method": 10
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 12
+            },
+            {
+              "name": "len",
+              "type": "u64"
+            }
+          ],
+          "results": [
+            {
+              "type": 15
+            }
+          ],
+          "docs": {
+            "contents": "Skip bytes from a stream. Returns number of bytes skipped.\n\nBehaves identical to `read`, except instead of returning a list\nof bytes, returns the number of bytes consumed from the stream."
+          }
+        },
+        "[method]input-stream.subscribe": {
+          "name": "[method]input-stream.subscribe",
+          "kind": {
+            "method": 10
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 12
+            }
+          ],
+          "results": [
+            {
+              "type": 18
+            }
+          ],
+          "docs": {
+            "contents": "Create a `pollable` which will resolve once either the specified stream\nhas bytes available to read or the other end of the stream has been\nclosed.\nThe created `pollable` is a child resource of the `input-stream`.\nImplementations may trap if the `input-stream` is dropped before\nall derived `pollable`s created with this function are dropped."
+          }
+        },
+        "[method]output-stream.blocking-flush": {
+          "name": "[method]output-stream.blocking-flush",
+          "kind": {
+            "method": 11
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 16
+            }
+          ],
+          "results": [
+            {
+              "type": 17
+            }
+          ],
+          "docs": {
+            "contents": "Request to flush buffered output, and block until flush completes\nand stream is ready for writing again."
+          }
+        },
+        "[method]output-stream.blocking-splice": {
+          "name": "[method]output-stream.blocking-splice",
+          "kind": {
+            "method": 11
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 16
+            },
+            {
+              "name": "src",
+              "type": 12
+            },
+            {
+              "name": "len",
+              "type": "u64"
+            }
+          ],
+          "results": [
+            {
+              "type": 15
+            }
+          ],
+          "docs": {
+            "contents": "Read from one stream and write to another, with blocking.\n\nThis is similar to `splice`, except that it blocks until the\n`output-stream` is ready for writing, and the `input-stream`\nis ready for reading, before performing the `splice`."
+          }
+        },
+        "[method]output-stream.blocking-write-and-flush": {
+          "name": "[method]output-stream.blocking-write-and-flush",
+          "kind": {
+            "method": 11
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 16
+            },
+            {
+              "name": "contents",
+              "type": 13
+            }
+          ],
+          "results": [
+            {
+              "type": 17
+            }
+          ],
+          "docs": {
+            "contents": "Perform a write of up to 4096 bytes, and then flush the stream. Block\nuntil all of these operations are complete, or an error occurs.\n\nThis is a convenience wrapper around the use of `check-write`,\n`subscribe`, `write`, and `flush`, and is implemented with the\nfollowing pseudo-code:\n\n```text\nlet pollable = this.subscribe();\nwhile !contents.is_empty() {\n// Wait for the stream to become writable\npollable.block();\nlet Ok(n) = this.check-write(); // eliding error handling\nlet len = min(n, contents.len());\nlet (chunk, rest) = contents.split_at(len);\nthis.write(chunk  );            // eliding error handling\ncontents = rest;\n}\nthis.flush();\n// Wait for completion of `flush`\npollable.block();\n// Check for any errors that arose during `flush`\nlet _ = this.check-write();         // eliding error handling\n```"
+          }
+        },
+        "[method]output-stream.blocking-write-zeroes-and-flush": {
+          "name": "[method]output-stream.blocking-write-zeroes-and-flush",
+          "kind": {
+            "method": 11
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 16
+            },
+            {
+              "name": "len",
+              "type": "u64"
+            }
+          ],
+          "results": [
+            {
+              "type": 17
+            }
+          ],
+          "docs": {
+            "contents": "Perform a write of up to 4096 zeroes, and then flush the stream.\nBlock until all of these operations are complete, or an error\noccurs.\n\nThis is a convenience wrapper around the use of `check-write`,\n`subscribe`, `write-zeroes`, and `flush`, and is implemented with\nthe following pseudo-code:\n\n```text\nlet pollable = this.subscribe();\nwhile num_zeroes != 0 {\n// Wait for the stream to become writable\npollable.block();\nlet Ok(n) = this.check-write(); // eliding error handling\nlet len = min(n, num_zeroes);\nthis.write-zeroes(len);         // eliding error handling\nnum_zeroes -= len;\n}\nthis.flush();\n// Wait for completion of `flush`\npollable.block();\n// Check for any errors that arose during `flush`\nlet _ = this.check-write();         // eliding error handling\n```"
+          }
+        },
+        "[method]output-stream.check-write": {
+          "name": "[method]output-stream.check-write",
+          "kind": {
+            "method": 11
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 16
+            }
+          ],
+          "results": [
+            {
+              "type": 15
+            }
+          ],
+          "docs": {
+            "contents": "Check readiness for writing. This function never blocks.\n\nReturns the number of bytes permitted for the next call to `write`,\nor an error. Calling `write` with more bytes than this function has\npermitted will trap.\n\nWhen this function returns 0 bytes, the `subscribe` pollable will\nbecome ready when this function will report at least 1 byte, or an\nerror."
+          }
+        },
+        "[method]output-stream.flush": {
+          "name": "[method]output-stream.flush",
+          "kind": {
+            "method": 11
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 16
+            }
+          ],
+          "results": [
+            {
+              "type": 17
+            }
+          ],
+          "docs": {
+            "contents": "Request to flush buffered output. This function never blocks.\n\nThis tells the output-stream that the caller intends any buffered\noutput to be flushed. the output which is expected to be flushed\nis all that has been passed to `write` prior to this call.\n\nUpon calling this function, the `output-stream` will not accept any\nwrites (`check-write` will return `ok(0)`) until the flush has\ncompleted. The `subscribe` pollable will become ready when the\nflush has completed and the stream can accept more writes."
+          }
+        },
+        "[method]output-stream.splice": {
+          "name": "[method]output-stream.splice",
+          "kind": {
+            "method": 11
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 16
+            },
+            {
+              "name": "src",
+              "type": 12
+            },
+            {
+              "name": "len",
+              "type": "u64"
+            }
+          ],
+          "results": [
+            {
+              "type": 15
+            }
+          ],
+          "docs": {
+            "contents": "Read from one stream and write to another.\n\nThe behavior of splice is equivelant to:\n1. calling `check-write` on the `output-stream`\n2. calling `read` on the `input-stream` with the smaller of the\n`check-write` permitted length and the `len` provided to `splice`\n3. calling `write` on the `output-stream` with that read data.\n\nAny error reported by the call to `check-write`, `read`, or\n`write` ends the splice and reports that error.\n\nThis function returns the number of bytes transferred; it may be less\nthan `len`."
+          }
+        },
+        "[method]output-stream.subscribe": {
+          "name": "[method]output-stream.subscribe",
+          "kind": {
+            "method": 11
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 16
+            }
+          ],
+          "results": [
+            {
+              "type": 18
+            }
+          ],
+          "docs": {
+            "contents": "Create a `pollable` which will resolve once the output-stream\nis ready for more writing, or an error has occured. When this\npollable is ready, `check-write` will return `ok(n)` with n>0, or an\nerror.\n\nIf the stream is closed, this pollable is always ready immediately.\n\nThe created `pollable` is a child resource of the `output-stream`.\nImplementations may trap if the `output-stream` is dropped before\nall derived `pollable`s created with this function are dropped."
+          }
+        },
+        "[method]output-stream.write": {
+          "name": "[method]output-stream.write",
+          "kind": {
+            "method": 11
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 16
+            },
+            {
+              "name": "contents",
+              "type": 13
+            }
+          ],
+          "results": [
+            {
+              "type": 17
+            }
+          ],
+          "docs": {
+            "contents": "Perform a write. This function never blocks.\n\nWhen the destination of a `write` is binary data, the bytes from\n`contents` are written verbatim. When the destination of a `write` is\nknown to the implementation to be text, the bytes of `contents` are\ntranscoded from UTF-8 into the encoding of the destination and then\nwritten.\n\nPrecondition: check-write gave permit of Ok(n) and contents has a\nlength of less than or equal to n. Otherwise, this function will trap.\n\nreturns Err(closed) without writing if the stream has closed since\nthe last call to check-write provided a permit."
+          }
+        },
+        "[method]output-stream.write-zeroes": {
+          "name": "[method]output-stream.write-zeroes",
+          "kind": {
+            "method": 11
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 16
+            },
+            {
+              "name": "len",
+              "type": "u64"
+            }
+          ],
+          "results": [
+            {
+              "type": 17
+            }
+          ],
+          "docs": {
+            "contents": "Write zeroes to a stream.\n\nThis should be used precisely like `write` with the exact same\npreconditions (must use check-write first), but instead of\npassing a list of bytes, you simply pass the number of zero-bytes\nthat should be written."
+          }
+        }
+      },
+      "docs": {
+        "contents": "WASI I/O is an I/O abstraction API which is currently focused on providing\nstream types.\n\nIn the future, the component model is expected to add built-in stream types;\nwhen it does, they are expected to subsume this API."
+      },
+      "package": 0
+    },
+    {
+      "name": "stdin",
+      "types": {
+        "input-stream": 19
+      },
+      "functions": {
+        "get-stdin": {
+          "name": "get-stdin",
+          "kind": "freestanding",
+          "params": [],
+          "results": [
+            {
+              "type": 22
+            }
+          ]
+        }
+      },
+      "package": 1
+    },
+    {
+      "name": "stdout",
+      "types": {
+        "output-stream": 20
+      },
+      "functions": {
+        "get-stdout": {
+          "name": "get-stdout",
+          "kind": "freestanding",
+          "params": [],
+          "results": [
+            {
+              "type": 23
+            }
+          ]
+        }
+      },
+      "package": 1
+    },
+    {
+      "name": "stderr",
+      "types": {
+        "output-stream": 21
+      },
+      "functions": {
+        "get-stderr": {
+          "name": "get-stderr",
+          "kind": "freestanding",
+          "params": [],
+          "results": [
+            {
+              "type": 24
+            }
+          ]
+        }
+      },
+      "package": 1
+    },
+    {
+      "name": "monotonic-clock",
+      "types": {
+        "pollable": 25,
+        "instant": 26,
+        "duration": 27
+      },
+      "functions": {
+        "now": {
+          "name": "now",
+          "kind": "freestanding",
+          "params": [],
+          "results": [
+            {
+              "type": 26
+            }
+          ],
+          "docs": {
+            "contents": "Read the current value of the clock.\n\nThe clock is monotonic, therefore calling this function repeatedly will\nproduce a sequence of non-decreasing values."
+          }
+        },
+        "resolution": {
+          "name": "resolution",
+          "kind": "freestanding",
+          "params": [],
+          "results": [
+            {
+              "type": 27
+            }
+          ],
+          "docs": {
+            "contents": "Query the resolution of the clock. Returns the duration of time\ncorresponding to a clock tick."
+          }
+        },
+        "subscribe-instant": {
+          "name": "subscribe-instant",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "when",
+              "type": 26
+            }
+          ],
+          "results": [
+            {
+              "type": 29
+            }
+          ],
+          "docs": {
+            "contents": "Create a `pollable` which will resolve once the specified instant\noccured."
+          }
+        },
+        "subscribe-duration": {
+          "name": "subscribe-duration",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "when",
+              "type": 27
+            }
+          ],
+          "results": [
+            {
+              "type": 29
+            }
+          ],
+          "docs": {
+            "contents": "Create a `pollable` which will resolve once the given duration has\nelapsed, starting at the time at which this function was called.\noccured."
+          }
+        }
+      },
+      "docs": {
+        "contents": "WASI Monotonic Clock is a clock API intended to let users measure elapsed\ntime.\n\nIt is intended to be portable at least between Unix-family platforms and\nWindows.\n\nA monotonic clock is a clock which has an unspecified initial value, and\nsuccessive reads of the clock will produce non-decreasing values.\n\nIt is intended for measuring elapsed time."
+      },
+      "package": 2
+    },
+    {
+      "name": "wall-clock",
+      "types": {
+        "datetime": 28
+      },
+      "functions": {
+        "now": {
+          "name": "now",
+          "kind": "freestanding",
+          "params": [],
+          "results": [
+            {
+              "type": 28
+            }
+          ],
+          "docs": {
+            "contents": "Read the current value of the clock.\n\nThis clock is not monotonic, therefore calling this function repeatedly\nwill not necessarily produce a sequence of non-decreasing values.\n\nThe returned timestamps represent the number of seconds since\n1970-01-01T00:00:00Z, also known as [POSIX's Seconds Since the Epoch],\nalso known as [Unix Time].\n\nThe nanoseconds field of the output is always less than 1000000000.\n\n[POSIX's Seconds Since the Epoch]: https://pubs.opengroup.org/onlinepubs/9699919799/xrat/V4_xbd_chap04.html#tag_21_04_16\n[Unix Time]: https://en.wikipedia.org/wiki/Unix_time"
+          }
+        },
+        "resolution": {
+          "name": "resolution",
+          "kind": "freestanding",
+          "params": [],
+          "results": [
+            {
+              "type": 28
+            }
+          ],
+          "docs": {
+            "contents": "Query the resolution of the clock.\n\nThe nanoseconds field of the output is always less than 1000000000."
+          }
+        }
+      },
+      "docs": {
+        "contents": "WASI Wall Clock is a clock API intended to let users query the current\ntime. The name \"wall\" makes an analogy to a \"clock on the wall\", which\nis not necessarily monotonic as it may be reset.\n\nIt is intended to be portable at least between Unix-family platforms and\nWindows.\n\nA wall clock is a clock which measures the date and time according to\nsome external reference.\n\nExternal references may be reset, so this clock is not necessarily\nmonotonic, making it unsuitable for measuring elapsed time.\n\nIt is intended for reporting the current date and time for humans."
+      },
+      "package": 2
+    },
+    {
+      "name": "random",
+      "types": {},
+      "functions": {
+        "get-random-bytes": {
+          "name": "get-random-bytes",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "len",
+              "type": "u64"
+            }
+          ],
+          "results": [
+            {
+              "type": 30
+            }
+          ],
+          "docs": {
+            "contents": "Return `len` cryptographically-secure random or pseudo-random bytes.\n\nThis function must produce data at least as cryptographically secure and\nfast as an adequately seeded cryptographically-secure pseudo-random\nnumber generator (CSPRNG). It must not block, from the perspective of\nthe calling program, under any circumstances, including on the first\nrequest and on requests for numbers of bytes. The returned data must\nalways be unpredictable.\n\nThis function must always return fresh data. Deterministic environments\nmust omit this function, rather than implementing it with deterministic\ndata."
+          }
+        },
+        "get-random-u64": {
+          "name": "get-random-u64",
+          "kind": "freestanding",
+          "params": [],
+          "results": [
+            {
+              "type": "u64"
+            }
+          ],
+          "docs": {
+            "contents": "Return a cryptographically-secure random or pseudo-random `u64` value.\n\nThis function returns the same type of data as `get-random-bytes`,\nrepresented as a `u64`."
+          }
+        }
+      },
+      "docs": {
+        "contents": "WASI Random is a random data API.\n\nIt is intended to be portable at least between Unix-family platforms and\nWindows."
+      },
+      "package": 3
+    },
+    {
+      "name": "types",
+      "types": {
+        "duration": 31,
+        "input-stream": 32,
+        "output-stream": 33,
+        "io-error": 34,
+        "pollable": 35,
+        "method": 36,
+        "scheme": 37,
+        "DNS-error-payload": 40,
+        "TLS-alert-received-payload": 42,
+        "field-size-payload": 44,
+        "error-code": 47,
+        "header-error": 48,
+        "field-key": 49,
+        "field-value": 50,
+        "fields": 51,
+        "headers": 52,
+        "trailers": 53,
+        "incoming-request": 54,
+        "outgoing-request": 55,
+        "request-options": 56,
+        "response-outparam": 57,
+        "status-code": 58,
+        "incoming-response": 59,
+        "incoming-body": 60,
+        "future-trailers": 61,
+        "outgoing-response": 62,
+        "outgoing-body": 63,
+        "future-incoming-response": 64
+      },
+      "functions": {
+        "[constructor]fields": {
+          "name": "[constructor]fields",
+          "kind": {
+            "constructor": 51
+          },
+          "params": [],
+          "results": [
+            {
+              "type": 70
+            }
+          ],
+          "docs": {
+            "contents": "Construct an empty HTTP Fields.\n\nThe resulting `fields` is mutable."
+          }
+        },
+        "[method]fields.append": {
+          "name": "[method]fields.append",
+          "kind": {
+            "method": 51
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 65
+            },
+            {
+              "name": "name",
+              "type": 49
+            },
+            {
+              "name": "value",
+              "type": 50
+            }
+          ],
+          "results": [
+            {
+              "type": 66
+            }
+          ],
+          "docs": {
+            "contents": "Append a value for a key. Does not change or delete any existing\nvalues for that key.\n\nFails with `header-error.immutable` if the `fields` are immutable.\n\nFails with `header-error.invalid-syntax` if the `field-key` or\n`field-value` are syntactically invalid."
+          }
+        },
+        "[method]fields.clone": {
+          "name": "[method]fields.clone",
+          "kind": {
+            "method": 51
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 65
+            }
+          ],
+          "results": [
+            {
+              "type": 70
+            }
+          ],
+          "docs": {
+            "contents": "Make a deep copy of the Fields. Equivelant in behavior to calling the\n`fields` constructor on the return value of `entries`. The resulting\n`fields` is mutable."
+          }
+        },
+        "[method]fields.delete": {
+          "name": "[method]fields.delete",
+          "kind": {
+            "method": 51
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 65
+            },
+            {
+              "name": "name",
+              "type": 49
+            }
+          ],
+          "results": [
+            {
+              "type": 66
+            }
+          ],
+          "docs": {
+            "contents": "Delete all values for a key. Does nothing if no values for the key\nexist.\n\nFails with `header-error.immutable` if the `fields` are immutable.\n\nFails with `header-error.invalid-syntax` if the `field-key` is\nsyntactically invalid."
+          }
+        },
+        "[method]fields.entries": {
+          "name": "[method]fields.entries",
+          "kind": {
+            "method": 51
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 65
+            }
+          ],
+          "results": [
+            {
+              "type": 68
+            }
+          ],
+          "docs": {
+            "contents": "Retrieve the full set of keys and values in the Fields. Like the\nconstructor, the list represents each key-value pair.\n\nThe outer list represents each key-value pair in the Fields. Keys\nwhich have multiple values are represented by multiple entries in this\nlist with the same key."
+          }
+        },
+        "[method]fields.get": {
+          "name": "[method]fields.get",
+          "kind": {
+            "method": 51
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 65
+            },
+            {
+              "name": "name",
+              "type": 49
+            }
+          ],
+          "results": [
+            {
+              "type": 69
+            }
+          ],
+          "docs": {
+            "contents": "Get all of the values corresponding to a key. If the key is not present\nin this `fields` or is syntactically invalid, an empty list is returned.\nHowever, if the key is present but empty, this is represented by a list\nwith one or more empty field-values present."
+          }
+        },
+        "[method]fields.has": {
+          "name": "[method]fields.has",
+          "kind": {
+            "method": 51
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 65
+            },
+            {
+              "name": "name",
+              "type": 49
+            }
+          ],
+          "results": [
+            {
+              "type": "bool"
+            }
+          ],
+          "docs": {
+            "contents": "Returns `true` when the key is present in this `fields`. If the key is\nsyntactically invalid, `false` is returned."
+          }
+        },
+        "[method]fields.set": {
+          "name": "[method]fields.set",
+          "kind": {
+            "method": 51
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 65
+            },
+            {
+              "name": "name",
+              "type": 49
+            },
+            {
+              "name": "value",
+              "type": 69
+            }
+          ],
+          "results": [
+            {
+              "type": 66
+            }
+          ],
+          "docs": {
+            "contents": "Set all of the values for a key. Clears any existing values for that\nkey, if they have been set.\n\nFails with `header-error.immutable` if the `fields` are immutable.\n\nFails with `header-error.invalid-syntax` if the `field-key` or any of\nthe `field-value`s are syntactically invalid."
+          }
+        },
+        "[static]fields.from-list": {
+          "name": "[static]fields.from-list",
+          "kind": {
+            "static": 51
+          },
+          "params": [
+            {
+              "name": "entries",
+              "type": 68
+            }
+          ],
+          "results": [
+            {
+              "type": 71
+            }
+          ],
+          "docs": {
+            "contents": "Construct an HTTP Fields.\n\nThe resulting `fields` is mutable.\n\nThe list represents each key-value pair in the Fields. Keys\nwhich have multiple values are represented by multiple entries in this\nlist with the same key.\n\nThe tuple is a pair of the field key, represented as a string, and\nValue, represented as a list of bytes.\n\nAn error result will be returned if any `field-key` or `field-value` is\nsyntactically invalid, or if a field is forbidden."
+          }
+        },
+        "[method]incoming-request.authority": {
+          "name": "[method]incoming-request.authority",
+          "kind": {
+            "method": 54
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 72
+            }
+          ],
+          "results": [
+            {
+              "type": 38
+            }
+          ],
+          "docs": {
+            "contents": "Returns the authority from the request, if it was present."
+          }
+        },
+        "[method]incoming-request.consume": {
+          "name": "[method]incoming-request.consume",
+          "kind": {
+            "method": 54
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 72
+            }
+          ],
+          "results": [
+            {
+              "type": 74
+            }
+          ],
+          "docs": {
+            "contents": "Gives the `incoming-body` associated with this request. Will only\nreturn success at most once, and subsequent calls will return error."
+          }
+        },
+        "[method]incoming-request.headers": {
+          "name": "[method]incoming-request.headers",
+          "kind": {
+            "method": 54
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 72
+            }
+          ],
+          "results": [
+            {
+              "type": 116
+            }
+          ],
+          "docs": {
+            "contents": "Get the `headers` associated with the request.\n\nThe returned `headers` resource is immutable: `set`, `append`, and\n`delete` operations will fail with `header-error.immutable`.\n\nThe `headers` returned are a child resource: it must be dropped before\nthe parent `incoming-request` is dropped. Dropping this\n`incoming-request` before all children are dropped will trap."
+          }
+        },
+        "[method]incoming-request.method": {
+          "name": "[method]incoming-request.method",
+          "kind": {
+            "method": 54
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 72
+            }
+          ],
+          "results": [
+            {
+              "type": 36
+            }
+          ],
+          "docs": {
+            "contents": "Returns the method of the incoming request."
+          }
+        },
+        "[method]incoming-request.path-with-query": {
+          "name": "[method]incoming-request.path-with-query",
+          "kind": {
+            "method": 54
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 72
+            }
+          ],
+          "results": [
+            {
+              "type": 38
+            }
+          ],
+          "docs": {
+            "contents": "Returns the path with query parameters from the request, as a string."
+          }
+        },
+        "[method]incoming-request.scheme": {
+          "name": "[method]incoming-request.scheme",
+          "kind": {
+            "method": 54
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 72
+            }
+          ],
+          "results": [
+            {
+              "type": 75
+            }
+          ],
+          "docs": {
+            "contents": "Returns the protocol scheme from the request."
+          }
+        },
+        "[constructor]outgoing-request": {
+          "name": "[constructor]outgoing-request",
+          "kind": {
+            "constructor": 55
+          },
+          "params": [
+            {
+              "name": "headers",
+              "type": 116
+            }
+          ],
+          "results": [
+            {
+              "type": 117
+            }
+          ],
+          "docs": {
+            "contents": "Construct a new `outgoing-request` with a default `method` of `GET`, and\n`none` values for `path-with-query`, `scheme`, and `authority`.\n\n* `headers` is the HTTP Headers for the Request.\n\nIt is possible to construct, or manipulate with the accessor functions\nbelow, an `outgoing-request` with an invalid combination of `scheme`\nand `authority`, or `headers` which are not permitted to be sent.\nIt is the obligation of the `outgoing-handler.handle` implementation\nto reject invalid constructions of `outgoing-request`."
+          }
+        },
+        "[method]outgoing-request.authority": {
+          "name": "[method]outgoing-request.authority",
+          "kind": {
+            "method": 55
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 76
+            }
+          ],
+          "results": [
+            {
+              "type": 38
+            }
+          ],
+          "docs": {
+            "contents": "Get the HTTP Authority for the Request. A value of `none` may be used\nwith Related Schemes which do not require an Authority. The HTTP and\nHTTPS schemes always require an authority."
+          }
+        },
+        "[method]outgoing-request.body": {
+          "name": "[method]outgoing-request.body",
+          "kind": {
+            "method": 55
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 76
+            }
+          ],
+          "results": [
+            {
+              "type": 78
+            }
+          ],
+          "docs": {
+            "contents": "Returns the resource corresponding to the outgoing Body for this\nRequest.\n\nReturns success on the first call: the `outgoing-body` resource for\nthis `outgoing-request` can be retrieved at most once. Subsequent\ncalls will return error."
+          }
+        },
+        "[method]outgoing-request.headers": {
+          "name": "[method]outgoing-request.headers",
+          "kind": {
+            "method": 55
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 76
+            }
+          ],
+          "results": [
+            {
+              "type": 116
+            }
+          ],
+          "docs": {
+            "contents": "Get the headers associated with the Request.\n\nThe returned `headers` resource is immutable: `set`, `append`, and\n`delete` operations will fail with `header-error.immutable`.\n\nThis headers resource is a child: it must be dropped before the parent\n`outgoing-request` is dropped, or its ownership is transfered to\nanother component by e.g. `outgoing-handler.handle`."
+          }
+        },
+        "[method]outgoing-request.method": {
+          "name": "[method]outgoing-request.method",
+          "kind": {
+            "method": 55
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 76
+            }
+          ],
+          "results": [
+            {
+              "type": 36
+            }
+          ],
+          "docs": {
+            "contents": "Get the Method for the Request."
+          }
+        },
+        "[method]outgoing-request.path-with-query": {
+          "name": "[method]outgoing-request.path-with-query",
+          "kind": {
+            "method": 55
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 76
+            }
+          ],
+          "results": [
+            {
+              "type": 38
+            }
+          ],
+          "docs": {
+            "contents": "Get the combination of the HTTP Path and Query for the Request.\nWhen `none`, this represents an empty Path and empty Query."
+          }
+        },
+        "[method]outgoing-request.scheme": {
+          "name": "[method]outgoing-request.scheme",
+          "kind": {
+            "method": 55
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 76
+            }
+          ],
+          "results": [
+            {
+              "type": 75
+            }
+          ],
+          "docs": {
+            "contents": "Get the HTTP Related Scheme for the Request. When `none`, the\nimplementation may choose an appropriate default scheme."
+          }
+        },
+        "[method]outgoing-request.set-authority": {
+          "name": "[method]outgoing-request.set-authority",
+          "kind": {
+            "method": 55
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 76
+            },
+            {
+              "name": "authority",
+              "type": 38
+            }
+          ],
+          "results": [
+            {
+              "type": 79
+            }
+          ],
+          "docs": {
+            "contents": "Set the HTTP Authority for the Request. A value of `none` may be used\nwith Related Schemes which do not require an Authority. The HTTP and\nHTTPS schemes always require an authority. Fails if the string given is\nnot a syntactically valid uri authority."
+          }
+        },
+        "[method]outgoing-request.set-method": {
+          "name": "[method]outgoing-request.set-method",
+          "kind": {
+            "method": 55
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 76
+            },
+            {
+              "name": "method",
+              "type": 36
+            }
+          ],
+          "results": [
+            {
+              "type": 79
+            }
+          ],
+          "docs": {
+            "contents": "Set the Method for the Request. Fails if the string present in a\n`method.other` argument is not a syntactically valid method."
+          }
+        },
+        "[method]outgoing-request.set-path-with-query": {
+          "name": "[method]outgoing-request.set-path-with-query",
+          "kind": {
+            "method": 55
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 76
+            },
+            {
+              "name": "path-with-query",
+              "type": 38
+            }
+          ],
+          "results": [
+            {
+              "type": 79
+            }
+          ],
+          "docs": {
+            "contents": "Set the combination of the HTTP Path and Query for the Request.\nWhen `none`, this represents an empty Path and empty Query. Fails is the\nstring given is not a syntactically valid path and query uri component."
+          }
+        },
+        "[method]outgoing-request.set-scheme": {
+          "name": "[method]outgoing-request.set-scheme",
+          "kind": {
+            "method": 55
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 76
+            },
+            {
+              "name": "scheme",
+              "type": 75
+            }
+          ],
+          "results": [
+            {
+              "type": 79
+            }
+          ],
+          "docs": {
+            "contents": "Set the HTTP Related Scheme for the Request. When `none`, the\nimplementation may choose an appropriate default scheme. Fails if the\nstring given is not a syntactically valid uri scheme."
+          }
+        },
+        "[constructor]request-options": {
+          "name": "[constructor]request-options",
+          "kind": {
+            "constructor": 56
+          },
+          "params": [],
+          "results": [
+            {
+              "type": 118
+            }
+          ],
+          "docs": {
+            "contents": "Construct a default `request-options` value."
+          }
+        },
+        "[method]request-options.between-bytes-timeout": {
+          "name": "[method]request-options.between-bytes-timeout",
+          "kind": {
+            "method": 56
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 80
+            }
+          ],
+          "results": [
+            {
+              "type": 81
+            }
+          ],
+          "docs": {
+            "contents": "The timeout for receiving subsequent chunks of bytes in the Response\nbody stream."
+          }
+        },
+        "[method]request-options.connect-timeout": {
+          "name": "[method]request-options.connect-timeout",
+          "kind": {
+            "method": 56
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 80
+            }
+          ],
+          "results": [
+            {
+              "type": 81
+            }
+          ],
+          "docs": {
+            "contents": "The timeout for the initial connect to the HTTP Server."
+          }
+        },
+        "[method]request-options.first-byte-timeout": {
+          "name": "[method]request-options.first-byte-timeout",
+          "kind": {
+            "method": 56
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 80
+            }
+          ],
+          "results": [
+            {
+              "type": 81
+            }
+          ],
+          "docs": {
+            "contents": "The timeout for receiving the first byte of the Response body."
+          }
+        },
+        "[method]request-options.set-between-bytes-timeout": {
+          "name": "[method]request-options.set-between-bytes-timeout",
+          "kind": {
+            "method": 56
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 80
+            },
+            {
+              "name": "duration",
+              "type": 81
+            }
+          ],
+          "results": [
+            {
+              "type": 79
+            }
+          ],
+          "docs": {
+            "contents": "Set the timeout for receiving subsequent chunks of bytes in the Response\nbody stream. An error return value indicates that this timeout is not\nsupported."
+          }
+        },
+        "[method]request-options.set-connect-timeout": {
+          "name": "[method]request-options.set-connect-timeout",
+          "kind": {
+            "method": 56
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 80
+            },
+            {
+              "name": "duration",
+              "type": 81
+            }
+          ],
+          "results": [
+            {
+              "type": 79
+            }
+          ],
+          "docs": {
+            "contents": "Set the timeout for the initial connect to the HTTP Server. An error\nreturn value indicates that this timeout is not supported."
+          }
+        },
+        "[method]request-options.set-first-byte-timeout": {
+          "name": "[method]request-options.set-first-byte-timeout",
+          "kind": {
+            "method": 56
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 80
+            },
+            {
+              "name": "duration",
+              "type": 81
+            }
+          ],
+          "results": [
+            {
+              "type": 79
+            }
+          ],
+          "docs": {
+            "contents": "Set the timeout for receiving the first byte of the Response body. An\nerror return value indicates that this timeout is not supported."
+          }
+        },
+        "[static]response-outparam.set": {
+          "name": "[static]response-outparam.set",
+          "kind": {
+            "static": 57
+          },
+          "params": [
+            {
+              "name": "param",
+              "type": 119
+            },
+            {
+              "name": "response",
+              "type": 83
+            }
+          ],
+          "results": [],
+          "docs": {
+            "contents": "Set the value of the `response-outparam` to either send a response,\nor indicate an error.\n\nThis method consumes the `response-outparam` to ensure that it is\ncalled at most once. If it is never called, the implementation\nwill respond with an error.\n\nThe user may provide an `error` to `response` to allow the\nimplementation determine how to respond with an HTTP error response."
+          }
+        },
+        "[method]incoming-response.consume": {
+          "name": "[method]incoming-response.consume",
+          "kind": {
+            "method": 59
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 84
+            }
+          ],
+          "results": [
+            {
+              "type": 74
+            }
+          ],
+          "docs": {
+            "contents": "Returns the incoming body. May be called at most once. Returns error\nif called additional times."
+          }
+        },
+        "[method]incoming-response.headers": {
+          "name": "[method]incoming-response.headers",
+          "kind": {
+            "method": 59
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 84
+            }
+          ],
+          "results": [
+            {
+              "type": 116
+            }
+          ],
+          "docs": {
+            "contents": "Returns the headers from the incoming response.\n\nThe returned `headers` resource is immutable: `set`, `append`, and\n`delete` operations will fail with `header-error.immutable`.\n\nThis headers resource is a child: it must be dropped before the parent\n`incoming-response` is dropped."
+          }
+        },
+        "[method]incoming-response.status": {
+          "name": "[method]incoming-response.status",
+          "kind": {
+            "method": 59
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 84
+            }
+          ],
+          "results": [
+            {
+              "type": 58
+            }
+          ],
+          "docs": {
+            "contents": "Returns the status code from the incoming response."
+          }
+        },
+        "[method]incoming-body.stream": {
+          "name": "[method]incoming-body.stream",
+          "kind": {
+            "method": 60
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 85
+            }
+          ],
+          "results": [
+            {
+              "type": 87
+            }
+          ],
+          "docs": {
+            "contents": "Returns the contents of the body, as a stream of bytes.\n\nReturns success on first call: the stream representing the contents\ncan be retrieved at most once. Subsequent calls will return error.\n\nThe returned `input-stream` resource is a child: it must be dropped\nbefore the parent `incoming-body` is dropped, or consumed by\n`incoming-body.finish`.\n\nThis invariant ensures that the implementation can determine whether\nthe user is consuming the contents of the body, waiting on the\n`future-trailers` to be ready, or neither. This allows for network\nbackpressure is to be applied when the user is consuming the body,\nand for that backpressure to not inhibit delivery of the trailers if\nthe user does not read the entire body."
+          }
+        },
+        "[static]incoming-body.finish": {
+          "name": "[static]incoming-body.finish",
+          "kind": {
+            "static": 60
+          },
+          "params": [
+            {
+              "name": "this",
+              "type": 73
+            }
+          ],
+          "results": [
+            {
+              "type": 120
+            }
+          ],
+          "docs": {
+            "contents": "Takes ownership of `incoming-body`, and returns a `future-trailers`.\nThis function will trap if the `input-stream` child is still alive."
+          }
+        },
+        "[method]future-trailers.get": {
+          "name": "[method]future-trailers.get",
+          "kind": {
+            "method": 61
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 88
+            }
+          ],
+          "results": [
+            {
+              "type": 93
+            }
+          ],
+          "docs": {
+            "contents": "Returns the contents of the trailers, or an error which occured,\nonce the future is ready.\n\nThe outer `option` represents future readiness. Users can wait on this\n`option` to become `some` using the `subscribe` method.\n\nThe outer `result` is used to retrieve the trailers or error at most\nonce. It will be success on the first call in which the outer option\nis `some`, and error on subsequent calls.\n\nThe inner `result` represents that either the HTTP Request or Response\nbody, as well as any trailers, were received successfully, or that an\nerror occured receiving them. The optional `trailers` indicates whether\nor not trailers were present in the body.\n\nWhen some `trailers` are returned by this method, the `trailers`\nresource is immutable, and a child. Use of the `set`, `append`, or\n`delete` methods will return an error, and the resource must be\ndropped before the parent `future-trailers` is dropped."
+          }
+        },
+        "[method]future-trailers.subscribe": {
+          "name": "[method]future-trailers.subscribe",
+          "kind": {
+            "method": 61
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 88
+            }
+          ],
+          "results": [
+            {
+              "type": 121
+            }
+          ],
+          "docs": {
+            "contents": "Returns a pollable which becomes ready when either the trailers have\nbeen received, or an error has occured. When this pollable is ready,\nthe `get` method will return `some`."
+          }
+        },
+        "[constructor]outgoing-response": {
+          "name": "[constructor]outgoing-response",
+          "kind": {
+            "constructor": 62
+          },
+          "params": [
+            {
+              "name": "headers",
+              "type": 116
+            }
+          ],
+          "results": [
+            {
+              "type": 82
+            }
+          ],
+          "docs": {
+            "contents": "Construct an `outgoing-response`, with a default `status-code` of `200`.\nIf a different `status-code` is needed, it must be set via the\n`set-status-code` method.\n\n* `headers` is the HTTP Headers for the Response."
+          }
+        },
+        "[method]outgoing-response.body": {
+          "name": "[method]outgoing-response.body",
+          "kind": {
+            "method": 62
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 94
+            }
+          ],
+          "results": [
+            {
+              "type": 78
+            }
+          ],
+          "docs": {
+            "contents": "Returns the resource corresponding to the outgoing Body for this Response.\n\nReturns success on the first call: the `outgoing-body` resource for\nthis `outgoing-response` can be retrieved at most once. Subsequent\ncalls will return error."
+          }
+        },
+        "[method]outgoing-response.headers": {
+          "name": "[method]outgoing-response.headers",
+          "kind": {
+            "method": 62
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 94
+            }
+          ],
+          "results": [
+            {
+              "type": 116
+            }
+          ],
+          "docs": {
+            "contents": "Get the headers associated with the Request.\n\nThe returned `headers` resource is immutable: `set`, `append`, and\n`delete` operations will fail with `header-error.immutable`.\n\nThis headers resource is a child: it must be dropped before the parent\n`outgoing-request` is dropped, or its ownership is transfered to\nanother component by e.g. `outgoing-handler.handle`."
+          }
+        },
+        "[method]outgoing-response.set-status-code": {
+          "name": "[method]outgoing-response.set-status-code",
+          "kind": {
+            "method": 62
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 94
+            },
+            {
+              "name": "status-code",
+              "type": 58
+            }
+          ],
+          "results": [
+            {
+              "type": 79
+            }
+          ],
+          "docs": {
+            "contents": "Set the HTTP Status Code for the Response. Fails if the status-code\ngiven is not a valid http status code."
+          }
+        },
+        "[method]outgoing-response.status-code": {
+          "name": "[method]outgoing-response.status-code",
+          "kind": {
+            "method": 62
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 94
+            }
+          ],
+          "results": [
+            {
+              "type": 58
+            }
+          ],
+          "docs": {
+            "contents": "Get the HTTP Status Code for the Response."
+          }
+        },
+        "[method]outgoing-body.write": {
+          "name": "[method]outgoing-body.write",
+          "kind": {
+            "method": 63
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 95
+            }
+          ],
+          "results": [
+            {
+              "type": 97
+            }
+          ],
+          "docs": {
+            "contents": "Returns a stream for writing the body contents.\n\nThe returned `output-stream` is a child resource: it must be dropped\nbefore the parent `outgoing-body` resource is dropped (or finished),\notherwise the `outgoing-body` drop or `finish` will trap.\n\nReturns success on the first call: the `output-stream` resource for\nthis `outgoing-body` may be retrieved at most once. Subsequent calls\nwill return error."
+          }
+        },
+        "[static]outgoing-body.finish": {
+          "name": "[static]outgoing-body.finish",
+          "kind": {
+            "static": 63
+          },
+          "params": [
+            {
+              "name": "this",
+              "type": 77
+            },
+            {
+              "name": "trailers",
+              "type": 90
+            }
+          ],
+          "results": [
+            {
+              "type": 98
+            }
+          ],
+          "docs": {
+            "contents": "Finalize an outgoing body, optionally providing trailers. This must be\ncalled to signal that the response is complete. If the `outgoing-body`\nis dropped without calling `outgoing-body.finalize`, the implementation\nshould treat the body as corrupted.\n\nFails if the body's `outgoing-request` or `outgoing-response` was\nconstructed with a Content-Length header, and the contents written\nto the body (via `write`) does not match the value given in the\nContent-Length."
+          }
+        },
+        "[method]future-incoming-response.get": {
+          "name": "[method]future-incoming-response.get",
+          "kind": {
+            "method": 64
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 99
+            }
+          ],
+          "results": [
+            {
+              "type": 103
+            }
+          ],
+          "docs": {
+            "contents": "Returns the incoming HTTP Response, or an error, once one is ready.\n\nThe outer `option` represents future readiness. Users can wait on this\n`option` to become `some` using the `subscribe` method.\n\nThe outer `result` is used to retrieve the response or error at most\nonce. It will be success on the first call in which the outer option\nis `some`, and error on subsequent calls.\n\nThe inner `result` represents that either the incoming HTTP Response\nstatus and headers have recieved successfully, or that an error\noccured. Errors may also occur while consuming the response body,\nbut those will be reported by the `incoming-body` and its\n`output-stream` child."
+          }
+        },
+        "[method]future-incoming-response.subscribe": {
+          "name": "[method]future-incoming-response.subscribe",
+          "kind": {
+            "method": 64
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 99
+            }
+          ],
+          "results": [
+            {
+              "type": 121
+            }
+          ],
+          "docs": {
+            "contents": "Returns a pollable which becomes ready when either the Response has\nbeen received, or an error has occured. When this pollable is ready,\nthe `get` method will return `some`."
+          }
+        },
+        "http-error-code": {
+          "name": "http-error-code",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "err",
+              "type": 104
+            }
+          ],
+          "results": [
+            {
+              "type": 105
+            }
+          ],
+          "docs": {
+            "contents": "Attempts to extract a http-related `error` from the wasi:io `error`\nprovided.\n\nStream operations which return\n`wasi:io/stream/stream-error::last-operation-failed` have a payload of\ntype `wasi:io/error/error` with more information about the operation\nthat failed. This payload can be passed through to this function to see\nif there's http-related information about the error to return.\n\nNote that this function is fallible because not all io-errors are\nhttp-related errors."
+          }
+        }
+      },
+      "docs": {
+        "contents": "This interface defines all of the types and methods for implementing\nHTTP Requests and Responses, both incoming and outgoing, as well as\ntheir headers, trailers, and bodies."
+      },
+      "package": 4
+    },
+    {
+      "name": "incoming-handler",
+      "types": {
+        "incoming-request": 106,
+        "response-outparam": 107
+      },
+      "functions": {
+        "handle": {
+          "name": "handle",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "request",
+              "type": 122
+            },
+            {
+              "name": "response-out",
+              "type": 123
+            }
+          ],
+          "results": [],
+          "docs": {
+            "contents": "This function is invoked with an incoming HTTP Request, and a resource\n`response-outparam` which provides the capability to reply with an HTTP\nResponse. The response is sent by calling the `response-outparam.set`\nmethod, which allows execution to continue after the response has been\nsent. This enables both streaming to the response body, and performing other\nwork.\n\nThe implementor of this function must write a response to the\n`response-outparam` before returning, or else the caller will respond\nwith an error on its behalf."
+          }
+        }
+      },
+      "docs": {
+        "contents": "This interface defines a handler of incoming HTTP Requests. It should\nbe exported by components which can respond to HTTP Requests."
+      },
+      "package": 4
+    },
+    {
+      "name": "outgoing-handler",
+      "types": {
+        "outgoing-request": 108,
+        "request-options": 109,
+        "future-incoming-response": 110,
+        "error-code": 111
+      },
+      "functions": {
+        "handle": {
+          "name": "handle",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "request",
+              "type": 124
+            },
+            {
+              "name": "options",
+              "type": 113
+            }
+          ],
+          "results": [
+            {
+              "type": 115
+            }
+          ],
+          "docs": {
+            "contents": "This function is invoked with an outgoing HTTP Request, and it returns\na resource `future-incoming-response` which represents an HTTP Response\nwhich may arrive in the future.\n\nThe `options` argument accepts optional parameters for the HTTP\nprotocol's transport layer.\n\nThis function may return an error if the `outgoing-request` is invalid\nor not allowed to be made. Otherwise, protocol errors are reported\nthrough the `future-incoming-response`."
+          }
+        }
+      },
+      "docs": {
+        "contents": "This interface defines a handler of outgoing HTTP Requests. It should be\nimported by components which wish to make HTTP Requests."
+      },
+      "package": 4
+    }
+  ],
+  "types": [
+    {
+      "name": "error",
+      "kind": "resource",
+      "owner": {
+        "interface": 0
+      },
+      "docs": {
+        "contents": "A resource which represents some error information.\n\nThe only method provided by this resource is `to-debug-string`,\nwhich provides some human-readable information about the error.\n\nIn the `wasi:io` package, this resource is returned through the\n`wasi:io/streams/stream-error` type.\n\nTo provide more specific error information, other interfaces may\nprovide functions to further \"downcast\" this error into more specific\nerror information. For example, `error`s returned in streams derived\nfrom filesystem types to be described using the filesystem's own\nerror-code type, using the function\n`wasi:filesystem/types/filesystem-error-code`, which takes a parameter\n`borrow<error>` and returns\n`option<wasi:filesystem/types/error-code>`.\n\nThe set of functions which can \"downcast\" an `error` into a more\nconcrete type is open."
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "borrow": 0
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": "pollable",
+      "kind": "resource",
+      "owner": {
+        "interface": 1
+      },
+      "docs": {
+        "contents": "`pollable` represents a single I/O event which may be ready, or not."
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "borrow": 2
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "list": 3
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "list": "u32"
+      },
+      "owner": null
+    },
+    {
+      "name": "error",
+      "kind": {
+        "type": 0
+      },
+      "owner": {
+        "interface": 2
+      }
+    },
+    {
+      "name": "pollable",
+      "kind": {
+        "type": 2
+      },
+      "owner": {
+        "interface": 2
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "own": 6
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": "stream-error",
+      "kind": {
+        "variant": {
+          "cases": [
+            {
+              "name": "last-operation-failed",
+              "type": 8,
+              "docs": {
+                "contents": "The last operation (a write or flush) failed before completion.\n\nMore information is available in the `error` payload."
+              }
+            },
+            {
+              "name": "closed",
+              "type": null,
+              "docs": {
+                "contents": "The stream is closed: no more input will be accepted by the\nstream. A closed output-stream will return this error on all\nfuture operations."
+              }
+            }
+          ]
+        }
+      },
+      "owner": {
+        "interface": 2
+      },
+      "docs": {
+        "contents": "An error for input-stream and output-stream operations."
+      }
+    },
+    {
+      "name": "input-stream",
+      "kind": "resource",
+      "owner": {
+        "interface": 2
+      },
+      "docs": {
+        "contents": "An input bytestream.\n\n`input-stream`s are *non-blocking* to the extent practical on underlying\nplatforms. I/O operations always return promptly; if fewer bytes are\npromptly available than requested, they return the number of bytes promptly\navailable, which could even be zero. To wait for data to be available,\nuse the `subscribe` function to obtain a `pollable` which can be polled\nfor using `wasi:io/poll`."
+      }
+    },
+    {
+      "name": "output-stream",
+      "kind": "resource",
+      "owner": {
+        "interface": 2
+      },
+      "docs": {
+        "contents": "An output bytestream.\n\n`output-stream`s are *non-blocking* to the extent practical on\nunderlying platforms. Except where specified otherwise, I/O operations also\nalways return promptly, after the number of bytes that can be written\npromptly, which could even be zero. To wait for the stream to be ready to\naccept data, the `subscribe` function to obtain a `pollable` which can be\npolled for using `wasi:io/poll`."
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "borrow": 10
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "list": "u8"
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "result": {
+          "ok": 13,
+          "err": 9
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "result": {
+          "ok": "u64",
+          "err": 9
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "borrow": 11
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "result": {
+          "ok": null,
+          "err": 9
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "own": 7
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": "input-stream",
+      "kind": {
+        "type": 10
+      },
+      "owner": {
+        "interface": 3
+      }
+    },
+    {
+      "name": "output-stream",
+      "kind": {
+        "type": 11
+      },
+      "owner": {
+        "interface": 4
+      }
+    },
+    {
+      "name": "output-stream",
+      "kind": {
+        "type": 11
+      },
+      "owner": {
+        "interface": 5
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "own": 19
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "own": 20
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "own": 21
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": "pollable",
+      "kind": {
+        "type": 2
+      },
+      "owner": {
+        "interface": 6
+      }
+    },
+    {
+      "name": "instant",
+      "kind": {
+        "type": "u64"
+      },
+      "owner": {
+        "interface": 6
+      },
+      "docs": {
+        "contents": "An instant in time, in nanoseconds. An instant is relative to an\nunspecified initial value, and can only be compared to instances from\nthe same monotonic-clock."
+      }
+    },
+    {
+      "name": "duration",
+      "kind": {
+        "type": "u64"
+      },
+      "owner": {
+        "interface": 6
+      },
+      "docs": {
+        "contents": "A duration of time, in nanoseconds."
+      }
+    },
+    {
+      "name": "datetime",
+      "kind": {
+        "record": {
+          "fields": [
+            {
+              "name": "seconds",
+              "type": "u64"
+            },
+            {
+              "name": "nanoseconds",
+              "type": "u32"
+            }
+          ]
+        }
+      },
+      "owner": {
+        "interface": 7
+      },
+      "docs": {
+        "contents": "A time and date in seconds plus nanoseconds."
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "own": 25
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "list": "u8"
+      },
+      "owner": null
+    },
+    {
+      "name": "duration",
+      "kind": {
+        "type": 27
+      },
+      "owner": {
+        "interface": 9
+      }
+    },
+    {
+      "name": "input-stream",
+      "kind": {
+        "type": 10
+      },
+      "owner": {
+        "interface": 9
+      }
+    },
+    {
+      "name": "output-stream",
+      "kind": {
+        "type": 11
+      },
+      "owner": {
+        "interface": 9
+      }
+    },
+    {
+      "name": "io-error",
+      "kind": {
+        "type": 0
+      },
+      "owner": {
+        "interface": 9
+      }
+    },
+    {
+      "name": "pollable",
+      "kind": {
+        "type": 2
+      },
+      "owner": {
+        "interface": 9
+      }
+    },
+    {
+      "name": "method",
+      "kind": {
+        "variant": {
+          "cases": [
+            {
+              "name": "get",
+              "type": null
+            },
+            {
+              "name": "head",
+              "type": null
+            },
+            {
+              "name": "post",
+              "type": null
+            },
+            {
+              "name": "put",
+              "type": null
+            },
+            {
+              "name": "delete",
+              "type": null
+            },
+            {
+              "name": "connect",
+              "type": null
+            },
+            {
+              "name": "options",
+              "type": null
+            },
+            {
+              "name": "trace",
+              "type": null
+            },
+            {
+              "name": "patch",
+              "type": null
+            },
+            {
+              "name": "other",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "owner": {
+        "interface": 9
+      },
+      "docs": {
+        "contents": "This type corresponds to HTTP standard Methods."
+      }
+    },
+    {
+      "name": "scheme",
+      "kind": {
+        "variant": {
+          "cases": [
+            {
+              "name": "HTTP",
+              "type": null
+            },
+            {
+              "name": "HTTPS",
+              "type": null
+            },
+            {
+              "name": "other",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "owner": {
+        "interface": 9
+      },
+      "docs": {
+        "contents": "This type corresponds to HTTP standard Related Schemes."
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "option": "string"
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "option": "u16"
+      },
+      "owner": null
+    },
+    {
+      "name": "DNS-error-payload",
+      "kind": {
+        "record": {
+          "fields": [
+            {
+              "name": "rcode",
+              "type": 38
+            },
+            {
+              "name": "info-code",
+              "type": 39
+            }
+          ]
+        }
+      },
+      "owner": {
+        "interface": 9
+      },
+      "docs": {
+        "contents": "Defines the case payload type for `DNS-error` above:"
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "option": "u8"
+      },
+      "owner": null
+    },
+    {
+      "name": "TLS-alert-received-payload",
+      "kind": {
+        "record": {
+          "fields": [
+            {
+              "name": "alert-id",
+              "type": 41
+            },
+            {
+              "name": "alert-message",
+              "type": 38
+            }
+          ]
+        }
+      },
+      "owner": {
+        "interface": 9
+      },
+      "docs": {
+        "contents": "Defines the case payload type for `TLS-alert-received` above:"
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "option": "u32"
+      },
+      "owner": null
+    },
+    {
+      "name": "field-size-payload",
+      "kind": {
+        "record": {
+          "fields": [
+            {
+              "name": "field-name",
+              "type": 38
+            },
+            {
+              "name": "field-size",
+              "type": 43
+            }
+          ]
+        }
+      },
+      "owner": {
+        "interface": 9
+      },
+      "docs": {
+        "contents": "Defines the case payload type for `HTTP-response-{header,trailer}-size` above:"
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "option": "u64"
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "option": 44
+      },
+      "owner": null
+    },
+    {
+      "name": "error-code",
+      "kind": {
+        "variant": {
+          "cases": [
+            {
+              "name": "DNS-timeout",
+              "type": null
+            },
+            {
+              "name": "DNS-error",
+              "type": 40
+            },
+            {
+              "name": "destination-not-found",
+              "type": null
+            },
+            {
+              "name": "destination-unavailable",
+              "type": null
+            },
+            {
+              "name": "destination-IP-prohibited",
+              "type": null
+            },
+            {
+              "name": "destination-IP-unroutable",
+              "type": null
+            },
+            {
+              "name": "connection-refused",
+              "type": null
+            },
+            {
+              "name": "connection-terminated",
+              "type": null
+            },
+            {
+              "name": "connection-timeout",
+              "type": null
+            },
+            {
+              "name": "connection-read-timeout",
+              "type": null
+            },
+            {
+              "name": "connection-write-timeout",
+              "type": null
+            },
+            {
+              "name": "connection-limit-reached",
+              "type": null
+            },
+            {
+              "name": "TLS-protocol-error",
+              "type": null
+            },
+            {
+              "name": "TLS-certificate-error",
+              "type": null
+            },
+            {
+              "name": "TLS-alert-received",
+              "type": 42
+            },
+            {
+              "name": "HTTP-request-denied",
+              "type": null
+            },
+            {
+              "name": "HTTP-request-length-required",
+              "type": null
+            },
+            {
+              "name": "HTTP-request-body-size",
+              "type": 45
+            },
+            {
+              "name": "HTTP-request-method-invalid",
+              "type": null
+            },
+            {
+              "name": "HTTP-request-URI-invalid",
+              "type": null
+            },
+            {
+              "name": "HTTP-request-URI-too-long",
+              "type": null
+            },
+            {
+              "name": "HTTP-request-header-section-size",
+              "type": 43
+            },
+            {
+              "name": "HTTP-request-header-size",
+              "type": 46
+            },
+            {
+              "name": "HTTP-request-trailer-section-size",
+              "type": 43
+            },
+            {
+              "name": "HTTP-request-trailer-size",
+              "type": 44
+            },
+            {
+              "name": "HTTP-response-incomplete",
+              "type": null
+            },
+            {
+              "name": "HTTP-response-header-section-size",
+              "type": 43
+            },
+            {
+              "name": "HTTP-response-header-size",
+              "type": 44
+            },
+            {
+              "name": "HTTP-response-body-size",
+              "type": 45
+            },
+            {
+              "name": "HTTP-response-trailer-section-size",
+              "type": 43
+            },
+            {
+              "name": "HTTP-response-trailer-size",
+              "type": 44
+            },
+            {
+              "name": "HTTP-response-transfer-coding",
+              "type": 38
+            },
+            {
+              "name": "HTTP-response-content-coding",
+              "type": 38
+            },
+            {
+              "name": "HTTP-response-timeout",
+              "type": null
+            },
+            {
+              "name": "HTTP-upgrade-failed",
+              "type": null
+            },
+            {
+              "name": "HTTP-protocol-error",
+              "type": null
+            },
+            {
+              "name": "loop-detected",
+              "type": null
+            },
+            {
+              "name": "configuration-error",
+              "type": null
+            },
+            {
+              "name": "internal-error",
+              "type": 38,
+              "docs": {
+                "contents": "This is a catch-all error for anything that doesn't fit cleanly into a\nmore specific case. It also includes an optional string for an\nunstructured description of the error. Users should not depend on the\nstring for diagnosing errors, as it's not required to be consistent\nbetween implementations."
+              }
+            }
+          ]
+        }
+      },
+      "owner": {
+        "interface": 9
+      },
+      "docs": {
+        "contents": "These cases are inspired by the IANA HTTP Proxy Error Types:\nhttps://www.iana.org/assignments/http-proxy-status/http-proxy-status.xhtml#table-http-proxy-error-types"
+      }
+    },
+    {
+      "name": "header-error",
+      "kind": {
+        "variant": {
+          "cases": [
+            {
+              "name": "invalid-syntax",
+              "type": null,
+              "docs": {
+                "contents": "This error indicates that a `field-key` or `field-value` was\nsyntactically invalid when used with an operation that sets headers in a\n`fields`."
+              }
+            },
+            {
+              "name": "forbidden",
+              "type": null,
+              "docs": {
+                "contents": "This error indicates that a forbidden `field-key` was used when trying\nto set a header in a `fields`."
+              }
+            },
+            {
+              "name": "immutable",
+              "type": null,
+              "docs": {
+                "contents": "This error indicates that the operation on the `fields` was not\npermitted because the fields are immutable."
+              }
+            }
+          ]
+        }
+      },
+      "owner": {
+        "interface": 9
+      },
+      "docs": {
+        "contents": "This type enumerates the different kinds of errors that may occur when\nsetting or appending to a `fields` resource."
+      }
+    },
+    {
+      "name": "field-key",
+      "kind": {
+        "type": "string"
+      },
+      "owner": {
+        "interface": 9
+      },
+      "docs": {
+        "contents": "Field keys are always strings."
+      }
+    },
+    {
+      "name": "field-value",
+      "kind": {
+        "list": "u8"
+      },
+      "owner": {
+        "interface": 9
+      },
+      "docs": {
+        "contents": "Field values should always be ASCII strings. However, in\nreality, HTTP implementations often have to interpret malformed values,\nso they are provided as a list of bytes."
+      }
+    },
+    {
+      "name": "fields",
+      "kind": "resource",
+      "owner": {
+        "interface": 9
+      },
+      "docs": {
+        "contents": "This following block defines the `fields` resource which corresponds to\nHTTP standard Fields. Fields are a common representation used for both\nHeaders and Trailers.\n\nA `fields` may be mutable or immutable. A `fields` created using the\nconstructor, `from-list`, or `clone` will be mutable, but a `fields`\nresource given by other means (including, but not limited to,\n`incoming-request.headers`, `outgoing-request.headers`) might be be\nimmutable. In an immutable fields, the `set`, `append`, and `delete`\noperations will fail with `header-error.immutable`."
+      }
+    },
+    {
+      "name": "headers",
+      "kind": {
+        "type": 51
+      },
+      "owner": {
+        "interface": 9
+      },
+      "docs": {
+        "contents": "Headers is an alias for Fields."
+      }
+    },
+    {
+      "name": "trailers",
+      "kind": {
+        "type": 51
+      },
+      "owner": {
+        "interface": 9
+      },
+      "docs": {
+        "contents": "Trailers is an alias for Fields."
+      }
+    },
+    {
+      "name": "incoming-request",
+      "kind": "resource",
+      "owner": {
+        "interface": 9
+      },
+      "docs": {
+        "contents": "Represents an incoming HTTP Request."
+      }
+    },
+    {
+      "name": "outgoing-request",
+      "kind": "resource",
+      "owner": {
+        "interface": 9
+      },
+      "docs": {
+        "contents": "Represents an outgoing HTTP Request."
+      }
+    },
+    {
+      "name": "request-options",
+      "kind": "resource",
+      "owner": {
+        "interface": 9
+      },
+      "docs": {
+        "contents": "Parameters for making an HTTP Request. Each of these parameters is\ncurrently an optional timeout applicable to the transport layer of the\nHTTP protocol.\n\nThese timeouts are separate from any the user may use to bound a\nblocking call to `wasi:io/poll.poll`."
+      }
+    },
+    {
+      "name": "response-outparam",
+      "kind": "resource",
+      "owner": {
+        "interface": 9
+      },
+      "docs": {
+        "contents": "Represents the ability to send an HTTP Response.\n\nThis resource is used by the `wasi:http/incoming-handler` interface to\nallow a Response to be sent corresponding to the Request provided as the\nother argument to `incoming-handler.handle`."
+      }
+    },
+    {
+      "name": "status-code",
+      "kind": {
+        "type": "u16"
+      },
+      "owner": {
+        "interface": 9
+      },
+      "docs": {
+        "contents": "This type corresponds to the HTTP standard Status Code."
+      }
+    },
+    {
+      "name": "incoming-response",
+      "kind": "resource",
+      "owner": {
+        "interface": 9
+      },
+      "docs": {
+        "contents": "Represents an incoming HTTP Response."
+      }
+    },
+    {
+      "name": "incoming-body",
+      "kind": "resource",
+      "owner": {
+        "interface": 9
+      },
+      "docs": {
+        "contents": "Represents an incoming HTTP Request or Response's Body.\n\nA body has both its contents - a stream of bytes - and a (possibly\nempty) set of trailers, indicating that the full contents of the\nbody have been received. This resource represents the contents as\nan `input-stream` and the delivery of trailers as a `future-trailers`,\nand ensures that the user of this interface may only be consuming either\nthe body contents or waiting on trailers at any given time."
+      }
+    },
+    {
+      "name": "future-trailers",
+      "kind": "resource",
+      "owner": {
+        "interface": 9
+      },
+      "docs": {
+        "contents": "Represents a future which may eventaully return trailers, or an error.\n\nIn the case that the incoming HTTP Request or Response did not have any\ntrailers, this future will resolve to the empty set of trailers once the\ncomplete Request or Response body has been received."
+      }
+    },
+    {
+      "name": "outgoing-response",
+      "kind": "resource",
+      "owner": {
+        "interface": 9
+      },
+      "docs": {
+        "contents": "Represents an outgoing HTTP Response."
+      }
+    },
+    {
+      "name": "outgoing-body",
+      "kind": "resource",
+      "owner": {
+        "interface": 9
+      },
+      "docs": {
+        "contents": "Represents an outgoing HTTP Request or Response's Body.\n\nA body has both its contents - a stream of bytes - and a (possibly\nempty) set of trailers, inducating the full contents of the body\nhave been sent. This resource represents the contents as an\n`output-stream` child resource, and the completion of the body (with\noptional trailers) with a static function that consumes the\n`outgoing-body` resource, and ensures that the user of this interface\nmay not write to the body contents after the body has been finished.\n\nIf the user code drops this resource, as opposed to calling the static\nmethod `finish`, the implementation should treat the body as incomplete,\nand that an error has occured. The implementation should propogate this\nerror to the HTTP protocol by whatever means it has available,\nincluding: corrupting the body on the wire, aborting the associated\nRequest, or sending a late status code for the Response."
+      }
+    },
+    {
+      "name": "future-incoming-response",
+      "kind": "resource",
+      "owner": {
+        "interface": 9
+      },
+      "docs": {
+        "contents": "Represents a future which may eventaully return an incoming HTTP\nResponse, or an error.\n\nThis resource is returned by the `wasi:http/outgoing-handler` interface to\nprovide the HTTP Response corresponding to the sent Request."
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "borrow": 51
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "result": {
+          "ok": null,
+          "err": 48
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "tuple": {
+          "types": [
+            49,
+            50
+          ]
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "list": 67
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "list": 50
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "own": 51
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "result": {
+          "ok": 70,
+          "err": 48
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "borrow": 54
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "own": 60
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "result": {
+          "ok": 73,
+          "err": null
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "option": 37
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "borrow": 55
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "own": 63
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "result": {
+          "ok": 77,
+          "err": null
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "result": {
+          "ok": null,
+          "err": null
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "borrow": 56
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "option": 31
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "own": 62
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "result": {
+          "ok": 82,
+          "err": 47
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "borrow": 59
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "borrow": 60
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "own": 32
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "result": {
+          "ok": 86,
+          "err": null
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "borrow": 61
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "own": 53
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "option": 89
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "result": {
+          "ok": 90,
+          "err": 47
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "result": {
+          "ok": 91,
+          "err": null
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "option": 92
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "borrow": 62
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "borrow": 63
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "own": 33
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "result": {
+          "ok": 96,
+          "err": null
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "result": {
+          "ok": null,
+          "err": 47
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "borrow": 64
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "own": 59
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "result": {
+          "ok": 100,
+          "err": 47
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "result": {
+          "ok": 101,
+          "err": null
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "option": 102
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "borrow": 34
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "option": 47
+      },
+      "owner": null
+    },
+    {
+      "name": "incoming-request",
+      "kind": {
+        "type": 54
+      },
+      "owner": {
+        "interface": 10
+      }
+    },
+    {
+      "name": "response-outparam",
+      "kind": {
+        "type": 57
+      },
+      "owner": {
+        "interface": 10
+      }
+    },
+    {
+      "name": "outgoing-request",
+      "kind": {
+        "type": 55
+      },
+      "owner": {
+        "interface": 11
+      }
+    },
+    {
+      "name": "request-options",
+      "kind": {
+        "type": 56
+      },
+      "owner": {
+        "interface": 11
+      }
+    },
+    {
+      "name": "future-incoming-response",
+      "kind": {
+        "type": 64
+      },
+      "owner": {
+        "interface": 11
+      }
+    },
+    {
+      "name": "error-code",
+      "kind": {
+        "type": 47
+      },
+      "owner": {
+        "interface": 11
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "own": 109
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "option": 112
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "own": 110
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "result": {
+          "ok": 114,
+          "err": 111
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "own": 52
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "own": 55
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "own": 56
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "own": 57
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "own": 61
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "own": 35
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "own": 106
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "own": 107
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "own": 108
+        }
+      },
+      "owner": null
+    }
+  ],
+  "packages": [
+    {
+      "name": "wasi:io@0.2.0",
+      "interfaces": {
+        "error": 0,
+        "poll": 1,
+        "streams": 2
+      },
+      "worlds": {}
+    },
+    {
+      "name": "wasi:cli@0.2.0",
+      "interfaces": {
+        "stdin": 3,
+        "stdout": 4,
+        "stderr": 5
+      },
+      "worlds": {}
+    },
+    {
+      "name": "wasi:clocks@0.2.0",
+      "interfaces": {
+        "monotonic-clock": 6,
+        "wall-clock": 7
+      },
+      "worlds": {}
+    },
+    {
+      "name": "wasi:random@0.2.0",
+      "interfaces": {
+        "random": 8
+      },
+      "worlds": {}
+    },
+    {
+      "name": "wasi:http@0.2.0",
+      "interfaces": {
+        "types": 9,
+        "incoming-handler": 10,
+        "outgoing-handler": 11
+      },
+      "worlds": {
+        "proxy": 0
+      }
+    }
+  ]
+}

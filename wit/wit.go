@@ -53,24 +53,26 @@ func (*Resolve) WITKind() string { return "resolve" }
 // WIT returns the [WIT] text format for [Resolve] r.
 //
 // [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
-func (r *Resolve) WIT(_ Node, _ string) string {
+func (r *Resolve) WIT(ctx Node, _ string) string {
 	packages := slices.Clone(r.Packages)
 	slices.SortFunc(packages, func(a, b *Package) int {
 		return strings.Compare(a.Name.String(), b.Name.String())
 	})
 	var b strings.Builder
+	var hasContent bool
 	for i, p := range packages {
-		if i == 0 {
-			// Context == nil means write non-nested form of package
-			// https://github.com/bytecodealliance/wasm-tools/pull/1700
-			b.WriteString(p.WIT(nil, ""))
-		} else {
-			b.WriteRune('\n')
-			b.WriteRune('\n')
-			// Context == *Resolve means write single-file, multi-package style:
-			// https://github.com/WebAssembly/component-model/pull/340
-			// https://github.com/bytecodealliance/wasm-tools/pull/1577
-			b.WriteString(p.WIT(r, ""))
+		var name string
+		if i != 0 {
+			// Write subsequent packages with explicit name, which renders the package WIT with nested braces.
+			name = p.Name.WIT(p, "")
+		}
+		wit := p.WIT(ctx, name)
+		if wit != "" {
+			if hasContent {
+				b.WriteString("\n")
+			}
+			hasContent = true
+			b.WriteString(wit)
 		}
 	}
 	return b.String()
@@ -1037,52 +1039,59 @@ func (p *Param) WIT(_ Node, _ string) string {
 func (*Package) WITKind() string { return "package" }
 
 // WIT returns the [WIT] text format of [Package] p.
+// Specify name to render braced, multi-package form.
 //
 // [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
-func (p *Package) WIT(ctx Node, _ string) string {
-	_, multi := ctx.(*Resolve)
+func (p *Package) WIT(ctx Node, name string) string {
+	var filter *World
+	if w, ok := ctx.(*World); ok {
+		filter = w
+	}
+	multi := name != ""
 	var b strings.Builder
 	b.WriteString(p.Docs.WIT(ctx, ""))
 	b.WriteString("package ")
 	b.WriteString(p.Name.WIT(p, ""))
 	if multi {
-		b.WriteString(" {\n")
+		b.WriteString(" {")
 	} else {
-		b.WriteString(";\n\n")
+		b.WriteString(";\n")
 	}
 	i := 0
-	if p.Interfaces.Len() > 0 {
-		p.Interfaces.All()(func(name string, face *Interface) bool {
-			if i > 0 {
-				b.WriteRune('\n')
-			}
-			if multi {
-				b.WriteString(indent(face.WIT(p, name)))
-			} else {
-				b.WriteString(face.WIT(p, name))
-			}
-			b.WriteRune('\n')
-			i++
+	p.Interfaces.All()(func(name string, face *Interface) bool {
+		if filter != nil && !filter.HasInterface(face) {
 			return true
-		})
-	}
-	if p.Worlds.Len() > 0 {
-		p.Worlds.All()(func(name string, w *World) bool {
-			if i > 0 {
-				b.WriteRune('\n')
-			}
-			if multi {
-				b.WriteString(indent(w.WIT(p, name)))
-			} else {
-				b.WriteString(w.WIT(p, name))
-			}
-			b.WriteRune('\n')
-			i++
+		}
+		b.WriteRune('\n')
+		if multi {
+			b.WriteString(indent(face.WIT(p, name)))
+		} else {
+			b.WriteString(face.WIT(p, name))
+		}
+		b.WriteRune('\n')
+		i++
+		return true
+	})
+	p.Worlds.All()(func(name string, w *World) bool {
+		if filter != nil && w != filter {
 			return true
-		})
-	}
+		}
+		b.WriteRune('\n')
+		if multi {
+			b.WriteString(indent(w.WIT(p, name)))
+		} else {
+			b.WriteString(w.WIT(p, name))
+		}
+		b.WriteRune('\n')
+		i++
+		return true
+	})
 	if multi {
-		b.WriteRune('}')
+		b.WriteString("}\n")
+	}
+	// Return empty string in multi-package mode if package has no contents
+	if multi && i == 0 {
+		return ""
 	}
 	return b.String()
 }

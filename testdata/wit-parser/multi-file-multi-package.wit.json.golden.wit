@@ -11,7 +11,6 @@ world w2 {
 	}
 }
 
-
 package baz:name {
 	interface i3 {
 		type a = u32;

@@ -7,7 +7,6 @@ world a {
 	import e:e/e;
 }
 
-
 package b:b {
 	interface b {}
 }

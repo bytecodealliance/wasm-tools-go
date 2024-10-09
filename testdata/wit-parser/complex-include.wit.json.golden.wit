@@ -9,7 +9,6 @@ world bar-a {
 	import b;
 }
 
-
 package foo:baz {
 	interface a {}
 

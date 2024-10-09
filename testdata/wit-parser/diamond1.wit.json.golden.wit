@@ -2,7 +2,6 @@ package foo:dep1;
 
 interface types {}
 
-
 package foo:dep2 {
 	interface types {}
 }

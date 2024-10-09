@@ -67,29 +67,77 @@ func (w *World) WITPackage() *Package {
 	return w.Package
 }
 
+// Match returns true if [World] w matches pattern, which can be one of:
+// "name", "namespace:package/name" (qualified), or "namespace:package/name@1.0.0" (versioned).
+func (w *World) Match(pattern string) bool {
+	if pattern == w.Name {
+		return true
+	}
+	id := w.Package.Name
+	id.Extension = w.Name
+	if pattern == id.String() {
+		return true
+	}
+	id.Version = nil
+	return pattern == id.String()
+}
+
+// HasInterface returns true if [World] w references [Interface] i.
+func (w *World) HasInterface(i *Interface) bool {
+	var found bool
+	w.AllInterfaces()(func(_ string, face *Interface) bool {
+		found = face == i
+		return !found
+	})
+	return found
+}
+
+// AllInterfaces returns a [sequence] that yields each [Interface] in a [World].
+// The sequence stops if yield returns false.
+//
+// [sequence]: https://github.com/golang/go/issues/61897
+func (w *World) AllInterfaces() iterate.Seq2[string, *Interface] {
+	return func(yield func(string, *Interface) bool) {
+		w.AllImportsAndExports()(func(name string, i WorldItem) bool {
+			if ref, ok := i.(*InterfaceRef); ok {
+				return yield(name, ref.Interface)
+			}
+			return true
+		})
+	}
+}
+
 // AllFunctions returns a [sequence] that yields each [Function] in a [World].
 // The sequence stops if yield returns false.
 //
 // [sequence]: https://github.com/golang/go/issues/61897
 func (w *World) AllFunctions() iterate.Seq[*Function] {
 	return func(yield func(*Function) bool) {
-		var done bool
-		yield = iterate.Done(iterate.Once(yield), func() { done = true })
-		w.Imports.All()(func(_ string, i WorldItem) bool {
+		w.AllImportsAndExports()(func(_ string, i WorldItem) bool {
 			if f, ok := i.(*Function); ok {
 				return yield(f)
 			}
 			return true
 		})
+	}
+}
+
+// AllImportsAndExports returns a [sequence] that yields each [WorldItem] in a [World].
+// The sequence stops if yield returns false.
+//
+// [sequence]: https://github.com/golang/go/issues/61897
+func (w *World) AllImportsAndExports() iterate.Seq2[string, WorldItem] {
+	return func(yield func(string, WorldItem) bool) {
+		var done bool
+		yield = iterate.Done2(iterate.Once2(yield), func() { done = true })
+		f := func(name string, i WorldItem) bool {
+			return yield(name, i)
+		}
+		w.Imports.All()(f)
 		if done {
 			return
 		}
-		w.Exports.All()(func(_ string, i WorldItem) bool {
-			if f, ok := i.(*Function); ok {
-				return yield(f)
-			}
-			return true
-		})
+		w.Exports.All()(f)
 	}
 }
 
