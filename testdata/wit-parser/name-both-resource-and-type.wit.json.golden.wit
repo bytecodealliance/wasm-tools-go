@@ -7,7 +7,6 @@ interface foo {
 	type t3 = borrow<t1>;
 }
 
-
 package some:dep {
 	interface foo {
 		resource a;

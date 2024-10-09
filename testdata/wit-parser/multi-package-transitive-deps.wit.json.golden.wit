@@ -5,7 +5,6 @@ world w-bar {
 	import foo:dep1/types;
 }
 
-
 package foo:dep1 {
 	interface types {
 		use foo:dep2/types.{a};

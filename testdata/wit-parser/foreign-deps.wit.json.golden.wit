@@ -2,7 +2,6 @@ package foo:another-pkg;
 
 interface other-interface {}
 
-
 package foo:corp {
 	interface saas {}
 }

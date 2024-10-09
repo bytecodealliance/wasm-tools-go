@@ -11,7 +11,6 @@ world w2 {
 	}
 }
 
-
 package foo:name {
 	interface i1 {
 		type a = u32;
