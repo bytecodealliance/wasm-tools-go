@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - Go [type aliases](https://go.dev/ref/spec#Alias_declarations) are now generated for each WIT type alias (`type foo = bar`). Deep chains of type aliases (`type b = a; type c = b;`) are fully supported. Generated documentation now reflects whether a type is an alias. Fixes [#204](https://github.com/bytecodealliance/wasm-tools-go/issues/204).
 - `go:wasmimport` and `go:wasmexport` functions are now generated in a separate `.wasm.go` file. This helps enable testing or use of generated packages outside of WebAssembly.
+- `wit-bindgen-go generate` now generates a WIT file for each WIT world in its corresponding Go package directory. For example the `wasi:http/proxy` world would generate `wasi/http/proxy/proxy.wit`.
 - `wit-bindgen-go wit` now accepts a `--world` argument in the form of `imports`, `wasi:clocks/imports`, or `wasi:clocks/imports@0.2.0`. This filters the serialized WIT to a specific world and interfaces it references. This can be used to generate focused WIT for a specific world with a minimal set of dependencies.
 
 ### Changed
