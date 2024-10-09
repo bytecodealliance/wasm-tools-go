@@ -31,7 +31,7 @@ const (
 
 	// Create Go type aliases for WIT type aliases.
 	// This has issues with types that are simultaenously imported and exported in WIT.
-	experimentCreateTypeAliases = false
+	experimentCreateTypeAliases = true
 
 	// Predeclare Go types for own<T> and borrow<T>.
 	// Currently broken.
