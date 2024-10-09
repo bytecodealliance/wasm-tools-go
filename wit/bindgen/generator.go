@@ -205,7 +205,7 @@ func (g *generator) define(dir wit.Direction, v wit.Node) (defined bool) {
 func (g *generator) defineWorlds() error {
 	// fmt.Fprintf(os.Stderr, "Generating Go for %d world(s)\n", len(g.res.Worlds))
 	for i, w := range g.res.Worlds {
-		if matchWorld(w, g.opts.world) || (g.opts.world == "" && i == len(g.res.Worlds)-1) {
+		if w.Match(g.opts.world) || (g.opts.world == "" && i == len(g.res.Worlds)-1) {
 			err := g.defineWorld(w)
 			if err != nil {
 				return err
@@ -213,19 +213,6 @@ func (g *generator) defineWorlds() error {
 		}
 	}
 	return nil
-}
-
-func matchWorld(w *wit.World, name string) bool {
-	if name == w.Name {
-		return true
-	}
-	id := w.Package.Name
-	id.Extension = w.Name
-	if name == id.String() {
-		return true
-	}
-	id.Version = nil
-	return name == id.String()
 }
 
 func (g *generator) defineWorld(w *wit.World) error {
