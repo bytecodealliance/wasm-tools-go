@@ -221,8 +221,19 @@ func (t *TypeDef) TypeName() string {
 	return ""
 }
 
-// Root returns the root [TypeDef] of [type alias] t.
-// If t is not a type alias, Root returns t.
+// TypeDef returns the parent [TypeDef] of [TypeDef] t.
+// If t is not a [type alias], TypeDef returns t.
+//
+// [type alias]: https://component-model.bytecodealliance.org/design/wit.html#type-aliases
+func (t *TypeDef) TypeDef() *TypeDef {
+	if t, ok := t.Kind.(*TypeDef); ok {
+		return t
+	}
+	return t
+}
+
+// Root returns the root [TypeDef] of [TypeDef] t.
+// If t is not a [type alias], Root returns t.
 //
 // [type alias]: https://component-model.bytecodealliance.org/design/wit.html#type-aliases
 func (t *TypeDef) Root() *TypeDef {

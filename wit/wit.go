@@ -347,8 +347,10 @@ func (i *Interface) WIT(ctx Node, name string) string {
 
 // WITKind returns the [WIT] kind.
 func (t *TypeDef) WITKind() string {
-	// TODO: should this be prefixed with "alias" if t.Root() != t?
-	return t.Root().Kind.WITKind()
+	if alias := t.TypeDef(); alias != t {
+		return "type alias"
+	}
+	return t.Kind.WITKind()
 }
 
 // WIT returns the [WIT] text format for [TypeDef] t.
