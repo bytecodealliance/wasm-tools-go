@@ -59,13 +59,20 @@ func (r *Resolve) WIT(ctx Node, _ string) string {
 		return strings.Compare(a.Name.String(), b.Name.String())
 	})
 	var b strings.Builder
+	var hasContent bool
 	for i, p := range packages {
-		if i == 0 {
-			// Write first package with implied name, which renders package WIT without nested braces.
-			b.WriteString(p.WIT(ctx, ""))
-		} else {
-			b.WriteString("\n\n")
-			b.WriteString(p.WIT(ctx, p.Name.WIT(p, "")))
+		var name string
+		if i != 0 {
+			// Write subsequent packages with explicit name, which renders the package WIT with nested braces.
+			name = p.Name.WIT(p, "")
+		}
+		wit := p.WIT(ctx, name)
+		if wit != "" {
+			if hasContent {
+				b.WriteString("\n")
+			}
+			hasContent = true
+			b.WriteString(wit)
 		}
 	}
 	return b.String()
@@ -1036,49 +1043,55 @@ func (*Package) WITKind() string { return "package" }
 //
 // [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
 func (p *Package) WIT(ctx Node, name string) string {
+	var filter *World
+	if w, ok := ctx.(*World); ok {
+		filter = w
+	}
 	multi := name != ""
 	var b strings.Builder
 	b.WriteString(p.Docs.WIT(ctx, ""))
 	b.WriteString("package ")
 	b.WriteString(p.Name.WIT(p, ""))
 	if multi {
-		b.WriteString(" {\n")
+		b.WriteString(" {")
 	} else {
-		b.WriteString(";\n\n")
+		b.WriteString(";\n")
 	}
 	i := 0
-	if p.Interfaces.Len() > 0 {
-		p.Interfaces.All()(func(name string, face *Interface) bool {
-			if i > 0 {
-				b.WriteRune('\n')
-			}
-			if multi {
-				b.WriteString(indent(face.WIT(p, name)))
-			} else {
-				b.WriteString(face.WIT(p, name))
-			}
-			b.WriteRune('\n')
-			i++
+	p.Interfaces.All()(func(name string, face *Interface) bool {
+		if filter != nil && !filter.HasInterface(face) {
 			return true
-		})
-	}
-	if p.Worlds.Len() > 0 {
-		p.Worlds.All()(func(name string, w *World) bool {
-			if i > 0 {
-				b.WriteRune('\n')
-			}
-			if multi {
-				b.WriteString(indent(w.WIT(p, name)))
-			} else {
-				b.WriteString(w.WIT(p, name))
-			}
-			b.WriteRune('\n')
-			i++
+		}
+		b.WriteRune('\n')
+		if multi {
+			b.WriteString(indent(face.WIT(p, name)))
+		} else {
+			b.WriteString(face.WIT(p, name))
+		}
+		b.WriteRune('\n')
+		i++
+		return true
+	})
+	p.Worlds.All()(func(name string, w *World) bool {
+		if filter != nil && w != filter {
 			return true
-		})
-	}
+		}
+		b.WriteRune('\n')
+		if multi {
+			b.WriteString(indent(w.WIT(p, name)))
+		} else {
+			b.WriteString(w.WIT(p, name))
+		}
+		b.WriteRune('\n')
+		i++
+		return true
+	})
 	if multi {
-		b.WriteRune('}')
+		b.WriteString("}\n")
+	}
+	// Return empty string in multi-package mode if package has no contents
+	if multi && i == 0 {
+		return ""
 	}
 	return b.String()
 }
