@@ -9,7 +9,7 @@ type Package struct {
 	// Name is the short Go package name, e.g. "json"
 	Name string
 
-	// Files is the list of Go source files in this package.
+	// Files is the list of Go and non-Go files in this package.
 	Files map[string]*File
 
 	// Declared tracks declared package-scoped identifiers,
