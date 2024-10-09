@@ -170,7 +170,7 @@ func validateGeneratedGo(t *testing.T, res *wit.Resolve, origin string) {
 		}
 
 		// Verify number of files
-		count := len(goPkg.OtherFiles)
+		count := len(goPkg.OtherFiles) + len(goPkg.IgnoredFiles)
 		// t.Logf("Go package: %s %t", goPkg.PkgPath, goPkg.Types.Complete())
 		for _, f := range goPkg.GoFiles {
 			count++
@@ -180,9 +180,9 @@ func validateGeneratedGo(t *testing.T, res *wit.Resolve, origin string) {
 				t.Errorf("unknown file in package %s: %s", pkg.Path, base)
 			}
 		}
-		if count < len(pkg.Files) {
-			t.Errorf("%d files in package %s; expected %d:\n%s", count, pkg.Path, len(pkg.Files),
-				strings.Join(append(goPkg.GoFiles, goPkg.OtherFiles...), "\n"))
+		if count > len(pkg.Files) {
+			t.Errorf("%d files in package %s (expected %d):\n%s", count, pkg.Path, len(pkg.Files),
+				strings.Join(append(append(goPkg.GoFiles, goPkg.OtherFiles...), goPkg.IgnoredFiles...), "\n"))
 		}
 
 		// Verify generated names
