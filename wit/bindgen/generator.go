@@ -354,25 +354,19 @@ func (g *generator) defineTypeDef(dir wit.Direction, t *wit.TypeDef, name string
 		return err
 	}
 
-	// If an alias, get root
-	root := t.Root()
-	rootName := name
-	if root.Name != nil {
-		rootName = *root.Name
-	}
-
 	// Define the type
 	var b bytes.Buffer
 	stringio.Write(&b, "// ", decl.name, " represents the ")
 	if wit.HasResource(t) {
 		stringio.Write(&b, dir.String(), " ")
 	}
-	stringio.Write(&b, root.WITKind(), " \"", g.moduleNames[root.Owner], "#", rootName, "\".\n")
+	stringio.Write(&b, t.WITKind(), " \"", g.moduleNames[t.Owner], "#", name, "\".\n")
 	b.WriteString("//\n")
-	if root != t {
+	parent := t.TypeDef()
+	if parent != t {
 		// Type alias
-		stringio.Write(&b, "// See [", g.typeRep(decl.file, dir, root), "] for more information.\n")
-		stringio.Write(&b, "type ", decl.name, " = ", g.typeRep(decl.file, dir, root), "\n\n")
+		stringio.Write(&b, "// See [", g.typeRep(decl.file, dir, parent), "] for more information.\n")
+		stringio.Write(&b, "type ", decl.name, " = ", g.typeRep(decl.file, dir, parent), "\n\n")
 	} else {
 		b.WriteString(formatDocComments(t.Docs.Contents, false))
 		b.WriteString("//\n")
@@ -395,7 +389,7 @@ func (g *generator) defineTypeDef(dir wit.Direction, t *wit.TypeDef, name string
 		xfile := g.exportsFileFor(t.Owner)
 		scope := g.exportScopes[t.Owner]
 		goName := scope.GetName(GoName(*t.Name, true))
-		stringio.Write(xfile, "\n// ", goName, " represents the caller-defined exports for ", root.WITKind(), " \"", g.moduleNames[root.Owner], "#", rootName, "\".\n")
+		stringio.Write(xfile, "\n// ", goName, " represents the caller-defined exports for ", t.WITKind(), " \"", g.moduleNames[t.Owner], "#", name, "\".\n")
 		stringio.Write(xfile, goName, " struct {")
 	}
 
