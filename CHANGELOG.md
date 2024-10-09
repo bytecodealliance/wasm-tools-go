@@ -6,12 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 
-- CLI: `wit-bindgen-go wit` now accepts a `--world` argument in the form of `imports`, `wasi:clocks/imports`, or `wasi:clocks/imports@0.2.0`. This filters the serialized WIT to a specific world and interfaces it references. This can be used to generate focused WIT for a specific world with a minimal set of dependencies.
-- `wit.(*Resolve).WIT()` and `wit.(*Package).WIT()` now accept a `*wit.World` as context to filter serialized WIT to a specific world.
+- Go [type aliases](https://go.dev/ref/spec#Alias_declarations) are now generated for each WIT type alias (`type foo = bar`). Deep chains of type aliases (`type b = a; type c = b;`) are fully supported. Generated documentation now reflects whether a type is an alias. Fixes [#204](https://github.com/bytecodealliance/wasm-tools-go/issues/204).
+- `wit-bindgen-go wit` now accepts a `--world` argument in the form of `imports`, `wasi:clocks/imports`, or `wasi:clocks/imports@0.2.0`. This filters the serialized WIT to a specific world and interfaces it references. This can be used to generate focused WIT for a specific world with a minimal set of dependencies.
 
 ### Changed
 
 - Method `wit.(*Package).WIT()` now interprets the non-empty string `name` argument as signal to render in single-file, multi-package braced form.
+- `wit.(*Resolve).WIT()` and `wit.(*Package).WIT()` now accept a `*wit.World` as context to filter serialized WIT to a specific world.
 
 ## [v0.2.4] — 2024-10-06
 
