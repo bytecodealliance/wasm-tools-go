@@ -1,0 +1,169 @@
+{
+  "worlds": [
+    {
+      "name": "w",
+      "imports": {
+        "interface-0": {
+          "interface": {
+            "id": 0
+          }
+        }
+      },
+      "exports": {
+        "interface-0": {
+          "interface": {
+            "id": 0
+          }
+        }
+      },
+      "package": 0
+    }
+  ],
+  "interfaces": [
+    {
+      "name": "i",
+      "types": {
+        "r": 0,
+        "a": 1,
+        "b": 2,
+        "c": 3
+      },
+      "functions": {
+        "[method]r.m": {
+          "name": "[method]r.m",
+          "kind": {
+            "method": 0
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 4
+            }
+          ],
+          "results": [
+            {
+              "type": "u32"
+            }
+          ]
+        },
+        "fa": {
+          "name": "fa",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "v",
+              "type": 5
+            }
+          ],
+          "results": []
+        },
+        "fb": {
+          "name": "fb",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "v",
+              "type": 6
+            }
+          ],
+          "results": []
+        },
+        "fc": {
+          "name": "fc",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "v",
+              "type": 7
+            }
+          ],
+          "results": []
+        }
+      },
+      "package": 0
+    }
+  ],
+  "types": [
+    {
+      "name": "r",
+      "kind": "resource",
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": "a",
+      "kind": {
+        "type": 0
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": "b",
+      "kind": {
+        "type": 1
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": "c",
+      "kind": {
+        "type": 2
+      },
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "borrow": 0
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "own": 1
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "own": 2
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "own": 3
+        }
+      },
+      "owner": null
+    }
+  ],
+  "packages": [
+    {
+      "name": "example:aliases",
+      "interfaces": {
+        "i": 0
+      },
+      "worlds": {
+        "w": 0
+      }
+    }
+  ]
+}
