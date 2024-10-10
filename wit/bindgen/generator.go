@@ -1528,6 +1528,7 @@ func (g *generator) goParams(scope gen.Scope, dir wit.Direction, params []wit.Pa
 
 func (g *generator) declareFunction(owner wit.TypeOwner, dir wit.Direction, f *wit.Function) (*funcDecl, error) {
 	file := g.fileFor(owner)
+	wasmFile := g.wasmFileFor(owner)
 	var scope gen.Scope = file
 	wasm := f.CoreFunction(dir)
 	tdir := dir
@@ -1575,7 +1576,7 @@ func (g *generator) declareFunction(owner wit.TypeOwner, dir wit.Direction, f *w
 	case *wit.Freestanding:
 		baseName := GoName(f.BaseName(), true)
 		funcName = declareDirectedName(scope, dir, baseName)
-		wasmName = file.DeclareName(goPrefix + baseName)
+		wasmName = wasmFile.DeclareName(goPrefix + baseName)
 
 	case *wit.Constructor:
 		t := f.Type().(*wit.TypeDef)
@@ -1585,7 +1586,7 @@ func (g *generator) declareFunction(owner wit.TypeOwner, dir wit.Direction, f *w
 			baseName = GoName(f.BaseName(), true)
 		}
 		funcName = declareDirectedName(scope, dir, baseName)
-		wasmName = file.DeclareName(goPrefix + baseName)
+		wasmName = wasmFile.DeclareName(goPrefix + baseName)
 
 	case *wit.Static:
 		t := f.Type().(*wit.TypeDef)
@@ -1595,7 +1596,7 @@ func (g *generator) declareFunction(owner wit.TypeOwner, dir wit.Direction, f *w
 			baseName = GoName(f.BaseName(), true)
 		}
 		funcName = declareDirectedName(scope, dir, baseName)
-		wasmName = file.DeclareName(goPrefix + baseName)
+		wasmName = wasmFile.DeclareName(goPrefix + baseName)
 
 	case *wit.Method:
 		t := f.Type().(*wit.TypeDef)
@@ -1609,14 +1610,11 @@ func (g *generator) declareFunction(owner wit.TypeOwner, dir wit.Direction, f *w
 			if wasm.IsMethod() {
 				wasmName = td.scope.DeclareName(goPrefix + funcName)
 			} else {
-				wasmName = file.DeclareName(goPrefix + td.name + funcName)
+				wasmName = wasmFile.DeclareName(goPrefix + td.name + funcName)
 			}
 		case wit.Exported:
-			// baseName := td.name + GoName(f.BaseName(), true)
-			// funcName = g.declareDirectedName(file, dir, baseName)
-			// wasmName = file.DeclareName(pfx + baseName)
 			funcName = td.scope.DeclareName(GoName(f.BaseName(), true))
-			wasmName = file.DeclareName(goPrefix + GoName(*t.Name, true) + GoName(f.BaseName(), true))
+			wasmName = wasmFile.DeclareName(goPrefix + GoName(*t.Name, true) + GoName(f.BaseName(), true))
 		}
 	}
 
@@ -1625,7 +1623,7 @@ func (g *generator) declareFunction(owner wit.TypeOwner, dir wit.Direction, f *w
 		dir:        dir,
 		f:          f,
 		goFunc:     g.goFunction(file, tdir, dir, f, funcName),
-		wasmFunc:   g.goFunction(file, tdir, dir, wasm, wasmName),
+		wasmFunc:   g.goFunction(wasmFile, tdir, dir, wasm, wasmName),
 		linkerName: linkerName,
 	}
 	g.functions[dir][f] = fdecl
@@ -1807,8 +1805,8 @@ func (g *generator) defineImportedFunction(decl *funcDecl) error {
 	}
 	b.WriteString("}\n\n")
 
-	// Emit wasmimport function
-	wasmFile := g.wasmFileFor(decl.owner)
+	// Emit wasmimport function in wasm file
+	wasmFile := decl.wasmFunc.file
 
 	stringio.Write(wasmFile, "//go:wasmimport ", decl.linkerName, "\n")
 	wasmFile.WriteString("//go:noescape\n")
@@ -1890,9 +1888,9 @@ func (g *generator) defineExportedFunction(decl *funcDecl) error {
 		stringio.Write(xfile, decl.goFunc.name, " func", g.functionSignature(xfile, decl.goFunc), "\n")
 	}
 
-	wasmFile := g.wasmFileFor(decl.owner)
+	// Emit wasmexport function in wasm file
+	wasmFile := decl.wasmFunc.file
 
-	// Emit wasmexport function
 	stringio.Write(wasmFile, "//go:wasmexport ", decl.linkerName, "\n")
 	stringio.Write(wasmFile, "//export ", decl.linkerName, "\n") // TODO: remove this once TinyGo supports go:wasmexport.
 	stringio.Write(wasmFile, "func ", decl.wasmFunc.name, g.functionSignature(wasmFile, decl.wasmFunc))
