@@ -107,6 +107,7 @@ func validateGeneratedGo(t *testing.T, res *wit.Resolve, origin string) {
 	pkgs, err := Go(res,
 		GeneratedBy("test"),
 		PackageRoot(pkgPath),
+		Versioned(true),
 	)
 	if err != nil {
 		t.Error(err)
