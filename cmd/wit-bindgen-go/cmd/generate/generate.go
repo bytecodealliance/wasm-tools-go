@@ -10,6 +10,7 @@ import (
 	"github.com/bytecodealliance/wasm-tools-go/internal/codec"
 	"github.com/bytecodealliance/wasm-tools-go/internal/go/gen"
 	"github.com/bytecodealliance/wasm-tools-go/internal/witcli"
+	"github.com/bytecodealliance/wasm-tools-go/wit"
 	"github.com/bytecodealliance/wasm-tools-go/wit/bindgen"
 	"github.com/urfave/cli/v3"
 )
@@ -99,7 +100,11 @@ func action(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
-	return writeGoPackages(packages, cfg)
+	if err := writeGoPackages(packages, cfg); err != nil {
+		return err
+	}
+
+	return writeWITPackage(res, cfg)
 }
 
 func parseFlags(cmd *cli.Command) (*config, error) {
@@ -186,6 +191,24 @@ func writeGoPackages(packages []*gen.Package, cfg *config) error {
 				return err
 			}
 		}
+	}
+	return nil
+}
+
+func writeWITPackage(res *wit.Resolve, cfg *config) error {
+	if cfg.dryRun {
+		return nil
+	}
+	witDir := filepath.Join(cfg.out, "wit")
+	if err := os.MkdirAll(witDir, cfg.outPerm); err != nil {
+		return err
+	}
+	witFilePath := filepath.Join(witDir, "webassembly.wit")
+	fmt.Fprintf(os.Stderr, "Generated WIT files to: %s\n", witFilePath)
+
+	wit := res.WIT(nil, "")
+	if err := os.WriteFile(witFilePath, []byte(wit), cfg.outPerm); err != nil {
+		return err
 	}
 	return nil
 }
