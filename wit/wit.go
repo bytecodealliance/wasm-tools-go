@@ -424,10 +424,6 @@ func (t *TypeDef) WIT(ctx Node, name string) string {
 	return t.Kind.WIT(ctx, name)
 }
 
-func functionCompare(a, b *Function) int {
-	return strings.Compare(a.Name, b.Name)
-}
-
 func escape(name string) string {
 	if witKeywords[name] {
 		return "%" + name

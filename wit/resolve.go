@@ -1,7 +1,6 @@
 package wit
 
 import (
-	"cmp"
 	"fmt"
 	"slices"
 	"strconv"
@@ -271,9 +270,7 @@ func (t *TypeDef) StaticFunctions() []*Function {
 		}
 		return true
 	})
-	slices.SortFunc(statics, func(a, b *Function) int {
-		return cmp.Compare(a.Name, b.Name)
-	})
+	slices.SortFunc(statics, functionCompare)
 	return statics
 }
 
@@ -287,10 +284,12 @@ func (t *TypeDef) Methods() []*Function {
 		}
 		return true
 	})
-	slices.SortFunc(methods, func(a, b *Function) int {
-		return cmp.Compare(a.Name, b.Name)
-	})
+	slices.SortFunc(methods, functionCompare)
 	return methods
+}
+
+func functionCompare(a, b *Function) int {
+	return strings.Compare(a.Name, b.Name)
 }
 
 // Size returns the byte size for values of type t.
