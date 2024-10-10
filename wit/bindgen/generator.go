@@ -812,9 +812,11 @@ func (g *generator) variantRep(file *gen.File, dir wit.Direction, v *wit.Variant
 	shape := variantShape(v.Types())
 	align := variantAlign(v.Types())
 
-	typeShape := g.typeShape(file, dir, shape)
+	var typeShape string
 	if len(v.Types()) == 1 {
 		typeShape = g.typeRep(file, dir, shape)
+	} else {
+		typeShape = g.typeShape(file, dir, shape)
 	}
 
 	scope := gen.NewScope(file)
@@ -880,10 +882,12 @@ func (g *generator) variantRep(file *gen.File, dir wit.Direction, v *wit.Variant
 }
 
 func (g *generator) resultRep(file *gen.File, dir wit.Direction, r *wit.Result) string {
+	var typeShape string
 	shape := variantShape(r.Types())
-	typeShape := g.typeShape(file, dir, shape)
 	if len(r.Types()) == 1 {
 		typeShape = g.typeRep(file, dir, shape)
+	} else {
+		typeShape = g.typeShape(file, dir, shape)
 	}
 
 	// Emit type
@@ -936,7 +940,7 @@ func (g *generator) typeShape(file *gen.File, dir wit.Direction, t wit.Type) str
 
 	switch t := t.(type) {
 	case *wit.TypeDef:
-		t = t.Root()
+		// t = t.Root()
 		return g.typeDefShape(file, dir, t)
 	default:
 		return g.typeRep(file, dir, t)
