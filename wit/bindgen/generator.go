@@ -224,17 +224,20 @@ func (g *generator) defineWorld(w *wit.World) error {
 	if err != nil {
 		return err
 	}
-	file := g.fileFor(w)
 
-	{
-		var b strings.Builder
-		stringio.Write(&b, "Package ", pkg.Name, " represents the ", w.WITKind(), " \"", g.moduleNames[w], "\".\n")
-		if w.Docs.Contents != "" {
-			b.WriteString("\n")
-			b.WriteString(w.Docs.Contents)
-		}
-		file.PackageDocs = b.String()
+	// Write WIT file for this world
+	witFile := g.witFileFor(w)
+	witFile.WriteString(g.res.WIT(w, ""))
+
+	// Write Go package docs
+	file := g.fileFor(w)
+	var b strings.Builder
+	stringio.Write(&b, "Package ", pkg.Name, " represents the ", w.WITKind(), " \"", g.moduleNames[w], "\".\n")
+	if w.Docs.Contents != "" {
+		b.WriteString("\n")
+		b.WriteString(w.Docs.Contents)
 	}
+	file.PackageDocs = b.String()
 
 	w.Imports.All()(func(name string, v wit.WorldItem) bool {
 		switch v := v.(type) {
@@ -2163,6 +2166,12 @@ func (g *generator) fileFor(owner wit.TypeOwner) *gen.File {
 	pkg := g.packageFor(owner)
 	file := pkg.File(path.Base(pkg.Path) + ".wit.go")
 	file.GeneratedBy = g.opts.generatedBy
+	return file
+}
+
+func (g *generator) witFileFor(owner wit.TypeOwner) *gen.File {
+	pkg := g.packageFor(owner)
+	file := pkg.File(path.Base(pkg.Path) + ".wit")
 	return file
 }
 
