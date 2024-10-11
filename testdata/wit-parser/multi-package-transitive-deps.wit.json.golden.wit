@@ -1,20 +1,20 @@
-package foo:qux;
+package foo:bar;
 
-world w-qux {
+world w-bar {
 	import foo:dep2/types;
-}
-
-package foo:bar {
-	world w-bar {
-		import foo:dep2/types;
-		import foo:dep1/types;
-	}
+	import foo:dep1/types;
 }
 
 package foo:dep1 {
 	interface types {
 		use foo:dep2/types.{a};
 		record r { f: u8 }
+	}
+}
+
+package foo:qux {
+	world w-qux {
+		import foo:dep2/types;
 	}
 }
 

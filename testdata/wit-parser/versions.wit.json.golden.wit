@@ -5,13 +5,13 @@ interface foo {
 	use a:a/foo@2.0.0.{t as t2};
 }
 
-package a:a@2.0.0 {
+package a:a@1.0.0 {
 	interface foo {
 		type t = u32;
 	}
 }
 
-package a:a@1.0.0 {
+package a:a@2.0.0 {
 	interface foo {
 		type t = u32;
 	}
