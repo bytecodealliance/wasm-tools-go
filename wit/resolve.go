@@ -259,13 +259,6 @@ type TypeDef struct {
 	Docs      Docs
 }
 
-func (t *TypeDef) dependsOn(pkg *Package) bool {
-	if t.Owner != nil && t.Owner.WITPackage() == pkg {
-		return true
-	}
-	return DependsOn(t.Kind, pkg)
-}
-
 // TypeName returns the [WIT] type name for t.
 // Returns an empty string if t is anonymous.
 //
@@ -366,6 +359,13 @@ func (t *TypeDef) Flat() []Type {
 	return t.Kind.Flat()
 }
 
+func (t *TypeDef) dependsOn(pkg *Package) bool {
+	if t.Owner != nil && t.Owner.WITPackage() == pkg {
+		return true
+	}
+	return DependsOn(t.Kind, pkg)
+}
+
 func (t *TypeDef) hasPointer() bool  { return HasPointer(t.Kind) }
 func (t *TypeDef) hasBorrow() bool   { return HasBorrow(t.Kind) }
 func (t *TypeDef) hasResource() bool { return HasResource(t.Kind) }
@@ -425,11 +425,9 @@ func (*Pointer) Align() uintptr { return 4 }
 func (p *Pointer) Flat() []Type { return []Type{PointerTo(p.Type)} }
 
 func (p *Pointer) dependsOn(pkg *Package) bool { return DependsOn(p.Type, pkg) }
-
-// hasPointer always returns true.
-func (*Pointer) hasPointer() bool    { return true }
-func (p *Pointer) hasBorrow() bool   { return HasBorrow(p.Type) }
-func (p *Pointer) hasResource() bool { return HasResource(p.Type) }
+func (*Pointer) hasPointer() bool              { return true }
+func (p *Pointer) hasBorrow() bool             { return HasBorrow(p.Type) }
+func (p *Pointer) hasResource() bool           { return HasResource(p.Type) }
 
 // Record represents a WIT [record type], akin to a struct.
 // It implements the [Node], [ABI], and [TypeDefKind] interfaces.
@@ -1072,9 +1070,10 @@ func (*List) Align() uintptr { return 8 } // [2]int32
 // [flattened]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
 func (l *List) Flat() []Type { return []Type{PointerTo(l.Type), U32{}} }
 
-func (*List) hasPointer() bool    { return true }
-func (l *List) hasBorrow() bool   { return HasBorrow(l.Type) }
-func (l *List) hasResource() bool { return HasResource(l.Type) }
+func (l *List) dependsOn(p *Package) bool { return DependsOn(l.Type, p) }
+func (*List) hasPointer() bool            { return true }
+func (l *List) hasBorrow() bool           { return HasBorrow(l.Type) }
+func (l *List) hasResource() bool         { return HasResource(l.Type) }
 
 // Future represents a WIT [future type], expected to be part of [WASI Preview 3].
 // It implements the [Node], [ABI], and [TypeDefKind] interfaces.
@@ -1104,9 +1103,10 @@ func (*Future) Align() uintptr { return 0 }
 // [flattened]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
 func (*Future) Flat() []Type { return nil }
 
-func (f *Future) hasPointer() bool  { return HasPointer(f.Type) }
-func (f *Future) hasBorrow() bool   { return HasBorrow(f.Type) }
-func (f *Future) hasResource() bool { return HasResource(f.Type) }
+func (f *Future) dependsOn(p *Package) bool { return DependsOn(f.Type, p) }
+func (f *Future) hasPointer() bool          { return HasPointer(f.Type) }
+func (f *Future) hasBorrow() bool           { return HasBorrow(f.Type) }
+func (f *Future) hasResource() bool         { return HasResource(f.Type) }
 
 // Stream represents a WIT [stream type], expected to be part of [WASI Preview 3].
 // It implements the [Node], [ABI], and [TypeDefKind] interfaces.
@@ -1137,9 +1137,10 @@ func (*Stream) Align() uintptr { return 0 }
 // [flattened]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
 func (*Stream) Flat() []Type { return nil }
 
-func (s *Stream) hasPointer() bool  { return HasPointer(s.Element) || HasPointer(s.End) }
-func (s *Stream) hasBorrow() bool   { return HasBorrow(s.Element) || HasBorrow(s.End) }
-func (s *Stream) hasResource() bool { return HasResource(s.Element) || HasResource(s.End) }
+func (s *Stream) dependsOn(p *Package) bool { return DependsOn(s.Element, p) || DependsOn(s.End, p) }
+func (s *Stream) hasPointer() bool          { return HasPointer(s.Element) || HasPointer(s.End) }
+func (s *Stream) hasBorrow() bool           { return HasBorrow(s.Element) || HasBorrow(s.End) }
+func (s *Stream) hasResource() bool         { return HasResource(s.Element) || HasResource(s.End) }
 
 // TypeOwner is the interface implemented by any type that can own a TypeDef,
 // currently [World] and [Interface].
