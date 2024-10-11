@@ -66,7 +66,7 @@ func (w *World) dependsOn(pkg *Package) bool {
 		return true
 	}
 	var done bool
-	w.AllImportsAndExports()(func(_ string, i WorldItem) bool {
+	w.AllItems()(func(_ string, i WorldItem) bool {
 		done = DependsOn(i, pkg)
 		return !done
 	})
@@ -109,7 +109,7 @@ func (w *World) HasInterface(i *Interface) bool {
 // [sequence]: https://github.com/golang/go/issues/61897
 func (w *World) AllInterfaces() iterate.Seq2[string, *Interface] {
 	return func(yield func(string, *Interface) bool) {
-		w.AllImportsAndExports()(func(name string, i WorldItem) bool {
+		w.AllItems()(func(name string, i WorldItem) bool {
 			if ref, ok := i.(*InterfaceRef); ok {
 				return yield(name, ref.Interface)
 			}
@@ -124,7 +124,7 @@ func (w *World) AllInterfaces() iterate.Seq2[string, *Interface] {
 // [sequence]: https://github.com/golang/go/issues/61897
 func (w *World) AllTypeDefs() iterate.Seq2[string, *TypeDef] {
 	return func(yield func(string, *TypeDef) bool) {
-		w.AllImportsAndExports()(func(name string, i WorldItem) bool {
+		w.AllItems()(func(name string, i WorldItem) bool {
 			if t, ok := i.(*TypeDef); ok {
 				return yield(name, t)
 			}
@@ -139,7 +139,7 @@ func (w *World) AllTypeDefs() iterate.Seq2[string, *TypeDef] {
 // [sequence]: https://github.com/golang/go/issues/61897
 func (w *World) AllFunctions() iterate.Seq[*Function] {
 	return func(yield func(*Function) bool) {
-		w.AllImportsAndExports()(func(_ string, i WorldItem) bool {
+		w.AllItems()(func(_ string, i WorldItem) bool {
 			if f, ok := i.(*Function); ok {
 				return yield(f)
 			}
@@ -148,11 +148,11 @@ func (w *World) AllFunctions() iterate.Seq[*Function] {
 	}
 }
 
-// AllImportsAndExports returns a [sequence] that yields each [WorldItem] in a [World].
+// AllItems returns a [sequence] that yields each [WorldItem] in a [World].
 // The sequence stops if yield returns false.
 //
 // [sequence]: https://github.com/golang/go/issues/61897
-func (w *World) AllImportsAndExports() iterate.Seq2[string, WorldItem] {
+func (w *World) AllItems() iterate.Seq2[string, WorldItem] {
 	return func(yield func(string, WorldItem) bool) {
 		var done bool
 		yield = iterate.Done2(iterate.Once2(yield), func() { done = true })
