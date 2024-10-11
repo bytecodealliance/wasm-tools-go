@@ -26,7 +26,7 @@ func LoadWIT(ctx context.Context, forceWIT bool, path string) (*wit.Resolve, err
 			return wit.ParseWIT(bytes)
 		}
 	}
-	if forceWIT || !strings.HasSuffix(path, ".json") {
+	if forceWIT || (path != "" && path != "-" && !strings.HasSuffix(path, ".json")) {
 		return wit.LoadWIT(path)
 	}
 	return wit.LoadJSON(path)
