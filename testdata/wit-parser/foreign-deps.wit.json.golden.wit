@@ -1,57 +1,49 @@
-package foo:another-pkg;
+package foo:root;
 
-interface other-interface {}
-
-package foo:corp {
-	interface saas {}
+interface foo {
+	use foo:wasi/clocks.{timestamp};
+	use foo:wasi/filesystem.{stat};
 }
 
-package foo:different-pkg {
-	interface i {}
+interface bar {
+	use foo:some-pkg/the-default.{from-default};
+	use foo:some-pkg/some-interface.{another-type};
+	use foo:some-pkg/another-interface.{yet-another-type};
 }
 
-package foo:foreign-pkg {
-	interface the-default {
-		type some-type = u32;
-	}
+interface use1 {
+	use foo:foreign-pkg/the-default.{some-type};
 }
 
-package foo:root {
-	interface foo {
-		use foo:wasi/clocks.{timestamp};
-		use foo:wasi/filesystem.{stat};
+interface use2 {
+	use foo:foreign-pkg/the-default.{some-type};
+}
+
+world my-world {
+	import foo:wasi/filesystem;
+	import foo:wasi/clocks;
+	export foo:corp/saas;
+}
+
+world my-world2 {
+	import foo:wasi/filesystem;
+	import foo:wasi/clocks;
+	export foo;
+	export foo:corp/saas;
+}
+
+world bars-world {
+	import foo:some-pkg/the-default;
+	import foo:another-pkg/other-interface;
+}
+
+package foo:wasi {
+	interface clocks {
+		type timestamp = u64;
 	}
 
-	interface bar {
-		use foo:some-pkg/the-default.{from-default};
-		use foo:some-pkg/some-interface.{another-type};
-		use foo:some-pkg/another-interface.{yet-another-type};
-	}
-
-	interface use1 {
-		use foo:foreign-pkg/the-default.{some-type};
-	}
-
-	interface use2 {
-		use foo:foreign-pkg/the-default.{some-type};
-	}
-
-	world my-world {
-		import foo:wasi/filesystem;
-		import foo:wasi/clocks;
-		export foo:corp/saas;
-	}
-
-	world my-world2 {
-		import foo:wasi/filesystem;
-		import foo:wasi/clocks;
-		export foo;
-		export foo:corp/saas;
-	}
-
-	world bars-world {
-		import foo:some-pkg/the-default;
-		import foo:another-pkg/other-interface;
+	interface filesystem {
+		record stat { ino: u64 }
 	}
 }
 
@@ -69,12 +61,20 @@ package foo:some-pkg {
 	}
 }
 
-package foo:wasi {
-	interface clocks {
-		type timestamp = u64;
+package foo:foreign-pkg {
+	interface the-default {
+		type some-type = u32;
 	}
+}
 
-	interface filesystem {
-		record stat { ino: u64 }
-	}
+package foo:different-pkg {
+	interface i {}
+}
+
+package foo:corp {
+	interface saas {}
+}
+
+package foo:another-pkg {
+	interface other-interface {}
 }

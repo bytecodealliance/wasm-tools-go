@@ -1,4 +1,4 @@
-package bar:name;
+package foo:name;
 
 interface i {
 	type a = u32;
@@ -11,7 +11,7 @@ world w {
 	}
 }
 
-package foo:name {
+package bar:name {
 	interface i {
 		type a = u32;
 	}
