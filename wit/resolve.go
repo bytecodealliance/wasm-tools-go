@@ -1583,6 +1583,9 @@ type Package struct {
 }
 
 func (p *Package) dependsOn(pkg *Package) bool {
+	if pkg == p {
+		return false
+	}
 	var done bool
 	p.Interfaces.All()(func(_ string, i *Interface) bool {
 		done = DependsOn(i, pkg)
@@ -1614,6 +1617,8 @@ func DependsOn(node Node, p *Package) bool {
 
 func comparePackages(a, b *Package) int {
 	switch {
+	case a == b:
+		return 0
 	case DependsOn(b, a):
 		return -1
 	case DependsOn(a, b):
