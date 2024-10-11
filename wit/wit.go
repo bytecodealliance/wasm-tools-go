@@ -54,13 +54,9 @@ func (*Resolve) WITKind() string { return "resolve" }
 //
 // [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
 func (r *Resolve) WIT(ctx Node, _ string) string {
-	packages := slices.Clone(r.Packages)
-
 	// Sort packages topologically by dependency
+	packages := slices.Clone(r.Packages)
 	slices.SortFunc(packages, comparePackages)
-
-	// Reverse, so least-dependent package is first
-	slices.Reverse(packages)
 
 	var b strings.Builder
 	var hasContent bool
