@@ -582,7 +582,8 @@ type Own struct {
 	Type *TypeDef
 }
 
-func (o *Own) hasResource() bool { return HasResource(o.Type) }
+func (o *Own) dependsOn(pkg *Package) bool { return DependsOn(o.Type, pkg) }
+func (o *Own) hasResource() bool           { return HasResource(o.Type) }
 
 // Borrow represents a WIT [borrowed handle].
 // It implements the [Handle], [Node], [ABI], and [TypeDefKind] interfaces.
@@ -593,8 +594,9 @@ type Borrow struct {
 	Type *TypeDef
 }
 
-func (b *Borrow) hasBorrow() bool   { return true }
-func (b *Borrow) hasResource() bool { return HasResource(b.Type) }
+func (b *Borrow) dependsOn(pkg *Package) bool { return DependsOn(b.Type, pkg) }
+func (b *Borrow) hasBorrow() bool             { return true }
+func (b *Borrow) hasResource() bool           { return HasResource(b.Type) }
 
 // Flags represents a WIT [flags type], stored as a bitfield.
 // It implements the [Node], [ABI], and [TypeDefKind] interfaces.
@@ -978,10 +980,6 @@ func (o *Option) Align() uintptr {
 // [flattened]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
 func (o *Option) Flat() []Type {
 	return o.Despecialize().Flat()
-}
-
-func (o *Option) dependsOn(pkg *Package) bool {
-	return DependsOn(o.Type, pkg)
 }
 
 // Result represents a WIT [result type], which is the result of a function call,
