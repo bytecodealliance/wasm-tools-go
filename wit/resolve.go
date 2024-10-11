@@ -1238,9 +1238,6 @@ type _primitive[T primitive] struct{ _type }
 // isPrimitive conforms to the [Primitive] interface.
 func (_primitive[T]) isPrimitive() {}
 
-// DependsOn always returns false.
-func (_primitive[T]) dependsOn(pkg *Package) bool { return false }
-
 // Size returns the byte size for values of this type.
 func (_primitive[T]) Size() uintptr {
 	var v T
