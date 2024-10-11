@@ -1630,10 +1630,13 @@ func comparePackages(a, b *Package) int {
 	case a == b:
 		return 0
 	case DependsOn(b, a):
-		return -1
-	case DependsOn(a, b):
+		// println(b.Name.String() + " depends on " + a.Name.String())
 		return 1
+	case DependsOn(a, b):
+		// println(a.Name.String() + " depends on " + b.Name.String())
+		return -1
 	}
+	// println(a.Name.String() + " does not depend on " + b.Name.String())
 	return strings.Compare(a.Name.String(), b.Name.String())
 }
 

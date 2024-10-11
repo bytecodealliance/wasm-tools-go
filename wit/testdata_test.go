@@ -15,7 +15,10 @@ import (
 	"github.com/sergi/go-diff/diffmatchpatch"
 )
 
-var update = flag.Bool("update", false, "update golden files")
+var (
+	update = flag.Bool("update", false, "update golden files")
+	debug  = flag.Bool("debug", false, "debug errors by writing files")
+)
 
 func compareOrWrite(t *testing.T, path, golden, data string) {
 	if *update {
@@ -105,6 +108,9 @@ func TestGoldenWITRoundTrip(t *testing.T) {
 			// Convert back to WIT.
 			data2 := res2.WIT(nil, "")
 			if string(data2) != data {
+				if *debug {
+					os.WriteFile(path+".fail.wit", []byte(data2), os.ModePerm)
+				}
 				dmp := diffmatchpatch.New()
 				dmp.PatchMargin = 3
 				diffs := dmp.DiffMain(data, data2, false)
