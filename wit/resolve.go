@@ -62,6 +62,9 @@ type World struct {
 }
 
 func (w *World) dependsOn(pkg *Package) bool {
+	if w.Package == pkg {
+		return true
+	}
 	var done bool
 	w.AllImportsAndExports()(func(_ string, i WorldItem) bool {
 		done = DependsOn(i, pkg)
@@ -208,6 +211,9 @@ type Interface struct {
 }
 
 func (i *Interface) dependsOn(pkg *Package) bool {
+	if i.Package == pkg {
+		return true
+	}
 	var done bool
 	i.TypeDefs.All()(func(_ string, t *TypeDef) bool {
 		done = DependsOn(t, pkg)
@@ -1584,7 +1590,7 @@ type Package struct {
 
 func (p *Package) dependsOn(pkg *Package) bool {
 	if pkg == p {
-		return false
+		return true
 	}
 	var done bool
 	p.Interfaces.All()(func(_ string, i *Interface) bool {
@@ -1602,9 +1608,13 @@ func (p *Package) dependsOn(pkg *Package) bool {
 }
 
 // DependsOn returns true if [Node] node depends on [Package] p.
+// Because a package implicitly depends on itself, this returns true if node == p.
 func DependsOn(node Node, p *Package) bool {
 	if node == nil {
 		return false
+	}
+	if node == p {
+		return true
 	}
 	if k, ok := node.(TypeDefKind); ok {
 		node = Despecialize(k)
