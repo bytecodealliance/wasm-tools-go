@@ -392,7 +392,7 @@ func (t *TypeDef) WIT(ctx Node, name string) string {
 				b.WriteRune('\n')
 				n++
 			}
-			slices.SortFunc(methods, functionCompare)
+			slices.SortFunc(methods, compareFunctions)
 			for _, f := range methods {
 				if f.Docs.Contents != "" {
 					b.WriteRune('\n')
@@ -401,7 +401,7 @@ func (t *TypeDef) WIT(ctx Node, name string) string {
 				b.WriteRune('\n')
 				n++
 			}
-			slices.SortFunc(statics, functionCompare)
+			slices.SortFunc(statics, compareFunctions)
 			for _, f := range statics {
 				if f.Docs.Contents != "" {
 					b.WriteRune('\n')

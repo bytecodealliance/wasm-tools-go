@@ -327,7 +327,7 @@ func (t *TypeDef) StaticFunctions() []*Function {
 		}
 		return true
 	})
-	slices.SortFunc(statics, functionCompare)
+	slices.SortFunc(statics, compareFunctions)
 	return statics
 }
 
@@ -341,11 +341,11 @@ func (t *TypeDef) Methods() []*Function {
 		}
 		return true
 	})
-	slices.SortFunc(methods, functionCompare)
+	slices.SortFunc(methods, compareFunctions)
 	return methods
 }
 
-func functionCompare(a, b *Function) int {
+func compareFunctions(a, b *Function) int {
 	return strings.Compare(a.Name, b.Name)
 }
 
