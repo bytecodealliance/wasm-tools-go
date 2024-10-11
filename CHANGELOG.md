@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - Method `wit.(*Package).WIT()` now interprets the non-empty string `name` argument as signal to render in single-file, multi-package braced form.
 - `wit.(*Resolve).WIT()` and `wit.(*Package).WIT()` now accept a `*wit.World` as context to filter serialized WIT to a specific world.
+- Packages are now sorted topologically by dependency in generated WIT files. For example, `wasi:cli` would be followed by its dependencies like `wasi:io`, `wasi:filesystem`, or `wasi:random`.
 
 ## [v0.2.4] — 2024-10-06
 
