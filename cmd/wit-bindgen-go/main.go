@@ -58,7 +58,7 @@ func main() {
 
 	err := cmd.Run(context.Background(), os.Args)
 	if err != nil {
-		fmt.Printf("error: %v\n", err)
+		fmt.Fprintf(os.Stderr, "error: %v\n", err)
 		os.Exit(1)
 	}
 }

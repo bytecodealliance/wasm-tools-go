@@ -12,14 +12,14 @@ package foo:dep1 {
 	}
 }
 
-package foo:dep2 {
-	interface types {
-		resource a;
-	}
-}
-
 package foo:qux {
 	world w-qux {
 		import foo:dep2/types;
+	}
+}
+
+package foo:dep2 {
+	interface types {
+		resource a;
 	}
 }

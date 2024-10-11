@@ -1,9 +1,9 @@
-package foo:bar;
+package foo:foo;
 
-interface types {}
+world foo {
+	import foo:bar/types;
+}
 
-package foo:foo {
-	world foo {
-		import foo:bar/types;
-	}
+package foo:bar {
+	interface types {}
 }

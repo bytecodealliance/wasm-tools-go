@@ -1,7 +1,6 @@
 package wit
 
 import (
-	"cmp"
 	"fmt"
 	"slices"
 	"strconv"
@@ -62,7 +61,19 @@ type World struct {
 	Docs      Docs
 }
 
-// WITPackage returns the [Package] this [World] belongs to.
+func (w *World) dependsOn(pkg *Package) bool {
+	if w.Package == pkg {
+		return true
+	}
+	var done bool
+	w.AllItems()(func(_ string, i WorldItem) bool {
+		done = DependsOn(i, pkg)
+		return !done
+	})
+	return done
+}
+
+// WITPackage returns the [Package] that [World] w belongs to.
 func (w *World) WITPackage() *Package {
 	return w.Package
 }
@@ -98,9 +109,24 @@ func (w *World) HasInterface(i *Interface) bool {
 // [sequence]: https://github.com/golang/go/issues/61897
 func (w *World) AllInterfaces() iterate.Seq2[string, *Interface] {
 	return func(yield func(string, *Interface) bool) {
-		w.AllImportsAndExports()(func(name string, i WorldItem) bool {
+		w.AllItems()(func(name string, i WorldItem) bool {
 			if ref, ok := i.(*InterfaceRef); ok {
 				return yield(name, ref.Interface)
+			}
+			return true
+		})
+	}
+}
+
+// AllTypeDefs returns a [sequence] that yields each [TypeDef] in a [World].
+// The sequence stops if yield returns false.
+//
+// [sequence]: https://github.com/golang/go/issues/61897
+func (w *World) AllTypeDefs() iterate.Seq2[string, *TypeDef] {
+	return func(yield func(string, *TypeDef) bool) {
+		w.AllItems()(func(name string, i WorldItem) bool {
+			if t, ok := i.(*TypeDef); ok {
+				return yield(name, t)
 			}
 			return true
 		})
@@ -113,7 +139,7 @@ func (w *World) AllInterfaces() iterate.Seq2[string, *Interface] {
 // [sequence]: https://github.com/golang/go/issues/61897
 func (w *World) AllFunctions() iterate.Seq[*Function] {
 	return func(yield func(*Function) bool) {
-		w.AllImportsAndExports()(func(_ string, i WorldItem) bool {
+		w.AllItems()(func(_ string, i WorldItem) bool {
 			if f, ok := i.(*Function); ok {
 				return yield(f)
 			}
@@ -122,11 +148,11 @@ func (w *World) AllFunctions() iterate.Seq[*Function] {
 	}
 }
 
-// AllImportsAndExports returns a [sequence] that yields each [WorldItem] in a [World].
+// AllItems returns a [sequence] that yields each [WorldItem] in a [World].
 // The sequence stops if yield returns false.
 //
 // [sequence]: https://github.com/golang/go/issues/61897
-func (w *World) AllImportsAndExports() iterate.Seq2[string, WorldItem] {
+func (w *World) AllItems() iterate.Seq2[string, WorldItem] {
 	return func(yield func(string, WorldItem) bool) {
 		var done bool
 		yield = iterate.Done2(iterate.Once2(yield), func() { done = true })
@@ -163,6 +189,10 @@ type InterfaceRef struct {
 	Stability Stability
 }
 
+func (ref *InterfaceRef) dependsOn(pkg *Package) bool {
+	return DependsOn(ref.Interface, pkg)
+}
+
 // An Interface represents a [collection of types and functions], which are imported into
 // or exported from a [WebAssembly component].
 // It implements the [Node], and [TypeOwner] interfaces.
@@ -178,6 +208,25 @@ type Interface struct {
 	Package   *Package  // the Package this Interface belongs to
 	Stability Stability // WIT @since or @unstable (nil if unknown)
 	Docs      Docs
+}
+
+func (i *Interface) dependsOn(pkg *Package) bool {
+	if i.Package == pkg {
+		return true
+	}
+	var done bool
+	i.TypeDefs.All()(func(_ string, t *TypeDef) bool {
+		done = DependsOn(t, pkg)
+		return !done
+	})
+	if done {
+		return true
+	}
+	i.Functions.All()(func(_ string, f *Function) bool {
+		done = DependsOn(f, pkg)
+		return !done
+	})
+	return done
 }
 
 // WITPackage returns the [Package] this [Interface] belongs to.
@@ -271,9 +320,7 @@ func (t *TypeDef) StaticFunctions() []*Function {
 		}
 		return true
 	})
-	slices.SortFunc(statics, func(a, b *Function) int {
-		return cmp.Compare(a.Name, b.Name)
-	})
+	slices.SortFunc(statics, compareFunctions)
 	return statics
 }
 
@@ -287,10 +334,12 @@ func (t *TypeDef) Methods() []*Function {
 		}
 		return true
 	})
-	slices.SortFunc(methods, func(a, b *Function) int {
-		return cmp.Compare(a.Name, b.Name)
-	})
+	slices.SortFunc(methods, compareFunctions)
 	return methods
+}
+
+func compareFunctions(a, b *Function) int {
+	return strings.Compare(a.Name, b.Name)
 }
 
 // Size returns the byte size for values of type t.
@@ -308,6 +357,13 @@ func (t *TypeDef) Align() uintptr {
 // [flattened]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
 func (t *TypeDef) Flat() []Type {
 	return t.Kind.Flat()
+}
+
+func (t *TypeDef) dependsOn(pkg *Package) bool {
+	if t.Owner != nil && t.Owner.WITPackage() == pkg {
+		return true
+	}
+	return DependsOn(t.Kind, pkg)
 }
 
 func (t *TypeDef) hasPointer() bool  { return HasPointer(t.Kind) }
@@ -368,10 +424,10 @@ func (*Pointer) Align() uintptr { return 4 }
 // [flattened]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
 func (p *Pointer) Flat() []Type { return []Type{PointerTo(p.Type)} }
 
-// hasPointer always returns true.
-func (*Pointer) hasPointer() bool    { return true }
-func (p *Pointer) hasBorrow() bool   { return HasBorrow(p.Type) }
-func (p *Pointer) hasResource() bool { return HasResource(p.Type) }
+func (p *Pointer) dependsOn(pkg *Package) bool { return DependsOn(p.Type, pkg) }
+func (*Pointer) hasPointer() bool              { return true }
+func (p *Pointer) hasBorrow() bool             { return HasBorrow(p.Type) }
+func (p *Pointer) hasResource() bool           { return HasResource(p.Type) }
 
 // Record represents a WIT [record type], akin to a struct.
 // It implements the [Node], [ABI], and [TypeDefKind] interfaces.
@@ -414,6 +470,15 @@ func (r *Record) Flat() []Type {
 		flat = append(flat, f.Type.Flat()...)
 	}
 	return flat
+}
+
+func (r *Record) dependsOn(pkg *Package) bool {
+	for _, f := range r.Fields {
+		if DependsOn(f.Type, pkg) {
+			return true
+		}
+	}
+	return false
 }
 
 func (r *Record) hasPointer() bool {
@@ -517,7 +582,8 @@ type Own struct {
 	Type *TypeDef
 }
 
-func (o *Own) hasResource() bool { return HasResource(o.Type) }
+func (o *Own) dependsOn(pkg *Package) bool { return DependsOn(o.Type, pkg) }
+func (o *Own) hasResource() bool           { return HasResource(o.Type) }
 
 // Borrow represents a WIT [borrowed handle].
 // It implements the [Handle], [Node], [ABI], and [TypeDefKind] interfaces.
@@ -528,8 +594,9 @@ type Borrow struct {
 	Type *TypeDef
 }
 
-func (b *Borrow) hasBorrow() bool   { return true }
-func (b *Borrow) hasResource() bool { return HasResource(b.Type) }
+func (b *Borrow) dependsOn(pkg *Package) bool { return DependsOn(b.Type, pkg) }
+func (b *Borrow) hasBorrow() bool             { return true }
+func (b *Borrow) hasResource() bool           { return HasResource(b.Type) }
 
 // Flags represents a WIT [flags type], stored as a bitfield.
 // It implements the [Node], [ABI], and [TypeDefKind] interfaces.
@@ -760,6 +827,15 @@ func (v *Variant) maxCaseAlign() uintptr {
 	return a
 }
 
+func (v *Variant) dependsOn(pkg *Package) bool {
+	for _, t := range v.Types() {
+		if DependsOn(t, pkg) {
+			return true
+		}
+	}
+	return false
+}
+
 func (v *Variant) hasPointer() bool {
 	for _, t := range v.Types() {
 		if HasPointer(t) {
@@ -793,6 +869,10 @@ type Case struct {
 	Name string
 	Type Type // optional associated [Type] (can be nil)
 	Docs Docs
+}
+
+func (c *Case) dependsOn(pkg *Package) bool {
+	return DependsOn(c.Type, pkg)
 }
 
 // Enum represents a WIT [enum type], which is a [Variant] without associated data.
@@ -988,9 +1068,10 @@ func (*List) Align() uintptr { return 8 } // [2]int32
 // [flattened]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
 func (l *List) Flat() []Type { return []Type{PointerTo(l.Type), U32{}} }
 
-func (*List) hasPointer() bool    { return true }
-func (l *List) hasBorrow() bool   { return HasBorrow(l.Type) }
-func (l *List) hasResource() bool { return HasResource(l.Type) }
+func (l *List) dependsOn(p *Package) bool { return DependsOn(l.Type, p) }
+func (*List) hasPointer() bool            { return true }
+func (l *List) hasBorrow() bool           { return HasBorrow(l.Type) }
+func (l *List) hasResource() bool         { return HasResource(l.Type) }
 
 // Future represents a WIT [future type], expected to be part of [WASI Preview 3].
 // It implements the [Node], [ABI], and [TypeDefKind] interfaces.
@@ -1020,9 +1101,10 @@ func (*Future) Align() uintptr { return 0 }
 // [flattened]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
 func (*Future) Flat() []Type { return nil }
 
-func (f *Future) hasPointer() bool  { return HasPointer(f.Type) }
-func (f *Future) hasBorrow() bool   { return HasBorrow(f.Type) }
-func (f *Future) hasResource() bool { return HasResource(f.Type) }
+func (f *Future) dependsOn(p *Package) bool { return DependsOn(f.Type, p) }
+func (f *Future) hasPointer() bool          { return HasPointer(f.Type) }
+func (f *Future) hasBorrow() bool           { return HasBorrow(f.Type) }
+func (f *Future) hasResource() bool         { return HasResource(f.Type) }
 
 // Stream represents a WIT [stream type], expected to be part of [WASI Preview 3].
 // It implements the [Node], [ABI], and [TypeDefKind] interfaces.
@@ -1053,9 +1135,10 @@ func (*Stream) Align() uintptr { return 0 }
 // [flattened]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
 func (*Stream) Flat() []Type { return nil }
 
-func (s *Stream) hasPointer() bool  { return HasPointer(s.Element) || HasPointer(s.End) }
-func (s *Stream) hasBorrow() bool   { return HasBorrow(s.Element) || HasBorrow(s.End) }
-func (s *Stream) hasResource() bool { return HasResource(s.Element) || HasResource(s.End) }
+func (s *Stream) dependsOn(p *Package) bool { return DependsOn(s.Element, p) || DependsOn(s.End, p) }
+func (s *Stream) hasPointer() bool          { return HasPointer(s.Element) || HasPointer(s.End) }
+func (s *Stream) hasBorrow() bool           { return HasBorrow(s.Element) || HasBorrow(s.End) }
+func (s *Stream) hasResource() bool         { return HasResource(s.Element) || HasResource(s.End) }
 
 // TypeOwner is the interface implemented by any type that can own a TypeDef,
 // currently [World] and [Interface].
@@ -1329,6 +1412,20 @@ type Function struct {
 	Docs      Docs
 }
 
+func (f *Function) dependsOn(pkg *Package) bool {
+	for _, p := range f.Params {
+		if DependsOn(p.Type, pkg) {
+			return true
+		}
+	}
+	for _, r := range f.Results {
+		if DependsOn(r.Type, pkg) {
+			return true
+		}
+	}
+	return false
+}
+
 // BaseName returns the base name of [Function] f.
 // For static functions, this returns the function name unchanged.
 // For constructors, this removes the [constructor] and type prefix.
@@ -1485,6 +1582,58 @@ type Package struct {
 	Interfaces ordered.Map[string, *Interface]
 	Worlds     ordered.Map[string, *World]
 	Docs       Docs
+}
+
+func (p *Package) dependsOn(pkg *Package) bool {
+	if pkg == p {
+		return true
+	}
+	var done bool
+	p.Interfaces.All()(func(_ string, i *Interface) bool {
+		done = DependsOn(i, pkg)
+		return !done
+	})
+	if done {
+		return true
+	}
+	p.Worlds.All()(func(_ string, w *World) bool {
+		done = DependsOn(w, pkg)
+		return !done
+	})
+	return done
+}
+
+// DependsOn returns true if [Node] node depends on [Package] p.
+// Because a package implicitly depends on itself, this returns true if node == p.
+func DependsOn(node Node, p *Package) bool {
+	if node == nil {
+		return false
+	}
+	if node == p {
+		return true
+	}
+	if k, ok := node.(TypeDefKind); ok {
+		node = Despecialize(k)
+	}
+	if d, ok := node.(interface{ dependsOn(*Package) bool }); ok {
+		return d.dependsOn(p)
+	}
+	return false
+}
+
+func comparePackages(a, b *Package) int {
+	switch {
+	case a == b:
+		return 0
+	case DependsOn(b, a):
+		// println(b.Name.String() + " depends on " + a.Name.String())
+		return 1
+	case DependsOn(a, b):
+		// println(a.Name.String() + " depends on " + b.Name.String())
+		return -1
+	}
+	// println(a.Name.String() + " does not depend on " + b.Name.String())
+	return strings.Compare(a.Name.String(), b.Name.String())
 }
 
 // Stability represents the version or feature-gated stability of a given feature.

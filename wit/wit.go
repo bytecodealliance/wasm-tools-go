@@ -54,10 +54,10 @@ func (*Resolve) WITKind() string { return "resolve" }
 //
 // [WIT]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
 func (r *Resolve) WIT(ctx Node, _ string) string {
+	// Sort packages topologically by dependency
 	packages := slices.Clone(r.Packages)
-	slices.SortFunc(packages, func(a, b *Package) int {
-		return strings.Compare(a.Name.String(), b.Name.String())
-	})
+	slices.SortFunc(packages, comparePackages)
+
 	var b strings.Builder
 	var hasContent bool
 	for i, p := range packages {
@@ -392,7 +392,7 @@ func (t *TypeDef) WIT(ctx Node, name string) string {
 				b.WriteRune('\n')
 				n++
 			}
-			slices.SortFunc(methods, functionCompare)
+			slices.SortFunc(methods, compareFunctions)
 			for _, f := range methods {
 				if f.Docs.Contents != "" {
 					b.WriteRune('\n')
@@ -401,7 +401,7 @@ func (t *TypeDef) WIT(ctx Node, name string) string {
 				b.WriteRune('\n')
 				n++
 			}
-			slices.SortFunc(statics, functionCompare)
+			slices.SortFunc(statics, compareFunctions)
 			for _, f := range statics {
 				if f.Docs.Contents != "" {
 					b.WriteRune('\n')
@@ -422,10 +422,6 @@ func (t *TypeDef) WIT(ctx Node, name string) string {
 		return escape(name)
 	}
 	return t.Kind.WIT(ctx, name)
-}
-
-func functionCompare(a, b *Function) int {
-	return strings.Compare(a.Name, b.Name)
 }
 
 func escape(name string) string {

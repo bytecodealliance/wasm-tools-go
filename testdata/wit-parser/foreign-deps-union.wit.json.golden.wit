@@ -10,12 +10,6 @@ package foo:different-pkg {
 	interface i {}
 }
 
-package foo:foreign-pkg {
-	interface the-default {
-		type some-type = u32;
-	}
-}
-
 package foo:root {
 	interface foo {
 		use foo:wasi/clocks.{timestamp};
@@ -59,6 +53,12 @@ package foo:root {
 		import foo:wasi/clocks;
 		export foo:corp/saas;
 		export foo;
+	}
+}
+
+package foo:foreign-pkg {
+	interface the-default {
+		type some-type = u32;
 	}
 }
 
