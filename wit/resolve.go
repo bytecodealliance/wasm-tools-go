@@ -61,7 +61,16 @@ type World struct {
 	Docs      Docs
 }
 
-// WITPackage returns the [Package] this [World] belongs to.
+func (w *World) dependsOn(pkg *Package) bool {
+	var done bool
+	w.AllImportsAndExports()(func(_ string, i WorldItem) bool {
+		done = DependsOn(i, pkg)
+		return !done
+	})
+	return done
+}
+
+// WITPackage returns the [Package] that [World] w belongs to.
 func (w *World) WITPackage() *Package {
 	return w.Package
 }
@@ -100,6 +109,21 @@ func (w *World) AllInterfaces() iterate.Seq2[string, *Interface] {
 		w.AllImportsAndExports()(func(name string, i WorldItem) bool {
 			if ref, ok := i.(*InterfaceRef); ok {
 				return yield(name, ref.Interface)
+			}
+			return true
+		})
+	}
+}
+
+// AllTypeDefs returns a [sequence] that yields each [TypeDef] in a [World].
+// The sequence stops if yield returns false.
+//
+// [sequence]: https://github.com/golang/go/issues/61897
+func (w *World) AllTypeDefs() iterate.Seq2[string, *TypeDef] {
+	return func(yield func(string, *TypeDef) bool) {
+		w.AllImportsAndExports()(func(name string, i WorldItem) bool {
+			if t, ok := i.(*TypeDef); ok {
+				return yield(name, t)
 			}
 			return true
 		})
@@ -162,6 +186,10 @@ type InterfaceRef struct {
 	Stability Stability
 }
 
+func (ref *InterfaceRef) dependsOn(pkg *Package) bool {
+	return DependsOn(ref.Interface, pkg)
+}
+
 // An Interface represents a [collection of types and functions], which are imported into
 // or exported from a [WebAssembly component].
 // It implements the [Node], and [TypeOwner] interfaces.
@@ -177,6 +205,22 @@ type Interface struct {
 	Package   *Package  // the Package this Interface belongs to
 	Stability Stability // WIT @since or @unstable (nil if unknown)
 	Docs      Docs
+}
+
+func (i *Interface) dependsOn(pkg *Package) bool {
+	var done bool
+	i.TypeDefs.All()(func(_ string, t *TypeDef) bool {
+		done = DependsOn(t, pkg)
+		return !done
+	})
+	if done {
+		return true
+	}
+	i.Functions.All()(func(_ string, f *Function) bool {
+		done = DependsOn(f, pkg)
+		return !done
+	})
+	return done
 }
 
 // WITPackage returns the [Package] this [Interface] belongs to.
@@ -207,6 +251,13 @@ type TypeDef struct {
 	Owner     TypeOwner
 	Stability Stability // WIT @since or @unstable (nil if unknown)
 	Docs      Docs
+}
+
+func (t *TypeDef) dependsOn(pkg *Package) bool {
+	if t.Owner != nil && t.Owner.WITPackage() == pkg {
+		return true
+	}
+	return DependsOn(t.Kind, pkg)
 }
 
 // TypeName returns the [WIT] type name for t.
@@ -367,6 +418,8 @@ func (*Pointer) Align() uintptr { return 4 }
 // [flattened]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
 func (p *Pointer) Flat() []Type { return []Type{PointerTo(p.Type)} }
 
+func (p *Pointer) dependsOn(pkg *Package) bool { return DependsOn(p.Type, pkg) }
+
 // hasPointer always returns true.
 func (*Pointer) hasPointer() bool    { return true }
 func (p *Pointer) hasBorrow() bool   { return HasBorrow(p.Type) }
@@ -413,6 +466,15 @@ func (r *Record) Flat() []Type {
 		flat = append(flat, f.Type.Flat()...)
 	}
 	return flat
+}
+
+func (r *Record) dependsOn(pkg *Package) bool {
+	for _, f := range r.Fields {
+		if DependsOn(f.Type, pkg) {
+			return true
+		}
+	}
+	return false
 }
 
 func (r *Record) hasPointer() bool {
@@ -759,6 +821,15 @@ func (v *Variant) maxCaseAlign() uintptr {
 	return a
 }
 
+func (v *Variant) dependsOn(pkg *Package) bool {
+	for _, t := range v.Types() {
+		if DependsOn(t, pkg) {
+			return true
+		}
+	}
+	return false
+}
+
 func (v *Variant) hasPointer() bool {
 	for _, t := range v.Types() {
 		if HasPointer(t) {
@@ -792,6 +863,10 @@ type Case struct {
 	Name string
 	Type Type // optional associated [Type] (can be nil)
 	Docs Docs
+}
+
+func (c *Case) dependsOn(pkg *Package) bool {
+	return DependsOn(c.Type, pkg)
 }
 
 // Enum represents a WIT [enum type], which is a [Variant] without associated data.
@@ -899,6 +974,10 @@ func (o *Option) Align() uintptr {
 // [flattened]: https://github.com/WebAssembly/component-model/blob/main/design/mvp/CanonicalABI.md#flattening
 func (o *Option) Flat() []Type {
 	return o.Despecialize().Flat()
+}
+
+func (o *Option) dependsOn(pkg *Package) bool {
+	return DependsOn(o.Type, pkg)
 }
 
 // Result represents a WIT [result type], which is the result of a function call,
@@ -1153,6 +1232,9 @@ type _primitive[T primitive] struct{ _type }
 // isPrimitive conforms to the [Primitive] interface.
 func (_primitive[T]) isPrimitive() {}
 
+// DependsOn always returns false.
+func (_primitive[T]) dependsOn(pkg *Package) bool { return false }
+
 // Size returns the byte size for values of this type.
 func (_primitive[T]) Size() uintptr {
 	var v T
@@ -1328,6 +1410,20 @@ type Function struct {
 	Docs      Docs
 }
 
+func (f *Function) dependsOn(pkg *Package) bool {
+	for _, p := range f.Params {
+		if DependsOn(p.Type, pkg) {
+			return true
+		}
+	}
+	for _, r := range f.Results {
+		if DependsOn(r.Type, pkg) {
+			return true
+		}
+	}
+	return false
+}
+
 // BaseName returns the base name of [Function] f.
 // For static functions, this returns the function name unchanged.
 // For constructors, this removes the [constructor] and type prefix.
@@ -1484,6 +1580,46 @@ type Package struct {
 	Interfaces ordered.Map[string, *Interface]
 	Worlds     ordered.Map[string, *World]
 	Docs       Docs
+}
+
+func (p *Package) dependsOn(pkg *Package) bool {
+	var done bool
+	p.Interfaces.All()(func(_ string, i *Interface) bool {
+		done = DependsOn(i, pkg)
+		return !done
+	})
+	if done {
+		return true
+	}
+	p.Worlds.All()(func(_ string, w *World) bool {
+		done = DependsOn(w, pkg)
+		return !done
+	})
+	return done
+}
+
+// DependsOn returns true if [Node] node depends on [Package] p.
+func DependsOn(node Node, p *Package) bool {
+	if node == nil {
+		return false
+	}
+	if k, ok := node.(TypeDefKind); ok {
+		node = Despecialize(k)
+	}
+	if d, ok := node.(interface{ dependsOn(*Package) bool }); ok {
+		return d.dependsOn(p)
+	}
+	return false
+}
+
+func comparePackages(a, b *Package) int {
+	switch {
+	case DependsOn(b, a):
+		return -1
+	case DependsOn(a, b):
+		return 1
+	}
+	return strings.Compare(a.Name.String(), b.Name.String())
 }
 
 // Stability represents the version or feature-gated stability of a given feature.
