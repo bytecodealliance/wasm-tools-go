@@ -579,11 +579,7 @@ func (g *generator) typeDir(dir wit.Direction, t wit.Type) (tdir wit.Direction, 
 }
 
 func (g *generator) typeDefRep(file *gen.File, dir wit.Direction, t *wit.TypeDef, goName string) string {
-	return g.typeDefKindRep(file, dir, t.Kind, goName)
-}
-
-func (g *generator) typeDefKindRep(file *gen.File, dir wit.Direction, kind wit.TypeDefKind, goName string) string {
-	switch kind := kind.(type) {
+	switch kind := t.Kind.(type) {
 	case *wit.Pointer:
 		return g.pointerRep(file, dir, kind)
 	case wit.Type:
@@ -713,7 +709,7 @@ func (g *generator) tupleRep(file *gen.File, dir wit.Direction, t *wit.Tuple, go
 		stringio.Write(&b, "[", strconv.Itoa(len(t.Types)), "]", g.typeRep(file, dir, typ))
 	} else if len(t.Types) == 0 || len(t.Types) > cm.MaxTuple {
 		// Force struct representation
-		return g.typeDefKindRep(file, dir, t.Despecialize(), goName)
+		return g.recordRep(file, dir, t.Despecialize().(*wit.Record), goName)
 	} else {
 		stringio.Write(&b, file.Import(g.opts.cmPackage), ".Tuple")
 		if len(t.Types) > 2 {
