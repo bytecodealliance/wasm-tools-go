@@ -821,7 +821,8 @@ func (g *generator) variantRep(file *gen.File, dir wit.Direction, t *wit.TypeDef
 		typeShape = g.typeShape(file, dir, shape)
 	}
 
-	scope := gen.NewScope(file)
+	decl, _ := g.typeDecl(dir, t)
+	scope := decl.scope
 	scope.DeclareName("String") // For fmt.Stringer
 
 	// Emit type
@@ -1110,6 +1111,7 @@ func (g *generator) lowerFlags(file *gen.File, dir wit.Direction, t *wit.TypeDef
 }
 
 func (g *generator) lowerVariant(file *gen.File, dir wit.Direction, t *wit.TypeDef, input string) string {
+	decl, _ := g.typeDecl(dir, t)
 	v := t.Kind.(*wit.Variant)
 	flat := t.Flat()
 	if v.Enum() != nil {
@@ -1124,7 +1126,7 @@ func (g *generator) lowerVariant(file *gen.File, dir wit.Direction, t *wit.TypeD
 			continue
 		}
 		caseNum := strconv.Itoa(i)
-		caseName := GoName(c.Name, true)
+		caseName := decl.scope.GetName(GoName(c.Name, true))
 		stringio.Write(&b, "case ", caseNum, ": // ", c.Name, "\n")
 		b.WriteString(g.lowerVariantCaseInto(abiFile, dir, c.Type, flat[1:], "*v."+caseName+"()"))
 	}
