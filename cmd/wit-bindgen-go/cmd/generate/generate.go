@@ -106,12 +106,9 @@ func parseFlags(cmd *cli.Command) (*config, error) {
 	dryRun := cmd.Bool("dry-run")
 	out := cmd.String("out")
 
-	info, err := os.Stat(out)
+	info, err := witcli.FindOrCreateDir(out)
 	if err != nil {
 		return nil, err
-	}
-	if !info.IsDir() {
-		return nil, fmt.Errorf("%s is not a directory", out)
 	}
 	fmt.Fprintf(os.Stderr, "Output dir: %s\n", out)
 	outPerm := info.Mode().Perm()
