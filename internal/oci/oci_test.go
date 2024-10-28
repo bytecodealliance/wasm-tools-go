@@ -1,14 +1,19 @@
-//go:build !tinygo
-
 package oci
 
 import (
 	"os"
 	"path/filepath"
+	"runtime"
+	"strings"
 	"testing"
 )
 
 func TestIsOCIPath(t *testing.T) {
+	// Something in TinyGo’s package regexp breaks here
+	if runtime.Compiler == "tinygo" || strings.Contains(runtime.GOARCH, "wasm") {
+		return
+	}
+
 	// Create a temporary directory for local file path tests
 	tempDir := t.TempDir()
 
