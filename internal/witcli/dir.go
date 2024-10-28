@@ -1,5 +1,3 @@
-//go:build !wasip1 && !wasip2 && !tinygo
-
 package witcli
 
 import (

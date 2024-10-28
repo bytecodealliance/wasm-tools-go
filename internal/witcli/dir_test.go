@@ -1,14 +1,14 @@
-//go:build !tinygo
-
 package witcli
 
 import (
 	"os"
 	"path/filepath"
+	"runtime"
+	"strings"
 	"testing"
 )
 
-func TestFindOrCreateDir_Find(t *testing.T) {
+func TestFindOrCreateDirFind(t *testing.T) {
 	temp := t.TempDir()
 
 	dir := filepath.Join(temp, "existing")
@@ -32,6 +32,11 @@ func TestFindOrCreateDir_Find(t *testing.T) {
 		t.Errorf("FindOrCreateDirExisting returned directory with modtime %v; want %v", gotModTime, wantModTime)
 	}
 
+	// Skip remaining tests
+	if runtime.Compiler == "tinygo" || strings.Contains(runtime.GOARCH, "wasm") {
+		return
+	}
+
 	gotPerm := info.Mode().Perm()
 	wantPerm := fi.Mode().Perm()
 	if gotPerm != wantPerm {
@@ -39,7 +44,7 @@ func TestFindOrCreateDir_Find(t *testing.T) {
 	}
 }
 
-func TestFindOrCreateDir_Create(t *testing.T) {
+func TestFindOrCreateDirCreate(t *testing.T) {
 	temp := t.TempDir()
 
 	dir := filepath.Join(temp, "new")
@@ -51,6 +56,11 @@ func TestFindOrCreateDir_Create(t *testing.T) {
 	info, err := FindOrCreateDir(dir)
 	if err != nil {
 		t.Fatal(err)
+	}
+
+	// Skip remaining tests
+	if runtime.Compiler == "tinygo" || strings.Contains(runtime.GOARCH, "wasm") {
+		return
 	}
 
 	gotPerm := int(info.Mode().Perm())
