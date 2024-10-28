@@ -593,7 +593,7 @@ func (g *generator) typeDefRep(file *gen.File, dir wit.Direction, t *wit.TypeDef
 	case *wit.Enum:
 		return g.enumRep(file, dir, kind, goName)
 	case *wit.Variant:
-		return g.variantRep(file, dir, kind, goName)
+		return g.variantRep(file, dir, t, goName)
 	case *wit.Result:
 		return g.resultRep(file, dir, kind)
 	case *wit.Option:
@@ -801,7 +801,10 @@ func (g *generator) enumRep(file *gen.File, dir wit.Direction, e *wit.Enum, goNa
 	return b.String()
 }
 
-func (g *generator) variantRep(file *gen.File, dir wit.Direction, v *wit.Variant, goName string) string {
+// variantRep is special because it accepts a [wit.TypeDef] instead of a [wit.Variant].
+// The TypeDef is used to determine the scope for generating accessor methods on the type.
+func (g *generator) variantRep(file *gen.File, dir wit.Direction, t *wit.TypeDef, goName string) string {
+	v := t.Kind.(*wit.Variant)
 	// If the variant has no associated types, represent the variant as an enum.
 	if e := v.Enum(); e != nil {
 		return g.enumRep(file, dir, e, goName)
