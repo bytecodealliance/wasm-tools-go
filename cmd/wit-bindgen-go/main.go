@@ -30,18 +30,17 @@ var Command = &cli.Command{
 	},
 	Flags: []cli.Flag{
 		&cli.BoolFlag{
-			Name:  "force-wit",
-			Usage: "force loading WIT via wasm-tools",
-		},
-		&cli.BoolFlag{
 			Name:        "version",
 			Usage:       "print the version",
 			HideDefault: true,
+			Local:       true,
+		},
+		&cli.BoolFlag{
+			Name:  "force-wit",
+			Usage: "force loading WIT via wasm-tools",
 		},
 	},
-	Version:     witcli.Version(),
-	HideVersion: true,
-	Action:      action,
+	Action: action,
 }
 
 func action(ctx context.Context, cmd *cli.Command) error {
