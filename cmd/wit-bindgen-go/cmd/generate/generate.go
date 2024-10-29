@@ -11,6 +11,7 @@ import (
 	"github.com/bytecodealliance/wasm-tools-go/internal/go/gen"
 	"github.com/bytecodealliance/wasm-tools-go/internal/witcli"
 	"github.com/bytecodealliance/wasm-tools-go/wit/bindgen"
+	"github.com/bytecodealliance/wasm-tools-go/wit/logging"
 	"github.com/urfave/cli/v3"
 )
 
@@ -66,6 +67,7 @@ var Command = &cli.Command{
 
 // Config is the configuration for the `generate` command.
 type config struct {
+	logger    logging.Logger
 	dryRun    bool
 	out       string
 	outPerm   os.FileMode
@@ -90,6 +92,7 @@ func action(ctx context.Context, cmd *cli.Command) error {
 
 	packages, err := bindgen.Go(res,
 		bindgen.GeneratedBy(cmd.Root().Name),
+		bindgen.Logger(cfg.logger),
 		bindgen.World(cfg.world),
 		bindgen.PackageRoot(cfg.pkgRoot),
 		bindgen.Versioned(cfg.versioned),
@@ -103,6 +106,7 @@ func action(ctx context.Context, cmd *cli.Command) error {
 }
 
 func parseFlags(cmd *cli.Command) (*config, error) {
+	logger := witcli.Logger(cmd.Bool("verbose"), cmd.Bool("debug"))
 	dryRun := cmd.Bool("dry-run")
 	out := cmd.String("out")
 
@@ -110,7 +114,7 @@ func parseFlags(cmd *cli.Command) (*config, error) {
 	if err != nil {
 		return nil, err
 	}
-	fmt.Fprintf(os.Stderr, "Output dir: %s\n", out)
+	logger.Infof("Output dir: %s\n", out)
 	outPerm := info.Mode().Perm()
 
 	pkgRoot := cmd.String("package-root")
@@ -120,7 +124,7 @@ func parseFlags(cmd *cli.Command) (*config, error) {
 			return nil, err
 		}
 	}
-	fmt.Fprintf(os.Stderr, "Package root: %s\n", pkgRoot)
+	logger.Infof("Package root: %s\n", pkgRoot)
 
 	path, err := witcli.LoadPath(cmd.Args().Slice()...)
 	if err != nil {
@@ -128,6 +132,7 @@ func parseFlags(cmd *cli.Command) (*config, error) {
 	}
 
 	return &config{
+		logger,
 		dryRun,
 		out,
 		outPerm,
@@ -141,13 +146,13 @@ func parseFlags(cmd *cli.Command) (*config, error) {
 }
 
 func writeGoPackages(packages []*gen.Package, cfg *config) error {
-	fmt.Fprintf(os.Stderr, "Generated %d package(s)\n", len(packages))
+	cfg.logger.Infof("Generated %d Go package(s)\n", len(packages))
 	for _, pkg := range packages {
 		if !pkg.HasContent() {
-			fmt.Fprintf(os.Stderr, "Skipping empty package: %s\n", pkg.Path)
+			cfg.logger.Debugf("Skipped empty package: %s\n", pkg.Path)
 			continue
 		}
-		fmt.Fprintf(os.Stderr, "Generated package: %s\n", pkg.Path)
+		cfg.logger.Infof("Generated package: %s\n", pkg.Path)
 
 		for _, filename := range codec.SortedKeys(pkg.Files) {
 			file := pkg.Files[filename]
@@ -155,7 +160,7 @@ func writeGoPackages(packages []*gen.Package, cfg *config) error {
 			path := filepath.Join(dir, file.Name)
 
 			if !file.HasContent() {
-				fmt.Fprintf(os.Stderr, "Skipping empty file: %s\n", path)
+				cfg.logger.Debugf("\tSkipping empty file: %s\n", path)
 				continue
 			}
 
@@ -168,9 +173,9 @@ func writeGoPackages(packages []*gen.Package, cfg *config) error {
 				if content == nil {
 					return err
 				}
-				fmt.Fprintf(os.Stderr, "Error formatting file: %v\n", err)
+				cfg.logger.Errorf("\tError formatting file: %v\n", err)
 			} else {
-				fmt.Fprintf(os.Stderr, "Generated file: %s\n", path)
+				cfg.logger.Infof("\t%s\n", path)
 			}
 
 			if cfg.dryRun {

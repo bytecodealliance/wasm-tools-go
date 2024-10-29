@@ -39,6 +39,16 @@ var Command = &cli.Command{
 			Name:  "force-wit",
 			Usage: "force loading WIT via wasm-tools",
 		},
+		&cli.BoolFlag{
+			Name:    "verbose",
+			Aliases: []string{"v"},
+			Usage:   "print verbose logging messages",
+		},
+		&cli.BoolFlag{
+			Name:    "debug",
+			Aliases: []string{"vv"},
+			Usage:   "print debug logging messages",
+		},
 	},
 	Action: action,
 }
