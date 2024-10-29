@@ -579,11 +579,7 @@ func (g *generator) typeDir(dir wit.Direction, t wit.Type) (tdir wit.Direction, 
 }
 
 func (g *generator) typeDefRep(file *gen.File, dir wit.Direction, t *wit.TypeDef, goName string) string {
-	return g.typeDefKindRep(file, dir, t.Kind, goName)
-}
-
-func (g *generator) typeDefKindRep(file *gen.File, dir wit.Direction, kind wit.TypeDefKind, goName string) string {
-	switch kind := kind.(type) {
+	switch kind := t.Kind.(type) {
 	case *wit.Pointer:
 		return g.pointerRep(file, dir, kind)
 	case wit.Type:
@@ -597,7 +593,7 @@ func (g *generator) typeDefKindRep(file *gen.File, dir wit.Direction, kind wit.T
 	case *wit.Enum:
 		return g.enumRep(file, dir, kind, goName)
 	case *wit.Variant:
-		return g.variantRep(file, dir, kind, goName)
+		return g.variantRep(file, dir, t, goName)
 	case *wit.Result:
 		return g.resultRep(file, dir, kind)
 	case *wit.Option:
@@ -713,7 +709,7 @@ func (g *generator) tupleRep(file *gen.File, dir wit.Direction, t *wit.Tuple, go
 		stringio.Write(&b, "[", strconv.Itoa(len(t.Types)), "]", g.typeRep(file, dir, typ))
 	} else if len(t.Types) == 0 || len(t.Types) > cm.MaxTuple {
 		// Force struct representation
-		return g.typeDefKindRep(file, dir, t.Despecialize(), goName)
+		return g.recordRep(file, dir, t.Despecialize().(*wit.Record), goName)
 	} else {
 		stringio.Write(&b, file.Import(g.opts.cmPackage), ".Tuple")
 		if len(t.Types) > 2 {
@@ -805,7 +801,10 @@ func (g *generator) enumRep(file *gen.File, dir wit.Direction, e *wit.Enum, goNa
 	return b.String()
 }
 
-func (g *generator) variantRep(file *gen.File, dir wit.Direction, v *wit.Variant, goName string) string {
+// variantRep is special because it accepts a [wit.TypeDef] instead of a [wit.Variant].
+// The TypeDef is used to determine the scope for generating accessor methods on the type.
+func (g *generator) variantRep(file *gen.File, dir wit.Direction, t *wit.TypeDef, goName string) string {
+	v := t.Kind.(*wit.Variant)
 	// If the variant has no associated types, represent the variant as an enum.
 	if e := v.Enum(); e != nil {
 		return g.enumRep(file, dir, e, goName)
@@ -822,7 +821,8 @@ func (g *generator) variantRep(file *gen.File, dir wit.Direction, v *wit.Variant
 		typeShape = g.typeShape(file, dir, shape)
 	}
 
-	scope := gen.NewScope(file)
+	decl, _ := g.typeDecl(dir, t)
+	scope := decl.scope
 	scope.DeclareName("String") // For fmt.Stringer
 
 	// Emit type
@@ -1111,6 +1111,7 @@ func (g *generator) lowerFlags(file *gen.File, dir wit.Direction, t *wit.TypeDef
 }
 
 func (g *generator) lowerVariant(file *gen.File, dir wit.Direction, t *wit.TypeDef, input string) string {
+	decl, _ := g.typeDecl(dir, t)
 	v := t.Kind.(*wit.Variant)
 	flat := t.Flat()
 	if v.Enum() != nil {
@@ -1125,7 +1126,7 @@ func (g *generator) lowerVariant(file *gen.File, dir wit.Direction, t *wit.TypeD
 			continue
 		}
 		caseNum := strconv.Itoa(i)
-		caseName := GoName(c.Name, true)
+		caseName := decl.scope.GetName(GoName(c.Name, true))
 		stringio.Write(&b, "case ", caseNum, ": // ", c.Name, "\n")
 		b.WriteString(g.lowerVariantCaseInto(abiFile, dir, c.Type, flat[1:], "*v."+caseName+"()"))
 	}

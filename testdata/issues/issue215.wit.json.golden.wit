@@ -1,0 +1,10 @@
+package issues:issue215;
+
+interface i {
+	variant var { var(u8) }
+	foo: func(var: var);
+}
+
+world w {
+	import i;
+}
