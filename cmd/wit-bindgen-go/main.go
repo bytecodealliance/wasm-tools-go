@@ -4,61 +4,58 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"runtime/debug"
 
 	"github.com/urfave/cli/v3"
 
 	"github.com/bytecodealliance/wasm-tools-go/cmd/wit-bindgen-go/cmd/generate"
 	"github.com/bytecodealliance/wasm-tools-go/cmd/wit-bindgen-go/cmd/wit"
+	"github.com/bytecodealliance/wasm-tools-go/internal/witcli"
 )
-
-var (
-	version       = ""
-	revision      = ""
-	versionString = ""
-)
-
-func init() {
-	build, ok := debug.ReadBuildInfo()
-	if !ok {
-		return
-	}
-	version = build.Main.Version
-	for _, s := range build.Settings {
-		switch s.Key {
-		case "vcs.revision":
-			revision = s.Value
-		}
-	}
-	if version == "" {
-		version = "(none)"
-	}
-	versionString = version
-	if revision != "" {
-		versionString += " (" + revision + ")"
-	}
-}
 
 func main() {
-	cmd := &cli.Command{
-		Name:  "wit-bindgen-go",
-		Usage: "inspect or manipulate WebAssembly Interface Types for Go",
-		Commands: []*cli.Command{
-			generate.Command,
-			wit.Command,
-		},
-		Flags: []cli.Flag{
-			&cli.BoolFlag{
-				Name:  "force-wit",
-				Usage: "force loading WIT via wasm-tools",
-			},
-		},
-		Version: versionString,
-	}
-
-	err := cmd.Run(context.Background(), os.Args)
+	err := Command.Run(context.Background(), os.Args)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error: %v\n", err)
 		os.Exit(1)
 	}
+}
+
+var Command = &cli.Command{
+	Name:  "wit-bindgen-go",
+	Usage: "inspect or manipulate WebAssembly Interface Types for Go",
+	Commands: []*cli.Command{
+		generate.Command,
+		wit.Command,
+		version,
+	},
+	Flags: []cli.Flag{
+		&cli.BoolFlag{
+			Name:  "force-wit",
+			Usage: "force loading WIT via wasm-tools",
+		},
+		&cli.BoolFlag{
+			Name:        "version",
+			Usage:       "print the version",
+			HideDefault: true,
+		},
+	},
+	Version:     witcli.Version(),
+	HideVersion: true,
+	Action:      action,
+}
+
+func action(ctx context.Context, cmd *cli.Command) error {
+	if cmd.Bool("version") {
+		return version.Run(ctx, nil)
+	}
+	return cli.ShowAppHelp(cmd)
+}
+
+var version = &cli.Command{
+	Name:  "version",
+	Usage: "print the version",
+	Action: func(ctx context.Context, cmd *cli.Command) error {
+		fmt.Printf("%s version %s\n", cmd.Root().Name, witcli.Version())
+		return nil
+	},
 }
