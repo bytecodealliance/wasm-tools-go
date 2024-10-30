@@ -76,10 +76,8 @@ jobs:
     strategy:
       matrix:
         go-version: ["1.22", "1.23"]
-        tinygo-version: ["0.32.0", "0.33.0"]
+        tinygo-version: ["0.32.0", "0.33.0", "0.34.0"]
         exclude:
-          - go-version: "1.23"
-            tinygo-version: "0.31.2"
           - go-version: "1.23"
             tinygo-version: "0.32.0"
     steps:
@@ -117,10 +115,8 @@ jobs:
     strategy:
       matrix:
         go-version: ["1.22", "1.23"]
-        tinygo-version: ["0.32.0", "0.33.0"]
+        tinygo-version: ["0.32.0", "0.33.0", "0.34.0"]
         exclude:
-          - go-version: "1.23"
-            tinygo-version: "0.31.2"
           - go-version: "1.23"
             tinygo-version: "0.32.0"
     steps:
