@@ -5,8 +5,8 @@ import (
 	"testing"
 	"unsafe"
 
-	instancenetwork "tests/generated/wasi/sockets/instance-network"
-	ipnamelookup "tests/generated/wasi/sockets/ip-name-lookup"
+	instancenetwork "tests/generated/wasi/sockets/v0.2.0/instance-network"
+	ipnamelookup "tests/generated/wasi/sockets/v0.2.0/ip-name-lookup"
 )
 
 func TestResolveAddresses(t *testing.T) {
