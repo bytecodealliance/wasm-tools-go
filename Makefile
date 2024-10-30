@@ -13,11 +13,27 @@ $(wit_files):
 golden: json
 	go test ./wit -update
 
-# generated writes test Go code to the filesystem
+# generated generated writes test Go code to the filesystem
 .PHONY: generated
-generated: clean
+generated: clean json
 	go test ./wit/bindgen -write
 
 .PHONY: clean
 clean:
 	rm -rf ./generated/*
+
+# tests/generated writes generated Go code to the tests directory
+.PHONY: tests/generated
+tests/generated: json
+	go generate ./tests
+
+# test runs Go and TinyGo tests
+GOTESTARGS :=
+.PHONY: test
+test:
+	go test $(GOTESTARGS) ./...
+	GOARCH=wasm GOOS=wasip1 go test $(GOTESTARGS) ./...
+	tinygo test $(GOTESTARGS) ./...
+	tinygo test -target=wasip1 $(GOTESTARGS) ./...
+	tinygo test -target=wasip2 $(GOTESTARGS) ./...
+	tinygo test -target=wasip2 $(GOTESTARGS) ./tests/...
