@@ -19,6 +19,47 @@ type resulter[OK, Err any] interface {
 	Err() *Err
 }
 
+func TestResultOKOrErr(t *testing.T) {
+	r1 := OK[Result[string, string, struct{}]]("hello")
+	if ok := r1.OK(); ok == nil {
+		t.Errorf("OK(): %v, expected non-nil OK", ok)
+	}
+	if err := r1.Err(); err != nil {
+		t.Errorf("Err(): %v, expected nil Err", err)
+	}
+
+	r2 := Err[Result[bool, struct{}, bool]](true)
+	if ok := r2.OK(); ok != nil {
+		t.Errorf("OK(): %v, expected nil OK", ok)
+	}
+	if err := r2.Err(); err == nil {
+		t.Errorf("Err(): %v, expected non-nil Err", err)
+	}
+}
+
+func TestResultResult(t *testing.T) {
+	ok, err, isErr := OK[Result[string, string, int]]("hello").Result()
+	if got, want := ok, "hello"; got != want {
+		t.Errorf("Result(): ok = %v; expected %v", got, want)
+	}
+	if got, want := err, 0; got != want {
+		t.Errorf("Result(): err = %v; expected %v", got, want)
+	}
+	if got, want := isErr, false; got != want {
+		t.Errorf("Result(): isErr = %v; expected %v", got, want)
+	}
+	ok, err, isErr = Err[Result[string, string, int]](42).Result()
+	if got, want := ok, ""; got != want {
+		t.Errorf("Result(): ok = %v; expected %v", got, want)
+	}
+	if got, want := err, 42; got != want {
+		t.Errorf("Result(): err = %v; expected %v", got, want)
+	}
+	if got, want := isErr, true; got != want {
+		t.Errorf("Result(): isErr = %v; expected %v", got, want)
+	}
+}
+
 func TestResultLayout(t *testing.T) {
 	// 8 on 64-bit, 4 on 32-bit
 	ptrSize := unsafe.Sizeof(uintptr(0))
@@ -67,24 +108,6 @@ func TestResultLayout(t *testing.T) {
 				t.Errorf("(%s).DataOffset(): %v, expected %v", typ, got, want)
 			}
 		})
-	}
-}
-
-func TestResultOKOrErr(t *testing.T) {
-	r1 := OK[Result[string, string, struct{}]]("hello")
-	if ok := r1.OK(); ok == nil {
-		t.Errorf("OK(): %v, expected non-nil OK", ok)
-	}
-	if err := r1.Err(); err != nil {
-		t.Errorf("Err(): %v, expected nil Err", err)
-	}
-
-	r2 := Err[Result[bool, struct{}, bool]](true)
-	if ok := r2.OK(); ok != nil {
-		t.Errorf("OK(): %v, expected nil OK", ok)
-	}
-	if err := r2.Err(); err == nil {
-		t.Errorf("Err(): %v, expected non-nil Err", err)
 	}
 }
 
