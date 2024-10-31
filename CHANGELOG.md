@@ -4,9 +4,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Added
+
+- `wit-bindgen-go` now accepts arguments that control the level of logging output on stderr. Verbose mode (`-v` or `--verbose`) will print informational log lines, warnings, and errors. Debug mode (`-vv` or `--debug`) will emit finer-grained debugging information. By default, `wit-bindgen-go` will print warnings or errors.
+
 ### Fixed
 
 - [#215](https://github.com/bytecodealliance/wasm-tools-go/issues/215): generate variant accessor methods with the correct scope for Go names.
+
+### New Contributors
+
+- [@vados-cosmonic](https://github.com/vados-cosmonic): [#212](https://github.com/bytecodealliance/wasm-tools-go/issues/212) and [#214](https://github.com/bytecodealliance/wasm-tools-go/pull/214) — verbose logging controls in `wit-bindgen-go`.
 
 ## [v0.3.0] — 2024-10-11
 
