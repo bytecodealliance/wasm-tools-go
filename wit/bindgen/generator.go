@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"go/token"
+	"io"
 	"path"
 	"path/filepath"
 	"runtime"
@@ -20,6 +21,7 @@ import (
 	"github.com/bytecodealliance/wasm-tools-go/internal/go/gen"
 	"github.com/bytecodealliance/wasm-tools-go/internal/stringio"
 	"github.com/bytecodealliance/wasm-tools-go/wit"
+	"github.com/bytecodealliance/wasm-tools-go/wit/logging"
 )
 
 const (
@@ -139,6 +141,9 @@ func newGenerator(res *wit.Resolve, opts ...Option) (*generator, error) {
 	if err != nil {
 		return nil, err
 	}
+	if g.opts.logger == nil {
+		g.opts.logger = logging.NewLogger(io.Discard, logging.LevelNever)
+	}
 	if g.opts.generatedBy == "" {
 		_, file, _, _ := runtime.Caller(0)
 		_, g.opts.generatedBy = filepath.Split(filepath.Dir(filepath.Dir(file)))
@@ -166,7 +171,7 @@ func (g *generator) generate() ([]*gen.Package, error) {
 func (g *generator) detectVersionedPackages() {
 	if g.opts.versioned {
 		g.versioned = true
-		// fmt.Fprintf(os.Stderr, "Generated versions for all package(s)\n")
+		g.opts.logger.Infof("Generated versions for all package(s)\n")
 		return
 	}
 	packages := make(map[string]string)
@@ -180,9 +185,9 @@ func (g *generator) detectVersionedPackages() {
 			packages[path] = pkg.Name.String()
 		}
 	}
-	// if g.versioned {
-	// 	fmt.Fprintf(os.Stderr, "Multiple versions of package(s) detected\n")
-	// }
+	if g.versioned {
+		g.opts.logger.Infof("Multiple versions of package(s) detected\n")
+	}
 }
 
 // define marks a world, interface, type, or function as defined.
@@ -199,7 +204,7 @@ func (g *generator) define(dir wit.Direction, v wit.Node) (defined bool) {
 // Options might override the Go package, including combining multiple
 // WIT interfaces and/or worlds into a single Go package.
 func (g *generator) defineWorlds() error {
-	// fmt.Fprintf(os.Stderr, "Generating Go for %d world(s)\n", len(g.res.Worlds))
+	g.opts.logger.Infof("Generating Go for %d world(s)\n", len(g.res.Worlds))
 	for i, w := range g.res.Worlds {
 		if w.Match(g.opts.world) || (g.opts.world == "" && i == len(g.res.Worlds)-1) {
 			err := g.defineWorld(w)
@@ -493,7 +498,15 @@ func (g *generator) declareTypeDef(file *gen.File, dir wit.Direction, t *wit.Typ
 		g.types[otherDir][t] = decl
 		g.define(otherDir, t) // Mark this type as defined
 	}
-	// fmt.Fprintf(os.Stderr, "Type:\t%s.%s\n\t%s.%s\n", owner.String(), name, decl.Package.Path, decl.Name)
+
+	{
+		name := "(anonymous)"
+		if t.Name != nil {
+			name = *t.Name
+		}
+		g.opts.logger.Debugf("Type:\t%s.%s\n\t%s.%s\n",
+			g.moduleNames[t.Owner], name, file.Package.Path, decl.name)
+	}
 
 	// Predeclare own<T> and borrow<T> for resource types.
 	if experimentPredeclareHandles {

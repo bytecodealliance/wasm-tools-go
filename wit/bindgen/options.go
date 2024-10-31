@@ -1,5 +1,9 @@
 package bindgen
 
+import (
+	"github.com/bytecodealliance/wasm-tools-go/wit/logging"
+)
+
 // Option represents a single configuration option for this package.
 type Option interface {
 	applyOption(*options) error
@@ -12,6 +16,8 @@ func (f optionFunc) applyOption(opts *options) error {
 }
 
 type options struct {
+	logger logging.Logger
+
 	// generatedBy is the name of the program that generates code with this package.
 	generatedBy string
 
@@ -38,6 +44,14 @@ func (opts *options) apply(o ...Option) error {
 		}
 	}
 	return nil
+}
+
+// Logger returns an [Option] that specifies a [logging.Logger] for logging.
+func Logger(logger logging.Logger) Option {
+	return optionFunc(func(opts *options) error {
+		opts.logger = logger
+		return nil
+	})
 }
 
 // GeneratedBy returns an [Option] that specifies the name of the program or package
