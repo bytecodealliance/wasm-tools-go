@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Added
 
 - `wit-bindgen-go` now accepts arguments that control the level of logging output on stderr. Verbose mode (`-v` or `--verbose`) will print informational log lines, warnings, and errors. Debug mode (`-vv` or `--debug`) will emit finer-grained debugging information. By default, `wit-bindgen-go` will print warnings or errors.
+- New method `(cm.Result).Result() (ok OK, err Err, isErr bool)` added to streamline common patterns using `result` types. It has a value receiver, allowing it to be chained off a function call that returns a `Result`, eliminating the need to declare a temporary variable. For example: `stream, err, isErr := stream.BlockingRead(n)`
 
 ### Fixed
 
