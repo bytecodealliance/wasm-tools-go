@@ -69,8 +69,8 @@ func (v *variant[Tag, Shape, Align]) Tag() Tag {
 }
 
 // This function is sized so it can be inlined and optimized away.
-func validateVariant[Disc Discriminant, Shape, Align any, T any]() {
-	var v variant[Disc, Shape, Align]
+func validateVariant[Tag Discriminant, Shape, Align any, T any]() {
+	var v variant[Tag, Shape, Align]
 	var t T
 
 	// Check if size of T is greater than Shape
