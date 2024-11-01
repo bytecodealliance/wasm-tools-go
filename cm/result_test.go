@@ -17,6 +17,7 @@ type resulter[OK, Err any] interface {
 	IsErr() bool
 	OK() *OK
 	Err() *Err
+	Result() (OK, Err, bool)
 }
 
 func TestResultOKOrErr(t *testing.T) {
