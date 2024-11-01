@@ -71,6 +71,16 @@ func (r *result[Shape, OK, Err]) Err() *Err {
 	return (*Err)(unsafe.Pointer(&r.data))
 }
 
+// Result returns (OK, zero value of Err, false) if r represents the OK case,
+// or (zero value of OK, Err, true) if r represents the error case.
+// This does not have a pointer receiver, so it can be chained.
+func (r result[Shape, OK, Err]) Result() (ok OK, err Err, isErr bool) {
+	if r.isErr {
+		return ok, *(*Err)(unsafe.Pointer(&r.data)), true
+	}
+	return *(*OK)(unsafe.Pointer(&r.data)), err, false
+}
+
 // This function is sized so it can be inlined and optimized away.
 func (r *result[Shape, OK, Err]) validate() {
 	var shape Shape
