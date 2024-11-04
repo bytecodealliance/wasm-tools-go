@@ -54,6 +54,14 @@ func Case[T any, V AnyVariant[Tag, Shape, Align], Tag Discriminant, Shape, Align
 	return nil
 }
 
+// Data returns a non-nil *T pointer to the data in [Variant] v.
+// Data panics if sizeof(T) > sizeof(Shape).
+func Data[T any, V AnyVariant[Tag, Shape, Align], Tag Discriminant, Shape, Align any](v *V) *T {
+	validateVariant[Tag, Shape, Align, T]()
+	v2 := (*variant[Tag, Shape, Align])(unsafe.Pointer(v))
+	return (*T)(unsafe.Pointer(&v2.data))
+}
+
 // variant is the internal representation of a Component Model variant.
 // Shape and Align must be non-zero sized types.
 type variant[Tag Discriminant, Shape, Align any] struct {
