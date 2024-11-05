@@ -5,13 +5,12 @@ on:
     branches:
       - main
   pull_request:
-    paths:
-        - '**.go'
-        - '**.mod'
-        - '**.sum'
-        - '**.wit'
-        - '**.yaml'
-        - 'Makefile'
+    paths-ignore:
+        - '/LICENSE'
+        - '/*.md'
+        - '/docs/**'
+        - '/.vscode/**'
+        - '/.prettier*'
 
 env:
   wasm-tools-version: "1.219.1"
