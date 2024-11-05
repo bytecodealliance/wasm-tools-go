@@ -1,4 +1,4 @@
-# go.bytecodealliance.org Vanity URLs
+# go.bytecodealliance.org Go import paths
 
 This directory hosts the configuration for Go vanity URLs under `go.bytecodealliance.org` domain.
 
@@ -8,8 +8,8 @@ More information about vanity URLs can be found in the [Go documentation](https:
 
 If you want to create a vanity URL `go.bytecodealliance.org/foo` pointing to `github.com/bytecodealliance/go-foo`:
 
-- Create directory `foo`
-- Create file `foo/index.html` with the following content:
+- Create directory `docs/foo`
+- Create file `docs/foo/index.html` with the following content:
 
      ```html
      <html>
@@ -19,4 +19,4 @@ If you want to create a vanity URL `go.bytecodealliance.org/foo` pointing to `gi
      </html>
      ```
 
-NOTE: Vanity URLs must be unique and not shadow existing package names in this repository. For ex: Creating a vanity URL `go.bytecodealliance.org/cm` would shadow the `cm` package in this repository.
+NOTE: Vanity URLs must be unique and not shadow existing package names in this repository. For example: Creating a vanity URL `go.bytecodealliance.org/cm` would shadow the `cm` package in this repository.
