@@ -4,7 +4,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [v0.3.2] — 2024-11-05
 
-This module has been renamed to [go.bytecodealliance.org](https://go.bytecodealliance.org). Going forward, please use `go.bytecodealliance.org` instead of `github.com/bytecodealliance/wasm-tools-go`.
+This module has been renamed. Going forward, please use `go.bytecodealliance.org` instead of `github.com/bytecodealliance/wasm-tools-go`.
 
 ## [v0.3.1] — 2024-11-01
 
