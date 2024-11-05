@@ -5,6 +5,12 @@ on:
     branches:
       - main
   pull_request:
+    paths-ignore:
+        - '.prettier*'
+        - '.vscode/**'
+        - '*.md'
+        - 'docs/**'
+        - 'LICENSE'
 
 env:
   wasm-tools-version: "1.219.1"
