@@ -1,3 +1,4 @@
+// Deprecated: use go.bytecodealliance.org instead.
 module github.com/bytecodealliance/wasm-tools-go
 
 go 1.22.0
